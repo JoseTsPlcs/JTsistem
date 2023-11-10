@@ -1,0 +1,39 @@
+[13-Mar-2021 21:43:25 UTC] PHP Notice:  Undefined index: cajero in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 10
+[04-Aug-2021 03:38:48 UTC] PHP Warning:  mysqli::__construct(): (08004/1040): Too many connections in /home/oz3oemevj453/public_html/PHP/Conection.php on line 8
+[04-Aug-2021 03:41:18 UTC] PHP Warning:  mysqli_query(): Couldn't fetch mysqli in /home/oz3oemevj453/public_html/PHP/Control/Control.php on line 140
+[04-Aug-2021 03:42:04 UTC] PHP Warning:  mysqli_fetch_assoc() expects parameter 1 to be mysqli_result, bool given in /home/oz3oemevj453/public_html/PHP/Control/Control.php on line 141
+[21-Jan-2022 16:09:29 UTC] PHP Notice:  Undefined variable: dni in /home/oz3oemevj453/public_html/PHP/Clientes/Cliente_Update.php on line 96
+[01-Feb-2022 12:59:47 UTC] PHP Notice:  Undefined index: nro in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 5
+[01-Feb-2022 12:59:47 UTC] PHP Notice:  Undefined index: metodo in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 6
+[01-Feb-2022 12:59:47 UTC] PHP Notice:  Undefined index: time_a in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 7
+[01-Feb-2022 12:59:47 UTC] PHP Notice:  Undefined index: time_b in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 8
+[01-Feb-2022 12:59:47 UTC] PHP Notice:  Undefined index: cancelado in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 9
+[01-Feb-2022 12:59:47 UTC] PHP Notice:  Undefined index: cajero in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 10
+[01-Feb-2022 12:59:47 UTC] PHP Notice:  Undefined index: entregado in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 11
+[01-Feb-2022 12:59:47 UTC] PHP Notice:  Undefined index: name in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 12
+[01-Feb-2022 12:59:47 UTC] PHP Notice:  Undefined index: comment in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 13
+[01-Feb-2022 12:59:47 UTC] PHP Notice:  Undefined index: users in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 14
+[01-Feb-2022 12:59:47 UTC] PHP Warning:  count(): Parameter must be an array or an object that implements Countable in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 16
+[01-Feb-2022 14:13:32 UTC] PHP Notice:  Undefined index: nro in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 5
+[01-Feb-2022 14:13:32 UTC] PHP Notice:  Undefined index: metodo in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 6
+[01-Feb-2022 14:13:32 UTC] PHP Notice:  Undefined index: time_a in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 7
+[01-Feb-2022 14:13:32 UTC] PHP Notice:  Undefined index: time_b in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 8
+[01-Feb-2022 14:13:32 UTC] PHP Notice:  Undefined index: cancelado in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 9
+[01-Feb-2022 14:13:32 UTC] PHP Notice:  Undefined index: cajero in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 10
+[01-Feb-2022 14:13:32 UTC] PHP Notice:  Undefined index: entregado in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 11
+[01-Feb-2022 14:13:32 UTC] PHP Notice:  Undefined index: name in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 12
+[01-Feb-2022 14:13:32 UTC] PHP Notice:  Undefined index: comment in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 13
+[01-Feb-2022 14:13:32 UTC] PHP Notice:  Undefined index: users in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 14
+[01-Feb-2022 14:13:32 UTC] PHP Warning:  count(): Parameter must be an array or an object that implements Countable in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 16
+[01-Feb-2022 14:15:44 UTC] PHP Notice:  Undefined index: nro in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 5
+[01-Feb-2022 14:15:44 UTC] PHP Notice:  Undefined index: metodo in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 6
+[01-Feb-2022 14:15:44 UTC] PHP Notice:  Undefined index: time_a in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 7
+[01-Feb-2022 14:15:44 UTC] PHP Notice:  Undefined index: time_b in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 8
+[01-Feb-2022 14:15:44 UTC] PHP Notice:  Undefined index: cancelado in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 9
+[01-Feb-2022 14:15:44 UTC] PHP Notice:  Undefined index: cajero in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 10
+[01-Feb-2022 14:15:44 UTC] PHP Notice:  Undefined index: entregado in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 11
+[01-Feb-2022 14:15:44 UTC] PHP Notice:  Undefined index: name in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 12
+[01-Feb-2022 14:15:44 UTC] PHP Notice:  Undefined index: comment in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 13
+[01-Feb-2022 14:15:44 UTC] PHP Notice:  Undefined index: users in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 14
+[01-Feb-2022 14:15:44 UTC] PHP Warning:  count(): Parameter must be an array or an object that implements Countable in /home/oz3oemevj453/public_html/PHP/Control/Control_Save.php on line 16
+[01-Feb-2022 18:22:44 UTC] PHP Notice:  Undefined variable: dni in /home/oz3oemevj453/public_html/PHP/Clientes/Cliente_Update.php on line 96
