@@ -1,10 +1,18 @@
 
 $(document).ready(function() {
 
+  var grid = new Grid({
+    cols:[12,12],
+    boxs:[
+      {tipe:0,default:'ventas netas'},
+    ]
+  });
+
   new Pag_Base({
     success:({page})=>{
 
       new Form_Table({
+        parent: grid.GetColData({x:0,y:0}).col,
         title:'control diario de ventas',
         h_min:500,
         tables:['ventas','clientes','usuarios'],
