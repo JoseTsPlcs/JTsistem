@@ -3,11 +3,11 @@ class Form_Base {
 
   #log = {
     loads:false,
-    reload:false,
+    reload:true,
     save:false,
-    add:true,
+    add:false,
     delete:false,
-    states:true,
+    states:false,
   }
 
   _add_after_reloadstate = true;
@@ -37,6 +37,7 @@ class Form_Base {
     selects:[],
     orders:[],
     conditions:[],
+    groups:[],
   }
 
   #Data_GetOptionsByLoad({load_index=null}){
@@ -196,6 +197,7 @@ class Form_Base {
     if(i.joins) this._extras.joins = i.joins;
     if(i.orders) this._extras.orders = i.orders;
     if(i.conditions) this._extras.conditions = i.conditions;
+    if(i.groups) this._extras.groups = i.groups;
 
     //set events
     if(i.events !=null){
@@ -710,7 +712,7 @@ class Form_Base {
       const fi_cn = fi.conection;
       const fi_bx_pri = fi.boxs[0];
 
-      if(fi.edit == null && fi_cn != null && fi_bx_pri !=null /*&& fi_bx_pri.GetTipe() != 0*/){
+      if(fi.edit == null && fi_cn != null && fi_cn.table == 0 && fi_bx_pri !=null /*&& fi_bx_pri.GetTipe() != 0*/){
 
         const v = fi_bx_pri.GetValue();
         const t = fi_bx_pri.GetTipe();
@@ -745,13 +747,14 @@ class Form_Base {
           limit:lmt,
           orders:k._extras.orders,
           success:success,
+          groups:k._extras.groups,
         });
       }
     })
     
   }
 
-  Reload_Base({success=null,selects=[],conditions=[],limit=[],orders=[]}={}){
+  Reload_Base({success=null,selects=[],conditions=[],limit=[],orders=[],groups=[]}={}){
 
     this.LogAction({action_name:"reload"});
     this._CallEvent({event_name:"reload_before", event_params:{}});
@@ -766,6 +769,7 @@ class Form_Base {
       limit:limit,
       joins:k._extras.joins,
       orders:orders,
+      groups:groups,
       log_sql:k.#log.reload,
       log_resp:k.#log.reload,
       success:function(resp){

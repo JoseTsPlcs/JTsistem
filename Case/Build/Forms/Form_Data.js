@@ -13,7 +13,11 @@ class Form_Data extends ODD{
 
     return this.#primary;
   }
-  
+  #data = null;
+  GetData(){
+
+    return this.#data;
+  }
 
   constructor(i){
 
@@ -25,6 +29,8 @@ class Form_Data extends ODD{
     //events
     this.AddEvents({events:[
       {name:'loads loaded',actions:[]},
+      {name:'reload_before',actions:[]},
+      {name:'reload_after',actions:[]},
     ]});
 
     //database
@@ -63,6 +69,40 @@ class Form_Data extends ODD{
   Loads_GetData(){
 
     return this.#loads.GetData();
+  }
+
+  MainReload({selects=[],joins=[],orders=[], success=null}){
+
+    let k = this;
+
+    k.CallEvent({name:'reload_before',params:{settings:settings}});
+
+    this.#db.Select_Sql({
+      table_main:this.#mainIndex,
+      selects:selects,
+      joins:joins,
+      orders:orders,
+      success:(resp)=>{
+
+        k.CallEvent({name:'reload_after',params:{data:resp}});
+        k.#data = resp;
+        
+        if(success!=null)success(resp);
+      }
+    });
+
+  }
+
+  MainUpdate({sets, success=null}){
+
+    this.#db.SaveSql({
+
+    });
+  }
+
+  MainInsert({}){
+
+
   }
 
   ///////////////////////////////////////////

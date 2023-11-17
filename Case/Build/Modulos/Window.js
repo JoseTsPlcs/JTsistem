@@ -1,5 +1,5 @@
 
-class Window {
+class Window extends ODD {
 
   Get_Parent(){
 
@@ -38,6 +38,8 @@ class Window {
 
   constructor(i){
     
+    super(i);
+
     if(i.events != null) this.#events = i.events;
     if(i.title) this.#title = i.title;
 
@@ -52,7 +54,7 @@ class Window {
     this.#prnt.grid = new Grid({
       parent:parent,
       cols:[[12]],
-    })
+    });
 
     //build head - body
    this.#body.grid = new Grid({
@@ -70,8 +72,28 @@ class Window {
    this.#conteiner = new Grid({
     parent: this.#body.grid.GetColData({x:0,y:1}).col,
     ...grid,
+    events:[
+      {
+        name:'boxUpdate',
+        actions:[
+          {
+            name:'grid boxupdate',
+            action:(i)=>{
+              
+              //console.log("....window grid boxUpdate");
+              k.CallEvent({name:'boxUpdate',params:{...i}});
+            }
+          }
+        ],
+      }
+    ],
    });
    
+  }
+
+  Conteiner_Grid(){
+
+    return this.#conteiner;
   }
 
   Conteiner_GetColData({x=null,y=null}){
@@ -82,22 +104,6 @@ class Window {
   Conteiner_GetAllBoxes(){
 
     return this.#conteiner.GetAllBoxes();
-  }
-
-  #Body_SetState({show=false,slow=false}){
-
-    const dom = this.#body.grid.Get_Parent();
-    const slw = slow ? 'slow': null;
-    this.#body.show = show;
-
-    if(this.#body.show) $('#'+dom.id).show(slw);
-    else $('#'+dom.id).hide(slw);
-    
-  }
-
-  #Body_ToggleState(){
-
-    this.#Body_SetState({show:!this.#body.show, slow:true});
   }
 
   Show({show=true,slow=false}){

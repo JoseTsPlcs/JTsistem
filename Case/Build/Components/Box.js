@@ -260,7 +260,7 @@ class Box {
       case 0:
       $('#' + this.#blocks[0]['id']).click(function() {
 
-        SetUpdate(this.value);
+        u.#CallUpdate(this.value);
       });
       break;
 
@@ -268,7 +268,7 @@ class Box {
 
       $('#' + this.#blocks[0]['id']).click(function() {
 
-        SetUpdate();
+        u.#CallUpdate();
       });
 
       break;
@@ -279,7 +279,7 @@ class Box {
 
         //console.log(this.checked);
 
-        SetUpdate(this.value);
+        u.#CallUpdate(this.value);
       });
 
       break;
@@ -287,16 +287,18 @@ class Box {
       default:
       $('#' + this.#blocks[0]['id']).change(function() {
 
-        SetUpdate(this.value);
+        
+        //if(u.#tipe==8) console.log("----------------setvalue----");
+        u.#CallUpdate(this.value);
       });
 
     }
+  }
 
-    function SetUpdate(v) {
+  #CallUpdate(v){
 
-      u.#value = v;
-      if(u.#update)u.#update(v);
-    }
+    this.#value = v;
+    if(this.#update!=null)this.#update(v);
   }
 
   #Format_GetValue({value=null}){
@@ -390,6 +392,9 @@ class Box {
 
       case 4:
 
+        //this.#blocks[0].setAttribute("class","selectpicker w-100 m-0 p-0");
+        //this.#blocks[0].setAttribute("multiple","");
+
         $('#'+this.#blocks[0].id).selectpicker('val',this.#value);
         $('#'+this.#blocks[0].id).selectpicker('render');
       break;
@@ -406,6 +411,7 @@ class Box {
 
         $('#'+this.#blocks[0].id).selectpicker('val',this.#value);
         $('#'+this.#blocks[0].id).selectpicker('render');
+        
       break;
 
       default:
@@ -430,6 +436,7 @@ class Box {
     this.#value = v;
     this.#Print();
     this.#Paint();
+    if(this.#tipe==8)this.#CallUpdate(v);
   }
 
   GetValue(){
@@ -478,17 +485,36 @@ class Box {
 
   SetOptions(ops){
 
+    var lastvalue = this.GetValue();
+    //console.log("-------------last.------",lastvalue,ops,this.#options);
+
     //update the options data
     this.#options = ops;
-    if(this.#tipe == 8){
+    if(this.#tipe == 8 || this.#tipe==4 || this.#tipe==3){
+
 
       this.#Destroy();
       this.#parent.innerHTML = "";//this is no able
       this.#Build();
       this.#Paint();
+      this.SetValue(lastvalue);
+      //this.SetDefault();
+
+      /*if(this.#tipe == 4){
+
+        this.SetDefault(ops.map((op)=>{return op.show}));
+      }*/
+
+      //control index option
+      /*var opIndex = this.GetOption_Index({value:this.#value});
+      var opMax = ops.length-1;
+      if(opIndex>opMax) this.SetValue(ops[opMax].value);
+      else if(opIndex<0) this.SetValue(ops[0].value);*/
+
+      return;
     }
 
-    if(this.#tipe == 3 || this.#tipe == 4){
+    /*if(this.#tipe == 3 || this.#tipe == 4){
 
       for (let op = 1; op < this.#blocks.length; op++) {
         const bc = this.#blocks[op];
@@ -507,9 +533,12 @@ class Box {
         op_nw.value = opi.value;
         op_nw.innerHTML = opi.show;
       }
-    }
+    }*/
 
+    //build with new options
+    this.SetValue(lastvalue);
     this.#Print();
+    
 
   }
 
@@ -565,7 +594,7 @@ class Box {
     }
 
     //clear data build
-    this.#blocks = [];
+    this.#blocks = [this.#blocks[0]];
   }
 
   SetLastOption(){

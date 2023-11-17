@@ -3,6 +3,10 @@ class Form_Body {
 
   #modulo = null;
   #filter = null;
+
+  /*
+  this is the html of form body
+  */
   
 
   constructor(i){
@@ -83,10 +87,39 @@ class Form_Body {
     return this.#modulo.Tool_GetBox(i);
   }
 
+  SetConfigTools({tools=[]}){
+    
+    tools.forEach(t => {
+      
+      this.SetConfigTool({config:t});
+    });
+  }
+
+  SetConfigTool({config}){
+
+    const toolbox =  this.Modulo_GetTool({...config});
+    if(toolbox){
+
+        if(config.show) toolbox.Show();
+        else toolbox.Hide();
+
+        if(config.value) toolbox.SetValue(config.value);
+    }
+  }
+
   Filter_GetCol_Data(i){
 
     return this.#filter.Conteiner_GetColData(i);
   }
+
+  Pages_Next({add=1}){
+
+    var box = this.Modulo_GetTool({name:'pages'});
+    if(add>0) box.NextOption();
+    else if(add!=0) box.BackOption();
+  }
+
+  //---------loadScreen-------------
 
   #loadscreen = {
     dom:null,
