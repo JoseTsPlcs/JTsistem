@@ -2,13 +2,16 @@ class Label {
 
     #parent = null;
     #name = "field";
+    GetName(){return this.#name;}
     #box = null;
     #tipe = 1;
     #gridcont = null;
     #data = [
+        {col:[[1,12]],label:{x:0,y:0},input:{x:1,y:0}},
         {col:[[4,8]],label:{x:0,y:0},input:{x:1,y:0}},
         {col:[[12],[12]],label:{x:0,y:0},input:{x:0,y:1}},
     ];
+    //0 -> [[0,12]]
     //1 -> [[4,8]]
     //2 -> [[12],[12]]
 
@@ -17,27 +20,19 @@ class Label {
         this.#parent = i.parent ? i.parent : document.body;
         if(i.name) this.#name = i.name;
         this.#box = i.box ? i.box : {tipe:0};
-        if(i.tipe) this.#tipe = i.tipe;
+
+        if(i.tipe==null) i.tipe=1;
+        this.#tipe = i.tipe;
 
         this.#Build();
     }
 
     #Build(){
 
-        switch(this.#tipe){
+        var data = this.#data[this.#tipe];
+        this.#BuildLabel(data.col, data.label,data.input);
 
-            case 1:
-
-            this.#BuildLabel([[4,8]],{x:0,y:0},{x:1,y:0});
-
-            break;
-
-            case 2:
-
-            this.#BuildLabel([[12],[12]],{x:0,y:0},{x:0,y:1});
-
-            break;
-        }
+        if(this.#tipe==0) this.#gridcont.GetColData({x:0,y:0}).boxs[0].Hide();
 
     }
 
@@ -94,7 +89,7 @@ class Label {
 
     GetBox(){
 
-        const input_coord = this.#data[this.#tipe-1].input;  
+        const input_coord = this.#data[this.#tipe].input;  
         const input_coldata = this.#gridcont.GetColData({x:input_coord.x,y:input_coord.y});
         return input_coldata.boxs[0];
     }

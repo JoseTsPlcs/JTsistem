@@ -1,5 +1,5 @@
 
-class dataBase {
+class dataBase extends Sql {
 
   #schema = [{"name":"accounts","fields":[{"Field":"ID","Type":"int(11)","Null":"NO","Key":"PRI","Default":null,"Extra":"auto_increment"},{"Field":"ACCOUNT","Type":"varchar(30)","Null":"NO","Key":"","Default":null,"Extra":""},{"Field":"TOTAL","Type":"float","Null":"NO","Key":"","Default":null,"Extra":""},{"Field":"ACTIVE","Type":"tinyint(1)","Null":"NO","Key":"","Default":"1","Extra":""}],"primary":{"index":0,"field":{"Field":"ID","Type":"int(11)","Null":"NO","Key":"PRI","Default":null,"Extra":"auto_increment"}}},
   {"name":"almacenes","fields":[{"Field":"ID","Type":"int(11)","Null":"NO","Key":"PRI","Default":null,"Extra":"auto_increment"},{"Field":"ALMACEN","Type":"varchar(30)","Null":"NO","Key":"","Default":null,"Extra":""},{"Field":"DESCRIPCION","Type":"text","Null":"NO","Key":"","Default":null,"Extra":""}],"primary":{"index":0,"field":{"Field":"ID","Type":"int(11)","Null":"NO","Key":"PRI","Default":null,"Extra":"auto_increment"}}},
@@ -29,7 +29,7 @@ class dataBase {
   {"name":"zonas","fields":[{"Field":"ID","Type":"int(11)","Null":"NO","Key":"PRI","Default":null,"Extra":""},{"Field":"ZONE","Type":"text","Null":"NO","Key":"","Default":null,"Extra":""},{"Field":"MACRO","Type":"int(11)","Null":"NO","Key":"","Default":"-1","Extra":""},{"Field":"DELIVERY","Type":"float","Null":"NO","Key":"","Default":null,"Extra":""},{"Field":"ACTIVO","Type":"tinyint(1)","Null":"NO","Key":"","Default":"1","Extra":""}],"primary":{"index":0,"field":{"Field":"ID","Type":"int(11)","Null":"NO","Key":"PRI","Default":null,"Extra":""}}},
   ];
 
-  #mysql = null;
+  #sql = null;
   #tables_data = [];
   GetTableData(){
 
@@ -40,9 +40,9 @@ class dataBase {
     return this.#tables_data[index];
   }
 
-  constructor({}={}) {
+  constructor(i) {
 
-    this.#mysql = new Mysql();
+    super(i);
   }
 
   LoadTables({success=null, tables=[], log=false, fail=null}){
@@ -67,7 +67,7 @@ class dataBase {
         k.#tables_data.push(tnw);
   
         //select one table
-        this.#mysql.Mysql_Row({
+        this.Mysql_Row({
           sql: 'SHOW COLUMNS FROM ' + ti,
           log_sql:false,
           log_resp:false,
@@ -241,7 +241,7 @@ class dataBase {
     }
 
     //insert where
-    sql += this.#Get_Where(i);
+    sql += this.Get_Where(i);
 
     //orders [{field:index, asc:true}]
     var ords = i.orders ? i.orders : [];
@@ -269,7 +269,34 @@ class dataBase {
         
       }
     }
-    
+
+    //groups [{table:0,field:0}]
+    var groups = i.groups? i.groups : [];
+    if(groups && groups.length > 0){
+
+      sql+= " GROUP BY ";
+
+      const gp_t = groups.length;
+      for (let gp = 0; gp < gp_t; gp++) {
+
+        const gpi = groups[gp];
+
+        var gpi_t = gpi.table;
+        var gpi_t_d = this.#tables_data[gpi_t];
+        var gpi_t_d_nm = gpi_t_d['name'];
+
+        var gpi_f = gpi.field;
+        var gpi_f_d = gpi_t_d['fields'][gpi_f];
+        var gpi_f_d_f = gpi_f_d['Field'];
+
+        var gpi_asc = gpi.asc == null ? true : gpi.asc; 
+
+        var coma = gp == gp_t -1 ? "": ",";
+        sql += gpi_t_d_nm + "." + gpi_f_d_f + coma;
+        
+      }
+    }
+
     //insert limit
     var lmt = i.limit;
     if(lmt && lmt.length > 0){
@@ -278,7 +305,7 @@ class dataBase {
       if(lmt.length > 1) sql+= ", " + lmt[1];
     }
 
-    this.#mysql.Mysql_Row({
+    this.Mysql_Row({
       sql: sql,
       ...i,
     });
@@ -312,9 +339,9 @@ class dataBase {
     }
 
     //insert conditions
-    sql+= this.#Get_Where(i);
+    sql+= this.Get_Where(i);
 
-    this.#mysql.Mysql_Success({
+    this.Mysql_Success({
       sql: sql,
       ...i,
     });
@@ -361,7 +388,7 @@ class dataBase {
     sql+=") ";
 
 
-    this.#mysql.Mysql_Success({
+    this.Mysql_Success({
       sql: sql,
       ...i,
     });
@@ -377,16 +404,16 @@ class dataBase {
     var t_mn_d_nm = t_mn_d['name'];
     sql += t_mn_d_nm;
 
-    sql += this.#Get_Where(i);
+    sql += this.Get_Where(i);
 
-    this.#mysql.Mysql_Success({
+    this.Mysql_Success({
       sql: sql,
       ...i,
     });
   }
 
   //return mysql conditions
-  #Get_Where(i){
+  Get_Where(i){
 
     // {
     //   and:true,

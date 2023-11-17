@@ -12,8 +12,7 @@ class Table_Grid {
 
   constructor(i){
 
-
-    this.#BuildTable(i)
+    this.#BuildTable(i);
   }
 
   #BuildTable({parent=null, headers=[],h_all=false}){
@@ -65,9 +64,11 @@ class Table_Grid {
 
   }
 
-  //{lines:[]}
-  //line -> {cells:[]}
-  //
+  /*{lines:[
+    [{box:}],
+    [{box:}],
+    [{box:}],
+  ]}*/
   AddLines({lines=[]}){
 
     let k = this;
@@ -106,6 +107,12 @@ class Table_Grid {
       console.log("error we need index", index);
       return;
     }
+
+    if(cells==null){
+
+      console.error("error cells are null");
+      return;
+    }//else console.log(cells);
 
     let k = this;
     
@@ -152,7 +159,7 @@ class Table_Grid {
     this.#data=[];
   }
 
-  Box_GetValue({x=-1,y=-1}){
+  Box_Get({x=-1,y=-1}){
 
     if(y<0){
 
@@ -178,7 +185,13 @@ class Table_Grid {
       return null;
     }
 
-    return this.#data[y].cells[x].box.GetValue();
+    return this.#data[y].cells[x].box;
+  }
+
+  Box_GetValue({x=-1,y=-1}){
+
+    var box = this.Box_Get({x:x,y:y});
+    return box.GetValue();
   }
 
   

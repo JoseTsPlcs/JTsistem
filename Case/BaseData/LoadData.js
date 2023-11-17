@@ -64,8 +64,4 @@ class LoadData extends ODD{
         });
     }
 
-    
-
-    
-
 }

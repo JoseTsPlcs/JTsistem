@@ -42,7 +42,7 @@ class LoadsData extends ODD {
                         description:'load one by loads',
                         action:()=>{
     
-                            k.OneLoad();
+                            k.#OneLoad();
                         }
                     }]}],
                 });
@@ -67,20 +67,20 @@ class LoadsData extends ODD {
                     load:ldi,
                 });
             }
-        }else Loaded();
+        }else this.#Loaded();
         
     }
 
-    OneLoad({}={}){
+    #OneLoad({}={}){
 
         this.#loadcount++;
         if(this.#loadcount >= this.#loads.length){
 
-            this.Loaded();
+            this.#Loaded();
         }
     }
 
-    Loaded(){
+    #Loaded(){
 
         this.#loading=false;
         this.CallEvent({name:'loads_end',params:{}});

@@ -38,7 +38,10 @@ class Modulo {
         x:t.x,
         y:t.y,
         box:{
-          update:(i)=> {k.#window.Event_Action({event_name:t.name,event_params:{m:k}})},
+          update:(i)=> {
+
+            if(k.#window!=null) k.#window.Event_Action({event_name:t.name,event_params:{m:k}});
+          },
           ...t.box,
         },
       });
@@ -112,6 +115,11 @@ class Modulo {
 
   Window_GetTitle(){
     return this.#window.Get_Title();
+  }
+
+  Conteiner_Grid({}={}){
+
+    return this.#conteiner;
   }
 
   Conteiner_GetColData(i){

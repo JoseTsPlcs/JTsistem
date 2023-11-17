@@ -1,6 +1,6 @@
 
 
-class Grid {
+class Grid extends ODD {
 
   //build div =class col-#
 
@@ -12,29 +12,50 @@ class Grid {
 
   #conteiner = null;
   #data = [];
-  GetAllBoxes(){
+  //{}
+  GetAllBoxes({boxs=true,labels=true}={}){
 
-    const boxs = [];
+    const total = [];
 
     this.#data.forEach(d => {
 
       d.cols.forEach(c => {
         
-        boxs.push(...c.boxs);
+        if(boxs) total.push(...c.boxs);
 
-        c.labels.forEach(lb => {
+        if(labels){
 
-          boxs.push(lb.GetBox());
-        });
+          c.labels.forEach(lb => {
+
+            total.push(lb.GetBox());
+          });
+        }
       });
 
       
     });
 
-    return boxs;
+    return total;
+  }
+  GetAllFilters({}={}){
+
+    const total = [];
+
+    this.#data.forEach(d => {
+
+      d.cols.forEach(c => {
+        
+        total.push(...c.labels);
+      });
+    });
+
+    return total;
+
   }
 
   constructor(i) {
+
+    super(i);
 
     if(i.parent) this.#parent = i.parent;
     else this.#parent = document.body;
@@ -52,6 +73,8 @@ class Grid {
   }
   
   #Build({cols=[[12]],attributes=[],boxs=[],labels=[]}){
+
+    let k = this;
 
     //create content where going stay rows and cols
     this.#conteiner = document.createElement('div');
@@ -133,6 +156,10 @@ class Grid {
           parent : col.col,
           id: col.boxs.length,
           ...box.box,
+          /*update:(v)=>{
+
+            //k.CallEvent({name:'boxUpdate',params:{x:box.x,y:box.y,valueUpdate:v}});
+          }*/
         });
 
         col.boxs.push(b_nw);
@@ -145,6 +172,14 @@ class Grid {
       
       const col = this.GetColData({x:label.x,y:label.y});
       if(col !=null){
+        
+        label.box = {
+          ...label.box,
+          update:(v)=>{
+            
+            k.CallEvent({name:'boxUpdate',params:{x:label.x,y:label.y,valueUpdate:v}});
+          }
+        }
 
         const b_nw = new Label({
           parent : col.col,
@@ -201,6 +236,32 @@ class Grid {
   GetParent(){
 
     return this.#parent;
+  }
+
+  GetLabel({name=null}={}){
+
+    if(name == null){
+
+      console.error("this grid need name to find label", this.#data);
+      return;
+    }
+
+    var labelfound = null;
+
+    this.#data.forEach(d => {
+
+      d.cols.forEach(c => {
+
+        if(labelfound == null){
+
+          labelfound = c.labels.find(lb=>lb.GetName() == name);
+        }
+      });
+    });
+
+    if(labelfound == null) console.error("couldnt found label with name " + name , this.#data);
+
+    return labelfound;
   }
 
 }
