@@ -7,13 +7,15 @@ class Crud_Form extends Crud {
         //pass labels of windows to fields
         i.fields = [];
 
+        if(i.windows == null) i.windows=[];
+
         for (let w = 0; w < i.windows.length; w++) {
             const wi = i.windows[w];
 
             var labels = wi.labels ? wi.labels : [];
             labels = labels.map((lb)=>{return{...lb,window:w}});
 
-            var gridConfig = GetGridConfig({panels:labels});
+            var gridConfig = this.GetGridConfig({panels:labels});
             //console.log(w,gridConfig);
             wi.grid = {
 
@@ -24,7 +26,7 @@ class Crud_Form extends Crud {
         }    
         //console.log("fields form", i.fields);
         
-        var windowsConfig =  GetGridConfig({panels:i.windows});
+        var windowsConfig =  this.GetGridConfig({panels:i.windows});
         //console.log("gridConfig", windowsConfig);
         i.gridCols = windowsConfig.cols;
 
