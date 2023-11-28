@@ -2,8 +2,6 @@
 
 class Grid extends ODD {
 
-  //build div =class col-#
-
   #parent = null;
   Get_Parent(){
 

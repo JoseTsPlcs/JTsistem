@@ -132,10 +132,9 @@ class Crud_Table extends Crud {
                         name:'delete by button delete',
                         action:({k,x,y,field})=>{
 
-                            k.LogAction({msg:[x,y,field]});
                             if(field.delete){
 
-                                k.EventDelete({y:y,success:()=>{
+                                k._Action_Delete({y:y,success:()=>{
 
                                     k.CallEvent({name:'stateDefault'});
                                 }});
@@ -148,7 +147,7 @@ class Crud_Table extends Crud {
 
                             if(field.sql == null)return;
 
-                            k.EventUpdate({y:y,success:()=>{
+                            k._Action_Update({y:y,success:()=>{
 
                                 k.CallEvent({name:'stateDefault'});
                             }});
@@ -192,12 +191,13 @@ class Crud_Table extends Crud {
                         }
                     }
                 ],
-            }
+            },
         ];
         if(i.events==null)i.events=[...eventsNew];
         else i.events=[...i.events,...eventsNew];
 
         super(i);
+        this._tipe="table";
 
         var st_reload = this._statesData.find(st=>st.name=='reload');
         st_reload['tools'].find(t=>t.name=='save')['show']=false;
@@ -254,7 +254,9 @@ class Crud_Table extends Crud {
         super._Action_Print(i);
     }
 
-    _Action_Print_GetBoxes({fieldIndex}){
+    _Action_Print_GetBoxes({fieldIndex,fieldName}){
+
+        if(fieldName!=null) fieldIndex = this._fields.findIndex(f=>f.name==fieldName);
 
         var boxes = [];
 
@@ -267,22 +269,9 @@ class Crud_Table extends Crud {
         return boxes;
     }
 
-    _Print_BoxUpdate(i){
-
-        super._Action_Print_UpdateBox(i);
-
-        var field = this._fields[i.fieldIndex];
-        if(field.box.tipe == 5){
-
-            if(field.delete == true) this._Action_Delete({y:i.y});
-
-            return;
-        }
-
-        this._Action_Update({y:i.y});
-    }
-
     New_Action(i){
+
+        super.New_Action(i);
 
         var lines = [[]];
         for (let x = 0; x < this._fields.length; x++) {
@@ -294,11 +283,7 @@ class Crud_Table extends Crud {
                 }
             });
         }
-
-        this._print.Clear();//first clear old lines
         this._print.AddLines({lines:lines});//print new lines
-
-        super.New_Action(i);
 
         for (let f = 0; f < this._fields.length; f++) {
             
@@ -306,4 +291,9 @@ class Crud_Table extends Crud {
         }
     }
     
+    Clear_Action(i){
+
+        super.Clear_Action(i);
+        this._print.Clear();
+    }
 }

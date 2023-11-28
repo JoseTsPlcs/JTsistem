@@ -1,4 +1,5 @@
 
+const testing = true;
 
 function Options_Dual({show=null,show2=null,colorinverse=false}) {
     
@@ -50,6 +51,8 @@ function Box_ShowOptions(i) {
 
 function Date_Today(days=0) {
   
+    if(testing) return "2021-05-27";
+
     var today = new Date();
     return today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + (parseInt(today.getDate()) + days)).slice(-2);
   }
@@ -106,3 +109,57 @@ icons = {
         <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
     </svg>`,
   } 
+
+  
+  function NewChart({parent,chart,width=null,height=null}) {
+        
+    var ctx1 = document.createElement("canvas");
+    if(width)ctx1.setAttribute("width",width);
+    if(height)ctx1.setAttribute("height",height);
+    parent.appendChild(ctx1);
+
+    return new Chart(ctx1, chart);
+  }
+
+   function GetGridConfig({panels=[]}){
+
+    var grid = {
+        cols:[],
+    };
+
+    var y = 0;
+    var x = 0;
+    var colxlrest = 12;
+    var line = [];
+
+    for (let p = 0; p < panels.length; p++) {
+        const panel = panels[p];
+
+        panels[p].x = x;
+        panels[p].y = y;
+
+        var col = panel.col !=null ? panel.col : 12;
+        line.push(col);
+
+        colxlrest -= col;
+
+        if(colxlrest <= 0){
+
+            y++;
+            x=0;
+            colxlrest=12;
+            grid.cols.push(line);
+            line=[];
+        }
+        else {
+
+            x++;
+        }
+
+        
+    }
+
+    grid.panels = {...panels};
+
+    return grid;
+}

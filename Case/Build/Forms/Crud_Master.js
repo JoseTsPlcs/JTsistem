@@ -9,248 +9,188 @@ class Crud_Master extends ODD {
 
     //----------workspace---------
 
-    #grid=null;
-    _parent={info:null,build:null};
-    _child={info:null,build:null};
+    _master={info:null,build:null};
+    _maid={info:null,build:null};
 
-    BuildWorkSpace({parent,child}){
+    BuildWorkSpace({master,maid}){
 
-      this.#grid=new Grid({
-          cols:[[12],[12]],
-      });
-      let u = this;
+      let k = this;
 
       //--------------set data---------------
+      this._master = master;
+      this._maid = maid;
 
-      
-      parent.parent = this.#grid.GetColData({x:0,y:0}).col;
-      child.parent = this.#grid.GetColData({x:0,y:1}).col;
-
-
-      //parent(table) & child(form) 
-      if(child.tipe == 2 && parent.tipe == 1){
-
-        
-        child.events=[
-          {
-            name:'update',
-            actions:[
-              {
-                description:'close child and reload master',
-                order:-999,
-                action:({k})=>{
-
-                  if(u._parent.build!=null) u._parent.build.CallEvent({name:'reload'});
-                }
-              }
-            ],
-          },
-          {
-            name:'stateDefault',
-            actions:[
-              {
-                description:'',
-                action:({k})=>{
-
-                  k.CallEvent({name:'block'});
-                }
-              }
-            ],
-          },
-          {
-            name:'delete',
-            actions:[
-              {
-                order:999,
-                name:'reload parent',
-                description:'reload the parent when delete',
-                action:({k})=>{
-
-                  if(u._parent.build!=null) u._parent.build.CallEvent({name:'reload'});
-                }
-              }
-            ],
-          }
-        ];
-        child.eventActives=[
-          {eventName:'stateDefault',actionName:'reload',active:false},
-        ],
-        child.states = [
-          {name:'reload',tools:[
-            {name:'new',show:false},
-            {name:'cancel',show:true},
-          ]},
-        ];
-
-
-        parent.events=[
+      this._master.build.AddEvents({
+        events:[
           {
             name:'boxUpdate',
             actions:[
               {
-                description:'edit button',
-                action:({k,x,y,field})=>{
+                name:'master boxUpdate',
+                action:({field,y})=>{
 
-                  u.ParentReload({y:y});
-                }
-              }
-            ],
-          },
-          {
-            name:'reload',
-            actions:[
-              {
-                description:'block child',
-                action:({k})=>{
-    
-                  if(u._child.build!=null) u._child.build.CallEvent({name:'block'});
-                }
-              }
-            ],
-          },       
-          {
-            name:'new',
-            actions:[
-              {
-                name:'open child',
-                description:'no block the child',
-                action:({k})=>{
-
-                  if(u._child.build!=null) u._child.build.CallEvent({name:'new'});
-                }
-              }
-            ],
-          },
-        ];
-        parent.eventActives=[
-          {eventName:'new',actionName:'state new',active:false},
-          {eventName:'new',actionName:'print new',active:false},
-        ];
-
-      }
-      
-      //parent(form) & child(table) 
-      if(child.tipe == 1 && parent.tipe == 2){
-
-
-        parent.events = [
-          {
-            name:'reload',
-            actions:[
-              {
-                name:'parent realod',
-                action:({k})=>{
-
-                  u.ParentReload({y:0});
-                }
-              }
-            ],
-          },
-          {
-            name:'new',
-            actions:[
-              {
-                name:'clear child table',
-                description:'clear all lines in the table child',
-                action:({k})=>{
-
-                  if(u._child.build!=null) u._child.build.CallEvent({name:'block'});
-                }
-              }
-            ],
-          },
-          {
-            name:'delete',
-            actions:[
-              {
-                name:'delete child',
-                action:({k})=>{
-
-                  if(u._child.build!=null){
-
-                    console.log("chilld conditions",u._child.build._conditions);
-                    u._child.build.RequestDeleteMysql({conditions:u._child.build._conditions});
+                  if(k._master.fieldName != null){
+                    
+                    if(field.name=="edit"){
+  
+                      var masterValue = k._master.build.Print_GetValue({fieldName:k._master.fieldName,y});
+                      k.#MaidSearch({masterValue});
+                    }
                   }
                 }
               }
             ],
-          }
-        ];
-
-      }
-
-      //--------------create--------------
-
-      //create child
-      this._child.info=child;
-      switch(child.tipe){
-
-          case 1:
-              this._child.build=new Crud_Table({...child});
-          break;
-          case 2:
-              this._child.build=new Crud_Form({...child});
-          break;
-      }
-
-      this._parent.info=parent;
-      switch(parent.tipe){
-
-          case 1:
-              this._parent.build=new Crud_Table({...parent});
-          break;
-          case 2:
-              this._parent.build=new Crud_Form({...parent});
-          break;
-      }
-
-    }
-
-    ParentReload({y=0}){
-
-      if(this._parent.build==null||this._child.build==null)return;
-
-      //get value of field conection of parent
-      var parentFieldConection = this._parent.info.conection.field;
-      console.log(this._parent);
-      var parentFieldValue = this._parent.build.GetDataField({y:y,fieldIndex:parentFieldConection});
-
-      //create condition to reload in child
-      var childFieldIndex = this._child.info.conection.field;
-      var conditions = [{
-        and:true,
-        conditions:[
+          },
           {
-            table:0,
-            field:childFieldIndex,
-            inter:'=',
-            value:parentFieldValue,
-          }
+            name:'reloaded',
+            actions:[
+              {
+                name:'master reloaded',
+                action:({})=>{
+
+                  if(k._master.fieldSqlName!=null){
+
+                    var masterValue = k._master.build.Data_GetValue({y:0,fieldSqlName:k._master.fieldSqlName});
+                      k.#MaidSearch({masterValue});
+                  }
+                }
+              }
+            ],
+          },
+          {
+            name:'newed',
+            actions:[
+              {
+                name:'master newed',
+                action:()=>{
+
+                  k._maid.build.Block_Action({});
+                }
+              }
+            ],
+          },
         ],
-      }];
-
-      //create insert to create in child
-      var inserts = [
-        {
-          field:childFieldIndex,
-          value:parentFieldValue,
-        },
-      ];
-
-      //set conditions constants in child
-      this._child.build.SetConstantsSettingsRequest({
-        conditions:conditions,
-        inserts:inserts,
       });
 
-      //reload child with conditions
-      this._child.build.CallEvent({
-        name:'reload',
-        params:{
-          conditions:conditions,
-        }
+      this._maid.build.AddEvents({
+        events:[
+          {
+            name:'canceled',
+            actions:[
+              {
+                name:'maid canceled',
+                action:(prms)=>{
+
+                  prms.k.Modal_SetActive({active:false});
+                }
+              }
+            ],
+          },
+        ],
       });
-      
+
+      if(this._master.build._tipe=="form"&&this._maid.build._tipe=="form"){
+
+        this._master.build.AddEvents({
+          events:[
+            {
+              name:'boxUpdate',
+              actions:[
+                {
+                  name:'master boxUpdate',
+                  action:({field,y})=>{
+  
+                    if(k._master.fieldName != null){
+    
+                      if(field.name=="add"){
+    
+                        k._maid.build.Modal_SetActive({active:true});
+                        k._maid.build.New_Action({});
+                      }
+                    }
+                  }
+                }
+              ],
+            },
+          ],
+        })
+
+        
+      }
+
+      if(this._master.build._tipe=="table"&&this._maid.build._tipe=="form"){
+
+        this._master.build.SetActiveOneAction({
+          eventName:'newed',
+          actionName:'base newed',
+          active:false,
+        });
+
+        this._master.build.AddEvents({events:[
+          {
+            name:'newed',
+            actions:[
+              {
+                name:'master table newed',
+                action:(prms)=>{
+
+                  k._maid.build.Modal_SetActive({active:true});
+                  k._maid.build.New_Action({});
+                }
+              }
+            ],
+          }
+        ]});
+
+        this._maid.build.AddEvents({
+          events:[
+            {
+              name:'inserted',
+              actions:[
+                {
+                  name:'maid inserted',
+                  action:(prms)=>{
+
+                    var masterField = k._master.build.Fields_GetInfo({fieldName:k._master.fieldName});
+  
+                    k._master.build.Action_Insert({
+                      inserts:[
+                        {
+                          field:masterField.sql.field,
+                          value:prms.newPrimary,
+                        }
+                      ],
+                      addFields:false,
+                    });
+                  }
+                }
+              ],
+            },
+          ],
+        });
+      }
+
     }
+
+    #MaidSearch({masterValue}){
+
+      this._maid.build.Conection_SetConection({
+          name:this._master.build._name,
+          fieldSqlIndex:this._maid.fieldSqlIndex,
+          value:masterValue,
+      });
+      this._maid.build.States_SetData({
+        name:"reload",
+        tools:[
+          {name:"new",show:(this._maid.build._tipe!="form")},
+          {name:"cancel",show:(this._maid.build._tipe=="form")},
+          {name:"delete",show:(this._maid.build._tipe=="form")},
+        ],
+      });
+      this._maid.build.Modal_SetActive({active:true});
+      this._maid.build.Reload_Action({});
+    }
+
+
     
 }

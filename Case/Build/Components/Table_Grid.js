@@ -194,6 +194,12 @@ class Table_Grid {
     return box.GetValue();
   }
 
+  DeleteLine({y=0}){
+
+    var line = this.#data[y].line;
+    line.remove();
+    this.#data.splice(y, 0);
+  }
   
   
 }

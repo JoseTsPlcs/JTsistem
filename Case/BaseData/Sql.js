@@ -10,7 +10,7 @@ class Sql extends ODD {
     super(i);
   }
 
-  LoadByMysql({action,mysql,config,success,fail}){
+  LoadByMysql({action,mysql,config,success,fail,logSql=false}){
 
         if(action==null){
             
@@ -47,6 +47,7 @@ class Sql extends ODD {
                     break;
             }
         }
+        if(logSql)console.log(sql);
 
         var php = action == 'select' ? 'Case/BaseData/Mysql_Row.php' : 'Case/BaseData/Mysql_Success.php';
 
