@@ -24,6 +24,7 @@ $doms = array(
     "<script src='Case/Build/Components/Label.js'></script>",
     "<script src='Case/Build/Components/Table_Grid.js'></script>",
     "<script src='Case/Build/Components/ScreenLoad.js'></script>",
+    "<script src='Case/Build/Components/Panel.js'></script>",
 
     "<script src='Case/BaseData/LoadData.js'></script>",
     "<script src='Case/BaseData/LoadsData.js'></script>",
@@ -41,6 +42,7 @@ $doms = array(
     "<script src='Case/Build/Modulos/Modulo.js'></script>",
     "<script src='Case/Build/Modulos/Window.js'></script>",
     "<script src='Case/Build/Modulos/Filters.js'></script>",
+    "<script src='Case/Build/Modulos/List.js'></script>",
 
     "<script src='Case/Build/Forms/Form.js'></script>",
 

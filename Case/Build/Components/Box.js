@@ -6,7 +6,7 @@ class Box {
   //2 -> date
   //3 -> options
   //4 -> selects multiple
-  //5 -> buttons
+  //5 -> buttons class="btn btn-primary"
   //6 -> check
   //7 -> switch
   //8 -> search
