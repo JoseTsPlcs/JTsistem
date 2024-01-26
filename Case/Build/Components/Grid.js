@@ -2,13 +2,8 @@
 
 class Grid extends ODD {
 
-  #parent = null;
-  Get_Parent(){
-
-    return this.#parent;
-  }
-
-  #conteiner = null;
+  #parent=null;
+  #conteiner=null;
   #data = [];
   //{}
   GetAllBoxes({boxs=true,labels=true}={}){
@@ -55,8 +50,18 @@ class Grid extends ODD {
 
     super(i);
 
+    this._General_SetVariables(i);
+    this._General_Start(i);
+  }
+
+  _General_SetVariables(i){
+
     if(i.parent) this.#parent = i.parent;
-    else this.#parent = document.body;
+    else this.#parent = document.body;   
+
+  }
+
+  _General_Start(i){
 
     this.#Build(i);
   }
@@ -70,13 +75,13 @@ class Grid extends ODD {
     });
   }
   
-  #Build({cols=[[12]],attributes=[],boxs=[],labels=[]}){
+  #Build({cols=[[12]],attributes=[],boxs=[],labels=[],id=""}){
 
     let k = this;
 
     //create content where going stay rows and cols
     this.#conteiner = document.createElement('div');
-    this.#conteiner.id = this.#parent.id + '_conteiner';
+    this.#conteiner.id = this.#parent.id + '_conteiner_'+this.id;
     this.#parent.appendChild(this.#conteiner);
 
     //create estructure
@@ -89,6 +94,12 @@ class Grid extends ODD {
       row_div.setAttribute('class', 'row w-100 m-0 p-0');
       row_div.setAttribute('id', this.#conteiner.id + '_row_'+ y);
       this.#conteiner.appendChild(row_div);
+
+      $('#'+row_div.id).click(()=>{
+        //console.log("grid-rowClick",y,row_div);
+        //console.log(this._events);
+        k.CallEvent({name:"rowClick",params:{y,dom:row_div}});
+      });
 
       const row_data = {
         row:row_div,

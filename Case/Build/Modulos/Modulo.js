@@ -1,6 +1,30 @@
 
 
-class Modulo {
+class Modulo extends ODD {
+
+  /*
+
+  ------------------------------------
+  |               title              |
+  ------------------------------------
+  |                                  |
+  |   ----------------------------   | 
+  |   |          config          |   |
+  |   ----------------------------   |
+  |   |      tools line head     |   |
+  |   ----------------------------   |
+  |   |                          |   |
+  |   |                          |   |
+  |   |         conteiner        |   |
+  |   |                          |   |
+  |   |                          |   |
+  |   |                          |   |
+  |   ----------------------------   |
+  |   |      tools line foot     |   |
+  |   ----------------------------   |
+  |                                  |
+  ------------------------------------
+  */
 
   #window = null;
   #conteiner = null;
@@ -11,10 +35,12 @@ class Modulo {
 
   constructor(i){
 
+    super(i);
     this.#Build(i);
   }
 
   #tools = null;
+
   #Build({parent=null,grid={},tools=[],title='modulo',h_min=350, hsz=3}){
 
     let k = this;
@@ -40,14 +66,17 @@ class Modulo {
         box:{
           update:(i)=> {
 
-            if(k.#window!=null) k.#window.Event_Action({event_name:t.name,event_params:{m:k}});
+            if(k.#window!=null) k.CallEvent({name:t.name});
           },
           ...t.box,
         },
       });
       tools_events.push({
         name:t.name,
-        action:(i)=>t.action(i),
+        actions:[{
+          name:t.name,
+          action:(i)=>t.action(i),
+        }],
       });
     });
 
@@ -80,8 +109,9 @@ class Modulo {
         ],
         boxs:tools_boxs,
       },
-      events:tools_events,
+      //events:tools_events,
     });
+    this.AddEvents({events:tools_events});
 
     //config
     this.#config.dom = this.#window.Conteiner_GetColData({x:0,y:0}).col;

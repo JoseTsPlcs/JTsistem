@@ -1,5 +1,5 @@
 
-const testing = true;
+const testing = false;
 
 function Options_Dual({show=null,show2=null,colorinverse=false}) {
     
@@ -18,17 +18,33 @@ function Box_MutipleDual({show=null,show2=null, dlft=null}) {
     }
 }
 
-function Box_Soles({total=0, decimals=2,clss=null}={}) {
+function Box_Soles({total=0, decimals=2,clss=null,limit=false}={}) {
     
-    return {
+    var bx = {
         tipe:0,
         class:clss,
         default:total,
         format:{
             decimals:decimals,
             start:'S/.',
+            
         }
-    };
+    }
+
+    if(limit){
+
+        bx.format.limit={
+            value:0,
+            less:{attributes:[
+                {name:"class",value:"text-danger"},
+            ]},
+            more:{attributes:[
+                {name:"class",value:"text-success"},
+            ]},
+        };
+    }
+
+    return {...bx};
 }
 
 function Box_Dual(i){
@@ -46,6 +62,113 @@ function Box_ShowOptions(i) {
     };
 }
 
+function Param_GetBox(box) {
+    
+    var result = {tipe:0};
+
+    if(box!=null){
+
+        if(Number.isInteger(box)){
+
+            result.tipe = box;
+        }
+        else result = box;
+    }
+
+    if(result.tipe==2&&result.default==null) result.default = Date_Today(0);
+
+    return result;
+}
+
+function Param_GetSql(sql) {
+    
+    if(sql!=null){
+
+        if(Number.isInteger(sql)){
+
+            return {table:0,field:sql};
+        }
+        else{
+
+            if(sql.table==null) sql.table=0;
+            
+            return sql;
+        }
+    }
+    else return null;
+}
+
+function Param_GetLoad(load) {
+    
+    if(load!=null){
+
+        if(Number.isInteger(load)){
+
+            return {loadIndex:load};
+        }
+        else return load;
+    }
+    else return null;
+}
+
+function Param_GetAction(action) {
+    
+    var box = null;
+
+
+}
+
+function Param_GetField(field) {
+    
+    field.box = Param_GetBox(field.box);
+
+    if(field.action=="delete"){
+
+        field.box = {
+            default:"x",
+            tipe:5,
+            class:"btn btn-outline-danger btn-sm",
+        }
+        field.name="delete";
+        field.action="delete";
+    }
+
+    if(field.action=="edit"){
+
+        field.box = {
+            default:"[/]",
+            tipe:5,
+            class:"btn btn-outline-primary btn-sm",
+        }
+        field.name="edit";
+        field.action="edit";
+    }
+
+    if(field.action=="new"){
+
+        field.box = {
+            default:"[+]",
+            tipe:5,
+            class:"btn btn-outline-primary btn-sm",
+        }
+        field.name="new";
+        field.action="new";
+    }
+
+    
+    if((field.box.tipe==1 || field.box.tipe==8) && field.box.class==null) field.box.class = "w-100 m-0";
+
+    if(field.box.tipe == 6 && field.box.name == null){
+        if(field.tipe==null) field.tipe=0;
+        field.box.name = field.name;
+    }
+
+    if(field.box.tipe==5&&field.tipe==null) field.tipe=0;
+    if(field.box.tipe==3&&field.tipe==null) field.tipe=2;
+    //if(field.box.tipe==1&&field.tipe==null) field.tipe=0;
+
+    return field;
+}
 
 //-------
 

@@ -5,11 +5,18 @@ $(document).ready(function() {
   
       success:({page})=>{
   
-        new Form_Table({
+        var panel = new Grid({
+          cols:[[12],[12]],
+          labels:[
+            {name:"total de ventas",attributes:[{name:"class",value:"h1"}],x:0,y:0,box:{...Box_Soles(),class:"h1 text-success",default:0}}
+          ],
+        });
 
+        new Crud_Table({
+          parent:panel.GetColData({x:0,y:1}).col,
           title:'control de compras',
           tables:['buys','providers'],
-          loads:[
+          /*loads:[
             {table:1},
           ],
           joins:[
@@ -24,19 +31,19 @@ $(document).ready(function() {
             {name:'entregado',box:Box_MutipleDual({show:'entregado'}),conection:{table:0,field:7,inter:'='}},
             //{name:'fecha entrega min',box:{tipe:2,default:Date_FirstOfMoth()}},
             //{name:'fecha entrega max',box:{tipe:2,default:Date_LastOfMoth()}},
-          ],
+          ],*/
           fields:[
-            {edit:true, send:{page:page,url:'Buy_Add.php',send:{name:'search'}}},
+            {edit:true},
 
-            {name:'proveedor',attributes:[{name:'style',value:'min-width:220px'}],conection:{table:0,field:1},load:0},
-            {name:'fecha de emision',attributes:[{name:'style',value:'min-width:120px'}],box:{tipe:2},conection:{table:0,field:2}},
-            {name:'confirmado',box:{tipe:6},conection:{table:0,field:3}},
-            {name:'pagado',box:{tipe:6},conection:{table:0,field:4}},
-            {name:'total',box:Box_Soles(),conection:{table:0,field:5}},
-            {name:'costo de transporte',box:Box_Soles(),conection:{table:0,field:6}},
+            {name:'proveedor',attributes:[{name:'style',value:'min-width:220px'}],sql:{table:0,field:1},load:0},
+            {name:'fecha de emision',size:120,box:{tipe:2},sql:{table:0,field:2}},
+            {name:'confirmado',box:{tipe:6},sql:{table:0,field:3}},
+            {name:'pagado',box:{tipe:6},sql:{table:0,field:4}},
+            {name:'total',box:Box_Soles(),sql:{table:0,field:5}},
+            {name:'costo de transporte',box:Box_Soles(),sql:{table:0,field:6}},
 
-            {name:'entregado',box:Box_Dual({show:'entregado'}),conection:{table:0,field:7},attributes:[{name:'style',value:'min-width:130px'}]},
-            {name:'fecha de entrega',attributes:[{name:'style',value:'min-width:120px'}],box:{tipe:2},conection:{table:0,field:8}},
+            {name:'entregado',box:Box_Dual({show:'entregado'}),sql:{table:0,field:7},attributes:[{name:'style',value:'min-width:130px'}]},
+            {name:'fecha de entrega',size:120,box:{tipe:2},sql:{table:0,field:8}},
           ],
         });
         

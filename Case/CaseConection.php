@@ -34,17 +34,9 @@ echo '<script src="Case/Build/Forms/Crud.js"></script>';
 echo '<script src="Case/Build/Forms/Crud_Form.js"></script>';
 echo '<script src="Case/Build/Forms/Crud_Table.js"></script>';
 echo '<script src="Case/Build/Forms/Crud_Master.js"></script>';
-echo '<script src="Case/Build/Forms/Crud_Conection.js"></script>';
 
 echo '<script src="Case/Build/Forms/Form_Body.js"></script>';
-echo '<script src="Case/Build/Forms/Form_Data.js"></script>';
-echo '<script src="Case/Build/Forms/Form_Load.js"></script>';
-echo '<script src="Case/Build/Forms/Form_States.js"></script>';
 echo '<script src="Case/Build/Forms/Form_Base.js"></script>';
-echo '<script src="Case/Build/Forms/Form_Conection.js"></script>';
-echo '<script src="Case/Build/Forms/Form_Table.js"></script>';
-echo '<script src="Case/Build/Forms/Form_Modulos.js"></script>';
-echo '<script src="Case/Build/Forms/Master.js"></script>';
 
 echo '<script src="Case/Land/UserLog.js"></script>';
 echo '<script src="Case/Land/Pag_Base.js"></script>';
