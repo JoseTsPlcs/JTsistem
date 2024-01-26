@@ -34,6 +34,7 @@ class Mysql extends ODD {
   {"name":"ventas_productos","fields":[{"Field":"ID","Type":"int(11)","Null":"NO","Key":"PRI","Default":null,"Extra":"auto_increment"},{"Field":"LINE","Type":"int(11)","Null":"NO","Key":"","Default":null,"Extra":""},{"Field":"NRO","Type":"int(11)","Null":"NO","Key":"","Default":null,"Extra":""},{"Field":"INFO","Type":"text","Null":"NO","Key":"","Default":null,"Extra":""},{"Field":"PRODUCTO","Type":"text","Null":"NO","Key":"","Default":null,"Extra":""},{"Field":"PRODUCTO_ID","Type":"int(11)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"PRECIO","Type":"float","Null":"NO","Key":"","Default":null,"Extra":""},{"Field":"CANTIDAD","Type":"int(11)","Null":"NO","Key":"","Default":null,"Extra":""},{"Field":"UNIDAD","Type":"float","Null":"NO","Key":"","Default":"0","Extra":""},{"Field":"ITERACTION","Type":"int(1)","Null":"NO","Key":"","Default":null,"Extra":""},{"Field":"STRIKE","Type":"int(1)","Null":"NO","Key":"","Default":"0","Extra":""}],"primary":{"index":0,"field":{"Field":"ID","Type":"int(11)","Null":"NO","Key":"PRI","Default":null,"Extra":"auto_increment"}}},
   {"name":"ventas_transacctions","fields":[{"Field":"ID","Type":"int(11)","Null":"NO","Key":"PRI","Default":null,"Extra":"auto_increment"},{"Field":"VENTA_ID","Type":"int(11)","Null":"NO","Key":"","Default":null,"Extra":""},{"Field":"TRANSACC_ID","Type":"int(11)","Null":"NO","Key":"","Default":null,"Extra":""}],"primary":{"index":0,"field":{"Field":"ID","Type":"int(11)","Null":"NO","Key":"PRI","Default":null,"Extra":"auto_increment"}}},
   {"name":"zonas","fields":[{"Field":"ID","Type":"int(11)","Null":"NO","Key":"PRI","Default":null,"Extra":""},{"Field":"ZONE","Type":"text","Null":"NO","Key":"","Default":null,"Extra":""},{"Field":"MACRO","Type":"int(11)","Null":"NO","Key":"","Default":"-1","Extra":""},{"Field":"DELIVERY","Type":"float","Null":"NO","Key":"","Default":null,"Extra":""},{"Field":"ACTIVO","Type":"tinyint(1)","Null":"NO","Key":"","Default":"1","Extra":""}],"primary":{"index":0,"field":{"Field":"ID","Type":"int(11)","Null":"NO","Key":"PRI","Default":null,"Extra":""}}},
+  {"name":"buy_transacctions","fields":[{"Field":"ID","Type":"int(11)","Null":"NO","Key":"PRI","Default":null,"Extra":"auto_increment"},{"Field":"BUY_ID","Type":"int(11)","Null":"NO","Key":"","Default":null,"Extra":""},{"Field":"TRANSACC_ID","Type":"int(11)","Null":"NO","Key":"","Default":null,"Extra":""}],"primary":{"index":0,"field":{"Field":"ID","Type":"int(11)","Null":"NO","Key":"PRI","Default":null,"Extra":"auto_increment"}}},
   ];
   GetSchema(){
 
@@ -391,16 +392,16 @@ class Mysql extends ODD {
           }
 
           sql += ")"
+        }
 
-          //confirm if the next condition have conditions individual
-          var next = c < cnd_mn_t - 1 ? cnd_mn[c+1].conditions.length >= 1 : false;
-          if(next){
+        //confirm if the next condition have conditions individual
+        var next = c < cnd_mn_t - 1 ? cnd_mn[c+1].conditions.length >= 1 : false;
+        if(next){
 
-            var cnd_mn_add = cnds.and != null ? cnds.and : true;
-            var add_mn = cnds.and ? "AND" : "OR";
-            var coma_mn = c < cnd_mn_t -1 ? " " + add_mn + " " : "";
-            sql += coma_mn;
-          }
+          var cnd_mn_add = cnds.and != null ? cnds.and : true;
+          var add_mn = cnds.and ? "AND" : "OR";
+          var coma_mn = c < cnd_mn_t -1 ? " " + add_mn + " " : "";
+          sql += coma_mn;
         }
 
       }

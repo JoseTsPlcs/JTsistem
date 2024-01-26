@@ -15,6 +15,10 @@ class Table_Grid {
     this.#BuildTable(i);
   }
 
+  /*headers=[{
+    name:"title",
+    attributes[{name:"",value:""}],
+  }]*/
   #BuildTable({parent=null, headers=[],h_all=false}){
 
     if(parent == null){
@@ -186,6 +190,18 @@ class Table_Grid {
     }
 
     return this.#data[y].cells[x].box;
+  }
+
+  BoxesOfColum({x=-1}){
+
+    var boxes = this.#data.map((d)=>{
+
+      return d.cells[x].box;
+    });
+
+    //console.log("table_grid->result; boxes:",boxes);
+
+    return boxes;
   }
 
   Box_GetValue({x=-1,y=-1}){

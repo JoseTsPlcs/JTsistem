@@ -16,7 +16,7 @@ const paginas = [
 
   //{value:0,show:'',php:'',seccion:-1},
 
-  {value:1,show:'venta', php:'Factura',seccion:0},
+  {value:1,show:'venta', php:'Sales_New',seccion:0},
   {value:2,show:'control', php:'Sales_Control',seccion:0},
   {value:35,show:'caja', php:'Sales_Cash',seccion:0},
   {value:36,show:'caja ingreso', php:'Sales_CashAdd',seccion:0},

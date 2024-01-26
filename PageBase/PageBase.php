@@ -41,26 +41,15 @@ $doms = array(
 
     "<script src='Case/Build/Modulos/Modulo.js'></script>",
     "<script src='Case/Build/Modulos/Window.js'></script>",
-    "<script src='Case/Build/Modulos/Filters.js'></script>",
+    "<script src='Case/Build/Modulos/Form.js'></script>",
+    "<script src='Case/Build/Modulos/Config.js'></script>",
     "<script src='Case/Build/Modulos/List.js'></script>",
 
-    "<script src='Case/Build/Forms/Form.js'></script>",
-
     "<script src='Case/Build/Forms/Crud.js'></script>",
+    "<script src='Case/Build/Forms/Crud_Body.js'></script>",
     "<script src='Case/Build/Forms/Crud_Form.js'></script>",
     "<script src='Case/Build/Forms/Crud_Table.js'></script>",
     "<script src='Case/Build/Forms/Crud_Master.js'></script>",
-    "<script src='Case/Build/Forms/Crud_Conection.js'></script>",
-
-    "<script src='Case/Build/Forms/Form_Body.js'></script>",
-    "<script src='Case/Build/Forms/Form_Data.js'></script>",
-    "<script src='Case/Build/Forms/Form_Load.js'></script>",
-    "<script src='Case/Build/Forms/Form_States.js'></script>",
-    "<script src='Case/Build/Forms/Form_Base.js'></script>",
-    "<script src='Case/Build/Forms/Form_Conection.js'></script>",
-    "<script src='Case/Build/Forms/Form_Table.js'></script>",
-    "<script src='Case/Build/Forms/Form_Modulos.js'></script>",
-    "<script src='Case/Build/Forms/Master.js'></script>",
 
     "<script src='Case/Land/UserLog.js'></script>",
     "<script src='Case/Land/Pag_Base.js'></script>",

@@ -9,345 +9,309 @@ nt
 
     constructor(i){
 
-        //----------------filter Info------------
+        super(i);
+        var newInfo = this._General_GetParams(i);
+        this._General_Start(newInfo);
+    }
 
-        //filter set title
-        if(i.title==null)i.title='CRUD';
+    //------ODD-----
 
-        //filter adding logControl
-        const logControlStart = [
-            {
-                name:'sql',
-                log:true,
-            },
-        ];
-        if(i.logControl == null) i.logControl = [...logControlStart];
-        else i.logControl = [...i.logControl, ...logControlStart];
+    _General_GetParams(i){
 
-        //filter loads
-        if(i.loads!=null){
+        var fields = i.fields;
+        if(fields==null) fields=[];
 
-            for (let ld = 0; ld < i.loads.length; ld++) {
-                var ldi = i.loads[ld];
-                var setLoad = ldi!=null && (Number.isInteger(ldi)== true || Number.isInteger(ldi.tableIndex) == true);
-                if(setLoad){
-    
-                    var tableIndex = (Number.isInteger(ldi)== true) ? ldi : ldi.tableIndex;
-    
-                    i.loads[ld] = {
-                        table_main:tableIndex,
-                        selects:[
-                            {table:tableIndex,field:0,as:'value'},
-                            {table:tableIndex,field:1,as:'show'},
-                        ],
-                        ...ld,
-                    }
-                }//console.log(setLoad,ldi);
-            }
+        if(i.windows!=null){
+
+            i.windows.forEach(window => {
+                
+                window.fields.forEach(field => {
+                    
+                    fields.push(field);
+                });
+                
+            });
         }
+        i.fields = fields;
 
-        //filter fields
-        if(i.fields==null)i.fields=[];
-        i.fields.forEach(fi => {
-            
-            if(fi.sql!=null&&Number.isInteger(fi.sql)==true) fi.sql = {field:fi.sql,table:0};
-            if(fi.sql!=null&&fi.sql.table==null) fi.sql.table = 0;
+        return {...i};
+    }
 
-            if(fi.load!=null&&Number.isInteger(fi.load)==true)fi.load={index:0,fieldName:'show'};
-
-            if(fi['delete']==true){
-
-                fi['box'] = {
-                    default:'x',
-                    tipe:5,
-                    class:'btn btn-outline-danger btn-sm',
-                }
-                //fi['name']='';
-            }
-
-            if(fi['edit']==true){
-
-                fi['box'] = {
-                    default:'[/]',
-                    tipe:5,
-                    class:'btn btn-outline-primary btn-sm',
-                }
-                fi['name']='edit';
-            }
-
-            if(fi['new']==true){
-
-                fi['box'] = {
-                    default:'[+]',
-                    tipe:5,
-                    class:'btn btn-outline-primary btn-sm',
-                }
-                //fi['name']='';
-            }
-
-            if(fi.box!=null&&Number.isInteger(fi.box)==true) fi.box={tipe:fi.box};
-            if(fi.box==null) fi.box={tipe:0};
-
-            if((fi.box.tipe==1 || fi.box.tipe==8) && fi.box.class==null) fi.box.class = 'w-100 m-0';
-            
-            if(fi.box.tipe == 6 && fi.box.name == null){
-                fi.tipe=0;
-                fi.box.name = fi.name;
-            }
-
-            if(fi.box.tipe==5) fi.tipe=0;
-
-            if(fi.box.tipe==3) fi.tipe=2;
-
-            if(fi.box.tipe==2&&fi.box.default==null) fi.box.default = Date_Today(0);
-        });
-
-        //filter filters
-        var bodyFilters = {
-            cols:[],
-            labels:[],
-        };
-        if(i.filters==null)i.filters=[];
-        var filtersY = 0;
-        i.filters.forEach(f => {
-            
-            bodyFilters.cols.push([12]);
-
-            if(f.sql!=null&&Number.isInteger(f.sql) == true) f.sql = {table:0,field:f.sql};
-            if(f.sql!=null&&f.sql.table==null)f.sql.table=0;
-            
-            if(f.box==null) f.box={tipe:1};
-            if(f.box.class==null)f.box.class='w-100';
-            if(f.box.tipe==4&&f.box.options==null)f.box.options=[{value:0,show:('no '+f.name)},{value:1,show:f.name}]; 
-
-            f.x=0;
-            f.y=filtersY;
-
-            var label = {
-                x:f.x,y:f.y,
-                name: f.name,
-                box: f.box,
-            };
-
-            filtersY++;
-            bodyFilters.labels.push(label);
-        });
-
-        //filter to add events
-        const eventsNew = [
-            {
-                name:'newed',
-                actions:[
-                    {
-                        name:'base newed',
-                        action:()=>{
-
-                            k.New_Action({});
-                        }
-                    }
-                ],
-            }
-        ];
-        if(i.events==null) i.events=eventsNew;
-        else i.events=[...i.events,...eventsNew];
-
-        //construc ODD
-        super({...i,name:i.title});
+    _General_Start(i){
 
         let k = this;
-        this.#Start_SetParams({...i});
-        this._Start_BuildComponents({...i,bodyFilters:bodyFilters});    
+
+        
+        //buil sql request
+        this.#Sql_Build({title:i.title,tables:i.tables});
+
+        //set variables
+        this.#General_SetVariables({...i});
+
+        //build form body
+        this.#Body_Build({...i});
+        
+        //load data
         this.Loads_LoadAll({
-            success:()=>{k.#SetStart({})}
+            success:()=>{
+
+                if(i.recive==null) k.States_SetStart({});
+                else k.#Page_Recive({recive:i.recive});                
+            }
         });
     }
 
     _tipe = "base";
-    #Start_SetParams({tables=[],fields=[],filters=[],loads=[],joins=[],states=[],triggers=[],stateDefault='reload',stateStart='reload'}){
+    #General_SetVariables({tipe="base",fields=[],filters=[],loads=[],joins=[],selects=[],orders=[],states=[],triggers=[],stateDefault="reload",stateStart="reload",stateAfterInserted="reload",stateAfterSaved="reload",fieldsUpdateSave=true,newFieldsBlock=false}){
 
         //set values
-        this._tables = tables;
-        this._loads = loads;
+        this.#Loads_Set({loads});
         this._joins = joins;
-        this._fields = fields;
+        this.Fields_Set({fields});
+        this.#Selects_Set({extras:selects});
         this._filters = filters;
-        this._stateDefault = stateDefault;
-        this._stateStart = stateStart;
-        this._triggers = triggers;
+        this._orders=orders;
 
-        //set statedata
-        states.forEach(st => {
-                
-            this.States_SetData({...st});
-        });
+        this.#states.default = stateDefault;
+        this.#states.start = stateStart;
+        this.#states.afterInserted=stateAfterInserted;
+        this.#states.afterSaved=stateAfterSaved;
 
-    }
-    
-    _Start_BuildComponents({parent,title="crud",modal,bodyFilters}){
+        this.#newFieldsBlock = newFieldsBlock;
 
-        let k = this;
+        this._tipe=tipe;
 
-        //build modal
-        if(modal==true){
-
-            this.#Modal_Build({}); 
-            parent = this._modal.GetContent();
-        }
-
-        //build sql that will use to do request to db
-        this._sql = new Sql({name:(title+' [sql]'),logControl:[{name:'general',log:this.GetLogActive({logName:'sql'})}]});
-
-        //build mysql that will to get sql by schema
-        this._mysql = new Mysql({name:(title+' [mysql]'),logControl:[{name:'general',log:this.GetLogActive({logName:'mysql'})}]});
-        this._mysql.AddTables({tables:this._tables});
-        this._fieldPrimaryInfo = this._mysql.GetFieldPrimaryInfo({table:0});
-
-        //build form body
-        this.#Body_Build({title,parent,bodyFilters});
+        this.States_SetStateTools({states});
     }
 
     //--------------body---------
     _body = null;
-    #Body_Build({title,parent,bodyFilters}){
+    #Body_Build({title,parent,filters,windows,fields,h=350,head,blocked=true,show,configShow=false,modal}){
 
         let k = this;
-        this._body = new Form_Body({
+
+        var bodyparams = {
+            headCrud:k,
+            filters,
+            configShow,
             title:title,
-            name:title+'_body',
-            parent:parent,
-            logControl:[{name:'general',log:this.GetLogActive({logName:'body'})}],
-            filters:bodyFilters,
-            //this is when push button in the form body
-            actions:[
+            id:title,
+            modal,head,show,blocked,
+            name:title+"_body",
+            parent:parent,h,
+            windows,
+            fields,
+            events:[
                 {
-                    name:'reload',
-                    action:()=>{
+                    name:"boxUpdate",
+                    actions:[
+                        {
+                            name:"base",
+                            action:(i)=>{
 
-                        k.Reload_Action({});
-                    },
-                },
-                {
-                    name:'new',
-                    action:()=>{
-
-                        if(k._fieldsUpdate.length>0 && !confirm("se ha realizado cambios sin guardar, ¿segura que quiere continua?")){
-
-                            return;
+                                i.k=k;
+                                //k.Fields_GetInfo({})
+                                //console.log("crud->Call event boxupdate->i:",i);
+                                k.CallEvent({name:"boxUpdate",params:{...i}});
+                            }
                         }
+                    ],
+                },
+                {
+                    name:"reloadUpdate",
+                    actions:[
+                        {
+                            name:"base",
+                            action:()=>{
 
-                        k.CallEvent({name:'newed'});
-                    },
+                                k.States_SetState({state:"reload"});
+                            }
+                        }
+                    ]
                 },
                 {
-                    name:'cancel',
-                    action:()=>{
+                    name:"newUpdate",
+                    actions:[
+                        {
+                            name:"base",
+                            action:()=>{
 
-                        k.CallEvent({name:'canceled'});
-                        k.SetDefault({});
-                    },
+                                k.States_SetState({state:"new"});
+                            }
+                        }
+                    ]
                 },
                 {
-                    name:'add',
-                    action:()=>{
+                    name:"saveUpdate",
+                    actions:[
+                        {
+                            name:"base",
+                            action:()=>{
 
-                        k.Action_Insert({success:()=>{
+                                k.Update_Action({success:()=>{
 
-                            //clear filters
-                            //set last page
-                            //reload
-                        }});
-                    }
+                                    k.States_SetDefault();
+                                }});
+                            }
+                        }
+                    ]
                 },
                 {
-                    name:'sizes',
-                    action:()=>{
-                        k.Reload_Action({});
-                    }
-                },
-                {
-                    name:'pages',
-                    action:()=>{
-                        k.Reload_Action({});
-                    }
-                },
-                {
-                    name:'page_next',
-                    action:()=>{
+                    name:"cancelUpdate",
+                    actions:[
+                        {
+                            name:"base",
+                            action:()=>{
 
-                        k._body.Pages_Next({add:1});
-                        k.Reload_Action({});
-                    }
+                                k.Cancel_Action();
+                            }
+                        }
+                    ],
                 },
                 {
-                    name:'page_back',
-                    action:()=>{
-                        
-                        k._body.Pages_Next({add:-1});
-                        k.Reload_Action({});
-                    }
+                    name:"addUpdate",
+                    actions:[
+                        {
+                            name:"base",
+                            action:()=>{
+
+                                k.Insert_Action();
+                            }
+                        }
+                    ]
                 },
-                {
-                    name:'save',
-                    action:()=>{
-                        k._Action_Update({y:0});
-                    }
-                },
-                {
-                    name:'delete',
-                    action:()=>{
-                        k._Action_Delete({y:0});
-                    }
-                },
-                {
-                    name:'load',
-                    action:()=>{
-                        
-                        k.Loads_LoadAll({});
-                    }
-                }
             ],
-        });
+        };
+
+        switch(this._tipe){
+
+            case "form":
+            this._body = new Crud_Form({...bodyparams});
+            break;
+
+            case "table":
+            this._body = new Crud_Table({...bodyparams});
+            break;
+        }
+
+        //console.log("crud->body_build->body:",this._body,this._tipe);
+        this._fields.forEach(field => {
+
+            var boxes = k._body.Fields_GetBoxes({fieldName:field.name});
+            field.boxes = boxes;
+        });        
     }
 
-    //---------------modal---------
+    #Body_Filter_SetOptionsToFilter({filterName,options}){
 
-    _modal = null;
-    #Modal_Build({}){
-
-        this._modal = new Modal({name:title});
+        var box = this._body.Config_Filters_GetBox({filterName});
+        box.SetOptions(options);
+        box.SetDefault();
     }
-    
-    Modal_SetActive({active=true}){
-        //console.log(this._name,'modal_setactive active:'+active);
-        if(this._modal!=null)this._modal.SetActive({active:active});
+
+    #Body_Print({data=[]}){
+
+        var e_resp = this.CallEvent({name:"printBefore",params:{data}});
+        if(e_resp!=null&&e_resp.data!=null) data = e_resp.data;
+
+        var resultPrint = [];
+        let k = this;
+
+        for (let y = 0; y < data.length; y++) {
+            const line = data[y];
+            
+            var newLine = [];
+            this._fields.forEach(field => {
+                
+                var fieldSelect = field.select;
+                if(fieldSelect!=null){
+
+                    var selectInfo = k.Selects_Get({selectIndex:fieldSelect.index});
+                    //console.log("crud->body_print->foreach data-> foreach field->params; field:",field,"selectInfo",selectInfo);
+                    var value = line[selectInfo.name];
+                    newLine.push({
+                        field:field,
+                        y:y,
+                        value:value,
+                    });
+                }
+
+            });
+            resultPrint.push(newLine);
+        }        
+
+        this._body.Print({print:resultPrint});
+        //console.log("crud->body_print->params; data:",data,"->result:",resultPrint,"e_resp:",e_resp);
+        this.CallEvent({name:"printAfter",params:{data}});
+    }
+
+    Body_SetValue({fieldName,fieldIndex,y,value}){
+
+        this._body.Fields_SetValue({y,fieldName,fieldIndex,value});
+    }
+
+    Body_GetValue({fieldName,fieldIndex,y}){
+
+        return this._body.Fields_GetValue({y,fieldName,fieldIndex});
+    }
+
+    Body_GetWindow({windowIndex}){
+
+        return this._body.Form_GetWindow({windowIndex}).build;
+    }
+
+    Body_Modal_SetActive({active=true}){
+
+        this._body.Modal_SetActive({active});
     }
 
     //-----------------sql----------------------
 
-    _tables = [];
     _joins = [];
     _sql = null;
     _mysql = null;
-    _fieldPrimaryInfo=null;
+    _primary = {
+        name:"primary",
+        tableIndex:0,
+        fieldSqlIndex:0,
+        as:"ID",
+        data:[],
+    };
     _filters = [];
 
-    #Sql_Request({action=null,config=null,success,useScreen=true}){
+    #Sql_Build({title,tables}){
+
+         //build sql that will use to do request to db
+         this._sql = new Sql({name:(title+" [sql]"),logControl:[{name:"general",log:this.GetLogActive({logName:"sql"})}]});
+
+         //build mysql that will to get sql by schema
+         this._mysql = new Mysql({name:(title+" [mysql]"),logControl:[{name:"general",log:this.GetLogActive({logName:"mysql"})}]});
+         this._mysql.AddTables({tables:tables});
+
+         //set primary information
+         var primaryFieldInfo = this._mysql.GetFieldPrimaryInfo({table:this._primary.tableIndex});
+         this._primary.fieldSqlIndex = primaryFieldInfo["Index"];
+         this._primary.as = primaryFieldInfo["Field"];
+ 
+    }
+
+    #Sql_Request({action=null,config=null,success,useScreen=true,logSql=false}){
 
         let k = this;
-        if(useScreen) this.#Action_Print_ScreenLoad({show:true});
+        if(useScreen) this.#ScreamLoad({show:true});
         this._sql.LoadByMysql({
             action:action,
             mysql:this._mysql,
             config:config,
-            logSql:true,
+            logSql:logSql,
             fail:(f)=>{
 
-                k.#Action_Print_ScreenLoad({show:false});
+                k.#ScreamLoad({show:false});
                 k.#Sql_Fail(f)
             },
             success:(resp)=>{
 
-                k.#Action_Print_ScreenLoad({show:false});
+                k.#ScreamLoad({show:false});
                 if(success!=null) success(resp);
             }
         });
@@ -369,53 +333,89 @@ nt
 
         return this._fields[fieldIndex];
     }
-
-    Fields_GetAllInfo({}){
-
-        return this._fields;
-    }
     
+    Fields_Set({fields}){
+
+        for (let f = 0; f < fields.length; f++) {
+            var field = fields[f];
+
+            field.index = f;
+            field.sql = Param_GetSql(field.sql);
+            field.load = Param_GetLoad(field.load);
+            field = Param_GetField(field);
+
+            //console.log("crud->fields_set->foreach fields->params:",field);
+        }
+
+        this._fields = fields;
+        //console.log("crud - fields_set, params:",fields);
+    }
     
     //-------------loads-------------
 
     _loads = [];
-    _loadsData = [];
     _loadsCount = 0;
     _loadsLoaded = false;
+
+    #Loads_Set({loads=[]}){
+
+        var index = 0;
+        this._loads = loads.map((ld)=>{
+
+            var request = ld;
+
+            var setRequest = request!=null && (Number.isInteger(request)== true || Number.isInteger(request.tableIndex) == true);
+            if(setRequest){
+    
+                var tableIndex = Number.isInteger(request)? request : request.tableIndex;
+                request = {
+                    table_main:tableIndex,
+                    selects:[
+                        {table:tableIndex,field:0,as:"value"},
+                        {table:tableIndex,field:1,as:"show"},
+                    ],
+                }
+            };
+
+            index++;
+            return {
+                request,
+                index:index-1,
+                data:[],
+            };
+        });
+        //console.log("crud->loads_set, params-> loads:",loads,"results-> _loads:",this._loads);
+    }
  
     Loads_LoadAll({success}){
 
-        this._loadsData=[];
         this._loadsCount=0;
         this._loadsLoaded=false;
-        this.#Action_Print_ScreenLoad({show:true});
+        this.#ScreamLoad({show:true});
 
         if(this._loads.length<=0) this.#Loads_Loaded({success:success});
         else
         {
 
             for (let ld = 0; ld < this._loads.length; ld++) {
-            
-                this.#Loads_OneLoad({loadIndex:ld,success:success,useScreen:false});            
+                
+                this.Loads_OneLoad({loadIndex:ld,success:success,useScreen:false});            
             }
         }
         
     }
 
-    #Loads_OneLoad({loadIndex=0,success,useScreen}){
+    Loads_OneLoad({loadIndex,success,useScreen}){
 
         let k = this;
-        var load = this._loads[loadIndex];
+        var load = this._loads.find(ld=>ld.index==loadIndex);
+        //console.log("crud->loads_oneload->loadindex:",loadIndex,"result; load:",load);
         this.#Sql_Request({
             useScreen:useScreen,
-            action:'select',
-            config:{...load},
+            action:"select",
+            config:{...load.request},
+            logSql:false,
             success:(data)=>{
-
-                k._loadsData.push({
-                    data:data,
-                    index:loadIndex,
-                });
 
                 k.#Loads_OneLoaded({loadIndex:loadIndex,data:data,success:success});
             }
@@ -426,59 +426,106 @@ nt
 
         let k = this;
 
-        var loadIndex = this._loadsData.findIndex(ld=>ld.index==loadIndex);
-        if(loadIndex==-1){
-            
-            this._loadsData.push({
-                index:loadIndex,
-                data:data,
-            });
-        }else this._loadsData[loadIndex].data = data;
+        var load = this._loads.find(ld=>ld.index==loadIndex);
+        var e_resp = this.CallEvent({name:"oneLoadedBefore",params:{load,data}});
 
-        //get options by load
+        //set data to load
+        if(e_resp!=null&&e_resp.data!=null) data = e_resp.data;
+        load.data = data;
+
+        //sett options to load
         var options = k.#Loads_GetOptionsByData({data:data});
+        load.options = options;
+        //console.log("crud->loads_oneloeded->params:loadindex",loadIndex,"results->options:",options);
 
         //set loadoptions to fields
-        var fieldIndex = k._fields.findIndex(f=>f.load!=null&&f.load.index==loadIndex);
-        if(fieldIndex != -1){
-
-            var field = k._fields[fieldIndex];
-            field.loadOptions = options;
-            this._Action_Print_SetLoadOptionToBoxes({fieldIndex:fieldIndex});
-        }
+        this.#loads_SetOneLoadToFields({loadIndex});
 
         //set loadoptions to filter
-        var filter = k._filters.find(f=>f.load !=null&&f.load.index==loadIndex);
-        if(filter != null){
-
-            filter.loadOptions = options;
-            var box = k._body.Filter_GetCol_Data({...filter}).labels[0].GetBox();
-            box.SetOptions(options);
-            //console.log(filter,box,options);
-        }
+        this.#loads_SetOneLoadToFilters({loadIndex});
 
         this._loadsCount++;
         if(this._loadsCount>=this._loads.length){
 
             this.#Loads_Loaded({success});
         }
+
+        this.CallEvent({name:"oneLoaded",params:{load,data}});
+    }
+
+    #loads_SetOneLoadToFilters({loadIndex}){
+
+        var load = this.Loads_Get({loadIndex});
+        var options = load.options;
+
+        var filters = this._body.Config_Filters_GetAll();
+        var filtersSelecteds = filters.filter(f=>f.load!=null&&f.load.loadIndex==loadIndex); 
+
+        //console.log("crud->loads_setloadtofilters->params; filters:",filters,"filtersSelecteds:",filtersSelecteds,"loadindex",loadIndex);
+
+        let k = this;
+        filtersSelecteds.forEach(filter => {
+            
+            //console.log("crud->loads_setloadtofilters->foreach filtersSelecteds, params: filter",filter);
+            
+            k.#Body_Filter_SetOptionsToFilter({filterName:filter.name,options});
+        });
+    }
+
+    #loads_SetOneLoadToFields({loadIndex}){
+
+        var load = this.Loads_Get({loadIndex});
+
+        var fieldsSelecteds = this._fields.filter(f=>f.load!=null&&f.load.loadIndex==loadIndex); 
+        //console.log("crud->loads_setloadtofields->params; fields:",this._fields,"fieldsSelecteds:",fieldsSelecteds,"load:",load);
+
+        let k = this;
+        fieldsSelecteds.forEach(field => {
+            
+            k._body.Fields_SetOptions({
+                windowIndex:field.windowIndex,
+                fieldName:field.name,
+                options:load.options,
+            });
+        });
+    }
+
+    Loads_SetLoadsToFields({}={}){
+
+        let k = this;
+        this._loads.forEach(load => {
+           
+            k.#loads_SetOneLoadToFields({loadIndex:load.index});
+        });
     }
 
     #Loads_Loaded({success}){
 
         this._loadsLoaded=true;
-        this.#Action_Print_ScreenLoad({show:false});
+        this.#ScreamLoad({show:false});
         if(success!=null)success();
     }
 
-    #Loads_GetOptionsByData({data}){
+    Loads_Get({loadIndex}){
+
+        var loadFound = this._loads.find(ld=>ld.index==loadIndex);
+        return loadFound;
+    }
+
+    Loads_GetData({loadIndex}){
+        
+        var loadData = this._loads.find(ld=>ld.index == loadIndex);
+        return loadData.data;
+    }
+
+    #Loads_GetOptionsByData({data=[]}){
 
         var options = [];
         data.forEach(line => {
             
             options.push({
-                value: line['value'],
-                show: line['show'],
+                value: line["value"],
+                show: line["show"],
             });
         });
 
@@ -487,138 +534,218 @@ nt
 
     //--------------states-------------
 
-    _statesData = [
-        {name:'reload',tools:[
-          {name:'filter',show:true},
-          {name:'load',show:true},
-          {name:'sizes',show:true},
-          {name:'reload',show:true},
-          {name:'save',show:true},
-          {name:'new',show:true},
-          {name:'delete',show:true},
-          {name:'add',show:false},
-          {name:'cancel',show:false},
-          {name:'page_back',show:true},
-          {name:'pages',show:true},
-          {name:'page_next',show:true},
-        ]},
-        {name:'new',tools:[
-          {name:'filter',show:false},
-          {name:'load',show:true},
-          {name:'sizes',show:false},
-          {name:'reload',show:false},
-          {name:'save',show:false},
-          {name:'new',show:false},
-          {name:'delete',show:false},
-          {name:'add',show:true},
-          {name:'cancel',show:true},
-          {name:'page_back',show:false},
-          {name:'pages',show:false},
-          {name:'page_next',show:false},
-        ]},
-        {name:'block',tools:[
-          {name:'filter',show:false},
-          {name:'load',show:false},
-          {name:'sizes',show:false},
-          {name:'reload',show:false},
-          {name:'save',show:false},
-          {name:'new',show:false},
-          {name:'delete',show:false},
-          {name:'add',show:false},
-          {name:'cancel',show:false},
-          {name:'page_back',show:false},
-          {name:'pages',show:false},
-          {name:'page_next',show:false},
-        ]},
-    ];
+    #states = {
+        data:[
+            {name:"reload",tools:[
+                {name:"config",show:true},
+                {name:"load",show:true},
+                {name:"sizes",show:true},
+                {name:"reload",show:true},
+                {name:"save",show:true},
+                {name:"new",show:true},
+                {name:"page_back",show:true},
+                {name:"pages",show:true},
+                {name:"page_next",show:true},
+              ]},
+              {name:"new",tools:[
+                {name:"load",show:true},
+                {name:"add",show:true},
+                {name:"cancel",show:true},
+              ]},
+              {name:"block",tools:[
+      
+              ]},
+        ],
+        value:"reload",
+        default:"reload",
+        start:"reload",
+        afterSaved:"reload",
+        afterInserted:"reload",
+    };
 
     #States_SetTools({stateName=null}){
 
-        //found data of state
-        const stdt = this._statesData.find(d=>d.name == stateName);
+        var stateData = this.#states.data.find(st=>st.name==stateName);
+        if(stateData==null)return;
 
-        //confirm if datastate exist
-        if(stdt == null){
-
-            this.LogAction({
-                type:'error',
-                msg:'no found stdt with name ' + state
-            });
-            return;
-        }
-        //work with the tools of state
-        this._body.SetConfigTools({tools:stdt.tools});
-
+        this._body.Tools_Set({tools:stateData.tools});
     }
 
-    States_SetData({name=null,tools=[]}){
+    States_SetDefault(params){
 
-        //found data of name
-        var stateIndex = this._statesData.findIndex(d=>d.name==name);
-        if(stateIndex!=-1){
+        if(this._recive!=null) PageSend({url:this._recive.from});
+        this.States_SetState({state:this._stateDefault,params:params});        
+    }
 
-            var stateData = this._statesData[stateIndex];
-            tools.forEach(t => {
-                
-                var toolIndex = stateData.tools.findIndex(st_t=>st_t.name==t.name);
-                if(toolIndex!=-1){
+    States_SetStart(){
 
-                    stateData.tools[toolIndex]=t;
-                }
-                else
-                {
-                    this.LogAction({type:'error',msg:[
-                        'no found tool in state',
-                        stateData,t
-                    ]});
-                }
+        this.States_SetState({state:this.#states.start});   
+    }
+
+    States_SetState({state="reload",params=null}){
+
+        this.#States_SetTools({stateName:state});
+
+        switch (state) {
+            case "reload":
+                this.Block_Action({active:false});
+                this.Reload_Action({...params});
+                break;
+
+            case "new":
+                this.New_Action({});
+                break;
+
+            case "block":
+                this.Block_Action({active:true});
+                break;
+        
+            default:
+                break;
+        }
+        this._state = state;
+        this.CallEvent({name:"setState",params:{state}});
+    } 
+    
+    States_SetToolsData({name,tools}){
+
+        var stateDataIndex = this.#states.data.findIndex(st=>st.name==name);
+        var stateData = this.#states.data[stateDataIndex];
+
+        tools.forEach(tool => {
+            
+            var tooldataIndex = stateData.tools.findIndex(t=>t.name==tool.name);
+            if(tooldataIndex!=-1){
+
+                stateData.tools[tooldataIndex] = tool;
+            }else
+            {
+                stateData.tools.push(tool);
+            }
+        });
+    }
+
+    States_SetStateTools({states=[]}){
+
+        let k = this;
+        states.forEach(st => {
+            
+            k.States_SetToolsData({
+                name:st.name,
+                tools:st.tools,
             });
-
-        }else this.LogAction({type:'error',msg:('no found state named '+state)});
+        });
     }
 
     //------------data------------
 
-    _data = [];
+    #data = [];
     #Data_SetData({data=[]}){
 
-        this._data = data;
+        this.#data = data;
     }
 
-    #Data_GetFieldSql({y=0,fieldSqlIndex=0}){
+    Data_GetValue({y,selectName}){
 
-        var fieldInfo = this._mysql.GetFieldInfo({field:fieldSqlIndex});
-        var line = this._data[y];
-        return line[fieldInfo['Field']];
+        var values = this.Data_GetValues({selectName});
+        var value = values[y];
+        //console.log("crud->data_getvalues->params; y:",y,"->result; values:",values,"value:",value);
+        return value;
     }
 
-    Data_GetValue({fieldSqlName,y}){
+    Data_GetValues({selectName}){
 
-        return this._data[y][fieldSqlName];
+        var select = this.Selects_Get({selectName});
+        var values = this.#data.map((di)=>{return di[select.name]});
+        //console.log("crud->data_getvalues->params;selectName:",selectName,"results; select",select,"values:",values);
+        return values;
+    }
+
+    //--------------selects-----------
+
+    #selects = [];
+
+    #Selects_Set({extras=[]}){
+        
+        //--------add request------
+
+        this.#Selects_Add({
+            table:this._primary.tableIndex,
+            field:this._primary.fieldSqlIndex,
+            name:this._primary.name,
+        });
+
+        //extras
+        extras.forEach(ext => {
+            
+            this.#Selects_Add({
+                table:ext.table,
+                field:ext.field,
+                name:ext.as,
+            })
+        });
+
+        //fields
+        this._fields.forEach(field => {
+
+            //console.log("crud->selects_set->foreach fields->params: field",field);
+
+            if(field.sql!=null){
+
+                var selectIndex = this.#Selects_Add({
+                    field:field.sql.field,
+                    table:field.sql.table,
+                    name:field.name,
+                });
+                field.select = {index:selectIndex};
+            }
+
+            if(field.selectName!=null){
+
+               var selectIndex = this.#selects.findIndex(slc=>slc.name==field.selectName);
+               field.select = {index:selectIndex};
+            }
+        });
+    }
+
+    #Selects_Add({table,field,name}){
+
+        var index = this.#selects.findIndex(slc=>slc.table==table&&slc.field==field);
+        if(index==-1){
+
+            index  = this.#selects.length;
+            this.#selects.push({table,field,name,index});
+        }
+
+        return index;
+    }
+
+    Selects_Get({selectName,selectIndex}){
+
+        var index = selectIndex;
+        if(selectName!=null)index=this.#selects.findIndex(slc=>slc.name==selectName);        
+
+        var result = this.#selects[index];
+
+        //console.log("crud->selects_get->params; selectName:",selectName,"selectIndex:",index);
+
+        return result;
     }
 
     //---------reload------------
 
-    Reload_Action({lastPage=false}){
+    _orders=[];
+
+    Reload_Action({lastPage=false}={}){
 
         let k = this;
         
-        this.#States_SetTools({stateName:'reload'});
-        
-        var selects = [];
-        //selects by fields
-        for (let f = 0; f < this._fields.length; f++) {
-            const fi = this._fields[f];
-            if(fi.sql!=null) selects.push({...fi.sql});
-        };
-
-        //push field primary if no exist
-        var fieldPrimaryInfo = this._mysql.GetFieldPrimaryInfo({table:0});
-        var fieldPrimaryIndex = fieldPrimaryInfo['Index'];
-        selects.push({
-            table:0,
-            field:fieldPrimaryIndex,
-            as:'primary',
+        var selects = this.#selects.map((slc)=>{
+            return {
+                table:slc.table,
+                field:slc.field,
+                as:slc.name,
+            }
         });
 
         var conditions=[];
@@ -635,7 +762,7 @@ nt
                 conectionsCondition.conditions.push({
                     table:0,
                     field:cn.fieldSqlIndex,
-                    inter:'=',
+                    inter:"=",
                     value:cn.value,
                 });
             });
@@ -644,115 +771,47 @@ nt
         };
 
         //get conditions by filters
-        if(this._filters.length>0){        
-
-            for (let f = 0; f < k._filters.length; f++) {
-                const filter = k._filters[f];
-                var sql = filter.sql;
-                if(sql!=null){
-    
-                    var box = k._body.Filter_GetCol_Data({...filter}).labels[0].GetBox();
-                    var value = box.GetValue();
-                    
-                    //console.log(value,box.GetTipe(),filter);
-
-                    switch (box.GetTipe()) {
-                        case 1:
-
-                            conditions.push({
-                                and:true,
-                                conditions:[
-                                    {
-                                        table:sql.table,
-                                        field:sql.field,
-                                        inter:'LIKE',
-                                        value:value,
-                                        and:false,
-                                    },
-                                    {
-                                        table:sql.table,
-                                        field:sql.field,
-                                        inter:'IS',
-                                        value:'NULL',
-                                    }
-                                ],
-                            });
-                            
-                            break;
-                    
-                        case 4:
-
-                            var optionsConditions = {
-                                and:true,
-                                conditions:[],
-                            };
-                            value.forEach(v => {
-                               
-                                optionsConditions.conditions.push({
-                                    table:sql.table,
-                                    field:sql.field,
-                                    inter:'=',
-                                    value:v,
-                                    and:false,
-                                });
-                            });
-                            conditions.push(optionsConditions);
-
-                            break;
-
-                        default:
-
-                            conditions.push({
-                                and:true,
-                                conditions:[
-                                    {
-                                        table:sql.table,
-                                        field:sql.field,
-                                        inter:(sql.inter?sql.inter:"="),
-                                        value:value,
-                                        and:false,
-                                    },
-                                ],
-                            });
-
-                            break;
-                    }
-                    
-                }               
-            }
-
-        }
-
-        var joins = [...this._joins];
+        var filterConditions = k._body.Config_Filters_GetConditions();
+        //console.log("crud->reload_action->result; filterconditions:",filterConditions);
+        conditions=[...conditions,...filterConditions];
         
-        //console.log(this._mysql.Where_Sql({conditions:conditions}));
+        var joins = [...this._joins];
 
+        //console.log("crud->reload_action->param; selects:",selects,"conditions:",conditions);
+        
         //calculate size of all data and set pages
         k.#Reload_SetPages({
             conditions:conditions,
             joins:joins,
+            orders:k._orders,
             success:()=>{  
 
+                var pagesBox = k._body.Form_GetBuild().Tools_GetBox({name:"pages"});
+                var sizesBox = k._body.Form_GetBuild().Tools_GetBox({name:"sizes"});
+
+                if(lastPage) pagesBox.SetLastOption();
+
                 //calculate limit
-                var page = parseInt(this._body.Modulo_GetTool({name:'pages'}).GetValue());
-                var size = parseInt(this._body.Modulo_GetTool({name:'sizes'}).GetValue()); 
+                var page = parseInt(pagesBox.GetValue());
+                var size = parseInt(sizesBox.GetValue()); 
                 var limit = [(page-1)*size,size];
 
                 //request sql data of reload
                 k.#Sql_Request({
-                    action:'select',
+                    action:"select",
                     config:{
                         table_main:0,
                         selects:selects,
                         conditions:conditions,
                         joins:joins,
                         limit:limit,
-                    },
+                    },//logSql:true,
                     success:(data)=>{
                         
                         //print the resp
-                        k._Action_Print({data:data});
-                        k.CallEvent({name:'reloaded',params:{data:data}});
+                        k.#Data_SetData({data:data});
+                        k.#Body_Print({data:data});
+                        k.CallEvent({name:"reloaded",params:{data:data}});
                     }
                 });
             }
@@ -765,26 +824,30 @@ nt
         let k = this;
         //get size of data
         this.#Sql_Request({
-            action:'select',
+            action:"select",
             config:{
                 selects:[
                     {
                         table:0,
-                        field:this._fieldPrimaryInfo['Index'],
-                        as:'size',
-                        action:'count'
+                        field:this._primary.fieldSqlIndex,
+                        as:"size",
+                        action:"count"
                     },
                 ],
                 table_main:0,
                 conditions:conditions,
                 joins:joins,
             },
+            //logSql:true,
             success:(data)=>{
 
                 //calculate number of pages
-                var sizeTotal = parseInt(data[0]['size']);
-                var pagesBox = k._body.Modulo_GetTool({name:'pages'});
-                var size = parseInt(k._body.Modulo_GetTool({name:'sizes'}).GetValue());
+                var sizesBox = k._body.Tools_GetBox({name:"sizes"});
+                var pagesBox = k._body.Tools_GetBox({name:"pages"});
+
+
+                var sizeTotal = parseInt(data[0]["size"]);
+                var size = parseInt(sizesBox.GetValue());
                 var PagesTotal = Math.ceil(sizeTotal/size);
                 if(PagesTotal<=0) PagesTotal = 1;
 
@@ -794,17 +857,9 @@ nt
                     
                     pagesOptions.push({
                         value:pg,
-                        show:'pag ' + pg,
+                        show:"pag " + pg,
                     });
                 }
-
-                k.LogAction({msg:{
-                    msg:'calculate and set pages',
-                    sizeTotal: sizeTotal,
-                    size:size,
-                    PagesTotal:PagesTotal,
-                    pagesOptions:pagesOptions,
-                },logName:'eventSql'});
                 
                 var lastPage = pagesBox.GetValue(); 
                 //console.log("last page",lastPage,"pages",PagesTotal);
@@ -819,343 +874,31 @@ nt
         });
     }
 
-    //--------------print-----------
-    
-    _Action_Print({data=[]}){
-
-        this.#Data_SetData({data:data});
-
-        let k = this;
-
-        for (let f = 0; f < this._fields.length; f++) {
-            const field = this._fields[f];
-
-            //set load options
-            this._Action_Print_SetLoadOptionToBoxes({fieldIndex:f});
-
-            var boxes = this._Action_Print_GetBoxes({fieldIndex:f});
-            for (let y = 0; y < boxes.length; y++) {
-                
-                const box = boxes[y];
-
-                //set update
-                if(field.box.tipe != 0){
-   
-                    box.SetUpdate((value)=>{
-
-                        k._Print_BoxUpdate({value:value,fieldIndex:f,y:y});
-                    });
-                }
-
-                //print data
-                if(y < data.length){
-
-                    const line = data[y];               
-                    if(field.sql!=null){
-    
-                        var fieldSqlInfo = this._mysql.GetFieldInfo({...field.sql});
-                        var value = line[fieldSqlInfo['Field']];
-                        if(box) box.SetValue(value);
-                    }
-                }
-
-            }
-
-        }
-
-        this._fieldsUpdate=[];
-    }
-
-    _Action_Print_SetLoadOptionToBoxes({fieldIndex,field,loadOptions=null}){
-
-        var field = this._fields[fieldIndex];
-        var loadOptions = field.loadOptions;
-
-        if(loadOptions!=null){
-
-            var boxes = this._Action_Print_GetBoxes({fieldIndex:fieldIndex});
-            boxes.forEach(box => {
-                
-                box.SetOptions(loadOptions);
-            });
-        }
-
-    }
-
-    _Action_Print_GetBox({fieldName,fieldIndex=null,y}){
-
-        var boxes = this._Action_Print_GetBoxes({fieldIndex:fieldIndex,fieldName:fieldName});
-
-        if(boxes==null)return null;
-        if(y>=boxes.length)return null;
-
-        return boxes[y];
-    }
-
-    Print_GetValue({fieldName,fieldIndex=null,y}){
-
-        var box = this._Action_Print_GetBox({fieldName,fieldIndex,y});
-        return box.GetValue();
-    }
-
-    Print_SetValue({fieldName,fieldIndex,value,y=null}){
-
-        if(y==null){
-
-            var boxes = this._Action_Print_GetBoxes({fieldName,fieldIndex});
-            boxes.forEach(box => {
-                
-                box.SetValue(value);
-            });
-        }else
-        {
-            var box = this._Action_Print_GetBox({fieldName,fieldIndex,y});
-            box.SetValue(value);
-        }
-        
-    }
-
-    _Action_Print_GetBoxes({fieldIndex,fieldName}){
-
-        return [];
-    }
-
-    _fieldsUpdate = [
-        //{fieldIndex:0,y:0,value:1},
-    ];
-
-    _Print_BoxUpdate({fieldIndex,y,value}){
-
-        this._fieldsUpdate.push({
-            fieldIndex:fieldIndex,
-            y:y,
-            value:value,
-        });
-    
-        //----events----
-        this.CallEvent({name:'boxUpdate',params:{y:y,fieldIndex:fieldIndex,field:this._fields[fieldIndex],value:value}});
-     
-    }
-
-    #Action_Print_ScreenLoad({show=true}){
-
-        if(this._body!=null){
-            
-            this._body.LoadScreen_SetState({show:show});
-        }
-    }
-
-    //--------------trigger-----------------
-
-    _triggers = [
-        /*{
-          trigger:{fieldName:'cliente',toolName:'add'},
-          actions:[
-            {
-                name:'action',
-                params:[
-                    {name:'param1',value:10},
-                    {name:'param2',trigger:true},
-                    {name:'param4',build:null},
-                ],
-            },
-          ],
-        },*/
-    ];
-
-    #Trigger_AddOne(triggerData){
-
-        triggerData.load = {
-            total:triggerData.actions.length,
-            count:0,
-            loading:false,
-        }
-        this._triggers.push(triggerData);
-    }
-
-    #Trigger_BoxUpdate({}){
-
-        
-    }
-
-    #Trigger_CallOne({params=[],triggerData,success}){
-
-        triggerData.load.loading=true;
-        triggerData.load.count=0;
-
-        let k = this;
-        triggerData.actions.forEach(action => {
-            
-            var triggerParams = [...params,...action.params];
-            
-            k.Trigger_Action({
-                actionName:action.name,
-                params:triggerParams,
-                success:()=>{
-
-                    triggerData.load.count++;
-                    if(triggerData.load.count>=triggerData.load.total){
-
-                        triggerData.load.count=0;
-                        triggerData.load.loading=false;
-                        if(success!=null)success();
-                    }
-                }
-            });
-        });
-    }
-
-    _triggerActionsData=[
-        {
-            name:'printLoadData',
-            params:['loadIndex','printField'],
-        },
-        {
-            name:'modal',
-            params:['build','active'],
-        },
-        {
-            name:'setConection',
-            params:['name','field','value'],
-        },
-        {
-            name:'reload',
-            params:[],
-        },
-
-    ];
-
-    Trigger_Action({actionName,params,success}){
-
-        function GetValue(paramName) {
-            
-            var dlf = null;
-            switch (paramName) {
-                case 'build':
-                    df=this;
-                    break;
-            }
-
-            var param = params.find(pr=>pr[0]==paramName);
-            return param?param[1]:dlf;
-        }
-
-        switch (actionName) {
-
-            case 'printLoadData':
-
-                var data = this._loadsData[GetValue('loadIndex')].data;
-                var foundInData = data.find(d=>d.value==GetValue('searchValue'));
-                var printValue = foundInData[GetValue('printField')];
-
-                var boxs = this._Action_Print_GetBoxes({fieldName:GetValue('printField')});
-                boxs.forEach(bx => {
-
-                    bx.SetValue(printValue);
-                });
-
-            break;
-
-            case 'modal':
-                GetValue('build').Modal_SetActive({active:GetValue('active')});
-            break;
-
-            case 'conection':
-
-                var ParentValue = triggerBuild.Print_GetValue({fieldName:params.valueFieldName,y:triggerParams.y});
-                this.Conection_SetConection({
-                    name:params.name,
-                    fieldSqlIndex:params.fieldSqlIndex,
-                    value:ParentValue,
-                });
-            break;
-
-            case 'reload':
-                this.Reload_Action({});
-            break;
-
-            case 'new':
-                this.New_Action({});
-            break;
-
-            case 'load':
-                this.#Loads_OneLoad({
-                    loadIndex:params.loadIndex,
-                    useScreen:true,
-                });
-            break;
-
-            case 'setFieldValue':
-
-            var valueFrom = triggerParams.params.newPrimary;
-            console.log(triggerParams, valueFrom);
-            var boxesTo = this._Action_Print_GetBoxes({fieldName:params.fieldName});
-            boxesTo.forEach(bx => {
-                
-                bx.SetValue(valueFrom);
-            });
-
-            break;
-        }
-
-        if(actionName!='load'){
-
-           if(success!=null) success();
-        }
-    }
-    
-    //--------------clear---------------
-
-    Clear_Action({}){
-
-        this._fieldsUpdate = [];
-        this.#Clear_Fields({});
-        this.CallEvent({name:'cleared'});
-    }
-
-    #Clear_Fields({}){
-
-        for (let f = 0; f < this._fields.length; f++) {
-            const field = this._fields[f];
-            
-            var boxes = this._Action_Print_GetBoxes({fieldIndex:f});
-            if(boxes!=null){
-
-                boxes.forEach(bx => {
-                    
-                    if(bx.GetTipe()!=5)bx.SetDefault({});
-                });
-            }
-        }
-    }
-
-    //--------------block------------
-
-    Block_Action({}){
-
-        this.Clear_Action({});
-        this.#States_SetTools({stateName:"block"});
-    }
-
-
     //---------------new------------
 
-    New_Action({}){
+    #newFieldsBlock = false;
+    New_Action({}={}){
 
-        this._fieldsUpdate = [];
-        this.Clear_Action({});
-        this.#States_SetTools({stateName:"new"});
+        this._body.FieldsUpdate_Clear();
+        this._body.Clear({});
+        this._body.Block({active:this.#newFieldsBlock});
+        this.CallEvent({name:"newed"});
+    }
+
+    Block_Action({active=true}={}){
+
+        this._body.Block({active});
     }
 
     //--------------insert---------------
 
-    Action_Insert({inserts=[],addConections=true,addFields=true}){
+    Insert_Action({inserts=[],addConections=true,addFields=true}={}){
 
         let k = this;
         //push by conections
         if(addConections){
 
-            inserts = this.#Action_Insert_PushToInserts({
+            inserts = this.#Insert_Action_PushToInserts({
                 base:inserts,
                 add:this.#Insert_GetInsertsByConections({}),
             });
@@ -1165,10 +908,11 @@ nt
        if(addFields){
 
         var insertsByFields = [];
+
         for (let f = 0; f < this._fields.length; f++) {
 
             const field = this._fields[f];
-            var boxes = this._Action_Print_GetBoxes({fieldIndex:f});
+            var boxes = field.boxes
             if(field.sql!=null && boxes!=null){
 
                 boxes.forEach(bx => {
@@ -1180,26 +924,28 @@ nt
                 });
             }
         }
-        inserts = this.#Action_Insert_PushToInserts({base:inserts,add:insertsByFields});
+
+        inserts = this.#Insert_Action_PushToInserts({base:inserts,add:insertsByFields});
        }
 
         //calculate new id
         this.#Sql_Request({
-            action:'select',
+            action:"select",
             config:{
                 selects:[
                     {
-                        table:0,
-                        field:this._fieldPrimaryInfo['Index'],
-                        as:'max',
-                        action:'max'
+                        table:this._primary.tableIndex,
+                        field:this._primary.fieldSqlIndex,
+                        as:"max",
+                        action:"max"
                     },
                 ],
                 table_main:0,
             },
+            logSql:false,
             success:(data)=>{
 
-                var max = data[0]['max'];
+                var max = data[0]["max"];
                 if(max==null) max=0;
                 var newPrimary = parseInt(max)+1;
 
@@ -1207,37 +953,39 @@ nt
                   
                 //delete all inserts that have primaryfieldindex
                 for (var i = inserts.length - 1; i >= 0; --i) {
-                    if (inserts[i].field == k._fieldPrimaryInfo['Index']){
+                    if (inserts[i].field == k._primary.fieldSqlIndex){
                         inserts.splice(i,1);
                     }
                 }
                 //insert primaryfield value -> new primary
-                inserts=k.#Action_Insert_PushToInserts({
+                inserts=k.#Insert_Action_PushToInserts({
                     base:inserts,
                     add:[{
-                        field:k._fieldPrimaryInfo['Index'],
+                        field:k._primary.fieldSqlIndex,
                         value:newPrimary,
                     }]
                 });
 
                 k.#Sql_Request({
-                    action:'insert',
+                    action:"insert",
                     config:{
-                        table_main:0,
+                        table_main:this._primary.tableIndex,
                         inserts:inserts,
                     },
+                    logSql:false,
                     success:()=>{
 
-                        k.CallEvent({name:'inserted',params:{newPrimary:newPrimary,fieldIndexPrimary:k._fieldPrimaryInfo['Index']}});
-                        k.SetDefault({primaryValue:newPrimary});
+                        k.CallEvent({name:"inserted",params:{newPrimary:newPrimary,fieldIndexPrimary:k._primary.fieldSqlIndex}});
+                        k.States_SetState({state:k._stateAfterInserted,params:{lastPage:true}});
+                        //k.States_SetDefault({primaryValue:newPrimary,params:{lastPage:true}});
                     }
                 });
 
             }
         });
-    }
+    }    
 
-    #Action_Insert_PushToInserts({base=[],add=[]}){
+    #Insert_Action_PushToInserts({base=[],add=[]}){
 
         var result = [...base];
 
@@ -1250,7 +998,7 @@ nt
         return result;
     }
 
-    #Insert_GetInsertsByConections({}){
+    #Insert_GetInsertsByConections({}={}){
 
         return this._conections.map(cn=>{
 
@@ -1264,116 +1012,144 @@ nt
 
     //--------------update-----------------
 
-    _Action_Update({y=0,success}){
-
-        let k = this;
-        var sets = [];
-
-        //push set by fieldsUpdate
-        this._fieldsUpdate.forEach(f => {
-           
-            var field = k._fields[f.fieldIndex];    
-            if(field.sql!=null){
-
-                var value = k._Action_Print_GetBox({fieldIndex:f.fieldIndex,y:f.y}).GetValue();
-                sets.push({
-                    field:field.sql.field,
-                    value:value,
-                });
-            }
-        });
-
-        //remove set if fieldSql is primary
-        var fieldPrimaryIndex = this._fieldPrimaryInfo['Index'];
-        for (var i = sets.length - 1; i >= 0; --i) {
-            if (sets[i].field == fieldPrimaryIndex){
-                sets.splice(i,1);
-            }
-        }
-        
-        var conditions = [];
-        //condition by primary
-        var fieldPrimaryValue = this.#Data_GetFieldSql({fieldSqlIndex:this._fieldPrimaryInfo['Index'],y:y});
-        conditions.push({
-            and:true,
-            conditions:[{
-                table:0,
-                field:this._fieldPrimaryInfo['Index'],
-                inter:'=',
-                value:fieldPrimaryValue,
-            }],
-        });
-
-        if(sets.length<=0){ 
-
-            k.#Update_Success({success});
-            this.LogAction({msg:['error sets to update is empty',sets,conditions]});
-            return;
-        }
-
-        this.#Sql_Request({
-            action:'update',
-            config:{
-                table_main:0,
-                sets:sets,
-                conditions:conditions,
-            },
-            success:()=>{
-
-                k.#Update_Success({success,sets,conditions});
-            }
-        });
+    #fieldsUpdate = {
+        data:[],
+        total:0,
+        count:0,
+        save:true,
     }
 
-    #Update_Success({success,sets,conditions}){
+    Update_Action({success}={}){
 
-        this._fieldsUpdate = [];
-        this.CallEvent({name:'updated',params:{sets:sets,conditions:conditions}});
-        if(success!=null)success({conditions:conditions,sets:sets});
+        this.#fieldsUpdate.data = this._body.FieldsUpdate_GetData();
+        this.#fieldsUpdate.total = this.#fieldsUpdate.data.length;
+        this.#fieldsUpdate.count = 0;
+        this.#fieldsUpdate.save = false;
+
+        if(this.#fieldsUpdate.total>0){
+
+            this.#fieldsUpdate.data.forEach(fup => {
+
+                this.#Update_OneLoad({fieldUpdate:fup,success});
+            });
+            
+        }else this.#Update_Success({success});     
+    }
+
+    #Update_OneLoad({fieldUpdate,success}){
+
+        let k = this;
+
+        //console.log("crud->update_oneload->params; fieldupdate:",fieldUpdate);
+        
+        var sets = [];
+        fieldUpdate.fields.forEach(fup => {
+            
+            var field = k.Fields_GetInfo({fieldIndex:fup.fieldIndex});
+            var sql = field.sql;
+            if(sql!=null&&sql.table==k._primary.tableIndex){
+
+                sets.push({
+                    field:sql.field,
+                    value:fup.value,
+                });
+            }
+            
+        });
+
+        this.#Sql_Request({
+            action:"update",
+            config:{
+                table_main:k._primary.tableIndex,
+                sets:sets,
+                conditions:[{
+                    and:true,
+                    conditions:[{
+                        table:k._primary.tableIndex,
+                        field:k._primary.fieldSqlIndex,
+                        inter:"=",
+                        value:this.Data_GetValue({selectName:k._primary.name,y:fieldUpdate.y}),
+                    }]
+                }],
+            },logSql:true,
+            success:()=>{
+
+                k.#Update_OneLoaded({fieldUpdate,success})
+            }
+        })
+    }
+
+    #Update_OneLoaded({fieldUpdate,success}){
+
+        this.#fieldsUpdate.count++;
+        this.#fieldsUpdate.data.splice(fieldUpdate.index, 1);
+
+        if(this.#fieldsUpdate.count >= this.#fieldsUpdate.total){
+
+            this.#Update_Success({success});
+        }
+    }
+
+    #Update_Success({success}){
+
+        //this.#FieldsUpdate_Clear();
+        this.CallEvent({name:"updated",params:{}});
+        if(success!=null)success({});
+        this.States_SetState({state:this._stateAfterSaved});
+        //this.States_SetDefault({});
     }
 
     //----------------delete-------------
 
-    //request in sql to delete data by fields of body
-    
-    _Action_Delete({y=0,success}){
-
-        var conditions=[];
+    Delete_Action({y=-1,primaryValue,conditions=[],success}){
 
         //condition by primary
-        var primaryFieldIndex = this._fieldPrimaryInfo['Index'];
-        var primaryValue = this.#Data_GetFieldSql({fieldSqlIndex:primaryFieldIndex,y:y});
-        conditions.push({
-            and:true,
-            conditions:[{
-                table:0,
-                field:primaryFieldIndex,
-                inter:'=',
-                value:primaryValue,
-            }],
-        });
+        if(y!=-1) primaryValue = this.Data_GetValue({selectName:this._primary.name,y});
+
+        if(primaryValue!=null){
+
+            conditions.push({
+                and:true,
+                conditions:[{
+                    table:this._primary.tableIndex,
+                    field:this._primary.fieldSqlIndex,
+                    inter:"=",
+                    value:primaryValue,
+                }],
+            });
+        }
+        
         
         let k = this;
         this.#Sql_Request({
-            action:'delete',
+            action:"delete",
             config:{
-                table_main:0,
+                table_main:k._primary.tableIndex,
                 conditions:conditions,
             },
             success:()=>{
 
-                k.SetDefault({});
+                k.CallEvent({name:"deleted",params:{primaryValue,y}});
+                k.States_SetDefault({});
                 if(success!=null) success();
             },
-        })
+        });
 
+    }
+
+    //------------------cancel-------------
+
+    Cancel_Action({}={}){
+
+        this.CallEvent({name:"canceled"});
+        this.States_SetDefault();
     }
 
     //----------------conections-----------
 
     _conections = [
         /*{
-            name:'',
+            name:"",
             fieldSqlIndex:0,
             value:0,
         }*/
@@ -1392,52 +1168,33 @@ nt
         }
     }
 
-    Conection_GetValue({y=0,fieldSqlIndex=0}){
-        
-        var fieldIndex = this._fields.findIndex(f=>f.sql!=null&&f.sql.field==fieldSqlIndex);
-        
-        if(fieldIndex != -1){
+    //-----------------page------------
 
-            var box = this._Action_Print_GetBox({y:y,fieldIndex:fieldIndex});
-            //console.log(box);
-            return box.GetValue();
+    _recive = null;
 
-        }else{
+    #Page_Recive({recive}){
 
-            return this.#Data_GetFieldSql({y:y,fieldSqlIndex:fieldSqlIndex});
+        this._recive=recive;
+
+        if(this._recive.conections!=null){
+
+            this._recive.conections.forEach(cnx => {
+                
+                this.Conection_SetConection({...cnx});
+            });
         }
+
+        this.States_SetState({...this._recive});
     }
 
     //-----------------Public Functions--------
 
-    //[reload,new]
-    _stateDefault = 'reload';
-    _stateStart = 'reload';
+    #ScreamLoad({show=true}){
 
-    SetDefault(params){
-
-        this.#SetState({state:this._stateDefault,params:params});         
-    }
-
-    #SetStart(){
-
-        this.#SetState({state:this._stateStart});   
-    }
-
-    #SetState({state='reload',params=null}){
-
-        switch (state) {
-            case 'reload':
-                this.Reload_Action({...params});
-                break;
-
-            case 'new':
-                this.New_Action({});
-                break;
-        
-            default:
-                break;
+        if(this._body!=null){
+            
+            this._body.Form_GetBuild().LoadScreen_SetState({show:show});
         }
-    }    
+    }
     
 }

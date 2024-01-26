@@ -4,109 +4,161 @@ $(document).ready(function() {
     new Pag_Base({
   
       success:({recive,page})=>{
-        //if(recive == null) recive = {name:'search',value:1};
+
         
-        new Master({
-          title:'ingreso de compras',
-          cols:[[12],[12]],
-          forms:[
-            {
-              tipe:2,
-              x:0,y:0,
-              form:{
-
-                title:'compra',
-                states:[{name:'reload',tools:[{name:'new',show:true},{name:'save',show:true}]}],
-                state_base:'search',
-                recive:recive,
-                page:page,
-                tables:['buys','providers'],
-                loads:[
-                  {table:1},
-                ],
-                modulos:{
-                  cols:[[12],[12]],
-                  windows:[
-                    {
-                      x:0,y:0,
-                      title:'informacion general',
-                      cols:[[12],[12],[6,6],[12],[12],[12],],
-                      fields:[
-                        {x:0,y:0,name:'fecha de emision',box:{tipe:2,default:Date_Today()},conection:{field:2}},
-                        {x:0,y:1,name:'proveedor',conection:{field:1},box:{tipe:8,class:'w-100'},load:0},
-                        {x:0,y:2,tipe:2,name:'confirmado',box:{tipe:6},conection:{field:3}},
-                        {x:1,y:2,tipe:2,name:'pagado',box:{tipe:6},conection:{field:4}},
-                      ],
-                    },
-                    {
-                      x:0,y:1,
-                      title:'informacion de entrega',
-                      cols:[[12],[6,6],[12],[12],[12],],
-                      fields:[
-                        {x:0,y:0,name:'fecha de entrega',box:{tipe:2,default:Date_Today(7)},conection:{table:0,field:8}},
-                        {x:0,y:1,tipe:2,name:'total',box:Box_Soles({total:0,clss:'h3'}),conection:{table:0,field:5}},
-                        {x:1,y:1,tipe:2,name:'entregado',box:Box_Dual({show:'entregado',show2:'pendiente'}),conection:{table:0,field:7}},
-                      ],
-                    }
-                  ],
-                }
-      
-              }
-            },
-            {
-              x:0,y:1,
-              tipe:1,
-              form:{
-                title:'lista de productos',
-                h_min:500,
-                state_base:'list',
-                state_start:'block',
-                states:[{name:'list',tools:[{name:'save',show:false}]}],
-                tables:['buy_products','productos','unidades'],
-                loads:[
-                  {
-                    table_main:1,
-                    selects:[
-                      {table:1,field:0,as:'value'},
-                      {table:1,field:1,as:'show'},
-                      {table:2,field:1,as:'unidad'},
-                    ],
-                    joins:[
-                      {main:{table:1,field:10},join:{table:2,field:0}},
-                    ],
-                  }
-                ],
-                fields:[
-                  {delete:true},
-                  //{name:'id',conection:{field:0}},
-                  //{name:'buy_id',conection:{field:1}},
-                  {name:'product_id',conection:{field:2},box:{tipe:8,class:'w-100'},load:0,attributes:[{name:'style',value:'min-width:220px'}]},
-                  {name:'cant',conection:{field:3},box:{tipe:1,class:'w-100'},attributes:[{name:'style',value:'max-width:80px'}]},
-                  {name:'unidad',load:{index:0,as:'unidad'}},
-                  {name:'cost total',conection:{field:4},box:{tipe:1,class:'w-100'},attributes:[{name:'style',value:'min-width:110px'}]},
-                ],
-              }
-            }
-          ],
-          conections:[
-            {
-              tipe:1,
-              master:{index:0,table:0,field:0},
-              maid:{index:1,table:0,field:1}
-            }
-          ],
-          calculates:[
-            {
-              sum:[
-                {index:1,field:'cost total'},
-              ],
-              total:{index:0,field:'total'},
-              update:[0,1],
-            }
-          ],
-
+        const panel = new Grid({
+          cols:[[6,6],[12],[12],[12],[12],[12]],
         });
+
+        const buy_add = new Crud_Form({
+          parent:panel.GetColData({x:0,y:0}).col,
+          title:'compra',
+          //states:[{name:'reload',tools:[{name:'new',show:true},{name:'save',show:true}]}],
+          //state_base:'search',
+          tables:['buys','providers'],
+          loads:[1],
+          windows:[
+            {
+              title:'informacion general',
+              fields:[
+                {col:6,name:"nro",sql:{field:0}},
+                {col:6,name:'fecha de emision',box:{tipe:2,default:Date_Today()},sql:{field:2}},
+                {col:1,edit:true},{col:1,new:true},
+                {col:10,name:'proveedor',sql:{field:1},box:{tipe:8,class:'w-100'},load:0},
+                {col:4,tipe:2,name:'confirmado',box:{tipe:6},sql:{field:3}},
+                {col:4,tipe:2,name:'pagado',box:{tipe:6},sql:{field:4}},
+                {col:4,tipe:2,name:'total',box:Box_Soles({total:0,clss:'h3'}),sql:{table:0,field:5}},
+                {col:6,name:'fecha de entrega',box:{tipe:2,default:Date_Today(7)},sql:{table:0,field:8}},
+                {col:6,tipe:2,name:'entregado',box:{tipe:6},sql:{table:0,field:7}},
+              ],
+            },
+          ],
+        });
+
+        //proveedor
+        if(false){
+
+          const provider_modulo = new Crud_Form({
+            modal:true,
+            ...provider_add,
+          });
+  
+          new Crud_Master({
+            master:{
+              event:"edit",
+              fieldName:"proveedor",
+              build:buy_add,
+            },
+            maid:{
+              fieldSqlIndex:0,
+              build:provider_modulo,
+            }
+          });
+        }
         
+        //lista de productos
+        if(false){
+
+          const products_list = new Crud_Table({
+            parent:panel.GetColData({x:0,y:1}).col,
+            title:"lista de productos",
+            tables:["buy_products","productos"],
+            loads:[1],
+            fields:[
+              //{edit:true},
+              //{name:"id",sql:{field:0}},
+              //{name:"buy id",sql:{field:1}},
+              {delete:true},
+              {name:"producto",size:400,sql:{field:2},load:0,box:{tipe:8}},
+              {name:"cantidad",box:{tipe:1},sql:{field:3}},
+              {name:"costo total",box:{tipe:1},sql:{field:4}},
+            ],
+          });
+  
+          new Crud_Master({
+            master:{
+              event:"reload",
+              fieldSqlName:"primary",
+              build:buy_add,
+            },
+            maid:{
+              fieldSqlIndex:1,
+              build:products_list,
+            }
+          }); 
+        }
+
+        //lista de transacciones
+        if(true){
+
+          const tr_lst = new Crud_Table({
+            parent:panel.GetColData({x:1,y:0}).col,
+            title:"pagos",
+            tables:["buy_transacctions","transactions","transactions_tags"],
+            selects:[
+              {table:1,field:2,as:"total"},
+              {table:2,field:1,as:"etiqueta"},
+              {table:0,field:2,as:"pago id"},
+            ],
+            joins:[
+              {main:{table:0,field:2},join:{table:1,field:0}},
+              {main:{table:1,field:3},join:{table:2,field:0}},
+            ],
+            fields:[
+              {delete:true},
+              {edit:true,name:"edit"},
+              //{name:'id',sql:{field:0},box:{tipe:0}},
+              //{name:'buy id',sql:{field:1},box:{tipe:0}},
+              //{name:"pago id",sql:{field:2},box:{tipe:0}},
+              {name:"total",dataName:"total"},
+              {name:"etiqueta",dataName:"etiqueta"},
+            ]
+          });
+
+          new Crud_Master({
+            master:{
+              event:"reload",
+              fieldSqlName:"primary",
+              build:buy_add,
+              deleteChild:true,
+            },
+            maid:{
+              fieldSqlIndex:1,
+              build:tr_lst,
+            }
+          }); 
+
+          if(true){
+
+            //formato de transaccion
+            const tr_frm = new Crud_Form({
+              modal:true,
+              parent:panel.GetColData({x:0,y:4}).col,
+              ...transaction_add,
+            });
+
+            new Crud_Master({
+              master:{
+                event:"edit",
+                fieldSqlName:"pago id",
+                build:tr_lst,
+              },
+              maid:{
+                fieldSqlIndex:0,
+                build:tr_frm,
+              }
+            });
+
+            if(true){
+
+              
+            }
+
+          }
+
+        }
+        
+
       }
     })
   

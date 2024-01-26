@@ -29,12 +29,16 @@ class Box {
 
   #update = null;
   #att = [];
-  #SetAttribute({dom=null}) {
-    
-    this.#att.forEach(att => {
+  #SetDomAttribute({dom,att}){
+
+    att.forEach(att => {
       
       dom.setAttribute(att.name,att.value);
     });
+  }
+  #SetAttribute({dom=null}) {
+    
+    this.#SetDomAttribute({dom,att:this.#att});
   }
 
   constructor(i) {
@@ -54,14 +58,14 @@ class Box {
 
     this.#Build();
     //this.#Print();
-
+    
     //set default
     if(i.default == null){
 
       switch (this.#tipe) {
 
         case 3:
-          
+        
         this.#dflt = this.#options.length > 0 ? [this.#options[0].value] : 1;
         break;
 
@@ -132,7 +136,7 @@ class Box {
 
       break;
 
-      //date
+      //options
       case 3:
 
       this.#blocks[0] = document.createElement("select");
@@ -277,9 +281,9 @@ class Box {
 
       $('#' + this.#blocks[1]['id']).change(function() {
 
-        //console.log(this.checked);
+        //console.log(this.checked,this.value);
 
-        u.#CallUpdate(this.value);
+        u.#CallUpdate(this.checked?1:0);
       });
 
       break;
@@ -288,7 +292,7 @@ class Box {
       $('#' + this.#blocks[0]['id']).change(function() {
 
         
-        //if(u.#tipe==8) console.log("----------------setvalue----");
+        // console.log("----------------setvalue----");
         u.#CallUpdate(this.value);
       });
 
@@ -315,6 +319,23 @@ class Box {
     }
 
     return v;
+  }
+
+  #Format_GetAttributes({}={}){
+
+    var att = [];
+
+    if(this.#format==null)return att;
+
+    var limit = this.#format.limit;
+    if(limit){
+
+      var v = parseFloat(this.#value);
+      var limitState = v >= limit.value ? limit.more : limit.less;
+      att = limitState.attributes;
+    }
+
+    return att;
   }
 
   #Paint(){
@@ -354,10 +375,20 @@ class Box {
         var op = null;
         if(this.#options != null && this.#value < this.#options.length) op = this.#options.find(p=>p.value == this.#value);
 
-        const clss = op !=null && op.class !=null ? op.class : this.#clss;
-        const style = op !=null && op.style !=null ? op.style : this.#style;
+        var clss = op !=null && op.class !=null ? op.class : this.#clss;
+        var style = op !=null && op.style !=null ? op.style : this.#style;
 
-        //console.log(clss, op,'------paint');
+        var format_att = this.#Format_GetAttributes();
+        if(format_att.length>0){
+
+          var f_clss = format_att.find(f=>f.name=="class");
+          if(f_clss!=null) clss = f_clss.value;
+          var f_style = format_att.find(f=>f.name=="style");
+          if(f_style!=null) style = f_style.value;
+
+        }
+
+        //console.log(clss, style,'------paint');
 
         d.setAttribute("class",clss);
         d.setAttribute("style",style);
@@ -379,6 +410,7 @@ class Box {
   #Print(){
 
     switch (this.#tipe) {
+
       case 0:
 
         var p_op = this.#options.find(op=>op.value == this.#value);
@@ -410,7 +442,7 @@ class Box {
       case 8:
 
         $('#'+this.#blocks[0].id).selectpicker('val',this.#value);
-        $('#'+this.#blocks[0].id).selectpicker('render');
+        //$('#'+this.#blocks[0].id).selectpicker('render');
         
       break;
 
@@ -436,7 +468,7 @@ class Box {
     this.#value = v;
     this.#Print();
     this.#Paint();
-    if(this.#tipe==8)this.#CallUpdate(v);
+    //if(this.#tipe==8)this.#CallUpdate(v);
   }
 
   GetValue(){
@@ -486,8 +518,7 @@ class Box {
   SetOptions(ops){
 
     var lastvalue = this.GetValue();
-    //console.log("-------------last.------",lastvalue,ops,this.#options);
-
+    
     //update the options data
     this.#options = ops;
     if(this.#tipe == 8 || this.#tipe==4 || this.#tipe==3){
@@ -498,44 +529,12 @@ class Box {
       this.#Build();
       this.#Paint();
       this.SetValue(lastvalue);
-      //this.SetDefault();
-
-      /*if(this.#tipe == 4){
-
-        this.SetDefault(ops.map((op)=>{return op.show}));
-      }*/
-
-      //control index option
-      /*var opIndex = this.GetOption_Index({value:this.#value});
-      var opMax = ops.length-1;
-      if(opIndex>opMax) this.SetValue(ops[opMax].value);
-      else if(opIndex<0) this.SetValue(ops[0].value);*/
 
       return;
     }
 
-    /*if(this.#tipe == 3 || this.#tipe == 4){
-
-      for (let op = 1; op < this.#blocks.length; op++) {
-        const bc = this.#blocks[op];
-        bc.remove();
-      }
-
-      this.#blocks = [this.#blocks[0]];
-
-      //create options
-      for(var op=0; op < this.#options.length; op++){
-
-        var opi = this.#options[op];
-        var op_nw = document.createElement("option");
-        this.#blocks[0].appendChild(op_nw);
-        this.#blocks[op+1] = op_nw;
-        op_nw.value = opi.value;
-        op_nw.innerHTML = opi.show;
-      }
-    }*/
-
     //build with new options
+    //console.log("box->setoptions->params->lastvalue:",lastvalue);
     this.SetValue(lastvalue);
     this.#Print();
     
@@ -607,14 +606,29 @@ class Box {
     this.SetValue(this.#dflt);
   }
 
-  Hide(slow){
+  #show = true;
+  Show_Get(){
 
-    $('#'+this.#blocks[0].id).hide(slow ? "slow" : null);
+    return this.#show;
+  }
+
+  #Show_SetActive({show,slow}){
+    
+    this.#show=show;
+    var b = this.#blocks[0];
+    if(this.#show) $('#'+b.id).show(slow ? "slow" : null);
+    else $('#'+b.id).hide(slow ? "slow" : null);
+  }
+
+
+  Hide(slow){
+    
+    this.#Show_SetActive({show:false,slow});
   }
 
   Show(slow){
 
-    $('#'+this.#blocks[0].id).show(slow ? "slow" : null);
+    this.#Show_SetActive({show:true,slow});
   }
 
   SetUpdate(u){
@@ -622,6 +636,39 @@ class Box {
     //console.log("set new update");
     //console.log(u);
     this.#update = u;
+  }
+
+  //-----------bock-----------
+  #block = false;
+  #Block_Action({}={}){
+
+    var doms = [];
+
+    switch (this.#tipe) {
+
+      case 6:
+        doms=[...this.#blocks];
+      break;
+    
+      default:
+        doms=[this.#blocks[0]];
+        break;
+    }
+
+    if(doms.length>0){
+
+      doms.forEach(dom => {
+
+        if(this.#block) dom.setAttribute("disabled","disabled");
+        else dom.removeAttribute("disabled");
+      });
+    }    
+  }
+
+  Block({active=true}){
+
+    this.#block=active;
+    this.#Block_Action();
   }
 
 }

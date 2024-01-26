@@ -1,6 +1,7 @@
 
 class ODD {
 
+    #title="";
     _name = '';
     _setName({name=''}){this._name=name};
     _log  = true;
@@ -21,22 +22,36 @@ class ODD {
     }
     
 
-    constructor({name='',logControl=[],events=[],eventActives=[]}={}){
+    constructor(i){
 
-        this._name = name;
+        //------set variables-------
+
+        if(i){
+
+            if(i.name!=null) this._name = i.name;this.#title=i.title;
         
-        //update log control
-        logControl.forEach(lg => {
-            
-            var lgfound = this._logControl.findIndex(li=>li.name == lg.name);
+            //update log control
+            if(i.logControl!=null){
 
-            if(lgfound==-1) this._logControl.push(lg);
-            else this._logControl[lgfound].log = lg.log;
-        });
+                i.logControl.forEach(lg => {
+                
+                    var lgfound = this._logControl.findIndex(li=>li.name == lg.name);
+        
+                    if(lgfound==-1) this._logControl.push(lg);
+                    else this._logControl[lgfound].log = lg.log;
+                });
+            }
 
-        this.AddEvents({events:events});
-        this.SetActivesEvents({eventActives:eventActives});
+            if(i.events!=null)this.AddEvents({events:i.events});
+            if(i.eventActives!=null)this.SetActivesEvents({eventActives:i.eventActives});
+        }
+        
+        //------start------
+
+        this.CallEvent({name:"started",params:i});
     }
+
+    //------------
 
     LogAction({type='log',msg='',logName='general'}){
 
