@@ -39,7 +39,6 @@ $(document).ready(function() {
 
     scn.SetState({state:true});
     lg.LogIn({
-
       user:uss,
       password:pss,
       log:true,

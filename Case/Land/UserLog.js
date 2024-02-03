@@ -1,16 +1,17 @@
 
 class UserLog {
 
-  #load = null;
+  #sql = null;
+  #mysql = null;
 
   constructor({success=null}={}) {
 
     //first load tables
     let k = this;
 
-    this.#load = new dataBase();
+    this.#mysql = new Mysql({tables:['usuarios','usuarios_clases','clase_paginas']});
+    this.#sql = new Sql();
 
-    this.#load.SetTables({tables:['usuarios','usuarios_clases','clase_paginas']});
     if(success!=null)success({loger:this});
   }
 
@@ -20,7 +21,7 @@ class UserLog {
     let k = this;
 
     //confirm that user and password are right
-    this.#load.Select_Sql({
+    var sql_Log = this.#mysql.Select_Sql({
 
       table_main:0,
       selects:[
@@ -35,6 +36,10 @@ class UserLog {
           {table:0,field:4,inter:'=',value:1},
         ]
       }],
+    });
+    this.#sql.Load({
+      php:"row",
+      sql:sql_Log,
       success:function(resp) {
 
         var exist = resp.length > 0;
@@ -78,10 +83,7 @@ class UserLog {
         //console.log('user loged --- load pages');
 
         //get pages
-        k.#load.Select_Sql({
-
-          log_sql:false,
-
+        var sql_getUserInfo = k.#mysql.Select_Sql({
           table_main:0,
           conditions:[{
             and:true,
@@ -98,7 +100,10 @@ class UserLog {
           joins:[
             {main:{table:0,field:3},join:{table:2,field:1}},//clase -> clase_paginas
           ],
-
+        });
+        k.#sql.Load({
+          php:"row",
+          sql: sql_getUserInfo,
           success:function(resp1) {
 
             //console.log("user loged -> pages:",resp1);
@@ -106,7 +111,9 @@ class UserLog {
           }
         });
 
-      }else {
+      }
+      else
+      {
 
         var msg = "user no log";
         console.error(msg);
