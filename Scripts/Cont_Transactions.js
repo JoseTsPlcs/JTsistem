@@ -6,7 +6,7 @@ $(document).ready(function() {
 
       var control = {
         cont_lst:{active:true},
-        cont_add:{active:true},
+        cont_add:{active:false},
       }
 
       var panel = new Grid({
@@ -27,8 +27,8 @@ $(document).ready(function() {
       if(control.cont_lst.active){
 
         control.cont_lst.parent = panel.GetColData({x:0,y:3}).col;
-        control.cont_lst.build = new Crud_Table({
-          parent:control.cont_lst.parent,
+        control.cont_lst.build = new Crud({
+          parent:control.cont_lst.parent,tipe:"table",
           title:"lista de transferencias",
           tables:["transactions","transactions_tags","accounts"],
           selects:[

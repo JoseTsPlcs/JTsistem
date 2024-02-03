@@ -29,8 +29,9 @@ class Crud_Master extends ODD {
                 name:'master boxUpdate',
                 action:({field,y})=>{
 
-                  //console.log("crud_master->event boxupdate->field:",field);
-                  if(k._master.event == "edit"){
+                  //console.log("crud_master->event boxupdate->field:",field+",y:"+y);
+                  
+                  if(k._master.event=="edit"){
                     
                     if(field.action=="edit"){
                       
@@ -128,6 +129,35 @@ class Crud_Master extends ODD {
                 }
               }
             ],
+          },
+          {
+            name:"deleted",
+            actions:[
+              {
+                name:"delete parent",
+                action:()=>{
+
+                  if(k._maid.deleteParent){
+
+                    var deleteValueofMaid = k._maid.build.Data_GetValue({fieldSqlIndex:k._maid.fieldSqlIndex});
+                    var deleteFieldSqlIndexofParent = k._master.build.Selects_Get({selectName:k._master.selectName}).field;
+
+                    //console.log(maidFieldSqlIndex,maidPrimaryValue);
+                    k._master.build.Delete_Action({conditions:[
+                      {
+                        and:true,
+                        conditions:[{
+                          table:k._master.build._primary.tableIndex,
+                          field:deleteFieldSqlIndexofParent,
+                          value:deleteValueofMaid,
+                          inter:"=",
+                        }],
+                      }
+                    ]});
+                  }
+                }
+              }
+            ],
           }
         ],
       });
@@ -148,7 +178,7 @@ class Crud_Master extends ODD {
                       if(field.action=="new"){
     
                         k._maid.build.Body_Modal_SetActive({active:true});
-                        k._maid.build.New_Action({});
+                        k._maid.build.States_SetState({state:"new"});
                       }
                     }
                   }
@@ -198,6 +228,11 @@ class Crud_Master extends ODD {
           actionName:"base",
           active:false,
         });
+        this._maid.build._body.Form_GetBuild().SetActiveOneAction({
+          eventName:"deleteUpdate",
+          actionName:"base",
+          active:false,
+        });
 
         this._master.build._body.Form_GetBuild().AddEvents({events:[
           {
@@ -210,6 +245,22 @@ class Crud_Master extends ODD {
                   k._maid.build.Body_Modal_SetActive({active:true});
                   //k._maid.build.New_Action({});
                   k._maid.build.States_SetState({state:"new"});
+                }
+              }
+            ],
+          },
+        ]});
+
+        this._master.build.AddEvents({events:[
+          {
+            name:"inserted",
+            actions:[
+              {
+                name:"maid insted newid to master",
+                action:()=>{
+
+                  //console.log("maid insted newid to master");
+                  k._master.build.States_SetDefault({lastPage:true});
                 }
               }
             ],
@@ -266,6 +317,8 @@ class Crud_Master extends ODD {
             },
           ],
         });
+
+        
       }
 
     }
@@ -301,7 +354,7 @@ class Crud_Master extends ODD {
         tools:[
           {name:"new",show:(this._maid.build._tipe!="form")},
           {name:"cancel",show:(this._maid.build._tipe=="form")},
-          {name:"delete",show:(this._maid.build._tipe=="form")},
+          {name:"delete",show:(false)},
         ],
       });
       this._maid.build.Body_Modal_SetActive({active:true});

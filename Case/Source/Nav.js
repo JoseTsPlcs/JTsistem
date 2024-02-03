@@ -1,7 +1,7 @@
 
 const secciones = [
   {value:0,show:'ventas'},
-  {value:1,show:'despacho'},
+  //{value:1,show:'despacho'},
   {value:2,show:'reporte'},
   {value:3,show:'clientes'},
   {value:4,show:'productos'},
@@ -18,11 +18,11 @@ const paginas = [
 
   {value:1,show:'venta', php:'Sales_New',seccion:0},
   {value:2,show:'control', php:'Sales_Control',seccion:0},
-  {value:35,show:'caja', php:'Sales_Cash',seccion:0},
-  {value:36,show:'caja ingreso', php:'Sales_CashAdd',seccion:0},
-  {value:3,show:'armar', php:'Armar',seccion:0},
-  {value:4,show:'cobrar', php:'Sales_Pay',seccion:0},
-  {value:5,show:'entregar', php:'Sales_Commit',seccion:0},
+  //{value:35,show:'caja', php:'Sales_Cash',seccion:0},
+  //{value:36,show:'caja ingreso', php:'Sales_CashAdd',seccion:0},
+  //{value:3,show:'armar', php:'Armar',seccion:0},
+  //{value:4,show:'cobrar', php:'Sales_Pay',seccion:0},
+  //{value:5,show:'entregar', php:'Sales_Commit',seccion:0},
 
   {value:6,show:'deliverys',php:'Delivery',seccion:1},
   {value:7,show:'zonas',php:'Delivery_Zones',seccion:1},

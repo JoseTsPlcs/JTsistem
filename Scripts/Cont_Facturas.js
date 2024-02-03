@@ -12,10 +12,10 @@ $(document).ready(function() {
         ],
       });
 
-      new Form_Table({
+      new Crud({
         parent: conteiner.GetColData({x:0,y:1}).col,
+        tipe:"table",
         title:'lista de facturas',
-        h_min:500,
         tables:['ventas','clientes'],
         selects:[
           {table:1,field:3,as:'0_3'},
@@ -30,7 +30,7 @@ $(document).ready(function() {
           conditions:[{table:0,field:16,inter:'=',value:0}],
         }],
         states:[{name:'reload',tools:[
-          {name:'sizes',value:999,show:false},
+          {name:'sizes',value:10,show:false},
           {name:'pages',show:false},
           {name:'page_back',show:false},
           {name:'pages',show:false},
@@ -40,24 +40,24 @@ $(document).ready(function() {
           {name:'new',show:false},
         ]}],
         filters:[
-          {name:'fecha min',conection:{table:0,field:2,inter:'>='},box:{tipe:2,default: Date_FirstOfMoth()}},
-          {name:'fecha max',conection:{table:0,field:2,inter:'<='},box:{tipe:2,default: Date_LastOfMoth()}},
-          {name:'cliente',conection:{table:1,field:3,inter:'LIKE'},box:{tipe:1,class:'w-100'}},
-          {name:'documentos',conection:{table:0,field:14},box:{tipe:4,options:documentos_options,default:['boleta','factura']}},
-          {name:'emitido',conection:{table:0,field:15},box:{...Box_MutipleDual({show:'emitido'}),default:['no emitido']}},
+          {name:'fecha min',sql:{table:0,field:2,inter:'>='},box:{tipe:2,default: Date_FirstOfMoth()}},
+          {name:'fecha max',sql:{table:0,field:2,inter:'<='},box:{tipe:2,default: Date_LastOfMoth()}},
+          {name:'cliente',sql:{table:1,field:3,inter:'LIKE'},box:{tipe:1,class:'w-100'}},
+          {name:'documentos',sql:{table:0,field:14},box:{tipe:4,options:documentos_options,default:['boleta','factura']}},
+          {name:'emitido',sql:{table:0,field:15},box:{...Box_MutipleDual({show:'emitido'}),default:['no emitido']}},
         ],
         fields:[
-          {edit:true,send:{page:page,url:'Cont_Factura_View.php',send:{name:'search'}}},
-          {name:'cliente',conection:{table:1,field:3},attributes:[{name:'style',value:'min-width:200px'}]},
-          {name:'dni/ruc',conection:{table:1,field:4},attributes:[{name:'style',value:'min-width:100px'}]},
-          //{name:'total',conection:{table:0,field:4},box:Box_Soles()},
+          {action:"edit",send:{page:page,url:'Cont_Factura_View.php',send:{name:'search'}}},
+          {name:'cliente',sql:{table:1,field:3},attributes:[{name:'style',value:'min-width:200px'}]},
+          {name:'dni/ruc',sql:{table:1,field:4},attributes:[{name:'style',value:'min-width:100px'}]},
+          //{name:'total',sql:{table:0,field:4},box:Box_Soles()},
           //{name:'delivery',field:6,box:Box_Soles()},
           {name:'total neto',box:Box_Soles()},
-          {name:'pagado',conection:{table:0,field:8},box:Box_ShowOptions({show:'pagado'})},
-          {name:'entregado',conection:{table:0,field:11},box:Box_ShowOptions({show:'entregado'})},
-          {name:'documento',conection:{table:0,field:14},box:{tipe:3,options:documentos_options}},
-          {name:'fecha',conection:{table:0,field:2},attributes:[{name:'style',value:'min-width:100px'}]},
-          {name:'emitido',field:15,box:{tipe:6}},
+          {name:'pagado',sql:{table:0,field:8},box:Box_ShowOptions({show:'pagado'})},
+          {name:'entregado',sql:{table:0,field:11},box:Box_ShowOptions({show:'entregado'})},
+          {name:'documento',sql:{table:0,field:14},box:{tipe:3,options:documentos_options}},
+          {name:'fecha',sql:{table:0,field:2},attributes:[{name:'style',value:'min-width:100px'}]},
+          {name:'emitido',sql:15,box:{tipe:6}},
         ],
         events:[
           {
