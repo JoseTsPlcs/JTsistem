@@ -18,11 +18,11 @@ class Crud_Table extends Crud_Body {
 
     //------------print---------
 
-    Print({print=[]}){
+    Print_BuildBoxes({data=[]}){
 
-        this.#Table_SetLines({count:print.length});
-        //console.log("crud_table->print->params; print:",print);
-        super.Print({print});        
+        this.#Table_SetLines({count:data.length});
+        //console.log("crud_table->data->params; data:",data);
+        super.Print_BuildBoxes({data});        
     }
 
     Clear({}={}){

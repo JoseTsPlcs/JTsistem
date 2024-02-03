@@ -272,17 +272,17 @@ const customers_add = {
 //----------buys----------
 
 const provider_add = {
-
+    tipe:"form",
     title:'proveedor',
     tables:['providers'],
     windows:[
         {
             title:"informacion",
             fields:[  
-                {name:'activo',sql:{field:4},box:{tipe:6}},
-                {name:'empresa',sql:{field:1},box:{tipe:1,class:'w-100'},attributes:[{name:'style',value:'min-width:250px'}]},
-                {name:'ruc',sql:{field:2},box:{tipe:1,class:'w-100'}},
-                {name:'celular',sql:{field:3},box:{tipe:1,class:'w-100'}},
+                //{name:'activo',sql:4,box:6},
+                {name:'empresa',sql:1},
+                //{name:'ruc',sql:{field:2},box:{tipe:1,class:'w-100'}},
+                //{name:'celular',sql:{field:3},box:{tipe:1,class:'w-100'}},
             ],
         }
     ],
@@ -302,56 +302,112 @@ const transaccion_list = {
   }
 
 const transaction_add = {
-    title:"nueva transaccion",
-    tables:["transactions","accounts","transactions_tags"],
-    loads:[1,
-      {
-        table_main:2,
-        selects:[
-          {table:2,field:0,as:"value"},
-          {table:2,field:1,as:"show"},
-          {table:2,field:2,as:"ingreso"},
-        ],
-      }
-    ],
-    windows:[
-      {
-        title:"informacion general",
-        fields:[
-          {col:3,name:"nro",sql:{field:0}},
-          {col:9,name:"fecha",sql:{field:1},box:{tipe:2}},
-          {name:"cuenta",tipe:1,sql:{field:4},box:{tipe:3},load:0},
-          {col:6,name:"ingreso",sql:{field:6},box:{tipe:6}},
-          {col:6,name:"etiqueta",tipe:1,sql:{field:3},box:{tipe:3}},
-          {name:"total",sql:{field:2},box:{tipe:1}},
-          {name:"descripcion",tipe:2,sql:{field:5},box:{tipe:1}},
-        ],
-      }
-    ],
-    events:[
-      {
-        name:"boxUpdate",
-        actions:[
-          {
-            name:"tag chag by ingreso",
-            action:(u)=>{
+  title:"transaccion",
+  tables:["transactions","transactions_tags","accounts"],
+  loads:[
+    {
+      table_main:1,
+      selects:[
+        {table:1,field:0,as:"value"},
+        {table:1,field:1,as:"show"},
+        {table:1,field:2,as:"ingreso"},
+      ],
+    }
+    ,2],
+  windows:[
+    {
+      title:"informacion general",
+      fields:[
+        {name:"id",sql:0,col:6},
+        {name:"fecha",sql:1,box:2,col:6},
+        
+        {name:"etiqueta",tipe:1,sql:3,box:3,load:0,col:6},
+        {name:"cuenta",sql:4,tipe:1,box:3,load:1,col:6},
 
-              if(u.field.name == "ingreso"){
+        
+        {name:"ingreso",sql:6,box:Box_Dual({show:"Ingreso(+)",show2:"Egreso(-)"}),col:6},
+        {name:"total",sql:2,box:1,col:6},
+        {name:"descripcion",sql:5,box:1},
+      ],
+    }
+  ],
+  events:[
+    {
+      name:"oneLoadedBefore",
+      actions:[{
+        action:({load,data})=>{
 
-                var ingresoValue = u.k.Print_GetValue({fieldName:u.field.name,y:u.y});
-                var tagsData = u.k.Loads_GetData({loadIndex:1});
-                var tagsByIngreso = tagsData.filter(tg=>tg.ingreso==ingresoValue);
-                var optionsFromTags = tagsByIngreso.map((tg)=>{return{value:tg.value,show:tg.show}});
-                var optionInitial = optionsFromTags[0];
+          if(load.index==0){
+            
+            //return {data:data.filter(di=>["venta","regularizaciones"].findIndex(t=>t==di.show)!=-1)};
+          }   
+          
+          if(load.index==1){
 
-                u.k.Print_SetOptions({fieldName:"etiqueta",options:optionsFromTags});
-                u.k.Print_SetValue({fieldName:"etiqueta",value:optionInitial.value,y:0});
-              }
-            }
+            //return {data:data.filter(di=>["Caja Chica","BCP","Interbank"].findIndex(t=>t==di.show)!=-1)};
           }
-        ],
-      }
-    ],
+        }
+      }],
+    },
+    {
+      name:"boxUpdate",
+      actions:[{
+        action:({k,field,y})=>{
+
+          if(field.name=="etiqueta"){
+            
+            k.CallEvent({name:"Filter_IngresoByTag",params:{k,y:0}});
+          }
+        }
+      }],
+    },
+    {
+      name:"printAfter",
+      actions:[{
+        action:({k})=>{
+
+          k.CallEvent({name:"Filter_IngresoByTag",params:{k,y:0}});
+        }
+      }],
+    },
+    {
+      name:"Filter_IngresoByTag",
+      actions:[
+        {
+          name:"base",
+          action:({k,y})=>{
+
+            //console.log("md_transaccion->filter_IngresoByTag(y:"+y+")");
+
+            var ingreso = "0";
+            var etiqueta_id = k.Body_GetValue({fieldName:"etiqueta",y});
+            var load = k.Loads_GetData({loadIndex:0});
+            var data = load.find(ld=>ld.value == etiqueta_id);
+            if(data!=null) ingreso = data["ingreso"];
+
+            //console.log("return",ingreso);
+
+            k.Body_SetValue({fieldName:"ingreso",y,value:ingreso,fieldUpdateAdd:true});
+          }
+        }
+      ],
+    },
+    {
+      name:"filterLoads",
+      actions:[
+        {
+          name:"base",
+          action:({load,data})=>{
+
+            if(tags.length>0&&load.index==0){
+            
+              return {data:data.filter(di=>tags.findIndex(t=>t==di.show)!=-1)};
+            }   
+          }
+        }
+      ],
+    }
+  ],
   }
 
 

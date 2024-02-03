@@ -18,7 +18,7 @@ $(document).ready(function() {
             active:true,
         },
         crud:{
-            active:true,
+            active:false,
         }
     }
 
@@ -76,6 +76,13 @@ $(document).ready(function() {
                     title:"window 1",
                     blocked:false,
                     show:false,
+                    fields:[
+                        {col:2,name:"campo0",box:0},
+                        {col:10,name:"campo1",box:1},
+                        {name:"campo2",box:2},
+                        {name:"campo3",box:3},
+                        {name:"campo4",box:4},
+                    ],
                 },
                 {
                     col:6,h:200,head:false,
@@ -158,6 +165,13 @@ $(document).ready(function() {
                 {
                     col:6,h:200,head:true,
                     title:"window 2",
+                    fields:[
+                        {col:2,name:"campo0",box:0},
+                        {col:10,name:"campo1",box:1},
+                        {name:"campo2",box:2},
+                        {name:"campo3",box:3},
+                        {name:"campo4",box:4},
+                    ],
                 },
                 {
                     col:6,h:200,head:true,

@@ -12,14 +12,14 @@ $(document).ready(function() {
         var control = {
           stateNew:false,
 
-          ventas:{active:true},
+          ventas:{active:false},
           clientes:{active:true},
-          zonas:{active:true},
+          zonas:{active:false},
 
-          productos:{active:true},
+          productos:{active:false},
 
-          pagos:{active:true},
-          pago:{active:true},
+          pagos:{active:false},
+          pago:{active:false},
 
         }
 

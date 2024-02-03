@@ -19,7 +19,8 @@ $(document).ready(function() {
         ],
       });
 
-      var salesControl = new Crud_Table({
+      var salesControl = new Crud({
+        tipe:"table",
         parent:grid.GetColData({x:0,y:3}).col,
         filters:[
           {name:"fecha min",box:{tipe:2,default:Date_Today()},sql:{field:2,inter:">="}},

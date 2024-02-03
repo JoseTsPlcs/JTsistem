@@ -110,7 +110,6 @@ nt
                             action:(i)=>{
 
                                 i.k=k;
-                                //k.Fields_GetInfo({})
                                 //console.log("crud->Call event boxupdate->i:",i);
                                 k.CallEvent({name:"boxUpdate",params:{...i}});
                             }
@@ -175,11 +174,53 @@ nt
                             name:"base",
                             action:()=>{
 
-                                k.Insert_Action();
+                                k.Insert_Action({success:()=>{
+
+                                    k.States_SetState({state:k.#states.afterInserted,params:{lastPage:true}});
+                                }});
                             }
                         }
                     ]
                 },
+                {
+                    name:"pagesUpdate",
+                    actions:[
+                        {
+                            name:"base",
+                            action:()=>{
+
+                                k.States_SetState({state:"reload"});
+                            }
+                        }
+                    ],
+                },
+                {
+                    name:"sizesUpdate",
+                    actions:[
+                        {
+                            name:"base",
+                            action:()=>{
+
+                                k.States_SetState({state:"reload"});
+                            }
+                        }
+                    ],
+                },
+                {
+                    name:"deleteUpdate",
+                    actions:[
+                        {
+                            name:"base",
+                            action:()=>{
+
+                                k.Delete_Action({y:0,success:()=>{
+
+                                    k.States_SetDefault();
+                                }});
+                            }
+                        }
+                    ],
+                }
             ],
         };
 
@@ -214,45 +255,55 @@ nt
         var e_resp = this.CallEvent({name:"printBefore",params:{data}});
         if(e_resp!=null&&e_resp.data!=null) data = e_resp.data;
 
-        var resultPrint = [];
+        
+        this._body.Print_BuildBoxes({data:data});
         let k = this;
 
-        for (let y = 0; y < data.length; y++) {
-            const line = data[y];
-            
-            var newLine = [];
-            this._fields.forEach(field => {
+        if(data.length>0){
+
+            for (let y = 0; y < data.length; y++) {
+                const line = data[y];
                 
-                var fieldSelect = field.select;
-                if(fieldSelect!=null){
+                this._fields.forEach(field => {
+                    
+                    var fieldSelect = field.select;
+                    if(fieldSelect!=null){
+    
+                        var selectInfo = k.Selects_Get({selectIndex:fieldSelect.index});
+                        var value = line[selectInfo.name];
+                        //console.log("crud->body_print->foreach data-> foreach field->params; field:",field,"selectInfo",selectInfo);
+                        
+                        var boxes = k._body.Fields_GetBoxes({fieldName:field.name});
+                        var boxesLength = boxes.length;
+                        if(y < boxesLength){
+    
+                            var box = boxes[y];
+                            box.SetValue(value);
+                        }else console.error("crud->BodyPrint(data:",data,")","y:"+y+" > boxes.lenght:"+boxesLength,"field:",field);
+                    }
+    
+                });
+            }
 
-                    var selectInfo = k.Selects_Get({selectIndex:fieldSelect.index});
-                    //console.log("crud->body_print->foreach data-> foreach field->params; field:",field,"selectInfo",selectInfo);
-                    var value = line[selectInfo.name];
-                    newLine.push({
-                        field:field,
-                        y:y,
-                        value:value,
-                    });
-                }
+        }else this._body.Clear();
+                
 
-            });
-            resultPrint.push(newLine);
-        }        
-
-        this._body.Print({print:resultPrint});
         //console.log("crud->body_print->params; data:",data,"->result:",resultPrint,"e_resp:",e_resp);
         this.CallEvent({name:"printAfter",params:{data}});
     }
 
     Body_SetValue({fieldName,fieldIndex,y,value}){
 
-        this._body.Fields_SetValue({y,fieldName,fieldIndex,value});
+        var boxIndex = this.#Field_GetBoxIndexByCoord({y});
+        this._body.Fields_SetValue({boxIndex,fieldName,fieldIndex,value});
+
+        //console.log("crud->Body_SetValue(fieldName:"+fieldName+",fieldIndex:"+fieldIndex,+",y:"+y+",value:"+value+")");
     }
 
     Body_GetValue({fieldName,fieldIndex,y}){
 
-        return this._body.Fields_GetValue({y,fieldName,fieldIndex});
+        var boxIndex = this.#Field_GetBoxIndexByCoord({y});
+        return this._body.Fields_GetValue({boxIndex,fieldName,fieldIndex});
     }
 
     Body_GetWindow({windowIndex}){
@@ -349,6 +400,14 @@ nt
 
         this._fields = fields;
         //console.log("crud - fields_set, params:",fields);
+    }
+
+    #Field_GetBoxIndexByCoord({y}){
+        
+        var boxIndex = y;
+        if(this._tipe=="form") boxIndex=0;
+        //console.log("crud->GetBoxIndexByCoord(y:"+y+")->return "+boxIndex);
+        return boxIndex;
     }
     
     //-------------loads-------------
@@ -645,17 +704,17 @@ nt
         this.#data = data;
     }
 
-    Data_GetValue({y,selectName}){
+    Data_GetValue({y,selectName,fieldSqlIndex}){
 
-        var values = this.Data_GetValues({selectName});
+        var values = this.Data_GetValues({selectName,fieldSqlIndex});
         var value = values[y];
         //console.log("crud->data_getvalues->params; y:",y,"->result; values:",values,"value:",value);
         return value;
     }
 
-    Data_GetValues({selectName}){
+    Data_GetValues({selectName,fieldSqlIndex}){
 
-        var select = this.Selects_Get({selectName});
+        var select = this.Selects_Get({selectName,fieldSqlIndex});
         var values = this.#data.map((di)=>{return di[select.name]});
         //console.log("crud->data_getvalues->params;selectName:",selectName,"results; select",select,"values:",values);
         return values;
@@ -720,10 +779,11 @@ nt
         return index;
     }
 
-    Selects_Get({selectName,selectIndex}){
+    Selects_Get({selectName,selectIndex,fieldSqlIndex}){
 
         var index = selectIndex;
-        if(selectName!=null)index=this.#selects.findIndex(slc=>slc.name==selectName);        
+        if(selectName!=null)index=this.#selects.findIndex(slc=>slc.name==selectName);  
+        if(fieldSqlIndex!=null)index=this.#selects.findIndex(slc=>slc.field==fieldSqlIndex);        
 
         var result = this.#selects[index];
 
@@ -892,7 +952,7 @@ nt
 
     //--------------insert---------------
 
-    Insert_Action({inserts=[],addConections=true,addFields=true}={}){
+    Insert_Action({inserts=[],addConections=true,addFields=true,success}={}){
 
         let k = this;
         //push by conections
@@ -912,15 +972,13 @@ nt
         for (let f = 0; f < this._fields.length; f++) {
 
             const field = this._fields[f];
-            var boxes = field.boxes
-            if(field.sql!=null && boxes!=null){
+            
+            if(field.sql!=null){
 
-                boxes.forEach(bx => {
-                    
-                    insertsByFields.push({
-                        field:field.sql.field,
-                        value:bx.GetValue(),
-                    });
+                var value = this.Body_GetValue({fieldName:field.name,y:0});
+                insertsByFields.push({
+                    field:field.sql.field,
+                    value:value,
                 });
             }
         }
@@ -972,11 +1030,12 @@ nt
                         table_main:this._primary.tableIndex,
                         inserts:inserts,
                     },
-                    logSql:false,
+                    logSql:true,
                     success:()=>{
 
-                        k.CallEvent({name:"inserted",params:{newPrimary:newPrimary,fieldIndexPrimary:k._primary.fieldSqlIndex}});
-                        k.States_SetState({state:k._stateAfterInserted,params:{lastPage:true}});
+                        var params = {newPrimary:newPrimary,fieldIndexPrimary:k._primary.fieldSqlIndex};
+                        k.CallEvent({name:"inserted",params});console.log("crud call inserted");
+                        if(success!=null)success(params);
                         //k.States_SetDefault({primaryValue:newPrimary,params:{lastPage:true}});
                     }
                 });
@@ -1105,6 +1164,7 @@ nt
 
         //condition by primary
         if(y!=-1) primaryValue = this.Data_GetValue({selectName:this._primary.name,y});
+        
 
         if(primaryValue!=null){
 
@@ -1126,7 +1186,7 @@ nt
             config:{
                 table_main:k._primary.tableIndex,
                 conditions:conditions,
-            },
+            },logSql:true,
             success:()=>{
 
                 k.CallEvent({name:"deleted",params:{primaryValue,y}});

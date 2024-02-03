@@ -70,7 +70,7 @@ class Crud_Body extends ODD {
   //----------form-----------
  
   _form = null;
-  #Form_Build({parent,name,title="form body",blocked,head,show,h=500,windows=[],events,configShow=false}={}){
+  #Form_Build({parent,name,title="form body",blocked,head,show,h=500,windows=[],events=[],configShow=false}={}){
     
     if(this._modal!=null) parent = this._modal.GetContent();
 
@@ -118,24 +118,9 @@ class Crud_Body extends ODD {
 
   //---------print----------
 
-  Print({print=[]}={}){
+  Print_BuildBoxes({data=[]}={}){
 
-    let k = this;
-
-    for (let y = 0; y < print.length; y++) {
-
-      const line = print[y];
-      
-      line.forEach(cell => {
-        
-          k.Fields_SetValue({
-            y:y,
-            fieldName:cell.field.name,
-            value:cell.value,
-          });
-      });        
-    }
-
+    
   }
 
   Clear({}={}){
@@ -175,7 +160,7 @@ class Crud_Body extends ODD {
 
   _fieldsUpdate = [];
 
-  _FieldsUpdate_Add({fieldIndex,value,y}){
+  _FieldsUpdate_Add({fieldIndex,boxIndex,value,y}){
 
     var fupIndex = this._fieldsUpdate.findIndex(fup=>fup.y==y);
     if(fupIndex==-1){
@@ -215,11 +200,14 @@ class Crud_Body extends ODD {
     return [];
   }
 
-  Fields_GetBox({y,fieldName,fieldIndex}){
+  Fields_GetBox({boxIndex,fieldName,fieldIndex}){
 
     var boxes = this.Fields_GetBoxes({fieldName,fieldIndex});
-    if(boxes.length > y) return boxes[y];
-    else return null;
+    var box = null;
+    if(boxes.length > boxIndex) box = boxes[boxIndex];
+    else console.error("crud_body->Fields_GetBox(boxindex:"+boxIndex+",fieldname:"+fieldName+") return ", box);
+
+    return box;
   }
 
   Fields_SetOptions({fieldName,fieldIndex,options}){
@@ -233,15 +221,22 @@ class Crud_Body extends ODD {
     });
   }
 
-  Fields_SetValue({y,fieldName,fieldIndex,value}){
+  Fields_SetValue({boxIndex,fieldName,fieldIndex,value}){
 
-    var box = this.Fields_GetBox({y,fieldName,fieldIndex});
+    var box = this.Fields_GetBox({boxIndex,fieldName,fieldIndex});
     if(box) box.SetValue(value);
   }
 
-  Fields_GetValue({y,fieldName,fieldIndex}){
+  Fields_GetValue({boxIndex,fieldName,fieldIndex}){
 
-    var box = this.Fields_GetBox({y,fieldName,fieldIndex});
+    var box = this.Fields_GetBox({boxIndex,fieldName,fieldIndex});
+    
+    if(box==null){
+
+      console.error("crud_body - fields_getvalue(boxIndex:"+boxIndex+",fieldName:"+fieldName+",fieldIndex:"+fieldIndex+")");
+      return null;
+    }
+
     return box.GetValue();
   }
 

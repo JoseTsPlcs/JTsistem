@@ -104,16 +104,18 @@ class Window extends ODD {
         {y:0,x:0,attributes:[{name:'class',value:'border border-secondary h' + titleSize +' text-center'},{name:'style',value:'min-height:50px'}]},
         {y:1,x:0,attributes:[{name:'class',value:'border-right border-left border-bottom border-secondary '},{name:'style',value:'min-height:'+h+'px'}]},
       ],
-      events:[{
-        name:"rowClick",
-        actions:[{
-          name:"conteinerShow",
-          action:({y,dom})=>{
-            
-            if(y==0) k.Conteiner_ShowToogle(); 
-          }
-        }]
-      }],
+      events:[
+        {
+          name:"rowClick",
+          actions:[{
+            name:"conteinerShow",
+            action:({y,dom})=>{
+              
+              if(y==0) k.Conteiner_ShowToogle(); 
+            }
+          }],
+        },
+      ],
     });
     this.#head.dom = this.#body.GetColData({x:0,y:0}).col;
     this.#conteiner.dom = this.#body.GetColData({x:0,y:1}).col;
@@ -186,7 +188,7 @@ class Window extends ODD {
 
     if(fieldName!=null) fieldIndex=this._fields.findIndex(f=>f.name==fieldName);
     var info = fieldIndex < 0 ? null : this._fields[fieldIndex];    
-    //if(info==null) console.log("window - fields_getinfo, params; fieldName:",fieldName,"fieldIndex:",fieldIndex,"results; info:",info);
+    if(info==null) console.error("window->fields_getinfo(fieldName:"+fieldName+",fieldIndex:"+fieldIndex+")",this._fields);
     return info;
   }
 

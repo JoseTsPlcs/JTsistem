@@ -94,6 +94,11 @@ class Form extends ODD {
         return i;
     }
 
+    _General_SetParams(i){
+
+
+    }
+
     //--------------body---------------
 
     #body = null;
@@ -299,7 +304,7 @@ class Form extends ODD {
 
     //----------------------------
 
-    Fields_Get({fieldName,fieldIndex}){
+    /*Fields_Get({fieldName,fieldIndex}){
 
         //console.log("form->fields_get->params; fieldName:",fieldName,"fieldIndex:",fieldIndex);
 
@@ -316,9 +321,11 @@ class Form extends ODD {
 
         });
 
+        if(field == null) console.error("form->Fileds_Get(fieldName:"+fieldName+",fieldIndex:"+fieldIndex+")");
+
         //console.log("form->fields_get->results; field:",field);
         return field;
-    }
+    }*/
 
     //------------tools-----------
     #tools = { 
@@ -349,7 +356,7 @@ class Form extends ODD {
                 update:(v)=>{
                     
                     var params = {value:v,tool};
-                    //console.log("form-callevent","toolUpdate",params,k._events);
+                    //console.log("form-callevent","toolUpdate",tool,params,k._events);
                     k.CallEvent({name:"toolUpdate",params});
                     k.CallEvent({name:tool.name+"Update",params});
                 }
