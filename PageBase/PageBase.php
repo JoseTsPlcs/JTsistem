@@ -26,18 +26,8 @@ $doms = array(
     "<script src='Case/Build/Components/ScreenLoad.js'></script>",
     "<script src='Case/Build/Components/Panel.js'></script>",
 
-    "<script src='Case/BaseData/LoadData.js'></script>",
-    "<script src='Case/BaseData/LoadsData.js'></script>",
-    "<script src='Case/BaseData/Load.js'></script>",
-    "<script src='Case/BaseData/LoadSql.js'></script>",
-    "<script src='Case/BaseData/LoadsDB.js'></script>",
     "<script src='Case/BaseData/Sql.js'></script>",
     "<script src='Case/BaseData/Mysql.js'></script>",
-    "<script src='Case/BaseData/dataBase.js'></script>",
-    "<script src='Case/BaseData/Load_Table.js'></script>",
-    "<script src='Case/BaseData/Loads.js'></script>",
-    "<script src='Case/BaseData/LoadTable.js'></script>",
-    "<script src='Case/BaseData/LoadsTables.js'></script>",
 
     "<script src='Case/Build/Modulos/Modulo.js'></script>",
     "<script src='Case/Build/Modulos/Window.js'></script>",

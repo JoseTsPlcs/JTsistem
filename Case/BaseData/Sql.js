@@ -62,6 +62,17 @@ class Sql extends ODD {
   Load({php=null,sql=null,success=null,fail=null}){
 
 
+    switch (php) {
+      case "row":
+        php = this.GetPath() + 'Case/BaseData/Mysql_Row.php';
+        break;
+
+      case "success":
+        php = this.GetPath() + 'Case/BaseData/Mysql_Success.php';
+        break;
+    
+    }
+
     if(php == null){
 
       return;
