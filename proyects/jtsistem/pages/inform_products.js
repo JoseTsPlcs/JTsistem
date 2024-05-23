@@ -5,7 +5,17 @@ $(document).ready(function() {
 
     success:({userData})=>{
 
-          
+      var grConfig = GetGridConfig({
+        panels:[
+          {name:"filters",col:12},
+          {name:"total",col:12},
+          {name:"evolutivo",col:8},
+          {name:"donu",col:4},
+        ],
+      });
+
+      console.log(grConfig);
+      
       var gr = new Grid({
         cols:[
           [12],//0-filters
@@ -13,6 +23,7 @@ $(document).ready(function() {
           [8,4],//2-prices
           [12],//3-cants
         ],
+        ...grConfig,
       });
 
       var chartParent1 = document.createElement("canvas");

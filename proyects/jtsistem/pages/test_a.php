@@ -5,8 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Convertir HTML a PDF</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.0/jspdf.umd.min.js"></script>
+
+
+<link rel="stylesheet" href="../../../libs/icons-1.11.3/font/bootstrap-icons.css">
+
 </head>
 <body>
+
+<i class="bi bi-house"></i>
+<i class="bi bi-unlock"></i><i class="bi bi-unity"></i>
     
 <!-- Contenido que deseas convertir a PDF -->
 <div id="contenido">
@@ -39,6 +46,8 @@ document.getElementById("generarPDF").addEventListener("click", function() {
     }
 });
 </script>
+
+
 
 </body>
 </html>

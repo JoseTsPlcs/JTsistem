@@ -14,6 +14,7 @@ echo '<script src="'.$src.'Build/Components/Table_Grid.js"></script>';
 echo '<script src="'.$src.'Build/Components/ScreenLoad.js"></script>';
 echo '<script src="'.$src.'Build/Components/Panel.js"></script>';
 echo '<script src="'.$src.'Build/Components/Steps.js"></script>';
+echo '<script src="'.$src.'Build/Components/LoadingScreen.js"></script>';
 
 echo '<script src="'.$src.'BaseData/Conection.js"></script>';
 

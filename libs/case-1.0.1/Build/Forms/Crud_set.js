@@ -101,13 +101,13 @@ class Crud_set extends ODD {
 
     #body_w;
     #body_tools = [
-        {x:0,y:1,index:0,name:"config",box:{tipe:5,value:"config",class:"btn btn-outline-primary btn-sm",update:()=>{this.Config_ShowChange()}},dom:null},
-        {x:0,y:1,index:1,name:"load",box:{tipe:5,value:"load",class:"btn btn-outline-primary btn-sm"},dom:null},
+        {x:0,y:1,index:0,name:"config",box:{tipe:5,value:'<i class="bi bi-gear"></i>',class:"btn btn-outline-primary btn-sm",update:()=>{this.Config_ShowChange()}},dom:null},
+        {x:0,y:1,index:1,name:"load",box:{tipe:5,value:'<i class="bi bi-database"></i>',class:"btn btn-outline-primary btn-sm",update:()=>{this.#Load({})}},dom:null},
 
         {x:2,y:1,index:0,name:"excel",box:{id:"btn1",tipe:5,value:"excel",class:"btn btn-outline-success btn-sm"},dom:null},
         {x:2,y:1,index:1,name:"pdf",box:{id:"btn2",tipe:5,value:"pdf",class:"btn btn-outline-danger btn-sm"},dom:null},
 
-        {x:0,y:3,index:0,name:"sizes",box:{tipe:3,value:1,options:[{show:1,value:1},{show:10,value:10},{show:50,value:50}]},dom:null},
+        {x:0,y:3,index:0,name:"sizes",box:{tipe:3,value:1,options:[{show:1,value:1},{show:10,value:10},{show:25,value:25},{show:50,value:50},{show:999,value:999}]},dom:null},
 
         {x:1,y:3,index:0,name:"reload",box:{id:"btn1",tipe:5,value:"recargar",class:"btn btn-outline-primary btn-sm",update:()=>{this.#Event_UpdateToolReload({})}},dom:null},
         {x:1,y:3,index:1,name:"update",box:{id:"btn2",tipe:5,value:"actualizar",class:"btn btn-outline-primary btn-sm",update:()=>{this.#Event_UpdateToolUpdate({})}},dom:null},
@@ -161,6 +161,8 @@ class Crud_set extends ODD {
         var colless = 12;
         var line = [];
         var panels_cols = [];
+        var atts = [];
+
         for (let y = 0; y < panels.length; y++) {
 
             const panel = panels[y];
@@ -168,6 +170,13 @@ class Crud_set extends ODD {
             panel.x = lastX;
 
             line.push(panel.col);
+            atts.push({
+                x:panel.x,
+                y:panel.y,
+                attributes:[
+                    {name:"class",value:"col-"+panel.col},
+                ],
+            });
             colless -=  panel.col;
 
             if(colless<=0){
@@ -180,12 +189,17 @@ class Crud_set extends ODD {
             }else lastX++;
         }
 
-        //console.log("crud set -> ", panels_cols, panels);
+        var gridConfig = GetGridConfig({panels});
+        console.log("crud set -> ","panels:",panels," gridConfig:",gridConfig);        
 
         this.#conteiner_gr = new Grid({
             parent:this.#body_w.Conteiner_GetColData({x:0,y:2}).col,
-            cols:panels_cols,
+            //cols:panels_cols,
+            cols:gridConfig.cols,
+            attributes:gridConfig.attributes,
         });
+
+        
 
         let k = this;
         var events = [

@@ -15,7 +15,7 @@ $(document).ready(function() {
           {x:1,y:1,box:bx_moneyh3},
         ],
       });
-      var md = new Modal({parent:gr.GetColData({x:0,y:3}).col});
+      var md = new Modal({parent:gr.GetColData({x:0,y:3}).col,size:"lg"});
       var mdgr = new Grid({
         parent:md.GetContent(),
         cols:[[12],[12]],
@@ -76,7 +76,7 @@ $(document).ready(function() {
               fields:[
                 //{panel:"main",name:"id",box:{tipe:0},select:"ID_SALE"},
           
-                {panel:"main",...fld_edit},
+                {panel:"main",...fld_show,action:"edit"},
                 {panel:"main",name:"cliente",box:{tipe:0},select:"NAME"},
                 {panel:"main",name:"estado",box:{tipe:0,options:op_sales_status},select:"ID_STATUS"},
                 {panel:"main",name:"cancelado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_paid},select:"PAID"},
@@ -188,11 +188,11 @@ $(document).ready(function() {
     
               fields:[
                 {panel:"main",name:"producto-servicio",attributes:att_ln,box:{tipe:0},select:"NAME"},
-                {panel:"main",name:"cp",attributes:att_btn,box:{tipe:5,class:"btn btn-primary btn-sm",value:"copy"},action:"copy"},
+                {panel:"main",name:"cp",attributes:att_btn,box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-arrow-left-short"></i><i class="bi bi-clipboard"></i>'},action:"copy"},
                 {panel:"main",name:"tipo",attributes:att_cnt,box:{tipe:0,options:op_products_tipe},select:"ID_PRODUCT_TIPE"},
                 {panel:"main",name:"cantidad",attributes:att_cnt,box:{tipe:0,class:"text-center"},select:"CANT"},
                 {panel:"main",name:"precio unitario",attributes:att_cnt,box:bx_money,select:"PRICE_UNIT"},
-                {panel:"main",name:"cu",attributes:att_btn,box:{tipe:5,class:"btn btn-primary btn-sm",value:"copy"},action:"copy"},
+                {panel:"main",name:"cu",attributes:att_btn,box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-arrow-left-short"></i><i class="bi bi-clipboard"></i>'},action:"copy"},
                 {panel:"main",name:"precio total",attributes:att_cnt,box:bx_money,select:"PRICE_TOTAL"},
               ],
               events:[
