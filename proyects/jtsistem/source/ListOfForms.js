@@ -98,9 +98,10 @@ const att_cnt = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"width
 
 //---------fields---------
 
-const fld_delete = {name:"delete",box:{tipe:5,value:"x",class:"btn btn-danger btn-sm"},action:"delete"};
-const fld_edit = {name:"edit",box:{tipe:5,value:"[/]",class:"btn btn-primary btn-sm"},action:"edit"};
-const fld_add = {name:"add",box:{tipe:5,value:"[+]",class:"btn btn-primary btn-sm"},action:"add"};
+const fld_delete = {name:"delete",box:{tipe:5,value:'<i class="bi bi-x-circle"></i>',class:"btn btn-danger btn-sm"},action:"delete"};
+const fld_edit = {name:"edit",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit"};
+const fld_add = {name:"add",box:{tipe:5,value:'<i class="bi bi-plus-circle"></i>',class:"btn btn-primary btn-sm"},action:"add"};
+const fld_show = {name:"add",box:{tipe:5,value:'<i class="bi bi-eye-fill"></i>',class:"btn btn-primary btn-sm"},action:"show"};
 
 
 //---------filter
@@ -142,7 +143,7 @@ const stTls_fm_maid = [
             {name:"excel",show:false},
             {name:"pdf",show:false},
 
-            {name:"sizes",show:false,value:50},
+            {name:"sizes",show:false,value:999},
             {name:"reload",show:true},
             {name:"update",show:true},
             {name:"new",show:false},
@@ -164,7 +165,7 @@ const stTls_tb_maid = [
             {name:"excel",show:false},
             {name:"pdf",show:false},
 
-            {name:"sizes",show:false,value:50},
+            {name:"sizes",show:false,value:999},
             {name:"reload",show:false},
             {name:"update",show:false},
             {name:"new",show:true},
@@ -186,7 +187,7 @@ const stTls_tb_all = [
             {name:"excel",show:false},
             {name:"pdf",show:false},
 
-            {name:"sizes",show:false,value:50},
+            {name:"sizes",show:false,value:999},
             {name:"reload",show:false},
             {name:"update",show:false},
             {name:"new",show:false},
@@ -249,7 +250,7 @@ const stTls_tb_show = [
             {name:"excel",show:false},
             {name:"pdf",show:false},
 
-            {name:"sizes",show:false,value:50},
+            {name:"sizes",show:false,value:999},
             {name:"reload",show:false},
             {name:"update",show:false},
             {name:"new",show:false},

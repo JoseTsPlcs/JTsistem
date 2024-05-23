@@ -16,9 +16,10 @@ $(document).ready(function() {
     
       var md = new Modal({
         parent:gr.GetColData({x:0,y:2}).col,
+        size:"lg",
       });
       var mdParent = md.GetContent();
-      mdParent.setAttribute("style","min-width: 600px;");
+      //mdParent.setAttribute("style","min-width: 600px;");
       var mdGr = new Grid({
         parent:mdParent,
         cols:[[12],[12],[12]],
@@ -81,8 +82,8 @@ $(document).ready(function() {
               fields:[
                 //{panel:"main",name:"id",box:{tipe:0},select:"ID_SALE"},
           
-                {panel:"main",name:"edit",attributes:[{name:"class",value:"px-1"}],box:{tipe:5,value:"[/]",class:"btn btn-primary btn-sm"},action:"edit-page"},
-                {panel:"main",name:"show",attributes:[{name:"class",value:"px-1"}],box:{tipe:5,value:"O",class:"btn btn-primary btn-sm"},action:"edit"},
+                {panel:"main",name:"edit",attributes:[{name:"class",value:"px-1"}],box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit-page"},
+                {panel:"main",name:"show",attributes:[{name:"class",value:"px-1"}],box:{tipe:5,value:'<i class="bi bi-eye-fill"></i>',class:"btn btn-primary btn-sm"},action:"edit"},
                 
                 {panel:"main",name:"cliente",box:{tipe:0},select:"NAME"},
                 {panel:"main",name:"estado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_status},select:"ID_STATUS"},
@@ -226,7 +227,7 @@ $(document).ready(function() {
                       {name:"excel",show:false},
                       {name:"pdf",show:false},
           
-                      {name:"sizes",show:false,value:50},
+                      {name:"sizes",show:false,value:999},
                       {name:"reload",show:false},
                       {name:"update",show:false},
                       {name:"new",show:false},

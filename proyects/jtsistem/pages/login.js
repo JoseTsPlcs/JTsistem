@@ -23,22 +23,29 @@ $(document).ready(function() {
     ],
   });
 
+  var scrn = new LoadingScreen({
+    parent:document.body,
+    active:false, 
+  });
+
   function StartLogin() {
     
     var uss = gr.GetColData({x:0,y:1}).labels[0].GetBox().GetValue();
     var pss = gr.GetColData({x:0,y:2}).labels[0].GetBox().GetValue();
 
-    //console.log("user",uss,"pass",pss);
+    scrn.SetActive({active:true});
 
     Login({
       uss,pss,
       success:({result})=>{
 
         console.log("login!!");
+        scrn.SetActive({active:false});
       },
       fail:()=>{
 
         alert("error en el usuario o contraseña");
+        scrn.SetActive({active:false});
       }
     })
 

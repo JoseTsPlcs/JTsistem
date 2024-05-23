@@ -28,7 +28,8 @@ class Modal extends ODD {
     #modal = null;
     #content = null;
 
-    #Build({parent}){
+    //sizes xl, lg && sm
+    #Build({parent,size}){
 
         if(parent==null) parent = document.body;
 
@@ -63,7 +64,7 @@ class Modal extends ODD {
         parent.appendChild(this.#modal);
 
         var modal_dialog = document.createElement("div");
-        modal_dialog.setAttribute("class","modal-dialog");
+        modal_dialog.setAttribute("class","modal-dialog" + (size?" modal-"+size:""));
         modal_dialog.setAttribute("role","document");
         this.#modal.appendChild(modal_dialog);
 
