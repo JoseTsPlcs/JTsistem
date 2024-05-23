@@ -3,7 +3,7 @@ $(document).ready(function() {
 
   //new Pag_Base({});
 
-  var cn = new Conection({
+  /*var cn = new Conection({
     //servidor:'localhost',//ser-jtsistem
     servidor:'ser-jtsistem.mysql.database.azure.com',
     usuario:'Lip_Alonso',
@@ -18,7 +18,7 @@ $(document).ready(function() {
 
       console.log(resp);
     }
-  })
+  })*/
 
   //console.log(cn);
 
