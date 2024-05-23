@@ -119,6 +119,11 @@ $(document).ready(function() {
         ],
       });
 
+      var scrn = new LoadingScreen({
+        parent:document.body,
+        active:false, 
+      });
+
       //--------------------------
 
       function Loaded({result}){
@@ -130,6 +135,8 @@ $(document).ready(function() {
 
       function Reload() {
         
+        scrn.SetActive({active:true});
+
         var conditionsFilters = filters.GetConditions();
         var requestSql = db_lip.GetSql_Select({
           tableMain:"sales",
@@ -235,6 +242,8 @@ $(document).ready(function() {
         
         chartPrices.update();
         chartPricesDoughtnut.update();
+
+        scrn.SetActive({active:false});
         
       }
 
