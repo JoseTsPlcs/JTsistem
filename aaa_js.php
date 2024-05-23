@@ -21,7 +21,7 @@
   //return;
   $url = $_SERVER["REQUEST_URI"];
   $parts = explode("/", $url);
-  $page = str_replace(".php", "", $parts[5]);  
+  $page = str_replace(".php", "", end($parts));  
 
 
   echo '<script src="'.$page.'.js"></script>';
