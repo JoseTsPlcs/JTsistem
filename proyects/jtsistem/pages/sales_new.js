@@ -47,8 +47,8 @@ $(document).ready(function() {
               parent:gr.GetColData({x:0,y:1}).col,
               title:"venta",
               panels:[
-                {col:6,y:0,tipe:"form",title:"principal",h:350},
-                {col:6,y:0,tipe:"form",title:"cliente",h:350},
+                {col:6,y:0,tipe:"form",title:"principal",h:350,blocked:false},
+                {col:6,y:0,tipe:"form",title:"cliente",h:350,blocked:false},
               ],
               stateStart:"new",
               //stateBase:"new",

@@ -54,6 +54,7 @@ class Window extends ODD {
         grid.cols[y].push(col);
         grid.labels.push({
           x,y,box,
+          tipe:field.tipe,
           name:field.name,
         });
 
@@ -113,6 +114,7 @@ class Window extends ODD {
             name:"conteinerShow",
             action:({y,dom})=>{
               
+              //console.log("rowcloasmdasd",y);
               if(y==0) k.Conteiner_ShowToogle(); 
             }
           }],

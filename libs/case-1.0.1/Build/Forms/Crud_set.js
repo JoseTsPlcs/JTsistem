@@ -227,6 +227,8 @@ class Crud_set extends ODD {
                     panel.build = new Window({
                         parent: panel.parent,
                         title: panel.title,
+                        blocked:panel.blocked,
+                        show:panel.show,
                         h:panel.h,
                         grid:{
                             cols: this.#GetColsOfPanels({panels:fieldsOfPanel}),
