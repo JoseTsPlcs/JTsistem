@@ -46,32 +46,28 @@ class Conection extends ODD {
     
     }
 
-    console.log("request -> sql:",sql);
+    //console.log("request -> sql:",sql);
 
     let k = this;
     $.post(php, {...this.config,sql}, function(resp){
 
-      console.log("----",resp);
-
-      if (typeof resp !== "string") {
-        
-        k.#RequestFail({fail,msg:resp});
-      }
-      else
-      {
-        try {
-
-          if(log) console.log(name+": ", sql,resp);
-          resp = JSON.parse(resp);
-          k.#AddRequestToList({sql,resp,name});
-          if(success!=null)success(resp.send);
-  
-        } catch (error) {
+      try {
+        resp = JSON.parse(resp);
     
-          if(log) console.log(name,",sql:",sql,",error:",error);
-          k.#RequestFail({fail,msg:error,resp});
-        }
+      } catch (error) {
+        
+        console.log(resp);
+        alert("se trato de pasar resp a JSON pero no se pudo");
       }
+
+      if(resp.resp == false){
+
+        console.log("msg:",resp.msg);
+        console.log("sql:",resp.sql);
+        alert(resp.msg);
+      }
+
+      if(success!=null)success(resp.send);
 
 
     }).fail(function() {
@@ -272,7 +268,7 @@ class Conection extends ODD {
       if(conditionBefore != null) sql += conditionBefore;
       sql += conditionTable + "." + conditionField; 
       sql += conditionInter;
-      if(conditionValue!=null) sql +=  (conditionInter=="LIKE"?"'%":"'") + conditionValue + (conditionInter==" LIKE "?"%'":"'");
+      if(conditionValue!=null) sql +=  (conditionInter==" LIKE "?"'%":"'") + conditionValue + (conditionInter==" LIKE "?"%'":"'");
       if(conditionAfter != null) sql += conditionAfter;
       
     }

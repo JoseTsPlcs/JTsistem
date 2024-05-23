@@ -2,12 +2,17 @@
 
 require 'Mysql_Conection.php';
 
-$send = array();
-while ($row = mysqli_fetch_assoc($consult)) {
+if($resp['resp'] == true){
 
-  array_push($send, $row);
+  $send = array();
+  while ($row = mysqli_fetch_assoc($consult)) {
+
+    array_push($send, $row);
+  }
+  $resp['send'] = $send;
 }
-$resp['send'] = $send;
+
+
 
 
 echo json_encode($resp);

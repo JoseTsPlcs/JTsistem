@@ -28,6 +28,7 @@ else
 
 //consult by sql
 $sql = $_POST['sql'];
+$resp['sql'] = $sql;
 $consult = mysqli_query($conexion, $sql);
 
 if ($consult) {

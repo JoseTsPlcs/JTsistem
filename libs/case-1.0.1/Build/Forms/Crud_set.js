@@ -372,6 +372,8 @@ class Crud_set extends ODD {
         this.#loadData.count = 0;
         this.#loadData.max = this.#loadData.data.length;
 
+        this.#Loading_SetActive({active:true});
+
         if(this.#loadData.max == 0){
 
             this.#Loaded({success});
@@ -414,6 +416,7 @@ class Crud_set extends ODD {
     #Loaded({success}){
 
         this.#Loaded_SetOptionsTo({});
+        this.#Loading_SetActive({active:false});
 
         if(success!=null) success();
     }

@@ -28,7 +28,7 @@ $(document).ready(function() {
               selects:[
                 {table:'provideers', field:'ID_PROVIDEER',primary:true},
                 {table:'provideers', field:'NAME'},
-                {table:'provideers', field:'ID_PROVIDEER_TIPE'},
+                //{table:'provideers', field:'ID_PROVIDEER_TIPE'},
                 {table:'provideers', field:'RUC'},
               ],
               conditions:[
