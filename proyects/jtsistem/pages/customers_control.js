@@ -19,27 +19,8 @@ $(document).ready(function() {
         selects:[
           {table:'customers', field:'ID_CUSTOMER',primary:true},
           {table:'customers', field:'NAME'},
-          {table:'customers', field:'ID_CUSTOMER_TIPE'},
           {table:'customers', field:'COMPANY'},
           {table:'customers', field:'NRO_DOCUMENT'},
-        ],
-        loads:[
-          {
-            name:"customers_tipes",
-            tableMain:"customers_tipe",
-            selects:[
-              {table:'customers_tipe', field:'ID_CUSTOMER_TIPE',as:"value"},
-              {table:'customers_tipe', field:'NAME',as:"show"},
-            ],
-            conditions:[
-              {
-                table:"customers_tipe",
-                field:"ACTIVE",
-                inter:"=",
-                value:1,
-              }
-            ],
-          }
         ],
         conditions:[
           {

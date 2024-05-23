@@ -120,7 +120,7 @@ $(document).ready(function() {
                   {table:'provideers', field:'ID_PROVIDEER',primary:true},
                   {table:'provideers', field:'ID_COMPANY'},
                   {table:'provideers', field:'NAME'},
-                  {table:'provideers', field:'ID_PROVIDEER_TIPE'},
+                  //{table:'provideers', field:'ID_PROVIDEER_TIPE'},
                   {table:'provideers', field:'RUC'},
                 ],
                 inserts:ins_general,

@@ -87,7 +87,7 @@ $(document).ready(function() {
                   selects:[
                     {table:'customers', field:'ID_CUSTOMER',as:"value"},
                     {table:'customers', field:'NAME',as:"show"},
-                    {table:'customers', field:'ID_CUSTOMER_TIPE'},
+                    //{table:'customers', field:'ID_CUSTOMER_TIPE'},
                     {table:'customers', field:'COMPANY'},
                     {table:'customers', field:'NRO_DOCUMENT'},
                   ],
