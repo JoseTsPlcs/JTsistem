@@ -42,12 +42,16 @@ $(document).ready(function() {
               inserts:[
                 {field:"ID_COMPANY",value:userData.company.id}
               ],
-    
+              
+              filters:[
+                {name:"nombre",box:{tipe:1},select:{table:"provideers",field:"NAME"}},
+                {name:"ruc",box:{tipe:1},select:{table:"provideers",field:"RUC"}},
+              ],
               fields:[
                 {panel:"main",...fld_delete},
                 //{panel:"main",...fld_edit},
-                {panel:"main",name:"nombre",box:bx_input,select:"NAME"},
-                {panel:"main",name:"ruc",box:bx_input,select:"RUC"},
+                {panel:"main",name:"nombre",attributes:[{name:"style",value:"min-width: 200px;"}],box:bx_input,select:"NAME"},
+                {panel:"main",name:"ruc",attributes:[{name:"style",value:"min-width: 150px;"}],box:bx_input,select:"RUC"},
               ],
             }
           },

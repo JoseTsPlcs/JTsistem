@@ -10,7 +10,6 @@ $(document).ready(function() {
         title:"stock de productos",
         panels:[{col:12,y:0,title:"main",tipe:"table"}],
         stateTools:stTls_tb,
-        configShow:true,
     
         tableMain:"products",
         selects:[
@@ -36,7 +35,8 @@ $(document).ready(function() {
           ld_unids,
           ld_products_tags,
         ],
-    
+
+        configShow:false,    
         filters:[
           {name:"producto",box:bx_input,select:{table:"products",field:"NAME"}},
           {name:"tipo",box:{tipe:4,options:op_products_tipe,value:["producto","insumo"]},select:{table:"products",field:"ID_PRODUCT_TIPE"}},
@@ -47,16 +47,16 @@ $(document).ready(function() {
         ],
         fields:[
           //{panel:"main",...fld_delete},
-          {panel:"main",name:"insumo",box:bx_shw,select:"NAME"},
-          {panel:"main",name:"tipo",box:{...bx_shw,options:op_products_tipe},select:"ID_PRODUCT_TIPE"},
-          {panel:"main",name:"etiqueta",box:bx_shw,select:"TAG_NAME"},
+          {panel:"main",attributes:[{name:"style",value:"min-width: 250px;"}],name:"producto",box:bx_shw,select:"NAME"},
+          {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"tipo",box:{...bx_shw,options:op_products_tipe},select:"ID_PRODUCT_TIPE"},
+          {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"etiqueta",box:bx_shw,select:"TAG_NAME"},
     
           {panel:"main",name:"unidad",box:bx_shw,select:"UNID_ID",load:{name:"ld-unids",show:"show"}},
-          {panel:"main",name:"stock",box:bx_input,select:"STOCK_TOTAL"},
-          {panel:"main",name:"limite",box:bx_input,select:"STOCK_LIMIT"},
+          {panel:"main",attributes:[{name:"style",value:"min-width: 100px;"}],name:"stock",box:bx_input,select:"STOCK_TOTAL"},
+          {panel:"main",attributes:[{name:"style",value:"min-width: 100px;"}],name:"limite",box:bx_input,select:"STOCK_LIMIT"},
           {panel:"main",name:"en limite",box:{tipe:0,options:[{value:0,show:"-",class:"rounded text-center bg-success text-white"},{value:1,show:"limit!",class:"rounded text-center bg-danger text-white"}]},select:"STOCK_ONLIMIT"},
           
-          {panel:"main",name:"activa",box:bx_active_show,select:"ACTIVE"},
+          {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"activa",box:bx_active_show,select:"ACTIVE"},
         ],
     
     

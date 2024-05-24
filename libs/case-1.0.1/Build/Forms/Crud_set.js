@@ -41,7 +41,7 @@ class Crud_set extends ODD {
         delete:false,
     }
 
-    #SetVariables({title,stateStart="reload",stateBase="reload",newActive=true,tableMain,selects,joins,inserts=[],orders=[],conditions=[],fields=[],loads=[]}){
+    #SetVariables({title,stateStart="reload",afterCancel="reload",afterDelete="reload",afterInsert="reload",afterUpdate="reload",newActive=true,tableMain,selects,joins,inserts=[],orders=[],conditions=[],fields=[],loads=[]}){
 
         this.#title = title;
         this.#conection = db_lip;
@@ -56,7 +56,10 @@ class Crud_set extends ODD {
 
         this.#newActive = newActive;
         this.#stateData.stateStart=stateStart;
-        this.#stateData.stateBase=stateBase;
+        this.#stateData.afterCancel = afterCancel;
+        this.#stateData.afterDelete = afterDelete;
+        this.#stateData.afterInsert = afterInsert;
+        this.#stateData.afterUpdate = afterUpdate;
 
         this.#loadData.max = loads.length;
         this.#loadData.data = loads;
@@ -88,10 +91,10 @@ class Crud_set extends ODD {
 
     //-------build----------
 
-    #Build({parent,title,panels,filters,configShow}){
+    #Build({parent,title,head=true,attributes,panels,filters,configShow}){
 
 
-        this.#Build_Body({parent,title});
+        this.#Build_Body({parent,title,head,attributes});
         this.#Build_Panels({panels});
         this.#Config_Build({filters,configShow});
 
@@ -118,10 +121,12 @@ class Crud_set extends ODD {
 
         {x:2,y:3,index:0,name:"pages",box:{tipe:3,value:1,options:[{show:"pag1",value:1}],update:()=>{this.#Event_UpdateToolPages({})}},dom:null},
     ];
-    #Build_Body({parent,title}){
+    #Build_Body({parent,title,head,attributes=[]}){
+        
+        console.log("set",attributes);
 
         this.#body_w = new Window({
-            parent,title,
+            parent,title,attributes,head,
             grid:{
                 cols:[
                     [12],//0 - config
@@ -135,6 +140,8 @@ class Crud_set extends ODD {
                 attributes:[
                     {y:1,x:0,attributes:[{name:"class",value:"d-flex justify-content-start"}]},
                     {y:1,x:2,attributes:[{name:"class",value:"d-flex justify-content-end"}]},
+
+                    //{y:2,x:0,attributes},
 
                     {y:3,x:0,attributes:[{name:"class",value:"d-flex justify-content-start"}]},
                     {y:3,x:1,attributes:[{name:"class",value:"d-flex justify-content-center"}]},
@@ -154,7 +161,7 @@ class Crud_set extends ODD {
 
     #conteiner_gr;
     #conteiner_panels = [];
-    #Build_Panels({panels=[]}){
+    #Build_Panels({panels=[],breaklevel}){
 
         var lastY = 0;
         var lastX = 0;
@@ -189,8 +196,8 @@ class Crud_set extends ODD {
             }else lastX++;
         }
 
-        var gridConfig = GetGridConfig({panels});
-        console.log("crud set -> ","panels:",panels," gridConfig:",gridConfig);        
+        var gridConfig = GetGridConfig({panels,breaklevel});
+        //console.log("crud set -> ","panels:",panels," gridConfig:",gridConfig);        
 
         this.#conteiner_gr = new Grid({
             parent:this.#body_w.Conteiner_GetColData({x:0,y:2}).col,
@@ -240,6 +247,7 @@ class Crud_set extends ODD {
 
                 case "table":
                     panel.build = new Table_Grid({
+                        attributes: panel.attributes,
                         parent: panel.parent,
                         fields:fieldsOfPanel,
                         h:panel.h,
@@ -540,6 +548,9 @@ class Crud_set extends ODD {
     Reload({success}){
 
         let k = this;
+
+        k.#Event_ReloadBefore({});
+
         k.#Loading_SetActive({active:true});
         this.#Reload_GetSizeData({
 
@@ -724,7 +735,7 @@ class Crud_set extends ODD {
             k.#Loading_SetActive({active:false});
             var rsp_ins = k.#Event_InsertAfter({field:k.#selectPrimary.field,value:primaryNew});
             if(rsp_ins != null && rsp_ins.stateBlock==true) return;
-            k.#SetBaseState();
+            k.SetState({stateName:k.#stateData.afterInsert});
         }})
     }
 
@@ -921,7 +932,9 @@ class Crud_set extends ODD {
 
         this.#Loading_SetActive({active:false});
         this.#update_listOfChanges=[];
-        this.#SetBaseState();
+
+        console.log("update->send state:",this.#stateData.afterUpdate);
+        this.SetState({stateName:this.#stateData.afterUpdate});
         this.#Event_UpdateAfter({result});
         if(success!=null) success({result});
     }
@@ -1000,7 +1013,7 @@ class Crud_set extends ODD {
             success:()=>{
 
                 k.#Loading_SetActive({active:false});
-                k.#SetBaseState({});
+                k.SetState({stateName:k.#stateData.afterDelete});
                 if(success!=null)success({primaryValue});
             }
         })
@@ -1031,6 +1044,7 @@ class Crud_set extends ODD {
 
                 fieldsOfPanel.forEach(f => {
                     
+                    this.SetValuesToBox({values:[f.box.value],fieldName:f.name});
                     this.GetBoxs({fieldName:f.name})[0].Block({active});
                 });
 
@@ -1106,6 +1120,10 @@ class Crud_set extends ODD {
                 ],
             },
         ],
+        afterInsert:"reload",
+        afterUpdate:"reload",
+        afterCancel:"reload",
+        afterDelete:"relad",
     }
 
     SetState({stateName}){
@@ -1160,11 +1178,6 @@ class Crud_set extends ODD {
             break;
         }
 
-    }
-
-    #SetBaseState(){
-
-        this.SetState({stateName:this.#stateData.stateBase});
     }
 
     #State_SetTools({stateName,toolsSet=[]}){
@@ -1230,7 +1243,7 @@ class Crud_set extends ODD {
 
     #Event_UpdateToolCancel({}){
 
-        this.#SetBaseState();
+        this.SetState({stateName:this.#stateData.afterCancel});
         this.CallEvent({name:"toolCancelUpdate"});
     }
 
@@ -1269,24 +1282,6 @@ class Crud_set extends ODD {
                 var primaryValue = line[primaryField];
 
                 k.Delete({primaryValue});
-
-                /*this.#conection.Request({
-                    php:"success",name:"delete-request",
-                    sql:k.#conection.GetSql_Delete({
-                        tableMain:k.#tableMain,
-                        conditions:[
-                            {
-                                field:k.#selectPrimary.field,
-                                inter:"=",
-                                value:primaryValue,
-                            }
-                        ],
-                    }),
-                    success:()=>{
-                        
-                        k.#SetBaseState({});
-                    }
-                })*/
             }
         }
 
@@ -1312,6 +1307,12 @@ class Crud_set extends ODD {
                 }); 
             }              
         }    
+    }
+
+    #Event_ReloadBefore(params){
+
+        //console.log(this.#title,"reload after");
+        this.CallEvent({name:"reloadBefore",params});
     }
 
     #Event_ReloadAfter(params){

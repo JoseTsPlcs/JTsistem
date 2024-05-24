@@ -7,6 +7,10 @@ $(document).ready(function() {
 
       var gr = new Grid({
         cols:[[6,6]],
+        attributes:[
+          {x:0,y:0,attributes:[{name:"class",value:"col-12 col-md-6"}]},
+          {x:1,y:0,attributes:[{name:"class",value:"col-12 col-md-6"}]},
+        ],
       });
     
       new ConsCruds({
@@ -17,7 +21,7 @@ $(document).ready(function() {
             active:true,
             script:{
               parent:gr.GetColData({x:0,y:0}).col,
-              title:"lista de unidades",
+              title:"lista de unidades",blocked:false,
               panels:[{col:12,y:0,title:"main",tipe:"table"}],
               stateTools:stTls_tb,
     
@@ -51,7 +55,7 @@ $(document).ready(function() {
             active:true,
             script:{
               parent:gr.GetColData({x:1,y:0}).col,
-              title:"lista de etiquetas",
+              title:"lista de etiquetas",blocked:false,
               panels:[{col:12,y:0,title:"main",tipe:"table"}],
               stateTools:stTls_tb,
     

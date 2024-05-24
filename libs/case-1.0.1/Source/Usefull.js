@@ -213,10 +213,11 @@ function NewChart({parent,chart,width=null,height=null}) {
     return new Chart(ctx1, chart);
 }
 
-function GetGridConfig({panels=[],level=1}){
+function GetGridConfig({panels=[],breaklevel="md"}){
 
     var grid = {
         cols:[],
+        labels:[],
         attributes:[],
     };
 
@@ -236,7 +237,7 @@ function GetGridConfig({panels=[],level=1}){
         grid.attributes.push({
             x,y,
             attributes:[
-                {name:"class",value:"col-12 col-md-"+col},
+                {name:"class",value:"col-12 col-"+breaklevel+"-"+col},
             ],
         });
 
@@ -255,10 +256,45 @@ function GetGridConfig({panels=[],level=1}){
             x++;
         }
 
-        
+        if(panel.box) grid.labels.push(panel);
     }
 
     grid.panels = panels;
 
     return grid;
+}
+
+function setDomAttributes({dom,attributes=[],startAttributes=[]}) {
+    
+    var finshAttribbutes = [...startAttributes];
+
+    attributes.forEach(att => {
+        
+        var fatt = finshAttribbutes.find(fatt=>fatt.name==att.name);
+        if(fatt){
+
+            switch (fatt.name) {
+                case "class":
+                    
+                    fatt.value += " " + att.value;
+                break;
+            
+                case "style":
+                    
+                    fatt.value += "; " + att.value;
+                break;
+            }
+        }else{
+
+            finshAttribbutes.push(att);
+        }
+    });
+
+    console.log("finsh:",finshAttribbutes);
+
+    finshAttribbutes.forEach(fatt => {
+        
+        dom.setAttribute(fatt.name,fatt.value);
+    });
+
 }

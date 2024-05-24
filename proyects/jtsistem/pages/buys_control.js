@@ -57,7 +57,7 @@ $(document).ready(function() {
           }
         ],
     
-        configShow:true,
+        configShow:false,
         filters:[
           {name:"proveedor",box:{tipe:1},select:{table:"provideers",field:"NAME"}},
           {col:6,name:"fecha min",box:bx_date_start,select:{table:"buys",field:"DATE_EMMIT",tipe:"min"}},
@@ -67,8 +67,8 @@ $(document).ready(function() {
         fields:[
           {panel:"main",...fld_edit},
           //{panel:"main",name:"id",box:{tipe:0},select:"ID_BUY"},
-          {panel:"main",name:"fecha de emision",box:{tipe:0},select:"DATE_EMMIT"},
-          {panel:"main",name:"proveedor",box:{tipe:0},select:"NAME"},
+          {panel:"main",name:"fecha de emision",attributes:[{name:"style",value:"min-width: 150px;"}],box:{tipe:0},select:"DATE_EMMIT"},
+          {panel:"main",name:"proveedor",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"NAME"},
           {panel:"main",name:"estado",box:{tipe:0,options:op_buys_status},select:"ID_BUY_STATUS"},
           {panel:"main",name:"total",box:bx_money,select:"TOTAL"},
         ],

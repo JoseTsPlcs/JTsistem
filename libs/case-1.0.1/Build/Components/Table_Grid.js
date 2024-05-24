@@ -29,7 +29,7 @@ class Table_Grid extends ODD {
 
   //-------------------------------
   
-  #Build({parent=null,h=0}){
+  #Build({parent=null,attributes=[],h}){
 
     if(parent == null){
 
@@ -40,8 +40,21 @@ class Table_Grid extends ODD {
 
     //create table responsive
     const tb_r = document.createElement("div");
-    tb_r.setAttribute("class", "table-responsive ");
-    tb_r.setAttribute("style","min-height: "+h+"px");
+
+    console.log("create tablle",attributes,tb_r);
+
+    setDomAttributes({
+      dom:tb_r,
+      startAttributes:[
+        {name:"class",value:"table-responsive"},
+        {name:"style",value:(h!=null?"min-height: "+h+"px":"")},
+      ],
+      attributes,
+    });
+
+    //tb_r.setAttribute("class", "table-responsive");
+    //stb_r.setAttribute("style","min-height: "+h+"px");
+
     parent.appendChild(tb_r);
 
     //create table

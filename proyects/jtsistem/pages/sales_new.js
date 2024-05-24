@@ -5,35 +5,51 @@ $(document).ready(function() {
 
     success:({userData})=>{
 
-      var gr = new Grid({cols:[[12],[12],[12]]});
+      var gr = new Grid({
+        cols:[
+          [12],//modal customer
+          [6,6],//venta
+          [12],//steps
+        ],
+        attributes:[
+          {x:0,y:1,attributes:[{name:"class",value:"col-12 col-md-4 pb-4"}/*,{name:"style",value:"background-color: lightcoral;"}*/]},
+          {x:1,y:1,attributes:[{name:"class",value:"col-12 col-md-8"}/*,{name:"style",value:"background-color: lightblue; min-height: 600px; flex: 1;"}*/]},
+        ],
+      });
+
+      var prnt_customer = gr.GetColData({x:0,y:0}).col;
+      var prnt_sale = gr.GetColData({x:0,y:1}).col;
+      var prnt_stps = gr.GetColData({x:1,y:1}).col;
+
       var stps = new Steps({
-        parent:gr.GetColData({x:0,y:2}).col,
+        parent:prnt_stps,
         steps:[
           {
-            name:"productos/servicios",
+            name:'<i class="bi bi-card-checklist"></i> items',
             window:{
-              //title:"productos",
+              //head:false,
               grid:{cols:[[12]]},
             }
           },     
           {
-            name:"insumos",
+            name:'<i class="bi bi-box"></i> insumos',
             window:{
-              //title:"insumos",
+              //head:false,
               grid:{cols:[[12]]},
             }
           },
           {
-            name:"pagos",
+            name:'<i class="bi bi-currency-dollar"></i> pagos',
             window:{
-              //title:"pagos",
+              //head:false,
               grid:{cols:[[12],[12]]},
             }
           },
         ],
       });
+
       var md = new Modal({parent:stps.GetStep({stepIndex:2}).window.Conteiner_GetColData({x:0,y:1}).col});
-      var md2 = new Modal({parent:gr.GetColData({x:0,y:0}).col});
+      var md2 = new Modal({parent:prnt_customer});
       stps.SetStepIndex({stepIndex:0});
 
       var conections = new ConsCruds({
@@ -44,15 +60,75 @@ $(document).ready(function() {
             name:"sale",
             active:true,
             script:{
-              parent:gr.GetColData({x:0,y:1}).col,
+              parent:prnt_sale,
               title:"venta",
+              //h:"100%",
               panels:[
-                {col:6,y:0,tipe:"form",title:"principal",h:350,blocked:false},
-                {col:6,y:0,tipe:"form",title:"cliente",h:350,blocked:false},
+                {col:12,tipe:"form",title:"principal",h:0,show:true,blocked:false},
+                {col:12,tipe:"form",title:"cliente",h:0,show:true,blocked:false},
               ],
-              stateStart:"new",
-              //stateBase:"new",
-              stateTools:stTls_fm_master,
+              //breaklevel:"sm",
+              stateStart:"block",
+              afterUpdate:"block",
+              stateTools:[
+                {
+                    name:"reload",
+                    tools:[
+                        {name:"config",show:false},
+                        {name:"load",show:true},
+                        
+                        {name:"excel",show:false},
+                        {name:"pdf",show:false},
+            
+                        {name:"sizes",show:false,value:1},
+                        {name:"reload",show:true},
+                        {name:"update",show:true},
+                        {name:"new",show:true},
+                        {name:"insert",show:false},
+                        {name:"cancel",show:false},
+                        
+                        {name:"pages",show:false},
+                    ],
+                },
+                {
+                    name:"new",
+                    tools:[
+                        {name:"config",show:false},
+                        {name:"load",show:true},
+                        
+                        {name:"excel",show:false},
+                        {name:"pdf",show:false},
+            
+                        {name:"sizes",show:false,value:1},
+                        {name:"reload",show:false},
+                        {name:"update",show:false},
+                        {name:"new",show:false},
+                        {name:"insert",show:true},
+                        {name:"cancel",show:false},
+                        
+                        {name:"pages",show:false},
+                    ],
+                },
+                {
+                  name:"block",
+                  tools:[
+                      {name:"config",show:false},
+                      {name:"load",show:false},
+                      
+                      {name:"excel",show:false},
+                      {name:"pdf",show:false},
+          
+                      {name:"sizes",show:false,value:1},
+                      {name:"reload",show:false},
+                      {name:"update",show:false},
+                      {name:"new",show:false},
+                      {name:"insert",show:true},
+                      {name:"cancel",show:false},
+                      
+                      {name:"pages",show:false},
+                  ],
+                }
+              ],
 
               tableMain:"sales",
               selects:[
@@ -105,9 +181,9 @@ $(document).ready(function() {
               fields:[
                 //{panel:"principal",col:12,y:0,name:"id",box:bx_shw,select:"ID_SALE"},
                 {panel:"principal",col:12,y:1,name:"fecha de emision",box:bx_date,select:"DATE_EMMIT"},
-                {panel:"principal",col:12,y:2,name:"estado",box:bx_op({ops:op_sales_status}),select:"ID_STATUS"},
-                {panel:"principal",col:12,y:2,name:"cancelado",box:{...bx_op({ops:op_sales_paid}),value:0},select:"PAID"},
-                {panel:"principal",col:12,y:3,name:"venta documento",box:bx_op({ops:op_sales_document}),select:"ID_DOCUMENT"},
+                {panel:"principal",col:12,y:2,tipe:1,name:"estado",box:bx_op({ops:op_sales_status}),select:"ID_STATUS"},
+                {panel:"principal",col:12,y:2,tipe:1,name:"cancelado",box:{...bx_op({ops:op_sales_paid}),value:0},select:"PAID"},
+                {panel:"principal",col:12,y:3,tipe:1,name:"venta documento",box:bx_op({ops:op_sales_document}),select:"ID_DOCUMENT"},
 
                 {panel:"principal",col:12,y:4,name:"total",box:bx_moneyh1,select:"TOTAL"},
                 //{panel:"principal",col:12,y:5,name:"servicios",box:bx_money},
@@ -116,9 +192,9 @@ $(document).ready(function() {
                 {panel:"principal",col:12,y:8,name:"comentario",box:{tipe:9,value:""},select:"COMMENT"},
                 //{panel:"principal",col:12,y:8,name:"pdf",tipe:2,box:{tipe:5,value:"pdf",class:"btn btn-danger text-white btn-sm",style:"min-weigth:100px"},action:"pdf"},
 
-                {panel:"cliente",col:12,y:0,name:"cliente",box:{tipe:8},select:"ID_CUSTOMER",load:{name:"customers",show:"show"}},
-                {panel:"cliente",col:6,...fld_edit},
-                {panel:"cliente",col:6,name:"add",box:{tip:5,value:"+",class:"btn btn-primary btn-sm"},action:"add"},
+                {panel:"cliente",col:8,y:0,name:"cliente",box:{tipe:8},select:"ID_CUSTOMER",load:{name:"customers",show:"show"}},
+                {panel:"cliente",col:2,...fld_edit},
+                {panel:"cliente",col:2,...fld_add},
                 {panel:"cliente",col:12,y:1,name:"tipo",box:{tipe:0}},
                 {panel:"cliente",col:12,y:2,name:"empresa",box:{tipe:0,options:[{value:0,show:"natural"},{value:1,show:"empresa"}]}},
                 {panel:"cliente",col:12,y:3,name:"cliente documento",box:{tipe:0,options:op_identity_document_tipe}},
@@ -319,10 +395,12 @@ $(document).ready(function() {
             active:true,
             script:{
               parent:stps.GetStep({stepIndex:0}).window.Conteiner_GetColData({x:0,y:0}).col,
-              title:"lista de productos/servicios",
-              panels:[{col:12,y:0,title:"main",tipe:"table",h:600}],
+              title:"lista de productos/servicios",head:false,
+              panels:[{col:12,y:0,title:"main",tipe:"table",h:580}],
               stateTools:stTls_tb_maid,
               stateStart:"block",
+              afterInsert:"reload",
+              afterUpdate:"block",
 
               tableMain:"sales_products",
               selects:[
@@ -539,7 +617,7 @@ $(document).ready(function() {
             active:true,
             script:{
               parent:stps.GetStep({stepIndex:1}).window.Conteiner_GetColData({x:0,y:0}).col,
-              title:"lista de insumos",
+              title:"lista de insumos",head:false,
               panels:[{col:12,y:0,title:"main",tipe:"table",h:600}],
               stateTools:stTls_tb_maid,
               stateStart:"block",
@@ -598,6 +676,7 @@ $(document).ready(function() {
             active:true,
             script:{
               ...scr_fm_pays({
+                head:false,
                 parent:stps.GetStep({stepIndex:2}).window.Conteiner_GetColData({x:0,y:0}).col,
                 stateTools:stTls_tb_maid,
 
