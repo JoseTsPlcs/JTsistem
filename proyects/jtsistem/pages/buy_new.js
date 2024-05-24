@@ -8,25 +8,30 @@ $(document).ready(function() {
         //----------buid dooms--------
 
         var grBody = new Grid({
-          cols:[[12],[12],[12]],
+          cols:[
+            [12],//modal provideer
+            [6,6],//buy
+            [12],//steps
+          ],
           attributes:[
-            {x:0,y:1,attributes:[{name:"class",value:"border"},{name:"style",value:"min-height:300px"}]}
+            {x:0,y:1,attributes:[{name:"class",value:"col-12 col-md-4 pb-4"}/*,{name:"style",value:"background-color: lightcoral;"}*/]},
+            {x:1,y:1,attributes:[{name:"class",value:"col-12 col-md-8"}/*,{name:"style",value:"background-color: lightblue; min-height: 600px; flex: 1;"}*/]},
           ]
         });
         var stpGeneral = new Steps({
-          parent:grBody.GetColData({x:0,y:2}).col,
+          parent:grBody.GetColData({x:1,y:1}).col,
           steps:[
             {
-              name:"productos",
+              name:'<i class="bi bi-card-checklist"></i> productos',
               window:{
-                title:"productos",
+                //head:false,
                 grid:{cols:[[12]]}
               }
             },
             {
-              name:"pagos",
+              name:'<i class="bi bi-currency-dollar"></i> pagos',
               window:{
-                title:"pagos",
+                //head:false,
                 grid:{cols:[[12],[12]]}
               }
             },
@@ -51,13 +56,72 @@ $(document).ready(function() {
               active:true,
               script:{
                 parent:grBody.GetColData({x:0,y:1}).col,
-                title:"compra",
+                title:"compra",head:true,
                 panels:[
-                  {col:6,y:0,title:"principal",tipe:"form",h:200},
-                  {col:6,y:0,title:"proveedor",tipe:"form",h:200},
+                  {col:12,y:0,title:"principal",tipe:"form",blocked:false},
+                  {col:12,y:0,title:"proveedor",tipe:"form",blocked:false},
                 ],
-                stateStart:"new",
-                stateTools:stTls_fm_master,
+                stateStart:"block",
+                afterUpdate:"block",
+                stateTools:[
+                  {
+                      name:"reload",
+                      tools:[
+                          {name:"config",show:false},
+                          {name:"load",show:true},
+                          
+                          {name:"excel",show:false},
+                          {name:"pdf",show:false},
+              
+                          {name:"sizes",show:false,value:1},
+                          {name:"reload",show:true},
+                          {name:"update",show:true},
+                          {name:"new",show:true},
+                          {name:"insert",show:false},
+                          {name:"cancel",show:false},
+                          
+                          {name:"pages",show:false},
+                      ],
+                  },
+                  {
+                      name:"new",
+                      tools:[
+                          {name:"config",show:false},
+                          {name:"load",show:true},
+                          
+                          {name:"excel",show:false},
+                          {name:"pdf",show:false},
+              
+                          {name:"sizes",show:false,value:1},
+                          {name:"reload",show:false},
+                          {name:"update",show:false},
+                          {name:"new",show:false},
+                          {name:"insert",show:true},
+                          {name:"cancel",show:false},
+                          
+                          {name:"pages",show:false},
+                      ],
+                  },
+                  {
+                    name:"block",
+                    tools:[
+                        {name:"config",show:false},
+                        {name:"load",show:false},
+                        
+                        {name:"excel",show:false},
+                        {name:"pdf",show:false},
+            
+                        {name:"sizes",show:false,value:1},
+                        {name:"reload",show:false},
+                        {name:"update",show:false},
+                        {name:"new",show:false},
+                        {name:"insert",show:true},
+                        {name:"cancel",show:false},
+                        
+                        {name:"pages",show:false},
+                    ],
+                  }
+                ],
 
                 tableMain:"buys",
                 selects:[
@@ -148,7 +212,7 @@ $(document).ready(function() {
               script:{
 
                 parent:stpGeneral.GetStep({stepIndex:0}).window.Conteiner_GetColData({x:0,y:0}).col,
-                title:"lista de productos",
+                title:"lista de productos",head:false,
                 panels:[
                   {col:12,y:0,title:"main",tipe:"table",h:600},
                 ],
@@ -290,6 +354,7 @@ $(document).ready(function() {
               active:true,
               script:{
                 ...scr_fm_pays({
+                  head:false,
                   parent:stpGeneral.GetStep({stepIndex:1}).window.Conteiner_GetColData({x:0,y:0}).col,
                   tableName:"buys_payments",
                   priFieldName:"ID_BUY_PAY",

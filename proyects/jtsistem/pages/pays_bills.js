@@ -63,7 +63,7 @@ $(document).ready(function() {
                 {field:"DATE_EMMIT",asc:false},
               ],
           
-              configShow:true,
+              configShow:false,
               filters:[
                 {col:12,y:0,name:"cliente",box:bx_input,select:{table:"customers",field:"NAME"}},
                 {col:6,y:1,name:"fecha min",box:bx_date_start,select:{table:"sales",field:"DATE_EMMIT",tipe:"min"}},
@@ -96,7 +96,7 @@ $(document).ready(function() {
     
                         return acum + parseFloat(val["TOTAL"]);
                       },0);
-                      var igv = CalculateWithOutIgv(total);
+                      var igv = total * 18/100;
     
                       gr.GetColData({x:1,y:0}).boxs[0].SetValue(igv);
                       gr.GetColData({x:1,y:1}).boxs[0].SetValue(total);
@@ -134,14 +134,14 @@ $(document).ready(function() {
               ],
     
               fields:[
-                {panel:"main",name:"id",box:{tipe:0},select:"ID_SALE"},
+                //{panel:"main",name:"id",box:{tipe:0},select:"ID_SALE"},
                 {panel:"main",name:"fecha de emision",box:{tipe:0},select:"DATE_EMMIT"},
-    
-                
                 {panel:"main",name:"documento",box:{tipe:0,options:op_sales_document},select:"ID_DOCUMENT"},
                 {panel:"main",name:"cliente",box:{tipe:0},select:"NAME"},
                 {panel:"main",name:"cliente documento",box:{tipe:0,options:op_identity_document_tipe},select:"COMPANY"},
-                {panel:"main",name:"nro documento",box:{tipe:0},select:"NRO_DOCUMENT"},
+                {panel:"main",col:10,name:"nro documento",box:{tipe:0},select:"NRO_DOCUMENT"},
+                {panel:"main",col:2,name:"copy nro",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-arrow-left-short"></i><i class="bi bi-clipboard"></i>'},action:"copy"},
+                {panel:"main",name:"total",box:bx_money,select:"TOTAL"},
     
               ],
               events:[
@@ -151,6 +151,20 @@ $(document).ready(function() {
                     action:({active})=>{
     
                       md.SetActive({active});
+                    }
+                  }]
+                },
+                {
+                  name:"boxUpdate",
+                  actions:[{
+                    action:({k,field,y})=>{
+
+                      var data = k.Reload_GetData();
+
+                      if(field.name=="copy nro"){
+    
+                        navigator.clipboard.writeText(data[0]["NRO_DOCUMENT"]);
+                      }
                     }
                   }]
                 }

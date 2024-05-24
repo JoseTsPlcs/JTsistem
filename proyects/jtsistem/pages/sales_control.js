@@ -69,7 +69,7 @@ $(document).ready(function() {
                 }
               ],
           
-              configShow:true,
+              configShow:false,
               filters:[
                 {col:12,y:0,name:"cliente",box:bx_input,select:{table:"customers",field:"NAME"}},
                 {col:6,y:1,name:"fecha min",box:bx_date,select:{table:"sales",field:"DATE_EMMIT",tipe:"min"}},
@@ -85,7 +85,7 @@ $(document).ready(function() {
                 {panel:"main",name:"edit",attributes:[{name:"class",value:"px-1"}],box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit-page"},
                 {panel:"main",name:"show",attributes:[{name:"class",value:"px-1"}],box:{tipe:5,value:'<i class="bi bi-eye-fill"></i>',class:"btn btn-primary btn-sm"},action:"edit"},
                 
-                {panel:"main",name:"cliente",box:{tipe:0},select:"NAME"},
+                {panel:"main",name:"cliente",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"NAME"},
                 {panel:"main",name:"estado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_status},select:"ID_STATUS"},
                 {panel:"main",name:"cancelado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_paid},select:"PAID"},
                 {panel:"main",name:"total",box:bx_money,select:"TOTAL"},
@@ -268,8 +268,8 @@ $(document).ready(function() {
               ],
     
               fields:[
-                {panel:"informacion",name:"descripcion",attributes:[{name:"class",value:"px-1 py-0 m-0"}],box:{tipe:0},select:"PRODUCT_NAME"},
-                {panel:"informacion",name:"tipo",attributes:[{name:"class",value:"px-1 py-0 m-0"}],box:{tipe:0,options:op_products_tipe},select:"ID_PRODUCT_TIPE"},
+                {panel:"informacion",name:"descripcion",attributes:att_ln,box:{tipe:0},select:"PRODUCT_NAME"},
+                {panel:"informacion",name:"tipo",attributes:att_ln50,box:{tipe:0,options:op_products_tipe},select:"ID_PRODUCT_TIPE"},
                 {panel:"informacion",name:"unidad",attributes:att_cnt,box:{tipe:0,class:"text-center"},select:"UNID_SIMBOL"},
                 {panel:"informacion",name:"cantidad",attributes:att_cnt,box:{tipe:0,class:"text-center"},select:"CANT"},
                 {panel:"informacion",name:"precio unitario",attributes:att_cnt,box:bx_money,select:"PRICE_UNIT"},

@@ -13,7 +13,6 @@ $(document).ready(function() {
         title:"lista de cliente",
         panels:[{col:12,y:0,title:"main",tipe:"table"}],
         stateTools:stTls_tb,
-        configShow:true,
 
         tableMain:"customers",
         selects:[
@@ -38,6 +37,7 @@ $(document).ready(function() {
           }
         ],
 
+        configShow:false,
         filters:[
           {col:12,y:0,name:"nombre",box:bx_input,select:{table:"customers",field:"NAME"}},
           {col:12,y:1,name:"documento",box:bx_input,select:{table:"customers",field:"NRO_DOCUMENT"}},
@@ -45,10 +45,10 @@ $(document).ready(function() {
         ],
         fields:[
           {panel:"main",...fld_delete},
-          {panel:"main",name:"nombre",box:bx_input,select:"NAME"},
+          {panel:"main",name:"nombre",attributes:[{name:"style",value:"min-width: 200px;"}],box:bx_input,select:"NAME"},
           //{panel:"main",name:"tipo",box:bx_op({ops:[]}),select:"ID_CUSTOMER_TIPE",load:{name:"customers_tipes",show:"show"}},
           {panel:"main",name:"empresa",box:{tipe:6,name:"empresa"},select:"COMPANY"},
-          {panel:"main",name:"documento",box:bx_input,select:"NRO_DOCUMENT"},
+          {panel:"main",name:"documento",attributes:[{name:"style",value:"min-width: 150px;"}],box:bx_input,select:"NRO_DOCUMENT"},
         ],
 
       });

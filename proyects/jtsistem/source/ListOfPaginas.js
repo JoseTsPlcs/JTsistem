@@ -2,17 +2,23 @@
 
 paginas = [
     {
-        seccion:"tienda",
+        seccion:'<i class="bi bi-shop"></i> tienda',
         paginas:[
             
           {name:"control de ventas diarias",href:"sales_control.php"},
           {name:"venta nueva",href:"sales_new.php"},
+        ],
+    },
+    {
+        seccion:'<i class="bi bi-cart"></i> compras',
+        paginas:[
+            
           {name:"control de compras",href:"buys_control.php"},
           {name:"compra nueva",href:"buy_new.php"},
         ],
     },
     {
-        seccion:"contactos",
+        seccion:'<i class="bi bi-person-rolodex"></i> contactos',
         paginas:[
             {name:"lista de clientes",href:"customers_control.php"},
             //{name:"configuracion de clientes",href:"customers_config.php"},
@@ -20,7 +26,7 @@ paginas = [
         ],
     },
     {
-        seccion:"inventario",
+        seccion:'<i class="bi bi-box"></i> inventario',
         paginas:[
             {name:"lista de productos",href:"products.php"},
             {name:"precios de productos",href:"products_prices.php"},
@@ -31,13 +37,13 @@ paginas = [
         ],
     },
     {
-        seccion:"informes",
+        seccion:'<i class="bi bi-clipboard-data"></i> informes',
         paginas:[
             {name:"ventas",href:"inform_products.php"},
         ],
     },
     {
-        seccion:"cuentas",
+        seccion:'<i class="bi bi-piggy-bank"></i> cuentas',
         paginas:[
             {name:"lista de pagos",href:"pays_control.php"},
             {name:"lista de facturas",href:"pays_bills.php"},
@@ -46,7 +52,7 @@ paginas = [
         ],
     },
     {
-        seccion:"usuario",
+        seccion:'<i class="bi bi-person"></i> usuario',
         paginas:[
             {name:"cuenta",href:"account.php"},
             {name:"salir",href:"login.php"},

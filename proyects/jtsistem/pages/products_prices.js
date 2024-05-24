@@ -39,7 +39,7 @@ $(document).ready(function() {
           ld_products_tags,
         ],
     
-        configShow:true,
+        configShow:false,
         filters:[
           {name:"producto",box:bx_input,select:{table:"products",field:"NAME"}},
           {name:"tipo",box:{tipe:4,options:op_products_tipe},select:{table:"products",field:"ID_PRODUCT_TIPE"}},
@@ -48,15 +48,15 @@ $(document).ready(function() {
           //{name:"unidad",box:{tipe:4},select:{table:"products",field:"UNID_ID"},load:{name:"unids",show:"show"}},
         ],
         fields:[
-          {panel:"main",name:"producto",box:bx_shw,select:"NAME"},
-          {panel:"main",name:"tipo",box:{...bx_shw,options:op_products_tipe},select:"ID_PRODUCT_TIPE"},
-          {panel:"main",name:"etiqueta",box:bx_shw,select:"TAG_NAME"},
+          {panel:"main",attributes:[{name:"class",value:"text-left"},{name:"style",value:"min-width: 250px;"}],name:"producto",box:bx_shw,select:"NAME"},
+          {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"tipo",box:{...bx_shw,options:op_products_tipe},select:"ID_PRODUCT_TIPE"},
+          {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"etiqueta",box:bx_shw,select:"TAG_NAME"},
           //{panel:"main",name:"unidad",box:bx_shw,select:"UNID_ID",load:{name:"unids",show:"show"}},
     
           {panel:"main",name:"precio unitario",box:bx_input,select:"PRICE_UNIT"},
           {panel:"main",name:"costo unitario",box:bx_input,select:"COST_UNIT"},
     
-          {panel:"main",name:"activa",box:bx_active_show,select:"ACTIVE"},
+          {panel:"main",attributes:[{name:"style",value:"min-width: 100px;"}],name:"activa",box:bx_active_show,select:"ACTIVE"},
         ],
     
     

@@ -33,7 +33,7 @@ class Window extends ODD {
     var fields = i.fields;
     if(fields!=null){
 
-      var grid = {
+      /*var grid = {
         cols:[[]],
         labels:[],
       }
@@ -71,7 +71,9 @@ class Window extends ODD {
       grid.cols.splice(grid.cols.length-1,1);
 
       i.grid = grid;
-      i.fields = fields;
+      i.fields = fields;*/
+
+      i.grid = GetGridConfig({panels:fields});
     }
 
     return i;
@@ -93,7 +95,7 @@ class Window extends ODD {
 
   #body=null;
 
-  #Body_Build({parent=null,title="window",id="w",grid={},titleSize=3,h=100}){
+  #Body_Build({parent=null,title="window",id="w",grid={},titleSize=3,h=100,attributes=[]}){
     
     let k = this;
 

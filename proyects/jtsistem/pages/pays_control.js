@@ -25,7 +25,7 @@ $(document).ready(function() {
           {x:1,y:2,box:{...bx_moneyh3,class:"h3 text-danger"}},
         ],
       });
-      var md = new Modal({parent:gr.GetColData({x:0,y:4}).col});
+      var md = new Modal({parent:gr.GetColData({x:0,y:4}).col,size:"lg"});
     
       new ConsCruds({
     
@@ -90,7 +90,7 @@ $(document).ready(function() {
               }],
               
     
-              configShow:true,
+              configShow:false,
               filters:[
                 {col:6,y:0,name:"fecha min",box:bx_date_start,select:{table:"payments",field:"DATE_EMMIT",tipe:"min"}},
                 {col:6,y:0,name:"fecha max",box:bx_date_end,select:{table:"payments",field:"DATE_EMMIT",tipe:"max"}},
@@ -101,7 +101,7 @@ $(document).ready(function() {
                 {panel:"main",...fld_delete},
                 {panel:"main",...fld_edit},
                 //{panel:"main",name:"id",box:bx_shw,select:"ID_PAY"},
-                {panel:"main",name:"fecha de emision",box:bx_shw,select:"DATE_EMMIT"},
+                {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"fecha de emision",box:bx_shw,select:"DATE_EMMIT"},
                 {panel:"main",name:"total",box:bx_income,select:"TOTAL"},
                 {panel:"main",name:"etiqueta",box:bx_shw,select:"TAG_NAME"},
                 {panel:"main",name:"cuenta",box:bx_shw,select:"ACCOUNT_NAME"},

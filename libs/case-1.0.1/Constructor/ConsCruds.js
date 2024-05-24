@@ -221,7 +221,7 @@ class ConsCruds extends ODD {
                         ],
                     },
                     {
-                        name:"reloadAfter",
+                        name:"reloadBefore",
                         actions:[{
                             name:"tb-fm (maid) -> block",
                             action:({k})=>{
@@ -405,7 +405,7 @@ class ConsCruds extends ODD {
                         }]
                     },
                     {
-                        name:"reloadAfter",
+                        name:"reloadBefore",
                         actions:[{
                             action:({k,value})=>{
 

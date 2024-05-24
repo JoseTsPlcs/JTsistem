@@ -5,7 +5,13 @@ $(document).ready(function() {
 
     success:({userData})=>{
 
-      var gr = new Grid({cols:[[6,6],[12]]})
+      var gr = new Grid({
+        cols:[[6,6],[12]],
+        attributes:[
+          {x:0,y:0,attributes:[{name:"class",value:"col-12 col-md-6"}]},
+          {x:1,y:0,attributes:[{name:"class",value:"col-12 col-md-6"}]},
+        ],
+      })
 
       new Crud_set({
         parent:gr.GetColData({x:0,y:0}).col,
@@ -68,7 +74,7 @@ $(document).ready(function() {
         fields:[
           //{panel:"main",...fld_delete},
           {panel:"main",name:"cuenta",box:bx_input,select:"NAME"},
-          {panel:"main",name:"total",box:bx_input,select:"TOTAL"},
+          {panel:"main",name:"total",box:bx_money,select:"TOTAL"},
           {panel:"main",name:"activo",box:bx_active_input,select:"ACTIVE"},
         ],
 

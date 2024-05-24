@@ -12,7 +12,7 @@ const op_sales_status = [
 ];
 const op_sales_paid = [
     {value:1,show:"pagado",class:"rounded text-center bg-success text-white"},
-    {value:0,show:"pendiente",class:"rounded text-center bg-danger text-white"},
+    {value:0,show:"sin pagar",class:"rounded text-center bg-danger text-white"},
 ];
 const op_sales_document = [
     {value:1,show:"nota de pago"},
@@ -64,8 +64,8 @@ function CalculateWithOutIgv(val) {
 const bx_shw = {tipe:0,value:"",class:"text-center"};
 
 const bx_money = {tipe:0,class:"text-center",format:{decimals:2,start:"S/."},value:0};
-const bx_moneyh1 = {tipe:0,class:"h1 text-center",format:{decimals:2,start:"S/."},value:0};
-const bx_moneyh3 = {tipe:0,class:"h3 text-center",format:{decimals:2,start:"S/."},value:0};
+const bx_moneyh1 = {tipe:0,class:"h1 text-left",format:{decimals:2,start:"S/."},value:0};
+const bx_moneyh3 = {tipe:0,class:"h3 text-left",format:{decimals:2,start:"S/."},value:0};
 
 const bx_income = {tipe:0,format:{decimals:2,start:"S/.",limit:{value:0,less:{attributes:[{name:"class",value:"text-danger"}]},more:{attributes:[{name:"class",value:"text-success"}]}}},value:0};
 const bx_incomeh1 = {tipe:0,format:{decimals:2,start:"S/.",limit:{value:0,less:{attributes:[{name:"class",value:"h1 text-danger"}]},more:{attributes:[{name:"class",value:"h1 text-success"}]}}},value:0};
@@ -94,7 +94,9 @@ function bx_op({ops}) {
 const att_btn = [{name:"class",value:"my-0 py-0"},{name:"style",value:"width: 50px"}];
 const att_shw = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"width: 130px"}];
 const att_ln = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"min-width: 300px;"}];
+const att_ln50 = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"min-width: 70px;"}];
 const att_cnt = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"width: 50px"}];
+const att_cnt2 = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"width: 100px"}];
 
 //---------fields---------
 
@@ -566,13 +568,13 @@ function scr_pay({tags=[],tagValue=1,events=[]}) {
     }
 }
 
-function scr_fm_pays({parent,tableName,priFieldName,joinFieldName,events=[]}) {
+function scr_fm_pays({parent,head=true,tableName,priFieldName,joinFieldName,events=[]}) {
     
     return {
 
-        parent,
+        parent,head,
         title:"lista de pagos",
-        panels:[{col:12,y:0,title:"main",tipe:"table"}],
+        panels:[{col:12,y:0,title:"main",tipe:"table",h:600}],
         stateTools:stTls_tb_maid,
         stateStart:"block",
 
