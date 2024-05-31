@@ -122,39 +122,7 @@ function Param_GetField(field) {
     
     field.box = Param_GetBox(field.box);
 
-    if(field.action=="delete"){
-
-        field.box = {
-            default:"x",
-            tipe:5,
-            class:"btn btn-outline-danger btn-sm",
-        }
-        field.name="delete";
-        field.action="delete";
-    }
-
-    if(field.action=="edit"){
-
-        field.box = {
-            value:"[/]",
-            tipe:5,
-            class:"btn btn-outline-primary btn-sm",
-        }
-        field.name="edit";
-        field.action="edit";
-    }
-
-    if(field.action=="new"){
-
-        field.box = {
-            default:"[+]",
-            tipe:5,
-            class:"btn btn-outline-primary btn-sm",
-        }
-        field.name="new";
-        field.action="new";
-    }
-
+    if(field.action != null) field.colAllLevel = true;
     
     if((field.box.tipe==1 || field.box.tipe==8) && field.box.class==null) field.box.class = "w-100 m-0";
 
@@ -164,7 +132,7 @@ function Param_GetField(field) {
     }
 
     if(field.box.tipe==5&&field.tipe==null) field.tipe=0;
-    if(field.box.tipe==3&&field.tipe==null) field.tipe=2;
+    //if(field.box.tipe==3&&field.tipe==null) field.tipe=2;
     //if(field.box.tipe==1&&field.tipe==null) field.tipe=0;
 
     return field;
@@ -178,7 +146,7 @@ function Date_Today(days=0) {
 
     var today = new Date();
     return today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + (parseInt(today.getDate()) + days)).slice(-2);
-  }
+}
 
 function Date_ToString({date=null}) {
   
@@ -200,6 +168,190 @@ function Date_LastOfMoth() {
     var date = new Date();
     var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
     return Date_ToString({date:lastDay});
+}
+
+function Date_StartQuarter() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+
+    let startMonth;
+
+    if (month >= 0 && month <= 2) { // Primer trimestre: enero, febrero, marzo
+        startMonth = 0;
+    } else if (month >= 3 && month <= 5) { // Segundo trimestre: abril, mayo, junio
+        startMonth = 3;
+    } else if (month >= 6 && month <= 8) { // Tercer trimestre: julio, agosto, septiembre
+        startMonth = 6;
+    } else { // Cuarto trimestre: octubre, noviembre, diciembre
+        startMonth = 9;
+    }
+
+    const startDate = new Date(year, startMonth, 1);
+    
+    const formatDate = (date) => {
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    };
+
+    return formatDate(startDate);
+}
+
+function Date_EndQuarter() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+
+    let endMonth;
+
+    if (month >= 0 && month <= 2) { // Primer trimestre: enero, febrero, marzo
+        endMonth = 2;
+    } else if (month >= 3 && month <= 5) { // Segundo trimestre: abril, mayo, junio
+        endMonth = 5;
+    } else if (month >= 6 && month <= 8) { // Tercer trimestre: julio, agosto, septiembre
+        endMonth = 8;
+    } else { // Cuarto trimestre: octubre, noviembre, diciembre
+        endMonth = 11;
+    }
+
+    const endDate = new Date(year, endMonth + 1, 0); // 0 obtiene el último día del mes anterior
+    
+    const formatDate = (date) => {
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    };
+
+    return formatDate(endDate);
+}
+
+function Date_GetPeriod({ data, dataField, period = "day" }) {
+    const labelsSet = new Set();
+    const uniqueLabels = [];
+
+    for (const item of data) {
+        const dateString = item[dataField];
+        const label = Date_GetLabel({ dateString, period });
+
+        if (!labelsSet.has(label)) {
+            labelsSet.add(label);
+            uniqueLabels.push(label);
+        }
+    }
+
+    return uniqueLabels;
+}
+
+function Date_GetDetails({ dateString }) {
+    const date = new Date(dateString);
+
+    // Obtener el día del mes
+    const dayOfMonth = date.getDate();
+
+    // Obtener el día de la semana (0-6) donde 0 es Domingo
+    const dayOfWeek = date.getDay();
+
+    // Obtener el nombre del día de la semana en español
+    const dayNames = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+    const dayName = dayNames[dayOfWeek];
+
+    // Obtener el mes (0-11) donde 0 es Enero
+    const monthNumber = date.getMonth();
+
+    // Obtener el nombre del mes en español
+    const monthNames = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    const monthName = monthNames[monthNumber];
+
+    // Calcular el trimestre (1-4)
+    const quarter = Math.floor(monthNumber / 3) + 1;
+
+    // Obtener el año
+    const year = date.getFullYear();
+
+    // Calcular el número de la semana
+    const startOfYear = new Date(date.getFullYear(), 0, 1);
+    const days = Math.floor((date - startOfYear) / (24 * 60 * 60 * 1000));
+    const weekNumber = Math.ceil((days + startOfYear.getDay() + 1) / 7);
+
+    return {
+        dayOfMonth,
+        dayOfWeek,
+        dayName,
+        weekNumber,
+        monthNumber,
+        monthName,
+        quarter,
+        year
+    };
+}
+
+function Date_GetLabel({dateString,period="day"}) {
+    
+    var detail = Date_GetDetails({dateString});
+
+    switch(period){
+
+        case "day":
+        return detail.dayName.substring(0, 3) + "-" + detail.dayOfMonth;
+
+        case "week":
+        return detail.monthName.substring(0, 3) + "-semana #" + detail.weekNumber;
+
+        case "month":
+        return detail.monthName.substring(0,3) + "-" + detail.year;
+
+        case "tri":
+        return "Q"+detail.quarter +"-"+detail.year;
+
+        default:
+        return dateString;
+    }
+}
+
+function UniqueLabels({ data, labelField }) {
+    // Utilizamos un conjunto para eliminar duplicados
+    const uniqueLabels = new Set();
+
+    data.forEach(item => {
+        // Añadimos cada label al conjunto usando el campo especificado por labelField
+        uniqueLabels.add(item[labelField]);
+    });
+
+    // Convertimos el conjunto a array
+    const labelsArray = Array.from(uniqueLabels);
+
+    // Colores vivos, cálidos y bonitos predefinidos
+    const vibrantColors = [
+        '#FF5733', // Red-Orange
+        '#FF8D1A', // Orange
+        '#FFC300', // Yellow
+        '#DAF7A6', // Light Green
+        '#FF6F61', // Coral
+        '#F7CAC9', // Pink
+        '#92A8D1', // Blue
+        '#F5B7B1', // Light Pink
+        '#B39BC8', // Purple
+        '#FAE03C'  // Bright Yellow
+    ];
+
+    // Función para obtener un color aleatorio del array predefinido
+    function getRandomColor() {
+        const randomIndex = Math.floor(Math.random() * vibrantColors.length);
+        return vibrantColors[randomIndex];
+    }
+
+    // Creamos la lista de objetos con la etiqueta y un color aleatorio
+    const result = labelsArray.map(label => {
+        return {
+            name: label,
+            color: getRandomColor()
+        };
+    });
+
+    return result;
 }
 
 
@@ -233,11 +385,12 @@ function GetGridConfig({panels=[],breaklevel="md"}){
         panel.y = y;
 
         var col = panel.col !=null ? panel.col : 12;
+        var colAllLevel = panel.colAllLevel == true;
         line.push(col);
         grid.attributes.push({
             x,y,
             attributes:[
-                {name:"class",value:"col-12 col-"+breaklevel+"-"+col},
+                {name:"class",value:"col-"+(colAllLevel?col:12)+" col-"+breaklevel+"-"+col},
             ],
         });
 
@@ -290,7 +443,7 @@ function setDomAttributes({dom,attributes=[],startAttributes=[]}) {
         }
     });
 
-    console.log("finsh:",finshAttribbutes);
+    //console.log("finsh:",finshAttribbutes);
 
     finshAttribbutes.forEach(fatt => {
         

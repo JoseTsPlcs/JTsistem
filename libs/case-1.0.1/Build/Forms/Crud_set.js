@@ -67,6 +67,8 @@ class Crud_set extends ODD {
 
     #title="crud";
     #conection;
+    Conection_Get(){return this.#conection};
+
     #tableMain;
     #selects;
     #selectPrimary;
@@ -89,6 +91,11 @@ class Crud_set extends ODD {
         return select;
     }
 
+    SelectPrimaryGet(){
+
+        return this.#selectPrimary;
+    }
+
     //-------build----------
 
     #Build({parent,title,head=true,attributes,panels,filters,configShow}){
@@ -99,7 +106,7 @@ class Crud_set extends ODD {
         this.#Config_Build({filters,configShow});
 
         this.#Loading_Build({parent:this.#body_w.Conteiner_Dom()});
-        this.#Loading_SetActive({active:false});
+        this.Loading_SetActive({active:false});
     }
 
     #body_w;
@@ -206,8 +213,6 @@ class Crud_set extends ODD {
             attributes:gridConfig.attributes,
         });
 
-        
-
         let k = this;
         var events = [
             {
@@ -236,6 +241,7 @@ class Crud_set extends ODD {
                         title: panel.title,
                         blocked:panel.blocked,
                         show:panel.show,
+                        head:panel.head,
                         h:panel.h,
                         grid:{
                             cols: this.#GetColsOfPanels({panels:fieldsOfPanel}),
@@ -293,7 +299,7 @@ class Crud_set extends ODD {
 
     }
 
-    #Loading_SetActive({active=true}){
+    Loading_SetActive({active=true}){
 
         this.#loading.state = active;
         this.#loading.dom.style.display = this.#loading.state ? "block":"none";
@@ -327,11 +333,13 @@ class Crud_set extends ODD {
 
     //--------filters-----------
 
-    #filterWindow = null;
+    #filters = null;
+    Filters_Get(){return this.#filters};
+
     #Filters_Build({filters=[]}){
 
         let k = this;
-        this.#filterWindow = new windowFilters({
+        this.#filters = new windowFilters({
             parent: this.#body_w.Conteiner_GetColData({x:0,y:0}).col,
             title:"filtros",
             filters,
@@ -396,7 +404,7 @@ class Crud_set extends ODD {
         this.#loadData.count = 0;
         this.#loadData.max = this.#loadData.data.length;
 
-        this.#Loading_SetActive({active:true});
+        this.Loading_SetActive({active:true});
 
         if(this.#loadData.max == 0){
 
@@ -440,7 +448,7 @@ class Crud_set extends ODD {
     #Loaded({success}){
 
         this.#Loaded_SetOptionsTo({});
-        this.#Loading_SetActive({active:false});
+        this.Loading_SetActive({active:false});
 
         if(success!=null) success();
     }
@@ -452,13 +460,13 @@ class Crud_set extends ODD {
         //fields
         this.#fields.forEach(field => {
             
-            if(field.load!=null){
+            if(field.load!=null&&field.load.field==null){
                     
                 var loadOptions = this.Loaded_GetLoadOptions({
                     loadName:field.load.name,
                     loadShow:field.load.show,
                 });
-                var valueDefault = loadOptions[0].value;
+                var valueDefault = loadOptions.length > 0 ? loadOptions[0].value : 1;
                 var rsp = this.#Event_SetOptionsToFields({field,loadOptions});
 
                 if(rsp !=null && rsp.loadOptions) loadOptions = rst.loadOptions;
@@ -476,7 +484,7 @@ class Crud_set extends ODD {
         });
 
         //filters
-        this.#filterWindow.Filters_Get().forEach(filter=>{
+        this.#filters.Filters_Get().forEach(filter=>{
 
             if(filter.load){
 
@@ -484,14 +492,19 @@ class Crud_set extends ODD {
                     loadName:filter.load.name,
                     loadShow:filter.load.show,
                 });
-                var filterBox = this.#filterWindow.Filter_GetBox({filterName:filter.name});
-                filterBox.SetOptions(loadOptions);
 
-                if(filter.box.tipe == 4){
+                this.#filters.Filter_SetOptions({
+                    filterName:filter.name,
+                    options:loadOptions,
+                })
+                //var filterBox = this.#filters.Filter_GetBox({filterName:filter.name});
+                //filterBox.SetOptions(loadOptions);
+
+                /*if(filter.box.tipe == 4 || filter.box.tipe == 3){
 
                     var valuesAll = loadOptions.map((op)=>{return op.show});
                     filterBox.SetValue(valuesAll);
-                }
+                }*/
             }
         });
     }
@@ -522,10 +535,10 @@ class Crud_set extends ODD {
     Load_Reset({success}){
 
         let k = this;
-        this.#Loading_SetActive({active:true});
+        this.Loading_SetActive({active:true});
         this.#Load({success:()=>{
 
-            k.#Loading_SetActive({active:false});
+            k.Loading_SetActive({active:false});
             k.#Event_LoadsReseted({});
             if(success!=null) success();
         }});
@@ -551,7 +564,7 @@ class Crud_set extends ODD {
 
         k.#Event_ReloadBefore({});
 
-        k.#Loading_SetActive({active:true});
+        k.Loading_SetActive({active:true});
         this.#Reload_GetSizeData({
 
             success:({size})=>{
@@ -576,7 +589,7 @@ class Crud_set extends ODD {
                 
                 k.#Reload_RequestData({success:({result})=>{
 
-                    k.#Loading_SetActive({active:false});
+                    k.Loading_SetActive({active:false});
                     k.#Event_ReloadAfter({reloadData:result});
                     k.#Reload_PrintData({result});
                 }});
@@ -680,8 +693,8 @@ class Crud_set extends ODD {
         var conditions = [];
 
         //filters
-        //console.log(this.#filterWindow);
-        var filtersCondition = this.#filterWindow.GetConditions();
+        //console.log(this.#filters);
+        var filtersCondition = this.#filters.GetConditions();
         conditions = [...filtersCondition];
 
 
@@ -708,6 +721,10 @@ class Crud_set extends ODD {
         });
 
         //console.log("reload-conditions:",conditions);
+
+        var e_rsp = this.CallEvent({name:"reloadConditionsAfter",params:{conditions}});
+        if(e_rsp != null && e_rsp.conditions != null) conditions = e_rsp.conditions;
+
         return conditions;
     }
 
@@ -725,14 +742,18 @@ class Crud_set extends ODD {
     Insert({inserts=[],success}){
 
         var e_rst = this.#Event_InsertBefore({inserts});
-        if(e_rst && e_rst.inserts) inserts=e_rst.inserts;
+        if(e_rst!=null){
+
+            if(e_rst.block == true) return this.SetState({stateName:this.#stateData.afterInsert});;
+            if( e_rst.inserts) inserts=e_rst.inserts;
+        }
 
         //console.log(this.#title+"-insert -> ",inserts);
         let k = this;
-        k.#Loading_SetActive({active:true});
+        k.Loading_SetActive({active:true});
         this.#Insert_Request({inserts,success:({primaryNew})=>{
 
-            k.#Loading_SetActive({active:false});
+            k.Loading_SetActive({active:false});
             var rsp_ins = k.#Event_InsertAfter({field:k.#selectPrimary.field,value:primaryNew});
             if(rsp_ins != null && rsp_ins.stateBlock==true) return;
             k.SetState({stateName:k.#stateData.afterInsert});
@@ -852,7 +873,11 @@ class Crud_set extends ODD {
 
                     fieldsOfPanel.forEach(f => {
                         
-                        this.SetValuesToBox({values:[f.box.value],fieldName:f.name});
+                        if(f.action != null){
+
+                            this.SetValuesToBox({values:[""],fieldName:f.name,box:{tipe:0}});
+                        }
+                        else this.SetValuesToBox({values:[f.box.value],fieldName:f.name});
                     });
 
                 break;
@@ -876,7 +901,7 @@ class Crud_set extends ODD {
     #Update({success}){
 
         let k = this;
-        k.#Loading_SetActive({active:true});
+        k.Loading_SetActive({active:true});
         if(this.#update_listOfChanges.length > 0 && this.#update_listOfChanges[0].fields.length > 0){
 
             //----sql----
@@ -930,7 +955,7 @@ class Crud_set extends ODD {
 
     #Update_success({success,result}){
 
-        this.#Loading_SetActive({active:false});
+        this.Loading_SetActive({active:false});
         this.#update_listOfChanges=[];
 
         console.log("update->send state:",this.#stateData.afterUpdate);
@@ -991,7 +1016,7 @@ class Crud_set extends ODD {
     Delete({primaryValue,success}){
 
         let k = this;
-        k.#Loading_SetActive({active:true});
+        k.Loading_SetActive({active:true});
 
         var deleteSql = this.#conection.GetSql_Delete({
             tableMain:k.#tableMain,
@@ -1012,7 +1037,7 @@ class Crud_set extends ODD {
             sql:deleteSql,
             success:()=>{
 
-                k.#Loading_SetActive({active:false});
+                k.Loading_SetActive({active:false});
                 k.SetState({stateName:k.#stateData.afterDelete});
                 if(success!=null)success({primaryValue});
             }
@@ -1269,7 +1294,7 @@ class Crud_set extends ODD {
         let k = this;
         u.k = this;
         u.primaryValues = this.#reloadData.map(ln=>{return ln[k.#selectPrimary.field]});
-        //console.log("event box update",u);
+        console.log("crud -> event box update",u);
         
 
         if(u.field.action == "delete"){
@@ -1307,6 +1332,29 @@ class Crud_set extends ODD {
                 }); 
             }              
         }    
+
+        //-------load change----------
+
+        var fieldsLoadByField = this.#fields.filter(f=>f.load!=null&&f.load.field!=null);
+        console.log("fieldsload",fieldsLoadByField);
+        if(fieldsLoadByField.length>0){
+
+            fieldsLoadByField.forEach(f_ld => {
+                
+                var load = f_ld.load;
+                if(load.field == u.field.name){
+
+                    var loadData = this.Loaded_GetLoadData({loadName:load.name});
+                    var dataFound = loadData.result.find(rst=>rst[load.value]==value);
+                    if(dataFound){
+
+                        console.log(u.field,loadData);
+                        var boxs = this.GetBoxs({fieldName:load.field});
+                        boxs[y].SetValue(dataFound[load.show]);
+                    }
+                }
+            });
+        }
     }
 
     #Event_ReloadBefore(params){
@@ -1399,6 +1447,7 @@ class Crud_set extends ODD {
 
         if(show==false) tool.dom.Hide();
         else tool.dom.Show();
+        //.Block({active});
     }
 
     Tools_GetBox({toolName}){
@@ -1449,7 +1498,7 @@ class Crud_set extends ODD {
         return values[y];
     }
 
-    SetValuesToBox({values=[],fieldName}){
+    SetValuesToBox({values=[],fieldName,box}){
 
         var field = this.#fields.find(f=>f.name == fieldName);
         var panel = this.#conteiner_panels.find(p=>p.title==field.panel);
@@ -1458,8 +1507,8 @@ class Crud_set extends ODD {
 
             case "table":
                 
-                //console.log(fieldName,values);
-                panel.build.Fields_SetValues({values,fieldName});
+                //console.log(fieldName,values,box);
+                panel.build.Fields_SetValues({values,fieldName,boxNew:box});
                 
             break;
         

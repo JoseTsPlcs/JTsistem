@@ -1,7 +1,18 @@
 //---------options--------
 
 var company_id = 1;
+var user_delete_data_import = true;
 
+var op_access = [
+    {value:1,show:"borrar data importante"},
+    ...paginasOptions,
+];
+
+const op_company_type = [
+    {value:1,show:"ecommerse"},
+    {value:2,show:"restaurante"},
+    {value:3,show:"taller"},
+];
 
 const op_sales_status = [
     {value:1,show:"cotizacion",class:"rounded text-center bg-secondary text-white"},
@@ -48,8 +59,19 @@ const op_active = [
 
 const op_date_ranges = [
     {value:"day",show:"diario"},
-    //{value:"week",show:"semanal"},
-    //{value:"month",show:"mensual"},
+    {value:"week",show:"semanal"},
+    {value:"month",show:"mensual"},
+    {value:"tri",show:"trimestre"},
+];
+
+const op_control_type = [
+    {value:1,show:"abrir"},
+    {value:0,show:"cerrar"},
+];
+
+const op_account_state = [
+    {value:1,show:"abierto",class:"rounded text-center bg-success text-white"},
+    {value:0,show:"cerrado",class:"rounded text-center bg-danger text-white"},
 ];
 
 const igvPorcent = 18;
@@ -57,6 +79,11 @@ const igvPorcent = 18;
 function CalculateWithOutIgv(val) {
     
     return val / (1+igvPorcent/100);
+}
+
+function CalculateJustIgv(val){
+
+    return val * igvPorcent/100;
 }
 
 //--------boxs---------
@@ -418,7 +445,9 @@ function scr_pay({tags=[],tagValue=1,events=[]}) {
         title:"pago",
         panels:[{col:12,y:0,title:"main",tipe:"form"}],
         stateStart:"block",
-        stateBase:"block",
+        afterUpdate:"block",
+        afterInsert:"block",
+        afterCancel:"block",
         stateTools:stTls_fm_maid,
 
         tableMain:"payments",
@@ -430,9 +459,14 @@ function scr_pay({tags=[],tagValue=1,events=[]}) {
             {table:'payments', field:'ID_ACCOUNT'},
             {table:'payments', field:'ID_PAY_TAG'},
         ],
-        inserts:ins_general,
+        inserts:[
+            ...ins_general,
+            {
+                field:"DATE_EMMIT",
+                value:Date_Today(),
+            }
+        ],
         loads:[
-            ld_accounts,
             {
                 name:"pay_tag",
                 tableMain:"pay_tag",
@@ -457,17 +491,41 @@ function scr_pay({tags=[],tagValue=1,events=[]}) {
                     },
                 ],
             },
-            //ld_pay_tag,
+            {
+                name:"ld-accounts",
+                tableMain:"accounts",
+                selects:[
+                    {table:"accounts",field:"ID_ACCOUNT",as:"value"},
+                    {table:"accounts",field:"NAME",as:"show"},
+                    {table:"accounts",field:"OPEN",as:"open"},
+                    {table:"accounts",field:"CONTROL_BY_OPEN",as:"open_control"},
+                ],
+                conditions:[
+                    {
+                        table:"accounts",
+                        field:"ACTIVE",
+                        inter:"=",
+                        value:1
+                    },
+                    {
+                        before:" AND ",
+                        table:"accounts",
+                        field:"ID_COMPANY",
+                        inter:"=",
+                        value:company_id,
+                    },
+                ],
+            }
         ],
 
         fields:[
-            {panel:"main",col:12,y:0,name:"id",box:bx_shw,select:"ID_PAY"},
-            {panel:"main",col:12,y:1,name:"fecha de emision",box:bx_date,select:"DATE_EMMIT"},
+            //{panel:"main",col:12,y:0,name:"id",box:bx_shw,select:"ID_PAY"},
+            {panel:"main",col:12,y:1,name:"fecha de emision",box:{tipe:0,value:Date_Today()},select:"DATE_EMMIT"},
             {panel:"main",col:12,y:2,name:"total",box:bx_input,select:"TOTAL"},
             //{panel:"main",col:12,name:"ingreso/egreso",box:{tipe:6,name:"ingreso"},select:"INCOME"},
-            {panel:"main",name:"ingreso/egreso",box:{tipe:0,value:0,options:[{value:0,show:"egreso",class:"text-danger"},{value:1,show:"ingreso",class:"text-success"}]},select:"INCOME"},
-            {panel:"main",col:12,y:2,name:"cuenta",box:bx_op({ops:[]}),select:"ID_ACCOUNT",load:{name:"accounts",show:"show"}},
-            {panel:"main",col:12,y:2,name:"etiqueta",box:{...bx_op({ops:[]}),value:tagValue},select:"ID_PAY_TAG",load:{name:"pay_tag",show:"show"}},
+            {panel:"main",tipe:1,name:"ingreso/egreso",box:{tipe:0,value:0,options:[{value:0,show:"egreso",class:"text-danger"},{value:1,show:"ingreso",class:"text-success"}]},select:"INCOME"},
+            {panel:"main",tipe:1,col:12,y:2,name:"cuenta",box:bx_op({ops:[]}),select:"ID_ACCOUNT",load:{name:"ld-accounts",value:"value",show:"show"}},
+            {panel:"main",tipe:1,col:12,y:2,name:"etiqueta",box:{...bx_op({ops:[]}),value:tagValue},select:"ID_PAY_TAG",load:{name:"pay_tag",show:"show"}},
         ],
         events:[
             ...events,
@@ -520,6 +578,23 @@ function scr_pay({tags=[],tagValue=1,events=[]}) {
                 name:"insertBefore",
                 actions:[{
                     action:({k,inserts})=>{
+
+                        var account_result = k.Loaded_GetLoadData({loadName:"ld-accounts"}).result;
+                        var account_id = k.GetValue({fieldName:"cuenta",y:0});
+                        var account_data = account_result.find(rst=>rst.value==account_id);
+
+                        console.log(account_data);
+
+                        if(account_data && account_data.open_control == "1" && account_data.open == "0"){
+
+                            alert("no se puede ingresar registros a una cuenta sin abrir");
+                            return {block:true};
+                        }
+
+                        if(account_data == null){
+                            alert("data de account is null");
+                            return {block:true};
+                        }
 
                         var income = k.GetValue({fieldName:"ingreso/egreso",y:0});
                         inserts.push({
@@ -683,6 +758,272 @@ var scr_sales_control = {
 
 
 }
+
+function scr_admin ({id_company,admin=false}){
+
+    var gr = new Grid({
+        cols:[
+          [8,4],
+          [12],
+        ],
+    });
+
+    var prnt_users = gr.GetColData({x:0,y:0}).col;
+    var prnt_clss = gr.GetColData({x:1,y:0}).col;
+    var prnt_accs = gr.GetColData({x:0,y:1}).col;
+
+    new ConsCruds({
+    cruds:[
+        {
+        name:"users",
+        active:true,
+        script:{
+            parent:prnt_users,
+            title:"lista de usuarios",
+            panels:[{col:12,y:0,title:"main",tipe:"table"}],
+            stateTools:[
+            {
+                name:"reload",
+                tools:[
+                    {name:"config",show:true},
+                    {name:"load",show:true},
+                    
+                    {name:"excel",show:false},
+                    {name:"pdf",show:false},
+        
+                    {name:"sizes",show:true,value:10},
+                    {name:"reload",show:true},
+                    {name:"update",show:false},
+                    {name:"new",show:true},
+                    {name:"insert",show:false},
+                    {name:"cancel",show:false},
+                    
+                    {name:"pages",show:false},
+                ],
+            }
+            ],
+
+            tableMain:"users",
+            selects:[
+            {table:"users",field:"ID_USER",primary:true},
+            {table:"users",field:"NAME"},
+            {table:"users",field:"PASSWORD"},
+            {table:"users",field:"ACTIVE"},
+            {table:"users",field:"ID_CLASS"},
+            ],
+            conditions:[
+            {
+                table:"users",
+                field:"ID_COMPANY",
+                inter:"=",
+                value:id_company,
+            }
+            ],
+            inserts:[
+            {field:"ID_COMPANY",value:id_company},
+            ],
+            loads:[
+            {
+                name:"ld-class",
+                tableMain:"class",
+                selects:[
+                {table:"class",field:"ID_CLASS",as:"value"},
+                {table:"class",field:"NAME",as:"show"},
+                ],
+                conditions:[
+                {
+                    table:"class",
+                    field:"ID_COMPANY",
+                    inter:"=",
+                    value:id_company
+                }
+                ],
+            }
+            ],
+
+            fields:[
+            (user_delete_data_import?{panel:"main",...fld_delete}:null),
+            {panel:"main",name:"usuario",box:{tipe:1},select:"NAME"},
+            {panel:"main",name:"clase",box:{tipe:3},select:"ID_CLASS",load:{name:"ld-class",show:"show",value:"value"}},
+            {panel:"main",name:"contraseña",box:{tipe:1},select:"PASSWORD"},
+            {panel:"main",name:"activo",box:bx_active_input,select:"ACTIVE"},
+            ],
+
+        }
+        },
+        {
+        name:"class",
+        active:true,
+        script:{
+            parent:prnt_clss,
+            title:"lista de classes",
+            panels:[{col:12,y:0,title:"main",tipe:"table"}],
+            stateTools:[
+            {
+                name:"reload",
+                tools:[
+                    {name:"config",show:true},
+                    {name:"load",show:true},
+                    
+                    {name:"excel",show:false},
+                    {name:"pdf",show:false},
+        
+                    {name:"sizes",show:true,value:10},
+                    {name:"reload",show:true},
+                    {name:"update",show:false},
+                    {name:"new",show:true},
+                    {name:"insert",show:false},
+                    {name:"cancel",show:false},
+                    
+                    {name:"pages",show:false},
+                ],
+            }
+            ],
+
+            tableMain:"class",
+            selects:[
+            {table:"class",field:"ID_CLASS",primary:true},
+            {table:"class",field:"NAME"},
+            ],
+            conditions:[
+            {
+                table:"class",
+                field:"ID_COMPANY",
+                inter:"=",
+                value:id_company,
+            }
+            ],
+            inserts:[
+            {field:"ID_COMPANY",value:id_company},
+            ],
+
+            fields:[
+            (user_delete_data_import?{panel:"main",...fld_delete}:null),
+            {panel:"main",name:"clase",box:{tipe:1,class:"w-100"},select:"NAME"},
+            ],
+            events:[
+            {
+                name:"insertAfter",
+                actions:[{
+                action:({k,field,value})=>{
+
+                    k.Loading_SetActive({active:true});
+
+                    var count = 0;
+                    var total = op_access.length;
+
+                    for (let t = 0; t < total; t++) {
+                    
+                    var conection = k.Conection_Get();
+                    var sql = conection.GetSql_Insert({
+                        tableMain:"class_access",
+                        inserts:[
+                        {field:"ID_CLASS",value},
+                        {field:"ID_ACCESS",value:op_access[t].value},
+                        {field:"ACTIVE",value:1},
+                        ],
+                    });
+                    conection.Request({
+                        sql,php:"success",
+                        success:()=>{
+
+                        OneInserted();
+                        }
+                    })
+                    
+                    }
+
+                    function OneInserted() {
+                    
+                    count++;
+                    if(count>=total){
+
+                        k.Loading_SetActive({active:false});
+                    }
+                    }
+                    
+                }
+                }]
+            }
+            ],
+        }
+        },
+        {
+        name:"access",
+        active:true,
+        script:{
+            parent:prnt_accs,
+            title:"control de accesos",
+            panels:[{col:12,y:0,title:"main",tipe:"table"}],
+            stateTools:[
+            {
+                name:"reload",
+                tools:[
+                    {name:"config",show:true},
+                    {name:"load",show:true},
+                    
+                    {name:"excel",show:false},
+                    {name:"pdf",show:false},
+        
+                    {name:"sizes",show:true,value:10},
+                    {name:"reload",show:true},
+                    {name:"update",show:false},
+                    {name:"new",show:true},
+                    {name:"insert",show:false},
+                    {name:"cancel",show:false},
+                    
+                    {name:"pages",show:false},
+                ],
+            }
+            ],
+
+            tableMain:"class_access",
+            selects:[
+            {table:"class_access",field:"ID_CLASS_ACCESS",primary:true},
+            {table:"class_access",field:"ID_CLASS"},
+            {table:"class_access",field:"ID_ACCESS"},
+            {table:"class_access",field:"ACTIVE"},
+            ],
+            orders:[
+            {field:"ID_CLASS",asc:true},
+            ],
+            loads:[
+            {
+                name:"ld-class",
+                tableMain:"class",
+                selects:[
+                {table:"class",field:"ID_CLASS",as:"value"},
+                {table:"class",field:"NAME",as:"show"},
+                ],
+                conditions:[
+                {
+                    table:"class",
+                    field:"ID_COMPANY",
+                    inter:"=",
+                    value:id_company
+                }
+                ],
+            }
+            ],
+
+            configShow:true,
+            filters:[
+            {name:"clase",box:{tipe:3},select:{table:"class_access",field:"ID_CLASS"},load:{name:"ld-class",show:"show",value:"value"}},
+            //{name:"accesso",box:{tipe:3},select:{table:"id_"}}
+            ],
+            fields:[
+            (user_delete_data_import?{panel:"main",...fld_delete}:null),
+            //{panel:"main",name:"clase",box:{tipe:3,class:"w-100"},select:"ID_CLASS",load:{name:"ld-class",show:"show",value:"value"}},
+            {panel:"main",name:"acceso",box:{tipe:0,options:op_access},select:"ID_ACCESS"},
+            {panel:"main",name:"activo",box:bx_active_input,select:"ACTIVE"},
+            ],
+        }
+        }
+    ],
+    });
+
+}
+
 
 //--------------------
 

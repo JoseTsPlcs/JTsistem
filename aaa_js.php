@@ -8,14 +8,15 @@
   
   /*select*/echo '<script src="'.$srcPathReturn.'libs/bootstrap-select-1.13.14/dist/js/bootstrap-select.js"></script>';
   /*graficos*/echo '<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>';
-  /*pdf*/ //echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.0/jspdf.umd.min.js"></script>';
+  /*pdf*/ echo '<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.16.0/dist/pdf-lib.js"></script>';
+
 
   $src= $srcPathReturn."libs/case-1.0.1/"; 
   include $srcPathReturn.'libs/case-1.0.1/case.php';
 
+  echo '<script src="../source/ListOfPaginas.js"></script>';
   echo '<script src="../source/ListOfConections.js"></script>';
   echo '<script src="../source/ListOfForms.js"></script>';
-  echo '<script src="../source/ListOfPaginas.js"></script>';
   echo '<script src="../source/ConfigProyect.js"></script>';
   
   //return;

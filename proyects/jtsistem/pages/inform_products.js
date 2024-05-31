@@ -5,139 +5,86 @@ $(document).ready(function() {
 
     success:({userData})=>{
 
-      var grConfig = GetGridConfig({
-        panels:[
-          {name:"filters",col:12},
-          {name:"total",col:12},
-          {name:"evolutivo",col:8},
-          {name:"donu",col:4},
-        ],
-      });
 
-      console.log(grConfig);
-      
-      var gr = new Grid({
-        cols:[
-          [12],//0-filters
-          [6,6],//1-total
-          [8,4],//2-prices
-          [12],//3-cants
-        ],
-        ...grConfig,
-      });
-
-      var chartParent1 = document.createElement("canvas");
-      gr.GetColData({x:0,y:2}).col.appendChild(chartParent1);
-      var chartPrices = new Chart(chartParent1, {
-        type: 'bar',
-        data: {
-          labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange',"Mes1","mes2"],
-          datasets: [
-            {
-              label: 'precios',
-              data: [12, 19, 3, 5, 2, 3],
-              borderWidth: 1,
-              type:"line",
-            },
-            {
-              label: 'precios',
-              data: [12, 19, 3, 5, 2, 3],
-              borderWidth: 1,
-            },
-          ]
-        },
-        options: {
-          plugins: {
-            title: {
-              display: true,
-              text: 'productos - venta total'
-            },
+      var inform = new ConsInform({
+        parent:document.body,
+        conection:db_lip,
+        title:"informe - ventas",
+        loads:[
+          {
+            name:"ld-tags",
+            tableMain:"products_tags",
+            selects:[
+              {table:'products_tags', field:'ID_PRODUCT_TAG',as:"value"},
+              {table:'products_tags', field:'NAME',as:"show"},
+            ],
+            conditions:[{
+              //before:" AND ",
+              table:"products_tags",
+              field:"ID_COMPANY",
+              inter:"=",
+              value:userData.company.id,
+            }],
           },
-          responsive: true,
-          scales: {
-            x: {
-              stacked: true,
-            },
-            y: {
-              stacked: true
-            }
-          }
-        }
-      });
-
-      var chartParent12 = document.createElement("canvas");
-      gr.GetColData({x:1,y:2}).col.appendChild(chartParent12);
-      var chartPricesDoughtnut = new Chart(chartParent12, {
-        type: 'doughnut',
-        data: {
-          labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange',"Mes1","mes2"],
-          datasets: [
-            {
-              label: 'precios',
-              data: [12, 19, 3, 5, 2, 3],
-              //borderWidth: 1
-            },
-          ]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          },
-          plugins: {
-            legend: {
-              position: 'top',
-            },
-            title: {
-              display: true,
-              text: 'productos - venta total'
-            }
-          }
-        }
-      });
-
-      var filters = new windowFilters({
-        parent:gr.GetColData({x:0,y:0}).col,
-        title:"filtros",
-
+        ],
         filters:[
-          {name:"rango de fecha",box:{tipe:3,options:op_date_ranges}},
-          {col:6,name:"fecha min",box:bx_date_start,select:{table:"sales",field:"DATE_EMMIT",tipe:"min"}},
-          {col:6,name:"fecha max",box:bx_date_end,select:{table:"sales",field:"DATE_EMMIT",tipe:"max"}},
-          {name:"estados",box:{tipe:4,options:op_sales_status,value:['confirmado','en proceso','pagado']},select:{table:"sales",field:"ID_STATUS"}},
+          {tipe:1,name:"periodo",box:{tipe:3,options:op_date_ranges,value:"month"}},
+          {col:6,name:"fecha min",box:{tipe:2,value:Date_StartQuarter()},select:{table:"sales",field:"DATE_EMMIT",tipe:"min"}},
+          {col:6,name:"fecha max",box:{tipe:2,value:Date_EndQuarter()},select:{table:"sales",field:"DATE_EMMIT",tipe:"max"}},
+          //{name:"estados",box:{tipe:4,options:op_sales_status,value:['confirmado','en proceso','terminado']},select:{table:"sales",field:"ID_STATUS"}},
+          //{name:"etiquetas",box:{tipe:4},load:{name:"ld-tags",show:"show",value:"value"}},
           //{name:"producto",box:{tipe:8}},
         ],
-
+        charts:[
+          {
+            name:"sales-tot",
+            tipe:"target",
+            col:12,
+          },
+          /*{
+            name:"sales-tot_paid",
+            tipe:"target",
+            col:6,
+          },*/
+          /*{
+            name:"sales-tot_nopaid",
+            tipe:"target",
+            col:6,
+          },*/
+          {
+            name:"sales-total",
+            tipe:"chart-evolutivo",
+            stacked:true,
+            title:"evolutivo de ventas totales",
+            //stacked:true,
+            col:8,
+          },
+          {
+            name:"sales-tags",
+            tipe:"chart-donu",
+            title:"ventas totales por etiquetas",
+            col:4,
+          },
+        ],
         events:[
           {
             name:"reload",
             actions:[{
-              action:()=>{ Reload()}
+              action:({k})=>{
+                
+                Reload({k});
+              }
             }]
           }
         ],
       });
 
-      var scrn = new LoadingScreen({
-        parent:document.body,
-        active:false, 
-      });
 
-      //--------------------------
-
-      function Loaded({result}){
-
-        //console.log("products-loaded",result);
-        //var op_prd = result.map((rst)=>{return {value:rst.value,show:rst.show}});
-        //filters.Filter_GetBox({filterName:"producto"}).SetOptions(op_prd);
-      }
-
-      function Reload() {
+      function Reload({k}) {
         
-        scrn.SetActive({active:true});
+        inform.ScreenLoad_Set({active:true});
 
-        var conditionsFilters = filters.GetConditions();
+        var conditionsFilters = inform.Filters_Get().GetConditions();
         var requestSql = db_lip.GetSql_Select({
           tableMain:"sales",
           selects:[
@@ -147,6 +94,7 @@ $(document).ready(function() {
             {table:'sales', field:'ID_DOCUMENT'},
             {table:'sales', field:'ID_CUSTOMER'},
             {table:'sales', field:'TOTAL'},
+            {table:'sales', field:'PAID'},
             //{table:'sales_products', field:'ID'},
             //{table:'sales_products', field:'ID_SALE'},
             {table:'sales_products', field:'ID_PRODUCT'},
@@ -180,7 +128,21 @@ $(document).ready(function() {
               field:"ID_COMPANY",
               inter:"=",
               value:userData.company.id,
-            }
+            },
+            {
+              before:" AND ",
+              table:"sales",
+              field:"ID_STATUS",
+              inter:"=",
+              value:4,
+            },
+            {
+              before:" AND ",
+              table:"sales",
+              field:"PAID",
+              inter:"=",
+              value:1,
+            },
           ],
           orders:[
             {field:"DATE_EMMIT",asc:true},
@@ -194,172 +156,130 @@ $(document).ready(function() {
           php:"row",
           success:(result)=>{
 
-            TransformData({result});
+            console.log("------result request----------");
+            console.log(result);
+
+            var periodType = k.Filters_Get().Filter_GetBox({filterName:"periodo"}).GetValue();
+
+            result.forEach(rst => {
+              
+              rst["PERIOD"] = Date_GetLabel({dateString:rst["DATE_EMMIT"],period:periodType});
+            });
+
+            var tags = UniqueLabels({data:result,labelField:"TAG_NAME"});
+            tags.forEach(tg => {
+              
+              tg.total = result.reduce((acc,rst)=>{
+
+                var add = rst["TAG_NAME"] == tg.name ? parseFloat(rst["PRICE_TOTAL"]) : 0;
+                return acc + add;
+              },0);
+
+            });
+            console.log("tags:",tags); 
+
+            var period = Date_GetPeriod({data:result,dataField:"DATE_EMMIT",period:periodType});
+            period = period.map((p)=>{return {label:p,total:0}});
+            console.log("period:",period);
+
+            period.forEach(p => {
+              
+              p.total = result.filter(rst=>rst["PERIOD"] == p.label).reduce((acc,v)=>{
+                
+                return acc+parseFloat(v["PRICE_TOTAL"]);
+              },0);
+              
+            });
+
+
+            tags.forEach(tg => {
+              
+              tg.dateValues = period.map((p)=>{
+
+                return result.filter(rst=>rst["PERIOD"]==p.label && rst["TAG_NAME"]==tg.name).reduce((acc,rst)=>{
+
+                  return acc + parseFloat(rst["PRICE_TOTAL"]);
+                },0);
+              });
+
+            });
+
+            var sales_total = tags.reduce((acc,tg)=>{return acc + tg.total},0);
+            var sales_total_nopaid = result.filter(rst=>rst["PAID"] == 0).reduce((acc,rst)=>{return acc + parseFloat(rst["TOTAL"])},0);
+            var sales_total_paid = result.filter(rst=>rst["PAID"] == 1).reduce((acc,rst)=>{return acc + parseFloat(rst["TOTAL"])},0);
+
+            //------print------
+
+            var priceEvolLabels = period.map((p)=>{return p.label});
+            var priceEvolData = [
+              {
+                type:"line",
+                label: 'total',
+                data: period.map((p)=>{return p.total}),
+                borderWidth: 1,
+                //backgroundColor:'#92A8D1',
+              },
+            ];
+            tags.forEach(tg => {
+              
+              priceEvolData.push({
+                label:tg.name,
+                data:tg.dateValues,
+                //backgroundColor:tg.color,
+                borderWidth: 1,
+              });
+            });
+
+            inform.Chart_SetData({
+              chartName:"sales-total",
+              labels:priceEvolLabels,
+              dataSets:priceEvolData,
+            });
+
+            var priceDonuLabes = tags.map((tg)=>{return tg.name});
+            var priceDonuData = [{
+              label:"etiquetas",
+              data:tags.map((tg)=>{return tg.total}),
+            }];
+
+            inform.Chart_SetData({
+              chartName:"sales-tags",
+              labels:priceDonuLabes,
+              dataSets:priceDonuData,
+            });
+
+            inform.Chart_SetData({
+              chartName:"sales-tot",
+              labels:[],
+              dataSets:[{
+                label:"total vendido",
+                data:["S/. " + sales_total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })],
+              }],
+            });
+
+            /*inform.Chart_SetData({
+              chartName:"sales-tot_paid",
+              labels:[],
+              dataSets:[{
+                label:"total vendido - pagado",
+                data:["S/. " + sales_total_paid.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })],
+              }],
+            });*/
+
+            /*inform.Chart_SetData({
+              chartName:"sales-tot_nopaid",
+              labels:[],
+              dataSets:[{
+                label:"total vendido - sin pagar",
+                data:["S/. " + sales_total_nopaid.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })],
+              }],
+            });*/
+
+            inform.ScreenLoad_Set({active:false});
           }
         });
 
       }
-
-      Reload();
-
-      //-----------transform data---------
-
-      function TransformData({result}) {
-        
-        console.log("------result request----------");
-        console.log(result);
-
-        //var date_start = filters.Filter_GetBox({filterName:"fecha min"}).GetValue();
-        //var date_end = filters.Filter_GetBox({filterName:"fecha max"}).GetValue();
-        //var range = filters.Filter_GetBox({filterName:"rango de fecha"}).GetValue();
-
-        //console.log(date_start,date_end,range);
-
-        var resultTrasnform = obtenerTotalesPorCategoria(result);
-
-        console.log("--------result transform--------");
-        console.log(resultTrasnform);
-
-
-        //----------------print------------ 
-
-        console.log(chartPrices);
-        chartPrices.data.labels = resultTrasnform.dias;
-
-        chartPrices.data.datasets = [];
-
-        resultTrasnform.totales.type = "line";
-        resultTrasnform.totales.borderWidth = 1;
-        chartPrices.data.datasets.push(resultTrasnform.totales);
-
-        resultTrasnform.totalesPorCategoria.forEach(totalCateg => {
-          
-          chartPrices.data.datasets.push(totalCateg);
-        });
-
-        chartPricesDoughtnut.data.labels = resultTrasnform.etiquetas.data;
-        chartPricesDoughtnut.data.datasets = [resultTrasnform.totalEtiquetas];
-        
-        chartPrices.update();
-        chartPricesDoughtnut.update();
-
-        scrn.SetActive({active:false});
-        
-      }
-
-      function obtenerTotalesPorCategoria(datos) {
-        var resultados = {};
-        var dias = [];
-        var totales = [];
-        var totalesPorCategoria = {};
-        var etiquetas = {};
-
-        // Obtener todos los días disponibles en los datos y todas las etiquetas
-        datos.forEach(item => {
-            var fecha = new Date(item.DATE_EMMIT + 'T13:00:00Z'); // Convertir la fecha a formato ISO y parsearla
-            var diaSemana = obtenerDiaSemana(fecha.getDay()); // Obtener el día de la semana
-            var dia = `${diaSemana}-${fecha.getDate()}`; // Formatear la fecha: 'lun-11', 'mar-12', etc.
-            if (!dias.includes(dia)) {
-                dias.push(dia);
-            }
-
-            var etiqueta = item.TAG_NAME || "Sin etiqueta";
-            if (!etiquetas[etiqueta]) {
-                etiquetas[etiqueta] = true;
-            }
-        });
-
-        // Obtener la fecha máxima
-        var fechaMaxima = new Date(Math.max.apply(null, datos.map(item => new Date(item.DATE_EMMIT + 'T00:00:00Z'))));
-        var diaSemanaMax = obtenerDiaSemana(fechaMaxima.getDay());
-        var diaMax = `${diaSemanaMax}-${fechaMaxima.getDate()}`;
-        if (!dias.includes(diaMax)) {
-            dias.push(diaMax);
-        }
-
-        // Inicializar totales y totales por categoría
-        dias.forEach(dia => {
-            resultados[dia] = { total: 0, totalesPorCategoria: {} };
-        });
-
-        // Calcular totales por día y totales por categoría
-        datos.forEach(item => {
-            var fecha = new Date(item.DATE_EMMIT + 'T13:00:00Z'); // Convertir la fecha a formato ISO y parsearla
-            var diaSemana = obtenerDiaSemana(fecha.getDay()); // Obtener el día de la semana
-            console.log(item.DATE_EMMIT,fecha);
-            var dia = `${diaSemana}-${fecha.getDate()}`; // Formatear la fecha: 'lun-11', 'mar-12', etc.
-            var precioTotal = parseFloat(item.PRICE_TOTAL) || 0; // Si es null, tomarlo como 0
-            var etiqueta = item.TAG_NAME || "Sin etiqueta";
-
-            resultados[dia].total += precioTotal;
-
-            if (!resultados[dia].totalesPorCategoria[etiqueta]) {
-                resultados[dia].totalesPorCategoria[etiqueta] = 0;
-            }
-
-            resultados[dia].totalesPorCategoria[etiqueta] += precioTotal;
-
-            if (!totalesPorCategoria[etiqueta]) {
-                totalesPorCategoria[etiqueta] = 0;
-            }
-
-            totalesPorCategoria[etiqueta] += precioTotal;
-        });
-
-        // Construir el array de totales por día y totales por categoría
-        dias.forEach(dia => {
-            totales.push(resultados[dia].total);
-        });
-
-        var totalesPorCategoriaArray = [];
-        Object.keys(totalesPorCategoria).forEach(etiqueta => {
-            var totalPorCategoria = [];
-            dias.forEach(dia => {
-                totalPorCategoria.push(resultados[dia].totalesPorCategoria[etiqueta] || 0);
-            });
-            totalesPorCategoriaArray.push({ label: etiqueta, data: totalPorCategoria });
-        });
-
-        // Construir el array de etiquetas encontradas
-        var etiquetasArray = Object.keys(etiquetas);
-        
-        // Construir el array de totales solo por etiqueta (sin tener en cuenta la fecha)
-        var totalesSoloPorEtiqueta = [];
-        etiquetasArray.forEach(etiqueta => {
-            totalesSoloPorEtiqueta.push(totalesPorCategoria[etiqueta] || 0);
-        });
-
-        return {
-            dias: dias,
-            totales: { label: 'Total', data: totales },
-            totalesPorCategoria: totalesPorCategoriaArray,
-            etiquetas: { label: 'Etiquetas', data: etiquetasArray },
-            totalEtiquetas: { label: 'Total de etiquetas', data: totalesSoloPorEtiqueta }
-        };
-    }
-
-    // Función para obtener el nombre del día de la semana
-    function obtenerDiaSemana(dia) {
-        var diasSemana = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
-        return diasSemana[dia];
-    }
-
-    // Ejemplo de uso
-    var datos = [
-        { PRICE_TOTAL: "800", DATE_EMMIT: "2024-05-01", TAG_NAME: "Etiqueta1" },
-        { PRICE_TOTAL: null, DATE_EMMIT: "2024-05-02", TAG_NAME: "Etiqueta2" },
-        { PRICE_TOTAL: "1200", DATE_EMMIT: "2024-05-03", TAG_NAME: "Etiqueta1" },
-        { PRICE_TOTAL: "600", DATE_EMMIT: "2024-05-04", TAG_NAME: "Etiqueta2" }
-    ];
-
-    var conjuntoDeArrays = obtenerTotalesPorCategoria(datos);
-    console.log("Días:", conjuntoDeArrays.dias);
-    console.log("Totales por día:", conjuntoDeArrays.totales);
-    console.log("Totales por categoría:", conjuntoDeArrays.totalesPorCategoria);
-    console.log("Etiquetas:", conjuntoDeArrays.etiquetas);
-    console.log("Total de etiquetas:", conjuntoDeArrays.totalEtiquetas);
-
-
 
     }
   });

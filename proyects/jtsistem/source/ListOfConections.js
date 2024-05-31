@@ -1,6 +1,6 @@
 
 var db_lip = new Conection({
-    //servidor:'localhost',//ser-jtsistem
+    //servidor:'localhost',
     servidor:'ser-jtsistem.mysql.database.azure.com',
     usuario:'Lip_Alonso',
     pass:'kfEq2Li-xwv3L]rP',

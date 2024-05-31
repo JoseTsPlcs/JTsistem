@@ -1,7 +1,8 @@
 
 
 var control = [
-    {name:"window",active:true},
+    {name:"window",active:false},
+    {name:"form",active:true},
 ];
 
 function ControlActive(name) {
@@ -36,6 +37,25 @@ control.forEach(cn => {
                     ],
                 });
     
+            break;
+
+            case "form":
+
+            cn.build = new Form({
+                parent:document.body,head:true,
+                blocked:false,show:true,
+                title:"formulario - titulo",
+                grid:{
+                    cols:[[12]],
+                    labels:[
+                        {x:0,y:0,name:"nombre",box:{tipe:1}},
+                    ]
+                },
+                tools:[
+                    {x:0,y:0,name:"config",box:{tipe:5,class:"btn btn-outline-primary btn-sm",value:'<i class="bi bi-gear-wide"></i>'}}
+                ],
+            });
+
             break;
         }
     }

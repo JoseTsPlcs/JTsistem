@@ -175,9 +175,11 @@ $(document).ready(function() {
                 parent:mdProvideer.GetContent(),
                 title:"proveedor",
                 panels:[{col:12,y:0,title:"main",tipe:"form"}],
-                stateTools:stTls_fm_maid,
+                stateTools:stTls_fm_maid, 
                 stateStart:"block",
-                stateBase:"block",
+                afterInsert:"block",
+                afterUpdate:"block",
+                afterCancel:"block",
 
                 tableMain:"provideers",
                 selects:[
@@ -443,6 +445,8 @@ $(document).ready(function() {
             {
               tipe:"fm-fm",
               master:"buy",
+              masterActionEdit:"edit",
+              masterActionAdd:"add",
               masterField:"proveedor",
               maid:"provieeder",
               maidField:"ID_PROVIDEER",
