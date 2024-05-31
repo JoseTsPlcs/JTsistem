@@ -73,7 +73,9 @@ class Window extends ODD {
       i.grid = grid;
       i.fields = fields;*/
 
-      i.grid = GetGridConfig({panels:fields});
+      var gridConfig = GetGridConfig({panels:fields});
+      i.grid = gridConfig;
+      //i.fields = i.panels;
     }
 
     return i;
@@ -82,7 +84,7 @@ class Window extends ODD {
   _General_Start(i){
 
     
-    this.#Fields_SetParams({...i});
+    this.#Fields_SetParams(i);
     if(i.blocked !=null) this.#conteiner.blocked=i.blocked;
 
     this.#Body_Build({...i});
@@ -181,6 +183,8 @@ class Window extends ODD {
       //console.log("window->fields_setparams->foreach fields->field:",field);
 
     });
+
+    //console.log("window - setfields",fields);
 
     this._fields = fields;
   }

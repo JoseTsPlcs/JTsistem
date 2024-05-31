@@ -80,6 +80,7 @@ $(document).ready(function() {
               ],
               orders:[
                 {field:"DATE_EMMIT",asc:false},
+                {field:"ID_PAY",asc:false},
               ],
               conditions:[{
                 before:" AND ",
@@ -98,7 +99,7 @@ $(document).ready(function() {
                 {col:12,y:1,name:"cuentas",box:{tipe:4,class:"w-100"},load:{name:"accounts",show:"show"},select:{table:"payments",field:"ID_ACCOUNT"}},
               ],
               fields:[
-                {panel:"main",...fld_delete},
+                (user_delete_data_import?{panel:"main",...fld_delete}:null),
                 {panel:"main",...fld_edit},
                 //{panel:"main",name:"id",box:bx_shw,select:"ID_PAY"},
                 {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"fecha de emision",box:bx_shw,select:"DATE_EMMIT"},

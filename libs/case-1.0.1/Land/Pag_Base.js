@@ -27,16 +27,21 @@ class Pag_Base {
 
   constructor({success}) {
 
-    this.#BuildNav();
-
-    this.#IsLog({success});
+    let k = this;
+    this.#IsLog({success:(i)=>{
+ 
+      k.#BuildNav({access:i.userData.access,title:i.userData.company.name});
+      if(success!=null)success(i);
+    }});
   }
 
-  #BuildNav(){
+  #BuildNav({access=[],title="EmpresaName"}){
+
+    //console.log(access);
 
     var nav = `
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand text-white" id="iconTittle">JTsistem</a>
+        <a class="navbar-brand text-white" id="iconTittle">`+title+`</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -54,8 +59,13 @@ class Pag_Base {
                     <div class="dropdown-menu">`;
 
             for (let pg = 0; pg < seccion.paginas.length; pg++) {
+
               const pag = seccion.paginas[pg];
-              nav += `<a class="dropdown-item" href="`+pag.href+`">`+pag.name+`</a>`;
+              var accessData = access.find(acc=>acc.value == pag.value);
+              var active = accessData ? accessData.active == "true" : false;
+              //console.log(pag,active);
+              active=true;
+              nav += `<a class="dropdown-item `+(active?"":"disabled")+`" href="`+(active?pag.href:"#")+`">`+pag.name+`</a>`;
             }
 
             nav += `
@@ -63,9 +73,7 @@ class Pag_Base {
                   </li>
             `;
 
-          };
-
-          
+          }; 
 
     nav+=`
           </ul>
@@ -83,15 +91,16 @@ class Pag_Base {
     let k = this;
     $.post("../../../libs/case-1.0.1/Land/IsLog.php",{},function(resp) {
 
-      console.log("is log----resp:",resp);
+      //console.log("is log----resp:",resp);
 
       resp = JSON.parse(resp);
       var userData = resp;
 
       console.log("userData:",userData);
 
-      var iconTittle = document.getElementById("iconTittle");
-      iconTittle.innerHTML = resp.company.name;
+      //--------------------
+
+      //--------------------
 
       functionOnlogPage.forEach(fct => {
     
@@ -145,27 +154,26 @@ function Login({uss,pss,fail}){
         tableMain:"users",
         selects:[
             {db:"lip_dv",table:'users', field:'ID_USER'},
-            {db:"lip_dv",table:'users', field:'NAME'},
+            {db:"lip_dv",table:'users', field:'NAME',as:"USER_NAME"},
             {db:"lip_dv",table:'users', field:'PASSWORD'},
-            {db:"lip_dv",table:'users', field:'ID_CLASS'},
             {db:"lip_dv",table:'users', field:'ACTIVE',as:"USER_ACTIVE"},
-            {db:"lip_dv",table:'class_pages', field:'ID_PAGE'},
-            {db:"lip_dv",table:'class_pages', field:'ACTIVE',as:'PAGE_ACTIVE'},
+            {db:"lip_dv",table:"class",field:"NAME",as:"CLASS_NAME"},
+            {db:"lip_dv",table:"class",field:"ID_CLASS"},
             {db:"lip_dv",table:"companies",field:"ID_COMPANY",as:"COMPANY_ID"},
             {db:"lip_dv",table:"companies",field:"NAME",as:"COMPANY_NAME"},
             {db:"lip_dv",table:"companies",field:"ACTIVE",as:"COMPANY_ACTIVE"},
         ],
         joins:[
             {
-              main:{db:"lip_dv",table:'users',field:'ID_CLASS'},
-              join:{db:"lip_dv",table:'class_pages',field:'ID_CLASS'},
-              tipe:'LEFT',
-            },
-            {
               main:{db:"lip_dv",table:"users",field:"ID_COMPANY"},
               join:{db:"lip_dv",table:"companies",field:"ID_COMPANY"},
               tipe:"LEFT",
-            }
+            },
+            {
+              main:{db:"lip_dv",table:"users",field:"ID_CLASS"},
+              join:{db:"lip_dv",table:"class",field:"ID_CLASS"},
+              tipe:"LEFT",
+            },
         ],
         conditions:[
             {
@@ -184,7 +192,7 @@ function Login({uss,pss,fail}){
         ],
     });
 
-    console.log("login:",loginSql);
+    //console.log("login:",loginSql);
 
     conectionOfUsers.Request({
         php:"row",log:true,
@@ -202,28 +210,65 @@ function Login({uss,pss,fail}){
                 return;
               }
 
-              //console.log(userActive,companyActive);
+              console.log(result);
 
               var userData = {
+                id:result[0]["IS_USER"],
+                name:result[0]["USER_NAME"],
+
                 company:{
                   id:result[0]["COMPANY_ID"],
                   name:result[0]["COMPANY_NAME"],
                 },
-                id:result[0]["IS_USER"],
-                name:"User",
+                class:{
+                  name:result[0]["CLASS_NAME"],
+                  id:result[0]["ID_CLASS"],
+                },
+                access:[],
               };
 
-              //console.log("login result:", result,"user_id:",user_id);
+              var AccessSql = conectionOfUsers.GetSql_Select({
+                tableMain:"class_access",
+                selects:[
+                  {table:"class_access",field:"ID_ACCESS"},
+                  {table:"class_access",field:"ACTIVE"},
+                ],
+                conditions:[
+                  {
+                    table:"class_access",
+                    field:"ID_CLASS",
+                    inter:"=",
+                    value:userData.class.id,
+                  }
+                ],
+              }); 
+              
+              
+              conectionOfUsers.Request({
+                php:"row",sql:AccessSql,
+                success:(result)=>{
 
-              $.post("../../../libs/case-1.0.1/Land/setLogin.php",{userData},function(resp) {
-                  
-                  if(controlTest.login) return;
-                  
-                  PageSend({
-                      url:"sales_control.php",
-                      send:{},
+                  result.forEach(rst => {
+                    
+                    var value = rst["ID_ACCESS"];
+                    var show = op_access.find(acc=>acc.value==value).show;
+                    var active = rst["ACTIVE"] == "1";
+
+                    userData.access.push({value,show,active});
                   });
-              });               
+
+
+                  $.post("../../../libs/case-1.0.1/Land/setLogin.php",{userData},function(resp) {
+                  
+                    if(controlTest.login) return;
+                    
+                    PageSend({
+                        url:"sales_control.php",
+                        send:{},
+                    });
+                  }); 
+                }
+              });         
                                
             }
             else if(fail!=null) fail();

@@ -180,13 +180,13 @@ class ConsCruds extends ODD {
                 
                               var data = k.Reload_GetData();
                               var maidBuild = c.Crud_GetBuild({name:conection.maid});
-                              console.log("box update edit!!!!");
+                              //console.log("box update edit!!!!");
 
                               if(data.length>0){
 
                                 var value = data[y][masterField];
 
-                                console.log("tb-fm edit! -> value:",value,",fieldMaid:",maidField);
+                                //console.log("tb-fm edit! -> value:",value,",fieldMaid:",maidField);
                                 maidBuild.CrudJoins_Set({
                                     field:maidField,
                                     value,
@@ -260,20 +260,26 @@ class ConsCruds extends ODD {
                             {
                                 action:({k,value})=>{
 
+                                    //insert into tableMaster if field new is no fielPrimary of masterTable
                                     var masterBuild = c.Crud_GetBuild({name:conection.master});
                                     if(masterBuild){
 
-                                        masterBuild.Insert({
-                                            inserts:[{
-                                                field:masterField,
-                                                value,
-                                            }],
-                                            success:()=>{
+                                        if(masterField != masterBuild.SelectPrimaryGet().field){
 
-                                                masterBuild.SetState({stateName:"reload"});
-                                            }
-                                        });
+                                            masterBuild.Insert({
+                                                inserts:[{
+                                                    field:masterField,
+                                                    value,
+                                                }],
+                                                success:()=>{
+    
+                                                    masterBuild.SetState({stateName:"reload"});
+                                                }
+                                            });
+                                        }
+                                        else masterBuild.SetState({stateName:"reload"});
                                     }
+                                    
                                 }
                             }
                         ],
@@ -350,23 +356,27 @@ class ConsCruds extends ODD {
 
                                 var maidbuild = c.Crud_GetBuild({name:conection.maid});
 
-                                if(field.action=="edit"){
+                                if(field.action!=null){
+                                    
+                                    if(field.action==conection.masterActionEdit){
 
-                                    var fieldValue = k.GetValue({fieldName:masterField,y:0});
-                                    if(fieldValue){
+                                        var fieldValue = k.GetValue({fieldName:masterField,y:0});
+                                        if(fieldValue){
 
-                                        maidbuild.CrudJoins_Set({
-                                            field:maidField,
-                                            value:fieldValue,
-                                        });
-                                        maidbuild.SetState({stateName:"reload"});
+                                            maidbuild.CrudJoins_Set({
+                                                field:maidField,
+                                                value:fieldValue,
+                                            });
+                                            maidbuild.SetState({stateName:"reload"});
+                                        }
+                                    }    
+                                    
+                                    if(field.action==conection.masterActionAdd){
+
+                                        maidbuild.SetState({stateName:"new"});
                                     }
-                                }    
-                                
-                                if(field.action=="add"){
-
-                                    maidbuild.SetState({stateName:"new"});
                                 }
+
                             }
                         }]
                     },
@@ -399,6 +409,8 @@ class ConsCruds extends ODD {
                                     success:()=>{
 
                                         masterBuild.SetValuesToBox({values:[value],fieldName:masterField});
+                                        var primary = masterBuild.Reload_GetData_Primarys()[0];
+                                        masterBuild.Update_AddChange({fieldName:masterField,value,primary});
                                     }
                                 });  
                             }

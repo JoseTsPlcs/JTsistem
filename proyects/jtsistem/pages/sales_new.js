@@ -192,10 +192,10 @@ $(document).ready(function() {
                 {panel:"principal",col:12,y:8,name:"comentario",box:{tipe:9,value:""},select:"COMMENT"},
                 //{panel:"principal",col:12,y:8,name:"pdf",tipe:2,box:{tipe:5,value:"pdf",class:"btn btn-danger text-white btn-sm",style:"min-weigth:100px"},action:"pdf"},
 
-                {panel:"cliente",col:8,y:0,name:"cliente",box:{tipe:8},select:"ID_CUSTOMER",load:{name:"customers",show:"show"}},
-                {panel:"cliente",col:2,...fld_edit},
-                {panel:"cliente",col:2,...fld_add},
-                {panel:"cliente",col:12,y:1,name:"tipo",box:{tipe:0}},
+                {panel:"cliente",col:8,colAllLevel:true,y:0,name:"cliente",box:{tipe:8},select:"ID_CUSTOMER",load:{name:"customers",show:"show"}},
+                {panel:"cliente",col:2,colAllLevel:true,...fld_edit},
+                {panel:"cliente",col:2,colAllLevel:true,...fld_add},
+                //{panel:"cliente",col:12,y:1,name:"tipo",box:{tipe:0}},
                 {panel:"cliente",col:12,y:2,name:"empresa",box:{tipe:0,options:[{value:0,show:"natural"},{value:1,show:"empresa"}]}},
                 {panel:"cliente",col:12,y:3,name:"cliente documento",box:{tipe:0,options:op_identity_document_tipe}},
                 {panel:"cliente",col:12,y:4,name:"nro de documento",box:{tipe:0}},
@@ -236,7 +236,7 @@ $(document).ready(function() {
 
                       if(customer_line){
 
-                        k.SetValuesToBox({fieldName:"tipo",values:[0]});
+                        //k.SetValuesToBox({fieldName:"tipo",values:[0]});
                         k.SetValuesToBox({fieldName:"empresa",values:[customer_line["COMPANY"]]});
                         k.SetValuesToBox({fieldName:"cliente documento",values:[customer_line["COMPANY"]]});
                         k.SetValuesToBox({fieldName:"nro de documento",values:[customer_line["NRO_DOCUMENT"]]});
@@ -310,7 +310,9 @@ $(document).ready(function() {
               title:"cliente",
               panels:[{col:12,y:0,title:"main",tipe:"form"}],
               stateStart:"block",
-              stateBase:"block",
+              afterInsert:"block",
+              afterUpdate:"block",
+              afterCancel:"block",
               stateTools:[
                 {
                     name:"reload",
@@ -360,6 +362,9 @@ $(document).ready(function() {
                 //{table:'customers', field:'ID_CUSTOMER_TIPE'},
                 {table:'customers', field:'COMPANY'},
                 {table:'customers', field:'NRO_DOCUMENT'},
+                {table:'customers', field:'PHONE'},
+                {table:'customers', field:'EMAIL'},
+                {table:'customers', field:'DESCRIPCION'},
               ],
               conditions:[{
                 table:"customers",
@@ -371,9 +376,13 @@ $(document).ready(function() {
 
               fields:[
                 {panel:"main",col:8,name:"cliente",box:bx_input,select:"NAME"},
-                {panel:"main",col:4,name:"empresa",box:{tipe:6,name:"empresa",value:0},select:"COMPANY"},
+                {panel:"main",col:4,tipe:0,name:"empresa",box:{tipe:6,name:"empresa",value:0},select:"COMPANY"},
                 {panel:"main",col:6,name:"documento",box:{tipe:0,options:op_identity_document_tipe},select:"COMPANY"},
                 {panel:"main",col:6,name:"nro documento",box:bx_input,select:"NRO_DOCUMENT"},
+                
+                {panel:"main",col:12,name:"telefono",box:{tipe:1,value:""},select:"PHONE"},
+                {panel:"main",col:12,name:"correo",box:{tipe:1,value:""},select:"EMAIL"},
+                {panel:"main",col:12,tipe:2,name:"descripcion",box:{tipe:9,value:""},select:"DESCRIPCION"},
               ],
 
               events:[
@@ -387,6 +396,16 @@ $(document).ready(function() {
                       }
                   }]
                 },
+                {
+                  name:"insertAfter",
+                  actions:[{
+                    action:({k})=>{
+
+                      //var fm_sale = conections.Crud_GetBuild({name:"sale"});
+
+                    }
+                  }]
+                }
               ],
             }
           },
@@ -647,11 +666,19 @@ $(document).ready(function() {
                       value:1,
                     },
                     {
-                      before:" AND ",
+                      before:" AND ( ",
                       table:"products",
                       field:"ID_PRODUCT_TIPE",
                       inter:"=",
                       value:2,
+                    },
+                    {
+                      before:" OR ",
+                      table:"products",
+                      field:"ID_PRODUCT_TIPE",
+                      inter:"=",
+                      value:3,
+                      after:" ) ",
                     },
                     {
                       before:" AND ",
@@ -772,6 +799,8 @@ $(document).ready(function() {
           {
             tipe:"fm-fm",
             master:"sale",
+            masterActionEdit:"edit",
+            masterActionAdd:"add",
             masterField:"cliente",
             maid:"customer",
             maidField:"ID_CUSTOMER",

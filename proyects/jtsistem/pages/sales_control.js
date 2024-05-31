@@ -24,14 +24,15 @@ $(document).ready(function() {
         parent:mdParent,
         cols:[[12],[12],[12]],
         boxs:[
-          //{x:0,y:2,box:{tipe:5,value:"pdf",class:"btn btn-danger btn-sm",update:()=>{generarPDF()}}},
+          {x:0,y:2,box:{tipe:5,id:"btn1",value:'PDF <i class="bi bi-filetype-pdf"></i>',class:"btn btn-danger btn-sm",update:()=>{SalePDF()}}},
+          {x:0,y:2,box:{tipe:5,id:"btn2",value:'Copiar <i class="bi bi-clipboard"></i>',class:"btn btn-primary btn-sm",update:()=>{SaleCopy()}}},
         ],
         attributes:[
           {x:0,y:2,attributes:[{name:"class",value:"col-4 m-0 p-0 d-flex justify-content-center"}]},
         ],
       });
     
-      new ConsCruds({
+      var cruds = new ConsCruds({
     
         cruds:[
           {
@@ -178,6 +179,8 @@ $(document).ready(function() {
                 {table:'sales', field:'DOCUMENT_EMMIT'},
                 {table:'sales', field:'COMMENT'},
                 {table:'customers',field:'NAME'},
+                {table:'customers',field:'PHONE'},
+                {table:'customers',field:'EMAIL'},
               ],
               joins:[
                 {main:{table:"sales",field:"ID_CUSTOMER"},join:{table:"customers",field:"ID_CUSTOMER"},tipe:"LEFT"}
@@ -187,12 +190,14 @@ $(document).ready(function() {
                 //{panel:"main",name:"id",box:{tipe:0},select:"ID_SALE"},
                 {panel:"informacion",name:"fecha de emision",box:{tipe:0},select:"DATE_EMMIT"},
                 {panel:"informacion",name:"cliente",box:{tipe:0},select:"NAME"},
+                {panel:"informacion",name:"telefono",box:{tipe:0},select:"PHONE"},
+                {panel:"informacion",name:"correo",box:{tipe:0},select:"EMAIL"},
     
                 //{panel:"informacion",name:"servicios",box:bx_money,action:"show"},
                 //{panel:"informacion",name:"productos",box:bx_money,action:"show"},
                 {panel:"informacion",name:"total",box:bx_moneyh1,select:"TOTAL"},
                 
-                {panel:"informacion",name:"comentario",box:{tipe:0,value:""},select:"COMMENT"},
+                //{panel:"informacion",name:"comentario",box:{tipe:0,value:""},select:"COMMENT"},
     
               ],
               events:[
@@ -300,6 +305,119 @@ $(document).ready(function() {
     
       });
 
+      function SaleCopy() {
+        
+        var sale_fm = cruds.Crud_GetBuild({name:"show-form"});
+        var sale_tb = cruds.Crud_GetBuild({name:"show-table"});
+
+        var inform = '';
+        inform += 'fecha: ' + sale_fm.GetValue({fieldName:"fecha de emision",y:0});
+        inform += '\ncliente: ' + sale_fm.GetValue({fieldName:"cliente",y:0});
+        inform += '\ntelefono: ' + sale_fm.GetValue({fieldName:"telefono",y:0});
+        inform += '\ncorreo: ' + sale_fm.GetValue({fieldName:"correo",y:0});
+        inform += '\ntotal: S/.' + sale_fm.GetValue({fieldName:"total",y:0});
+
+        var itemsCount = sale_tb.Reload_GetData().length;
+        for (let y = 0; y < itemsCount; y++) {
+
+          var itemName = sale_tb.GetValue({fieldName:"descripcion",y});
+          var cant= sale_tb.GetValue({fieldName:"cantidad",y});
+          var priceUnit = sale_tb.GetValue({fieldName:"precio unitario",y});
+          var priceTotal = sale_tb.GetValue({fieldName:"precio total",y});
+         
+          inform += '\n';
+          inform += ' item: ' + itemName;
+          inform += ' ,cantidad: ' + cant;
+          inform += ' ,precio unitario: ' + priceUnit;
+          inform += ' ,precio total: ' + priceTotal;
+        }
+
+        navigator.clipboard.writeText(inform);
+        console.log("sale information:");
+        console.log(inform);
+
+        alert("informacion de venta copiada!");
+      }
+
+      async function SalePDF() {
+
+        var sale_fm = cruds.Crud_GetBuild({name:"show-form"});
+        var sale_tb = cruds.Crud_GetBuild({name:"show-table"});
+        
+        // Obtener información de la factura (fecha de emisión, cliente, total y lista de elementos)
+        const fechaEmision = sale_fm.GetValue({fieldName:"fecha de emision",y:0});
+        const cliente = sale_fm.GetValue({fieldName:"cliente",y:0});
+        const telefono = sale_fm.GetValue({fieldName:"telefono",y:0});
+        const correo = sale_fm.GetValue({fieldName:"correo",y:0});
+        const total = parseFloat(sale_fm.GetValue({fieldName:"total",y:0}));
+
+        var data = sale_tb.Reload_GetData();
+        var items = data.map((d)=>{
+
+          return {
+            descripcion: d["PRODUCT_NAME"],
+            cantidad: parseFloat(d["CANT"]),
+            precioUnitario: parseFloat(d["PRICE_UNIT"]),
+            precioTotal: parseFloat(d["PRICE_TOTAL"]),
+          }
+        });
+
+        // Crear un nuevo documento PDF
+        const pdfDoc = await PDFLib.PDFDocument.create();
+
+        // Agregar una nueva página al documento
+        const page = pdfDoc.addPage([600, 800]); // Tamaño de la página: ancho x alto
+
+        // Agregar contenido a la página
+        const { width, height } = page.getSize();
+        const fontSize = 12;
+        let y = height - 50;
+        const lineHeight = 20;
+
+        // Agregar encabezado de la factura
+        page.drawText('Factura', { x: 50, y, size: 18 });
+        y -= lineHeight;
+        page.drawText(`Fecha de Emisión: ${fechaEmision}`, { x: 50, y, size: fontSize });
+        y -= lineHeight;
+        page.drawText(`Cliente: ${cliente}`, { x: 50, y, size: fontSize });
+        y -= lineHeight;
+        page.drawText(`Telefono: ${telefono}`, { x: 50, y, size: fontSize });
+        y -= lineHeight;
+        page.drawText(`Correo: ${correo}`, { x: 50, y, size: fontSize });
+        y -= lineHeight;
+
+        // Agregar encabezados de la tabla
+        page.drawText('Descripción', { x: 50, y, size: fontSize });
+        page.drawText('Cantidad', { x: 200, y, size: fontSize });
+        page.drawText('Precio Unitario', { x: 300, y, size: fontSize });
+        page.drawText('Precio Total', { x: 450, y, size: fontSize });
+        y -= lineHeight;
+
+        // Agregar filas de la tabla con los items
+        items.forEach(item => {
+            page.drawText(item.descripcion, { x: 50, y, size: fontSize });
+            page.drawText(item.cantidad.toString(), { x: 200, y, size: fontSize });
+            page.drawText(`S/.${item.precioUnitario.toFixed(2)}`, { x: 300, y, size: fontSize });
+            page.drawText(`S/.${item.precioTotal.toFixed(2)}`, { x: 450, y, size: fontSize });
+            y -= lineHeight;
+        });
+
+        // Agregar total
+        y -= lineHeight;
+        page.drawText(`Total: S/.${total.toFixed(2)}`, { x: 450, y, size: fontSize });
+
+        // Obtener el contenido del documento como ArrayBuffer
+        const pdfBytes = await pdfDoc.save();
+
+        // Convierte ArrayBuffer a Blob
+        const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+
+        // Crea una URL a partir del Blob
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+
+        // Abre el PDF en una nueva ventana
+        window.open(pdfUrl, '_blank');
+      }
 
     }
   });

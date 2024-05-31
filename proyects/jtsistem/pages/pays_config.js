@@ -59,6 +59,8 @@ $(document).ready(function() {
           {table:'accounts', field:'NAME'},
           {table:'accounts', field:'TOTAL'},
           {table:'accounts', field:'ACTIVE'},
+          {table:'accounts', field:'OPEN'},
+          {table:'accounts', field:'CONTROL_BY_OPEN'},
         ],
         conditions:[{
           table:"accounts",
@@ -73,8 +75,11 @@ $(document).ready(function() {
 
         fields:[
           //{panel:"main",...fld_delete},
-          {panel:"main",name:"cuenta",box:bx_input,select:"NAME"},
+          {panel:"main",name:"cuenta",attributes:[{name:"style",value:"min-width: 250px"}],box:bx_input,select:"NAME"},
           {panel:"main",name:"total",box:bx_money,select:"TOTAL"},
+          {panel:"main",name:"estado",box:{tipe:0,options:op_account_state},select:"OPEN"},
+          (user_delete_data_import?{panel:"main",name:"abierto",box:{tipe:6,name:"abierto"},select:"OPEN"}:null),
+          {panel:"main",name:"controlado",box:{tipe:6,name:"controlado"},select:"CONTROL_BY_OPEN"},
           {panel:"main",name:"activo",box:bx_active_input,select:"ACTIVE"},
         ],
 

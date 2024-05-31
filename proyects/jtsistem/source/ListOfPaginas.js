@@ -7,6 +7,7 @@ paginas = [
             
           {name:"control de ventas diarias",href:"sales_control.php"},
           {name:"venta nueva",href:"sales_new.php"},
+          {name:"caja",href:"pays_account.php"},
         ],
     },
     {
@@ -31,7 +32,7 @@ paginas = [
             {name:"lista de productos",href:"products.php"},
             {name:"precios de productos",href:"products_prices.php"},
             {name:"stock de productos",href:"products_stock.php"},
-            //{name:"recetas de productos",href:"products_recipe.php"},
+            {name:"recetas",href:"products_recipe.php"},
             {name:"orden de produccion",href:"produccions.php"},
             {name:"configuracion",href:"products_config.php"},
         ],
@@ -39,13 +40,17 @@ paginas = [
     {
         seccion:'<i class="bi bi-clipboard-data"></i> informes',
         paginas:[
-            {name:"ventas",href:"inform_products.php"},
+            {name:"ventas - completada",href:"inform_products.php"},
+            {name:"ventas - por cobrar",href:"inform_nopaid.php"},
+            //{name:"ventas - en proceso",href:"inform_products.php"},
+            {name:"transacciones",href:"inform_pays.php"},
         ],
     },
     {
         seccion:'<i class="bi bi-piggy-bank"></i> cuentas',
         paginas:[
             {name:"lista de pagos",href:"pays_control.php"},
+            {name:"control",href:"pays_account.php"},
             {name:"lista de facturas",href:"pays_bills.php"},
             //{name:"facturacion",href:"pays_bill.php"},
             {name:"configuracion",href:"pays_config.php"},
@@ -54,7 +59,7 @@ paginas = [
     {
         seccion:'<i class="bi bi-person"></i> usuario',
         paginas:[
-            {name:"cuenta",href:"account.php"},
+            {name:"config",href:"admin_config.php"},
             {name:"salir",href:"login.php"},
         ],
     },
@@ -69,8 +74,9 @@ for (let scc = 0; scc < paginas.length; scc++) {
 
     for (let pg = 0; pg < seccion.paginas.length; pg++) {
 
-        const pagina = seccion.paginas[pg];
+        var pagina = seccion.paginas[pg];
         var value = scc + "-" + pg;
+        pagina.value = value;
 
         paginasData.push({
             value,
@@ -80,7 +86,7 @@ for (let scc = 0; scc < paginas.length; scc++) {
         });
 
         
-        var show = seccion.seccion +"-"+pagina.name;
+        var show = "pagina: " + seccion.seccion +"-"+pagina.name;
         paginasOptions.push({value,show});
     }
     

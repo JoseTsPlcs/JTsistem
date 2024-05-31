@@ -27,8 +27,32 @@ class Table_Grid extends ODD {
     //console.log({...fields});
   }
 
+  Fields_Add({name,box,attributes=[]}){
+
+    this.#fields.push({
+      name,box,
+    });
+
+    var x = this.#fields.length-1;
+    const th = document.createElement("th");
+    th.setAttribute("id",this.#parent.id+"_header_"+x);
+    //f.dom = th;
+    th.setAttribute("scope","col");
+    this.#header_line.appendChild(th);
+    th.innerHTML = name;
+
+    //console.log(this.#header_line);
+
+    setDomAttributes({dom:th,attributes,startAttributes:[]});
+
+    //console.log("tble-grid add gield", this.#fields);
+  }
+
   //-------------------------------
   
+  //#parent = null;
+  #header_line =null;
+
   #Build({parent=null,attributes=[],h}){
 
     if(parent == null){
@@ -71,8 +95,9 @@ class Table_Grid extends ODD {
     tb.appendChild(this.#body_space);
 
     //create headers
-    const header_line = document.createElement("tr");
-    space_header.appendChild(header_line);
+    this.#header_line = document.createElement("tr");
+    space_header.appendChild(this.#header_line);
+
     var x = 0;
     this.#fields.forEach(f => {
       
@@ -81,7 +106,7 @@ class Table_Grid extends ODD {
       x++;
       f.dom = th;
       th.setAttribute("scope","col");
-      header_line.appendChild(th);
+      this.#header_line.appendChild(th);
 
       th.innerHTML = f.name;
 
@@ -98,11 +123,18 @@ class Table_Grid extends ODD {
 
   //-------------------------------
 
-  Fields_SetValues({values=[],fieldName}){
+  Fields_SetValues({values=[],fieldName,boxNew}){
 
     let k = this;
+    //console.log("table grid field:",fieldName," box:",boxNew);
 
     var field = this.#fields.find(f=>f.name==fieldName);
+    if(field==null){
+
+      console.log("error in tableGrid no found fieldName: " + fieldName, "fields:",this.#fields);
+      return;
+    }
+
     var fieldIndex = this.#fields.findIndex(f=>f.name==fieldName);
 
     var addlines = values.length - this.#linesDoom.length;
@@ -125,21 +157,20 @@ class Table_Grid extends ODD {
       }
     }  
 
+    //console.log(fieldName,field);
+
+    field.boxs = [];
     for (let y = 0; y < values.length; y++) {
+
       const value = values[y];
       var parent = this.#linesDoom[y].cells[fieldIndex].td;
+      parent.innerHTML = "";//delte build boxs
 
-      //field.boxs= [];
-
-      if(y+1<=field.boxs.length){
-
-        field.boxs[y].SetValue(value);
-
-      }else {
+      var boxConfig = boxNew ? boxNew : field.box;
 
         field.boxs.push(new Box({
           parent,
-          ...field.box,
+          ...boxConfig,
           value:value,
           update:()=>{
 
@@ -147,8 +178,12 @@ class Table_Grid extends ODD {
             k.CallEvent({name:"boxUpdate",params:{x:fieldIndex,y,field}});
           }
         }));
-      }
     }
+  }
+
+  #Field_ReplaceBox({fieldName,y,boxNew,value}){
+
+
   }
 
   Fields_GetBoxs({fieldName}){

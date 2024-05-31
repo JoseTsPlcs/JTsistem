@@ -15,8 +15,10 @@ echo '<script src="'.$src.'Build/Components/ScreenLoad.js"></script>';
 echo '<script src="'.$src.'Build/Components/Panel.js"></script>';
 echo '<script src="'.$src.'Build/Components/Steps.js"></script>';
 echo '<script src="'.$src.'Build/Components/LoadingScreen.js"></script>';
+echo '<script src="'.$src.'Build/Components/Toggle.js"></script>';
 
 echo '<script src="'.$src.'BaseData/Conection.js"></script>';
+echo '<script src="'.$src.'BaseData/Loads.js"></script>';
 
 echo '<script src="'.$src.'Build/Modulos/Modulo.js"></script>';
 echo '<script src="'.$src.'Build/Modulos/Window.js"></script>';
@@ -38,6 +40,7 @@ echo '<script src="'.$src.'Build/Window/windowRequest.js"></script>';
 echo '<script src="'.$src.'Build/Window/windowFilters.js"></script>';
 
 echo '<script src="'.$src.'Constructor/ConsCruds.js"></script>';
+echo '<script src="'.$src.'Constructor/ConsInform.js"></script>';
 
 echo '<script src="'.$src.'Land/UserLog.js"></script>';
 echo '<script src="'.$src.'Land/Pag_Base.js"></script>';

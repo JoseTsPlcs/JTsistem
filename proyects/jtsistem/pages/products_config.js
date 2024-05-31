@@ -44,7 +44,7 @@ $(document).ready(function() {
               }],
     
               fields:[
-                {panel:"main",...fld_delete},
+                //{panel:"main",...fld_delete},
                 {panel:"main",name:"unidad",box:bx_input,select:"NAME"},
                 {panel:"main",name:"simbolo",box:bx_input,select:"SIMBOL"},
               ],
@@ -77,7 +77,7 @@ $(document).ready(function() {
               }],
     
               fields:[
-                {panel:"main",...fld_delete},
+                //{panel:"main",...fld_delete},
                 {panel:"main",name:"etiqueta",box:bx_input,select:"NAME"},
               ],
             }

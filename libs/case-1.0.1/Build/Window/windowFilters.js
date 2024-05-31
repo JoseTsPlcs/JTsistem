@@ -27,13 +27,36 @@ class windowFilters extends ODD {
 
     Filter_SetOptions({filterName,options,value}){
 
+        var filter = this.Filter_Get({filterName});
+        if(value == null){
 
+            switch(filter.box.tipe){
+
+                case 4:
+                    value = options.map((op)=>{return op.show});
+                break;
+
+                case 3:
+                    value = options[options.length-1].value;
+                break;
+
+                default:
+                    value=filter.box.value;
+                break;
+            }
+        } 
+        var box = this.Filter_GetBox({filterName});
+        box.SetOptions(options);
+        box.SetValue(value);
+
+        console.log("filterName:",filterName,"options:",options,"value:",value);
     }
 
     Filter_GetBox({filterName}){
 
-        var field = this.Filter_Get({filterName});
-        var colData = this.#window.Conteiner_GetColData({x:field.x,y:field.y});
+        var filter = this.Filter_Get({filterName});
+        //console.log("getbox:",filter);
+        var colData = this.#window.Conteiner_GetColData({x:filter.x,y:filter.y});
         return colData.labels[0].GetBox();
     }
 
