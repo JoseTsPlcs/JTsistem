@@ -181,6 +181,11 @@ class Table_Grid extends ODD {
     }
   }
 
+  Fields_Add({value,fieldName,boxNew}){
+
+
+  }
+
   #Field_ReplaceBox({fieldName,y,boxNew,value}){
 
 
@@ -264,5 +269,17 @@ class Table_Grid extends ODD {
 
   }
   
+  RemoveLine({y}){
+
+    this.#fields.forEach(field => {
+      
+      field.boxs.splice(y,1);
+    });
+
+    var line = this.#linesDoom[y];
+    console.log("line",line);
+    var tr = line.line;
+    tr.remove();
+  }
   
 }

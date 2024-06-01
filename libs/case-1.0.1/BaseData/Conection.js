@@ -184,42 +184,133 @@ class Conection extends ODD {
     return sql;
   }
 
-  GetSql_Insert({tableMain,inserts}){
+  GetSql_Insert({tableMain,inserts=[]}){
 
     /*
     INSERT INTO table_name (column1, column2, column3, ...)
     VALUES (value1, value2, value3, ...);
     */
 
+    //---------------
+
+    /*{
+      name:"ID_PRIMARY",
+      tipe:"values",
+      value:1,
+    }*/
+
+    var columns = [];
+    inserts.forEach(ins => {
+      
+      var insertField = ins.field;
+      var insertValue = ins.value;
+      var insertTipe = ins.tipe ? ins.tipe : "values";
+      var columnFound = columns.find(c=>c.name==insertField);
+      if(!columnFound){
+
+        columns.push({
+          name:insertField,
+          values:[insertValue],
+          tipe: insertTipe,
+        });
+      }
+      else
+      {
+
+        columnFound.values.push(insertValue);
+      }
+
+    });
+
+    var linesTotal = 0;
+    columns.forEach(col => {
+      
+      var count = col.values.length;
+      if(count>linesTotal) linesTotal = count;
+    });
+
+    columns.forEach(col => {
+      
+      var fillCount = linesTotal - col.values.length;
+      var lastValue = col.values[col.values.length-1];
+
+      switch (col.tipe) {
+        case "const":
+          
+          for (let c = 0; c < fillCount; c++) {
+            
+            col.values.push(lastValue);
+          }
+        break;
+
+        case "secuence":
+          
+          for (let c = 0; c < fillCount; c++) {
+            
+            lastValue += 1;
+            col.values.push(lastValue);
+          }
+        break;
+      }
+
+    });
+
+    var fields = columns.map(col=>col.name);
+    var lines = [];
+    for (let ln = 0; ln < linesTotal; ln++) {
+      
+      var lineOne = [];
+      
+      columns.forEach(col => {
+        
+        lineOne.push(col.values[ln]);
+      });
+
+      lines.push(lineOne);
+    }
+
+    
+
+    //---------------
+    console.log(inserts,columns,fields,lines);
+
     var sql = "INSERT INTO " + tableMain + " (";
 
-    var insert_length = inserts.length;
+    var fieldsLength = fields.length;
+    for (let f = 0; f < fieldsLength; f++) {
 
-    for (let ins = 0; ins < insert_length; ins++) {
-
-      const insert = inserts[ins];
-      var insertLast = ins == insert_length-1;
-      var insertField = insert["field"];
-      
-      sql+= insertField;
-      if(!insertLast) sql += ", ";
-      
+      var field = fields[f];
+      var fieldLast = f == fieldsLength - 1;
+      sql += field;
+      sql += fieldLast ? "" : ",";
     }
 
-    sql += ") VALUES ("
+    sql += ") VALUES "
 
-    for (let ins = 0; ins < insert_length; ins++) {
+    var linesLength = lines.length;
+    for (let ln = 0; ln < linesLength; ln++) {
 
-      const insert = inserts[ins];
-      var insertLast = ins == insert_length-1;
-      var insertValue = "'"+insert["value"]+"'";
       
-      sql+= insertValue;
-      if(!insertLast) sql += ", ";
+      var line = lines[ln];
+      var lineLast = ln == linesLength - 1;
+      sql += "(";
+
+        var values = line;
+        var valuesLength = values.length;
+        for (let v = 0; v < valuesLength; v++) {
+
+          var value = values[v];
+          var valueLast = v == valuesLength - 1;
+
+          sql += "'" + value + "'";
+          sql += valueLast ? "" : ",";
+        }
+
+      sql += ")";
+      sql += lineLast ? "" : ",";
       
     }
-
-    sql += ")"
+    
 
     return sql;
   }

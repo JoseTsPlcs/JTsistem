@@ -70,13 +70,11 @@ class ConsInform extends ODD {
         this.#fm = new Form({
             parent,
             title,head,show,blocked,
-            grid:{
-                cols:[
-                    [12],
-                    [12],
-                    [12],
-                ],
-            },
+            fields:[
+                {col:12,name:"panel1",tipe:0,box:{tipe:0}},
+                {col:12,name:"panel2",tipe:0,box:{tipe:0}},
+                {col:12,name:"panel3",tipe:0,box:{tipe:0}},
+            ],
             tools:[
                 {x:0,y:0,index:0,name:"config",box:{tipe:5,value:'<i class="bi bi-gear"></i>',class:"btn btn-outline-primary btn-sm"}},
                 {x:0,y:0,index:1,name:"load",box:{tipe:5,value:'<i class="bi bi-database"></i>',class:"btn btn-outline-primary btn-sm"}},        
@@ -93,6 +91,7 @@ class ConsInform extends ODD {
                 }
             ],
         });
+
 
         this.#tg_config = new Toggle({
             dom:this.#fm.ContentGridGet().GetColData({x:0,y:1}).col,

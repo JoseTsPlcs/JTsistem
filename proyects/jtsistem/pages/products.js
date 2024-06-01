@@ -292,7 +292,7 @@ $(document).ready(function() {
                       if(!test) md_unds.SetActive({active});
                     }
                   }]
-                }
+                },
               ],
             }
           }

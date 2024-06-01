@@ -41,7 +41,7 @@ class Crud_set extends ODD {
         delete:false,
     }
 
-    #SetVariables({title,stateStart="reload",afterCancel="reload",afterDelete="reload",afterInsert="reload",afterUpdate="reload",newActive=true,tableMain,selects,joins,inserts=[],orders=[],conditions=[],fields=[],loads=[]}){
+    #SetVariables({title,stateStart="reload",afterCancel="reload",afterDelete="reload",afterInsert="reload",afterUpdate="reload",newLinesStart=1,newActive=true,tableMain,selects,joins,inserts=[],orders=[],conditions=[],fields=[],loads=[]}){
 
         this.#title = title;
         this.#conection = db_lip;
@@ -51,8 +51,12 @@ class Crud_set extends ODD {
         this.#conditions = conditions;
         this.#orders = orders;
         this.#inserts = inserts;
+        this.#inserts.forEach(ins => {
+            if(ins.tipe==null) ins.tipe = "const";
+        });
         this.#selectPrimary = selects.find(slc=>slc.primary==true);
-        this.#fields = fields;
+        this.#fields = fields.filter(f=>f!=null);
+        
 
         this.#newActive = newActive;
         this.#stateData.stateStart=stateStart;
@@ -60,6 +64,7 @@ class Crud_set extends ODD {
         this.#stateData.afterDelete = afterDelete;
         this.#stateData.afterInsert = afterInsert;
         this.#stateData.afterUpdate = afterUpdate;
+        this.#stateData.newLinesStart = newLinesStart;
 
         this.#loadData.max = loads.length;
         this.#loadData.data = loads;
@@ -98,12 +103,13 @@ class Crud_set extends ODD {
 
     //-------build----------
 
-    #Build({parent,title,head=true,attributes,panels,filters,configShow}){
+    #Build({parent,title,head=true,attributes,panels,filters,configShow,configHead,configTitle,configToolsPositions}){
 
+        
 
         this.#Build_Body({parent,title,head,attributes});
         this.#Build_Panels({panels});
-        this.#Config_Build({filters,configShow});
+        this.#Config_Build({filters,configShow,configHead,configTitle,configToolsPositions});
 
         this.#Loading_Build({parent:this.#body_w.Conteiner_Dom()});
         this.Loading_SetActive({active:false});
@@ -125,6 +131,7 @@ class Crud_set extends ODD {
         {x:1,y:3,index:3,name:"insert",box:{id:"btn4",tipe:5,value:"insertar",class:"btn btn-outline-primary btn-sm",update:()=>{this.#Event_UpdateToolInsert({})}},dom:null},
         {x:1,y:3,index:4,name:"delete",box:{id:"btn5",tipe:5,value:"borrar",class:"btn btn-outline-danger btn-sm",update:()=>{this.#Event_UpdateToolDelete({})}},dom:null},
         {x:1,y:3,index:5,name:"cancel",box:{id:"btn6",tipe:5,value:"cancelar",class:"btn btn-outline-danger btn-sm",update:()=>{this.#Event_UpdateToolCancel({})}},dom:null},
+        {x:1,y:3,index:6,name:"addLine",box:{id:"btn7",tipe:5,value:"añadir linea",class:"btn btn-outline-primary btn-sm",update:()=>{this.#New_AddLine({})}},dom:null},
 
         {x:2,y:3,index:0,name:"pages",box:{tipe:3,value:1,options:[{show:"pag1",value:1}],update:()=>{this.#Event_UpdateToolPages({})}},dom:null},
     ];
@@ -318,15 +325,20 @@ class Crud_set extends ODD {
         if(this.#config.show) $('#'+idParentDom).show((slow?"slow":null));
         else $('#'+idParentDom).hide((slow?"slow":null));
     }
-
     Config_ShowChange(){
 
         this.Config_ShowSet({show:!this.#config.show,slow:true});
     }
 
-    #Config_Build({filters,configShow=false}){
+    #Config_Build({filters,configShow=false,configHead=true,configTitle="fitros",configToolsPositions=[]}){
 
-        this.#Filters_Build({filters});
+        
+        this.#Filters_Build({
+            filters,
+            title:configTitle,
+            head:configHead,
+            toolsPositions:configToolsPositions,
+        });
 
         this.Config_ShowSet({show:configShow,slow:false});
     }
@@ -336,12 +348,12 @@ class Crud_set extends ODD {
     #filters = null;
     Filters_Get(){return this.#filters};
 
-    #Filters_Build({filters=[]}){
+    #Filters_Build({filters=[],title,head,show,blocked,toolsPositions=[]}){
 
         let k = this;
         this.#filters = new windowFilters({
             parent: this.#body_w.Conteiner_GetColData({x:0,y:0}).col,
-            title:"filtros",
+            title,head,show,blocked,toolsPositions,
             filters,
             events:[
                 {
@@ -793,6 +805,10 @@ class Crud_set extends ODD {
         this.#Insert_Request_PrimaryNew({
             success:({primaryNew})=>{
 
+                
+
+                //-------------------------
+
                 var insertSql_inserts = inserts;
 
                 //insert by inserts saved
@@ -802,6 +818,7 @@ class Crud_set extends ODD {
                 insertSql_inserts.push({
                     field:k.#selectPrimary.field,
                     value:primaryNew,
+                    tipe:"secuence",
                 });
 
                 //inserst by crudjoins
@@ -813,6 +830,7 @@ class Crud_set extends ODD {
                         insertSql_inserts.push({
                             field: jn.field,
                             value:jn.value,
+                            tipe:"const",
                         });
                     }                   
                 });
@@ -828,12 +846,15 @@ class Crud_set extends ODD {
                         if(!select.primary){
 
                             var fieldSelecField = select.field;
-                            var fieldValue = k.GetValue({fieldName:field.name,y:0});
+                            var fieldValues = k.GetValues({fieldName:field.name});
 
-                            insertSql_inserts.push({
-                                field: fieldSelecField,
-                                value: fieldValue,
-                            });
+                            fieldValues.forEach(v => {
+                                
+                                insertSql_inserts.push({
+                                    field: fieldSelecField,
+                                    value: v,
+                                });
+                            });                            
                         }                        
                     }
                 });    
@@ -864,6 +885,12 @@ class Crud_set extends ODD {
     #newActive=true;
     New({}){
 
+        this.#New_StartLines({});
+        this.#Event_NewAfter({});
+    }
+
+    #New_StartLines({}){
+
         this.#conteiner_panels.forEach(panel => {
 
             var fieldsOfPanel = this.#fields.filter(f=>f.panel==panel.title);
@@ -871,14 +898,22 @@ class Crud_set extends ODD {
             switch (panel.tipe) {
                 case "table":
 
-                    fieldsOfPanel.forEach(f => {
+                fieldsOfPanel.forEach(f => {
                         
-                        if(f.action != null){
+                    var value = "";
+                    var box = null;
 
-                            this.SetValuesToBox({values:[""],fieldName:f.name,box:{tipe:0}});
-                        }
-                        else this.SetValuesToBox({values:[f.box.value],fieldName:f.name});
-                    });
+                    value = f.box.value;
+                    //else box = {tipe:0};
+
+                    var values = [];
+                    for (let cnt = 0; cnt < this.#stateData.newLinesStart; cnt++) {
+                        
+                        values.push(value);
+                    }
+
+                    this.SetValuesToBox({values,fieldName:f.name,box});
+                });                   
 
                 break;
 
@@ -893,7 +928,72 @@ class Crud_set extends ODD {
                 break;
             }
         });
-        this.#Event_NewAfter({});
+    }
+
+    #New_AddLine({}){
+
+        this.#conteiner_panels.forEach(panel => {
+
+            var fieldsOfPanel = this.#fields.filter(f=>f.panel==panel.title);
+            
+            switch (panel.tipe) {
+                case "table":
+
+                fieldsOfPanel.forEach(f => {
+                        
+                    var value = "";
+                    var box = null;
+
+                    value = f.box.value;
+                    //else box = {tipe:0};
+
+                    var values = this.GetValues({fieldName:f.name});
+                    values.push(value);
+
+                    this.SetValuesToBox({values,fieldName:f.name,box});
+                });                   
+
+                break;
+
+                case "form":
+
+                fieldsOfPanel.forEach(f => {
+                    
+                    if(f.action == "edit") console.log("new -> field:",f);
+                    this.SetValuesToBox({values:[f.box.value],fieldName:f.name});
+                });
+
+                break;
+            }
+        });
+    }
+
+    #New_RemoveLine({y,from}){
+
+        console.log("remove line ", from);
+        this.#conteiner_panels.forEach(panel => {
+
+            var fieldsOfPanel = this.#fields.filter(f=>f.panel==panel.title);
+            
+            switch (panel.tipe) {
+                case "table":
+
+                console.log(panel);
+                panel.build.RemoveLine({y});               
+
+                break;
+
+                case "form":
+
+                fieldsOfPanel.forEach(f => {
+                    
+                    if(f.action == "edit") console.log("new -> field:",f);
+                    this.SetValuesToBox({values:[f.box.value],fieldName:f.name});
+                });
+
+                break;
+            }
+        });
     }
 
     //update
@@ -1102,6 +1202,7 @@ class Crud_set extends ODD {
                     {name:"new",show:false},
                     {name:"insert",show:true},
                     {name:"cancel",show:true},
+                    {name:"addLine",show:false},
                     
                     {name:"pages",show:false},
                 ],
@@ -1121,6 +1222,7 @@ class Crud_set extends ODD {
                     {name:"new",show:true},
                     {name:"insert",show:false},
                     {name:"cancel",show:false},
+                    {name:"addLine",show:false},
                     
                     {name:"pages",show:false},
                 ],
@@ -1140,6 +1242,7 @@ class Crud_set extends ODD {
                     {name:"new",show:false},
                     {name:"insert",show:false},
                     {name:"cancel",show:false},
+                    {name:"addLine",show:false},
                     
                     {name:"pages",show:false},
                 ],
@@ -1149,6 +1252,12 @@ class Crud_set extends ODD {
         afterUpdate:"reload",
         afterCancel:"reload",
         afterDelete:"relad",
+        newLinesStart: 10,
+    }
+
+    StateGet(){
+
+        return this.#stateData.state;
     }
 
     SetState({stateName}){
@@ -1212,7 +1321,8 @@ class Crud_set extends ODD {
         toolsSet.forEach(toolSet => {
             
             var toolData = stateToolsData.tools.find(toolData=>toolData.name==toolSet.name);
-            
+            //if(toolData == null) toolData = {};
+
             toolData.show = toolSet.show;
             toolData.value = toolSet.value;
 
@@ -1302,11 +1412,24 @@ class Crud_set extends ODD {
             var panel = this.#conteiner_panels.find(p=>p.title == u.field.panel);
             if(panel.tipe == "table"){
 
-                var primaryField = this.#selectPrimary["field"];
-                var line = this.#reloadData[u.y];
-                var primaryValue = line[primaryField];
+                switch (this.#stateData.state) {
+                    case "reload":
 
-                k.Delete({primaryValue});
+                        var primaryField = this.#selectPrimary["field"];
+                        var line = this.#reloadData[u.y];
+                        var primaryValue = line[primaryField];
+
+                        k.Delete({primaryValue});
+                        
+                    break;
+                
+                    case "new":
+
+                        k.#New_RemoveLine({y:u.y,from:"boxupdate"});
+                        
+                    break;
+                }
+                
             }
         }
 
@@ -1520,6 +1643,12 @@ class Crud_set extends ODD {
             break;
         }
 
+    }
+
+    SetValue({fieldName,y,value}){
+
+        var box = this.GetBoxs({fieldName})[y];
+        box.SetValue(value);
     }
 
     
