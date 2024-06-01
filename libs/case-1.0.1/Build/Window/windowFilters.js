@@ -22,6 +22,9 @@ class windowFilters extends ODD {
     #filters = [];
     Filter_Get({filterName}){
 
+        var filter = this.#form.Field_Get({fieldName:filterName});
+        console.log(filter,filterName);
+
         return this.#filters.find(f=>f.name==filterName);
     }
 
@@ -54,10 +57,7 @@ class windowFilters extends ODD {
 
     Filter_GetBox({filterName}){
 
-        var filter = this.Filter_Get({filterName});
-        //console.log("getbox:",filter);
-        var colData = this.#window.Conteiner_GetColData({x:filter.x,y:filter.y});
-        return colData.labels[0].GetBox();
+        return this.#form.Field_GetBox({fieldName:filterName});
     }
 
     Filters_Get(){
@@ -68,26 +68,41 @@ class windowFilters extends ODD {
     //--------build
 
     #window = null;
-    #Build({parent,title}){
+    #form = null;
+    #Build({parent,title,head,show,blocked,toolsPositions}){
 
-        var windowConfig = GetGridConfig({panels:this.#filters});
+        let k = this;
+        this.#form = new Form({
+            parent,//:content.GetColData({x:0,y:0}).col,
+            title,head,show,blocked,
+            fields:this.#filters,
+            tools:[
+                {position:"botton-center",name:"reload",action:"reload",box:{value:"recargar",tipe:5,class:"btn btn-outline-primary btn-sm"}},
+                {position:"botton-center",name:"clear",action:"clear",box:{value:"limpiar",tipe:5,class:"btn btn-outline-primary btn-sm"}},
+            ],
+            events:[
+                {
+                    name:"toolUpdate",
+                    actions:[{
+                        action:({tool})=>{
 
-        var content = new Grid({
-            parent,
-            cols:[
-                [12],
-                [12]
+                            switch (tool.action) {
+                                case "reload":
+                                    k.#Reload();
+                                break;
+                            
+                                case "clear":
+                                    k.#Clear();
+                                break;
+                            }
+                        }
+                    }]
+                }
             ],
-            boxs:[
-                {x:0,y:1,box:{id:1,tipe:5,class:"btn btn-primary btn-sm",value:"recargar",update:()=>{this.#Reload()}}},
-                {x:0,y:1,box:{id:2,tipe:5,class:"btn btn-primary btn-sm",value:"limpiar",update:()=>{this.#Clear()}}},
-            ],
-            attributes:[
-                {y:1,x:0,attributes:[{name:"class",value:"d-flex justify-content-center align-items-center"}]},
-            ],
+            toolsPositions,
         });
 
-        this.#window = new Window({
+        /*this.#window = new Window({
             parent:content.GetColData({x:0,y:0}).col,
             h:0,
             title,
@@ -95,11 +110,8 @@ class windowFilters extends ODD {
                 cols:windowConfig.cols,
             },
             fields:windowConfig.panels,
-            /*fields:[
-                {col:12,y:0,name:"filter1",box:{tipe:1}},
-            ],*/
             
-        });
+        });*/
     }
 
     //-------

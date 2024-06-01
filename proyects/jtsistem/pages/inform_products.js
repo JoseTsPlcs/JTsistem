@@ -39,18 +39,13 @@ $(document).ready(function() {
           {
             name:"sales-tot",
             tipe:"target",
-            col:12,
+            col:6,
           },
-          /*{
-            name:"sales-tot_paid",
+          {
+            name:"prom-tot",
             tipe:"target",
             col:6,
-          },*/
-          /*{
-            name:"sales-tot_nopaid",
-            tipe:"target",
-            col:6,
-          },*/
+          },
           {
             name:"sales-total",
             tipe:"chart-evolutivo",
@@ -82,6 +77,7 @@ $(document).ready(function() {
 
       function Reload({k}) {
         
+        //return;
         inform.ScreenLoad_Set({active:true});
 
         var conditionsFilters = inform.Filters_Get().GetConditions();
@@ -207,6 +203,7 @@ $(document).ready(function() {
             var sales_total = tags.reduce((acc,tg)=>{return acc + tg.total},0);
             var sales_total_nopaid = result.filter(rst=>rst["PAID"] == 0).reduce((acc,rst)=>{return acc + parseFloat(rst["TOTAL"])},0);
             var sales_total_paid = result.filter(rst=>rst["PAID"] == 1).reduce((acc,rst)=>{return acc + parseFloat(rst["TOTAL"])},0);
+            var sales_prom = sales_total/period.length;
 
             //------print------
 
@@ -254,6 +251,15 @@ $(document).ready(function() {
               dataSets:[{
                 label:"total vendido",
                 data:["S/. " + sales_total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })],
+              }],
+            });
+
+            inform.Chart_SetData({
+              chartName:"prom-tot",
+              labels:[],
+              dataSets:[{
+                label:"promedio vendido",
+                data:["S/. " + sales_prom.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })],
               }],
             });
 

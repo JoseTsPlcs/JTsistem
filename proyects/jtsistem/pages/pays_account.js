@@ -74,7 +74,7 @@ $(document).ready(function() {
               parent:prnt_account,
               title:"cuenta",
               panels:[
-                {col:12,y:0,title:"main",tipe:"form",show:false}
+                {col:12,y:0,title:"main",tipe:"form",show:false,head:false}
               ],
               stateTools:[
                 {
@@ -87,7 +87,7 @@ $(document).ready(function() {
                         {name:"pdf",show:false},
             
                         {name:"sizes",show:false,value:1},
-                        {name:"reload",show:false},
+                        {name:"reload",show:true},
                         {name:"update",show:false},
                         {name:"new",show:false},
                         {name:"insert",show:false},
@@ -140,6 +140,12 @@ $(document).ready(function() {
               ],
               
               configShow:true,
+              //configTitle:"cuenta",
+              configHead:false,
+              configToolsPositions:[
+                {name:"reload",position:"head-center",show:false},
+                {name:"clear",position:"head-center",show:false},
+              ],
               filters:[
                 {name:"cuenta",box:{tipe:3},load:{name:"ld-accounts",value:"value",show:"show"},select:{table:"accounts",field:"ID_ACCOUNT",inter:"="}},
               ],

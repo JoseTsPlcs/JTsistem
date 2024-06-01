@@ -5,6 +5,12 @@ $(document).ready(function() {
 
     success:({userData})=>{
 
+      var acc_products_update = userData.access.find(acc=>acc.value=="acc-2") && userData.access.find(acc=>acc.value=="acc-2").active == "true";
+      var acc_price_update = userData.access.find(acc=>acc.value=="acc-3") && userData.access.find(acc=>acc.value=="acc-2").active == "true";
+      //acc_products_update = false;
+
+      //-------------
+
       var gr = new Grid({
         cols:[
           [12],//modal customer
@@ -28,7 +34,22 @@ $(document).ready(function() {
             name:'<i class="bi bi-card-checklist"></i> items',
             window:{
               //head:false,
-              grid:{cols:[[12]]},
+              grid:{
+                cols:[
+                  [12],//0-buttoon
+                  [12],//1-form
+                  [12],//2 md-product
+                  [12],//3 md-unids
+                  [12],//4 md-tags
+                ],
+                boxs:[
+                  {x:0,y:0,box:{tipe:5,value:'añadir producto',class:"btn btn-outline-primary btn-sm",update:()=>{
+                    //console.log("aladainsndaskd");
+                    var cr_item = conections.Crud_GetBuild({name:"fm-product"});
+                    cr_item.SetState({stateName:"new"});
+                  }}},
+                ],
+              },
             }
           },     
           {
@@ -48,8 +69,18 @@ $(document).ready(function() {
         ],
       });
 
+      var bx_product_update = stps.GetStep({stepIndex:0}).window.Conteiner_GetColData({x:0,y:0}).boxs[0];
+
+      if(!acc_products_update) bx_product_update.Hide();
+
       var md = new Modal({parent:stps.GetStep({stepIndex:2}).window.Conteiner_GetColData({x:0,y:1}).col});
       var md2 = new Modal({parent:prnt_customer});
+      var md3 = new Modal({parent:stps.GetStep({stepIndex:0}).window.Conteiner_GetColData({x:0,y:2}).col});
+      var md4 = new Modal({parent:stps.GetStep({stepIndex:0}).window.Conteiner_GetColData({x:0,y:3}).col});
+      var md5 = new Modal({parent:stps.GetStep({stepIndex:0}).window.Conteiner_GetColData({x:0,y:4}).col});
+
+      var prnt_items_fm = md3.GetContent();
+
       stps.SetStepIndex({stepIndex:0});
 
       var conections = new ConsCruds({
@@ -413,13 +444,55 @@ $(document).ready(function() {
             name:"products",
             active:true,
             script:{
-              parent:stps.GetStep({stepIndex:0}).window.Conteiner_GetColData({x:0,y:0}).col,
+              parent:stps.GetStep({stepIndex:0}).window.Conteiner_GetColData({x:0,y:1}).col,
               title:"lista de productos/servicios",head:false,
               panels:[{col:12,y:0,title:"main",tipe:"table",h:580}],
-              stateTools:stTls_tb_maid,
+              stateTools:[
+                {
+                  name:"reload",
+                  tools:[
+                      {name:"config",show:false},
+                      {name:"load",show:true},
+                      
+                      {name:"excel",show:false},
+                      {name:"pdf",show:false},
+          
+                      {name:"sizes",show:false,value:999},
+                      {name:"reload",show:false},
+                      {name:"update",show:false},
+                      {name:"new",show:true},
+                      {name:"insert",show:false},
+                      {name:"cancel",show:false},
+                      {name:"addLine",show:false},
+                      
+                      {name:"pages",show:false},
+                  ],
+                },
+                {
+                  name:"new",
+                  tools:[
+                      {name:"config",show:false},
+                      {name:"load",show:false},
+                      
+                      {name:"excel",show:false},
+                      {name:"pdf",show:false},
+          
+                      {name:"sizes",show:false,value:999},
+                      {name:"reload",show:false},
+                      {name:"update",show:false},
+                      {name:"new",show:false},
+                      {name:"insert",show:true},
+                      {name:"cancel",show:true},
+                      {name:"addLine",show:true},
+                      
+                      {name:"pages",show:false},
+                  ],
+                },
+              ],
               stateStart:"block",
               afterInsert:"reload",
-              afterUpdate:"block",
+              //afterUpdate:"block",
+              newLinesStart:1,
 
               tableMain:"sales_products",
               selects:[
@@ -488,13 +561,12 @@ $(document).ready(function() {
 
               fields:[
                 {panel:"main",...fld_delete,attributes:att_btn},
-                //{panel:"main",name:"id sale producto",box:bx_shw,select:"ID"},
-                //{panel:"main",name:"id sale",box:bx_shw,select:"ID_SALE"},
+                (acc_products_update?{panel:"main",...fld_edit,attributes:att_btn}:null),
                 {panel:"main",name:"producto-servicio",box:{tipe:8,class:"w-100"},attributes:att_ln,select:"ID_PRODUCT",load:{name:"products-services",show:"show"}},
-                {panel:"main",name:"unidad",box:bx_shw,select:"SIMBOL"},
+                {panel:"main",name:"unidad",box:bx_shw,attributes:att_shw,select:"SIMBOL"},
                 {panel:"main",name:"cantidad",box:bx_cant,attributes:att_cnt,select:"CANT"},
-                {panel:"main",name:"precio unitario",box:bx_money,attributes:att_shw,select:"PRICE_UNIT"},
-                {panel:"main",name:"precio total",box:bx_money,attributes:att_shw,select:"PRICE_TOTAL"},
+                {panel:"main",name:"precio unitario",box:(acc_price_update?{tipe:1}:bx_money),attributes:att_shw,select:"PRICE_UNIT"},
+                {panel:"main",name:"precio total",box:(acc_price_update?{tipe:1}:bx_money),attributes:att_shw,select:"PRICE_TOTAL"},
               ],
               events:[
                 {
@@ -589,12 +661,35 @@ $(document).ready(function() {
                   actions:[{
                     action:({field,y,k})=>{
 
-                      if(field.name=="cantidad"||field.name=="producto-servicio"){
+                      if(field.action == "edit"){
 
-                        //var cal = k.CallEvent({name:"calculateLineTotal",params:{y}});
-                        //console.log("boxupdate field:",field.name,",cal:",cal);
-                        //k.Update_AddChange({fieldName:"precio unitario",value:cal.priceUnit,primary:cal.primary});
-                        //k.Update_AddChange({fieldName:"precio total",value:cal.priceTotal,primary:cal.primary});
+                        var product_id = k.Reload_GetData()[y]["ID_PRODUCT"];
+                        var cr_item = conections.Crud_GetBuild({name:"fm-product"});
+                        cr_item.CrudJoins_Set({name:"",field:"ID_PRODUCT",value:product_id});
+                        cr_item.SetState({stateName:"reload"});
+
+                      }
+
+                      if((field.name == "producto-servicio" || field.name == "cantidad") && k.StateGet()=="new"){
+
+                        var cal = k.CallEvent({name:"calculateLineTotal",params:{y}});
+                        k.GetBoxs({fieldName:"precio unitario"})[y].SetValue(cal.priceUnit);
+                        k.GetBoxs({fieldName:"precio total"})[y].SetValue(cal.priceTotal);
+                      }
+
+                      if(acc_price_update  && k.StateGet()=="new"  && (field.name=="precio unitario" || field.name == "precio total")){
+
+                        if(field.name=="precio unitario"){
+
+                          var tot =  k.GetValue({fieldName:"precio unitario",y}) * k.GetValue({fieldName:"cantidad",y});
+                          k.SetValue({fieldName:"precio total",value:tot,y}); 
+                        }
+
+                        if(field.name=="precio total"){
+
+                          var tot =  k.GetValue({fieldName:"precio total",y}) / k.GetValue({fieldName:"cantidad",y});
+                          k.SetValue({fieldName:"precio unitario",value:tot,y}); 
+                        }
                       }
                     }
                   }],
@@ -604,16 +699,29 @@ $(document).ready(function() {
                   actions:[{
                     action:({k,inserts=[]})=>{
 
-                      var cal = k.CallEvent({name:"calculateLineTotal",params:{y:0}});
-                      inserts.push({
-                        field:"PRICE_UNIT",
-                        value:cal.priceUnit
-                      });
-                      inserts.push({
-                        field:"PRICE_TOTAL",
-                        value:cal.priceTotal
-                      });
-                      //console.log("new_sale->insert before",cal,inserts);
+                      if(!acc_price_update){
+
+                        var priceUnit = k.GetValues({fieldName:"precio unitario"});
+                        var priceTotal = k.GetValues({fieldName:"precio total"});
+
+                        //console.log(priceUnit,priceTotal);
+
+                        for (let ln = 0; ln < priceUnit.length; ln++) {
+
+                          var unit = priceUnit[ln];
+                          var tot = priceTotal[ln];
+                          
+                          inserts.push({
+                            field:"PRICE_UNIT",
+                            value:unit
+                          });
+
+                          inserts.push({
+                            field:"PRICE_TOTAL",
+                            value:tot
+                          });
+                        }
+                      }
 
                       return {inserts};
                     }
@@ -640,6 +748,7 @@ $(document).ready(function() {
               panels:[{col:12,y:0,title:"main",tipe:"table",h:600}],
               stateTools:stTls_tb_maid,
               stateStart:"block",
+              //newLinesStart:10,
 
               tableMain:"sales_supplies",
               selects:[
@@ -765,6 +874,274 @@ $(document).ready(function() {
               }),
             },
           },
+          {
+            name:"fm-product",
+            active:true,
+            script:{
+              parent:prnt_items_fm,
+              title:"producto",
+              panels:[{col:12,y:0,title:"main",tipe:"form"}],
+              stateTools:[
+                {
+                    name:"reload",
+                    tools:[
+                        {name:"config",show:false},
+                        {name:"load",show:false},
+                        
+                        {name:"excel",show:false},
+                        {name:"pdf",show:false},
+            
+                        {name:"sizes",show:false,value:999},
+                        {name:"reload",show:true},
+                        {name:"update",show:true},
+                        {name:"new",show:false},
+                        {name:"insert",show:false},
+                        {name:"cancel",show:true},
+                        
+                        {name:"pages",show:false},
+                    ],
+                }
+              ],
+              stateStart:"block",
+              afterUpdate:"block",
+              afterInsert:"block",
+              afterCancel:"block",
+          
+              tableMain:"products",
+              selects:[
+                {table:'products', field:'ID_PRODUCT',primary:true},
+                {table:'products', field:'NAME'},
+                {table:'products', field:'ID_PRODUCT_TIPE'},
+                {table:'products', field:'ID_PRODUCT_TAG'},
+                {table:'products', field:'UNID_ID'},
+                {table:'products', field:'ACTIVE'},
+                {table:'products', field:'COST_UNIT'},
+                {table:'products', field:'PRICE_UNIT'},
+                {table:'products', field:'STOCK_TOTAL'},
+                {table:'products', field:'STOCK_LIMIT'},
+              ],
+              loads:[
+                ld_unids,
+                ld_products_tags,
+              ],
+              /*conditions:[
+                {
+                  table:"products",
+                  field:"ID_COMPANY",
+                  inter:"=",
+                  value:company_id,
+                }
+              ],*/
+              inserts:ins_general,
+              
+              fields:[
+                {panel:"main",col:9,tipe:1,name:"producto",box:bx_input,select:"NAME"},
+                {panel:"main",col:3,tipe:0,name:"activo",box:bx_active_input,select:"ACTIVE"},
+                
+                {panel:"main",col:12,tipe:1,name:"tipo",box:bx_op({ops:op_products_tipe}),select:"ID_PRODUCT_TIPE"},
+
+                {panel:"main",col:8,tipe:1,colAllLevel:true,name:"etiqueta",box:bx_op({ops:op_products_tipe}),select:"ID_PRODUCT_TAG",load:{name:"ld-products_tags",show:"show"}},
+                {panel:"main",col:2,tipe:0,colAllLevel:true,name:"edit-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-pencil-square"></i>'},action:"edit-tag"},
+                {panel:"main",col:2,tipe:0,colAllLevel:true,name:"add-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-plus-circle"></i>'},action:"add-tag"},
+
+                {panel:"main",col:8,tipe:1,colAllLevel:true,name:"unidad",box:bx_op({ops:[]}),select:"UNID_ID",load:{name:"ld-unids",show:"show"}},
+                {panel:"main",col:2,tipe:0,colAllLevel:true,name:"edit-und",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-pencil-square"></i>'},action:"edit-und"},
+                {panel:"main",col:2,tipe:0,colAllLevel:true,name:"add-und",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-plus-circle"></i>'},action:"add-und"},
+
+                {panel:"main",col:6,tipe:1,name:"costo unitario",box:{tipe:1,value:0},select:"COST_UNIT"},
+                {panel:"main",col:6,tipe:1,name:"precio unitario",box:{tipe:1,value:0},select:"PRICE_UNIT"},
+
+                {panel:"main",col:6,tipe:1,name:"stock total",box:{tipe:1,value:0},select:"STOCK_TOTAL"},
+                {panel:"main",col:6,tipe:1,name:"stock limite",box:{tipe:1,value:0},select:"STOCK_LIMIT"},
+              ],
+
+              events:[
+                {
+                  name:"modalSetActive",
+                  actions:[{
+                    action:({active})=>{
+
+                      md3.SetActive({active});
+                    }
+                  }]
+                },
+                {
+                  name:"newAfter",
+                  actions:[{
+                    action:({k})=>{
+
+                      k.CallEvent({name:"modalSetActive",params:{active:true}});
+                    }
+                  }]
+                },
+                {
+                  name:"blockAfter",
+                  actions:[{
+                    action:({k})=>{
+
+                      k.CallEvent({name:"modalSetActive",params:{active:false}});
+                    }
+                  }]
+                },
+                {
+                  name:"reloadBefore",
+                  actions:[{
+                    action:({k})=>{
+
+                      k.CallEvent({name:"modalSetActive",params:{active:true}});
+                    }
+                  }]
+                },
+                {
+                  name:"updateAfter",
+                  actions:[{
+                    action:({k})=>{
+
+                      conections.Crud_GetBuild({name:"products"}).Load_Reset({});
+                      //conections.Crud_GetBuild({name:"products"}).Load_Reset({});
+                    }
+                  }]
+                }
+              ],
+            }
+          },
+          {
+            name:"fm-tags",
+            active:true,
+            script:{
+              parent:md4.GetContent(),
+              title:"lista de etiquetas",
+              panels:[{col:12,y:0,title:"main",tipe:"form"}],
+              stateTools:[
+                {
+                    name:"reload",
+                    tools:[
+                        {name:"config",show:false},
+                        {name:"load",show:false},
+                        
+                        {name:"excel",show:false},
+                        {name:"pdf",show:false},
+            
+                        {name:"sizes",show:false,value:999},
+                        {name:"reload",show:true},
+                        {name:"update",show:true},
+                        {name:"new",show:false},
+                        {name:"insert",show:false},
+                        {name:"cancel",show:true},
+                        
+                        {name:"pages",show:false},
+                    ],
+                }
+              ],
+              stateStart:"block",
+              afterUpdate:"block",
+              afterInsert:"block",
+              afterCancel:"block",              
+    
+              tableMain:"products_tags",
+              selects:[
+                {table:'products_tags', field:'ID_PRODUCT_TAG',primary:true},
+                {table:'products_tags', field:'NAME'},
+              ],
+              /*conditions:[{
+                //before:" AND ",
+                table:"products_tags",
+                field:"ID_COMPANY",
+                inter:"=",
+                value:userData.company.id,
+              }],*/
+              inserts:[{
+                field:"ID_COMPANY",
+                value:userData.company.id,
+              }],
+    
+              fields:[
+                //{panel:"main",...fld_delete},
+                {panel:"main",col:12,name:"etiqueta",box:bx_input,select:"NAME"},
+              ],
+              events:[
+                {
+                  name:"modalSetActive",
+                  actions:[{
+                    action:({active})=>{
+
+                      md4.SetActive({active});
+                    }
+                  }]
+                }
+              ],
+            }
+          },
+          {
+            name:"fm-und",
+            active:true,
+            script:{
+
+              title:"lista de unidades",blocked:false,
+              parent:md5.GetContent(),
+              panels:[{col:12,y:0,title:"main",tipe:"form"}],
+              stateTools:[
+                {
+                    name:"reload",
+                    tools:[
+                        {name:"config",show:false},
+                        {name:"load",show:false},
+                        
+                        {name:"excel",show:false},
+                        {name:"pdf",show:false},
+            
+                        {name:"sizes",show:false,value:999},
+                        {name:"reload",show:true},
+                        {name:"update",show:true},
+                        {name:"new",show:false},
+                        {name:"insert",show:false},
+                        {name:"cancel",show:true},
+                        
+                        {name:"pages",show:false},
+                    ],
+                }
+              ],
+              stateStart:"block",
+              afterUpdate:"block",
+              afterInsert:"block",
+              afterCancel:"block",              
+    
+              tableMain:"unids",
+              selects:[
+                {table:'unids', field:'ID_UNID',primary:true},
+                {table:'unids', field:'NAME'},
+                {table:'unids', field:'SIMBOL'},
+              ],
+              /*conditions:[{
+                //before:" AND ",
+                table:"unids",
+                field:"ID_COMPANY",
+                inter:"=",
+                value:userData.company.id,
+              }],*/
+              inserts:[{
+                field:"ID_COMPANY",
+                value:userData.company.id,
+              }],
+    
+              fields:[
+                //{panel:"main",...fld_delete},
+                {panel:"main",name:"unidad",box:bx_input,select:"NAME"},
+                {panel:"main",name:"simbolo",box:bx_input,select:"SIMBOL"},
+              ],
+              events:[
+                {
+                  name:"modalSetActive",
+                  actions:[{
+                    action:({active})=>{
+
+                      md5.SetActive({active});
+                    }
+                  }]
+                },
+              ],
+            }
+          }
         ],
 
         conections:[
@@ -804,6 +1181,24 @@ $(document).ready(function() {
             masterField:"cliente",
             maid:"customer",
             maidField:"ID_CUSTOMER",
+          },
+          {
+            tipe:"fm-fm",
+            master:"fm-product",
+            masterActionEdit:"edit-tag",
+            masterActionAdd:"add-tag",
+            masterField:"etiqueta",
+            maid:"fm-tags",
+            maidField:"ID_PRODUCT_TAG",
+          },
+          {
+            tipe:"fm-fm",
+            master:"fm-product",
+            masterActionEdit:"edit-und",
+            masterActionAdd:"add-und",
+            masterField:"unidad",
+            maid:"fm-und",
+            maidField:"ID_UNID",
           },
         ],
 

@@ -45,14 +45,16 @@ control.forEach(cn => {
                 parent:document.body,head:true,
                 blocked:false,show:true,
                 title:"formulario - titulo",
-                grid:{
-                    cols:[[12]],
-                    labels:[
-                        {x:0,y:0,name:"nombre",box:{tipe:1}},
-                    ]
-                },
+                fields:[
+                    {col:12,name:"filtro 1",box:{tipe:1}},
+                ],
                 tools:[
-                    {x:0,y:0,name:"config",box:{tipe:5,class:"btn btn-outline-primary btn-sm",value:'<i class="bi bi-gear-wide"></i>'}}
+                    {position:"head-center",name:"config",box:{tipe:5,class:"btn btn-outline-primary btn-sm",value:'<i class="bi bi-gear-wide"></i>'}},
+                    {position:"head-left",name:"config",box:{tipe:5,class:"btn btn-outline-primary btn-sm",value:'<i class="bi bi-gear-wide"></i>'}},
+                    {position:"head-right",name:"config",box:{tipe:5,class:"btn btn-outline-primary btn-sm",value:'<i class="bi bi-gear-wide"></i>'}},
+                    {position:"botton-center",name:"config",box:{tipe:5,class:"btn btn-outline-primary btn-sm",value:'<i class="bi bi-gear-wide"></i>'}},
+                    {position:"botton-left",name:"config",box:{tipe:5,class:"btn btn-outline-primary btn-sm",value:'<i class="bi bi-gear-wide"></i>'}},
+                    {position:"botton-right",name:"config",box:{tipe:5,class:"btn btn-outline-primary btn-sm",value:'<i class="bi bi-gear-wide"></i>'}},
                 ],
             });
 

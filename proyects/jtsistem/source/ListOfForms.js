@@ -4,7 +4,9 @@ var company_id = 1;
 var user_delete_data_import = true;
 
 var op_access = [
-    {value:1,show:"borrar data importante"},
+    {value:"acc-1",show:"borrar data importante"},
+    {value:"acc-2",show:"actualizar lista de productos"},
+    {value:"acc-3",show:"asignar precio a producto en venta"},
     ...paginasOptions,
 ];
 
@@ -759,7 +761,7 @@ var scr_sales_control = {
 
 }
 
-function scr_admin ({id_company,admin=false}){
+function scr_admin({id_company,admin=false}){
 
     var gr = new Grid({
         cols:[
@@ -773,257 +775,281 @@ function scr_admin ({id_company,admin=false}){
     var prnt_accs = gr.GetColData({x:0,y:1}).col;
 
     new ConsCruds({
-    cruds:[
-        {
-        name:"users",
-        active:true,
-        script:{
-            parent:prnt_users,
-            title:"lista de usuarios",
-            panels:[{col:12,y:0,title:"main",tipe:"table"}],
-            stateTools:[
+        cruds:[
             {
-                name:"reload",
-                tools:[
-                    {name:"config",show:true},
-                    {name:"load",show:true},
-                    
-                    {name:"excel",show:false},
-                    {name:"pdf",show:false},
-        
-                    {name:"sizes",show:true,value:10},
-                    {name:"reload",show:true},
-                    {name:"update",show:false},
-                    {name:"new",show:true},
-                    {name:"insert",show:false},
-                    {name:"cancel",show:false},
-                    
-                    {name:"pages",show:false},
-                ],
-            }
-            ],
-
-            tableMain:"users",
-            selects:[
-            {table:"users",field:"ID_USER",primary:true},
-            {table:"users",field:"NAME"},
-            {table:"users",field:"PASSWORD"},
-            {table:"users",field:"ACTIVE"},
-            {table:"users",field:"ID_CLASS"},
-            ],
-            conditions:[
-            {
-                table:"users",
-                field:"ID_COMPANY",
-                inter:"=",
-                value:id_company,
-            }
-            ],
-            inserts:[
-            {field:"ID_COMPANY",value:id_company},
-            ],
-            loads:[
-            {
-                name:"ld-class",
-                tableMain:"class",
-                selects:[
-                {table:"class",field:"ID_CLASS",as:"value"},
-                {table:"class",field:"NAME",as:"show"},
-                ],
-                conditions:[
-                {
-                    table:"class",
-                    field:"ID_COMPANY",
-                    inter:"=",
-                    value:id_company
-                }
-                ],
-            }
-            ],
-
-            fields:[
-            (user_delete_data_import?{panel:"main",...fld_delete}:null),
-            {panel:"main",name:"usuario",box:{tipe:1},select:"NAME"},
-            {panel:"main",name:"clase",box:{tipe:3},select:"ID_CLASS",load:{name:"ld-class",show:"show",value:"value"}},
-            {panel:"main",name:"contraseña",box:{tipe:1},select:"PASSWORD"},
-            {panel:"main",name:"activo",box:bx_active_input,select:"ACTIVE"},
-            ],
-
-        }
-        },
-        {
-        name:"class",
-        active:true,
-        script:{
-            parent:prnt_clss,
-            title:"lista de classes",
-            panels:[{col:12,y:0,title:"main",tipe:"table"}],
-            stateTools:[
-            {
-                name:"reload",
-                tools:[
-                    {name:"config",show:true},
-                    {name:"load",show:true},
-                    
-                    {name:"excel",show:false},
-                    {name:"pdf",show:false},
-        
-                    {name:"sizes",show:true,value:10},
-                    {name:"reload",show:true},
-                    {name:"update",show:false},
-                    {name:"new",show:true},
-                    {name:"insert",show:false},
-                    {name:"cancel",show:false},
-                    
-                    {name:"pages",show:false},
-                ],
-            }
-            ],
-
-            tableMain:"class",
-            selects:[
-            {table:"class",field:"ID_CLASS",primary:true},
-            {table:"class",field:"NAME"},
-            ],
-            conditions:[
-            {
-                table:"class",
-                field:"ID_COMPANY",
-                inter:"=",
-                value:id_company,
-            }
-            ],
-            inserts:[
-            {field:"ID_COMPANY",value:id_company},
-            ],
-
-            fields:[
-            (user_delete_data_import?{panel:"main",...fld_delete}:null),
-            {panel:"main",name:"clase",box:{tipe:1,class:"w-100"},select:"NAME"},
-            ],
-            events:[
-            {
-                name:"insertAfter",
-                actions:[{
-                action:({k,field,value})=>{
-
-                    k.Loading_SetActive({active:true});
-
-                    var count = 0;
-                    var total = op_access.length;
-
-                    for (let t = 0; t < total; t++) {
-                    
-                    var conection = k.Conection_Get();
-                    var sql = conection.GetSql_Insert({
-                        tableMain:"class_access",
-                        inserts:[
-                        {field:"ID_CLASS",value},
-                        {field:"ID_ACCESS",value:op_access[t].value},
-                        {field:"ACTIVE",value:1},
+                name:"users",
+                active:true,
+                script:{
+                    parent:prnt_users,
+                    title:"lista de usuarios",
+                    panels:[{col:12,y:0,title:"main",tipe:"table"}],
+                    stateTools:[
+                    {
+                        name:"reload",
+                        tools:[
+                            {name:"config",show:true},
+                            {name:"load",show:true},
+                            
+                            {name:"excel",show:false},
+                            {name:"pdf",show:false},
+                
+                            {name:"sizes",show:true,value:10},
+                            {name:"reload",show:true},
+                            {name:"update",show:false},
+                            {name:"new",show:true},
+                            {name:"insert",show:false},
+                            {name:"cancel",show:false},
+                            
+                            {name:"pages",show:false},
                         ],
-                    });
-                    conection.Request({
-                        sql,php:"success",
-                        success:()=>{
+                    }
+                    ],
 
-                        OneInserted();
+                    tableMain:"users",
+                    selects:[
+                    {table:"users",field:"ID_USER",primary:true},
+                    {table:"users",field:"NAME"},
+                    {table:"users",field:"PASSWORD"},
+                    {table:"users",field:"ACTIVE"},
+                    {table:"users",field:"ID_CLASS"},
+                    ],
+                    conditions:[
+                    {
+                        table:"users",
+                        field:"ID_COMPANY",
+                        inter:"=",
+                        value:id_company,
+                    }
+                    ],
+                    inserts:[
+                    {field:"ID_COMPANY",value:id_company},
+                    ],
+                    loads:[
+                    {
+                        name:"ld-class",
+                        tableMain:"class",
+                        selects:[
+                        {table:"class",field:"ID_CLASS",as:"value"},
+                        {table:"class",field:"NAME",as:"show"},
+                        ],
+                        conditions:[
+                        {
+                            table:"class",
+                            field:"ID_COMPANY",
+                            inter:"=",
+                            value:id_company
                         }
-                    })
-                    
+                        ],
                     }
+                    ],
 
-                    function OneInserted() {
-                    
-                    count++;
-                    if(count>=total){
+                    fields:[
+                    (user_delete_data_import?{panel:"main",...fld_delete}:null),
+                    {panel:"main",name:"usuario",box:{tipe:1},select:"NAME"},
+                    {panel:"main",name:"clase",box:{tipe:3},select:"ID_CLASS",load:{name:"ld-class",show:"show",value:"value"}},
+                    {panel:"main",name:"contraseña",box:{tipe:1},select:"PASSWORD"},
+                    {panel:"main",name:"activo",box:bx_active_input,select:"ACTIVE"},
+                    ],
 
-                        k.Loading_SetActive({active:false});
-                    }
-                    }
-                    
                 }
-                }]
-            }
-            ],
-        }
-        },
-        {
-        name:"access",
-        active:true,
-        script:{
-            parent:prnt_accs,
-            title:"control de accesos",
-            panels:[{col:12,y:0,title:"main",tipe:"table"}],
-            stateTools:[
+            },
             {
-                name:"reload",
-                tools:[
-                    {name:"config",show:true},
-                    {name:"load",show:true},
-                    
-                    {name:"excel",show:false},
-                    {name:"pdf",show:false},
-        
-                    {name:"sizes",show:true,value:10},
-                    {name:"reload",show:true},
-                    {name:"update",show:false},
-                    {name:"new",show:true},
-                    {name:"insert",show:false},
-                    {name:"cancel",show:false},
-                    
-                    {name:"pages",show:false},
-                ],
-            }
-            ],
+                name:"class",
+                active:true,
+                script:{
+                    parent:prnt_clss,
+                    title:"lista de classes",
+                    panels:[{col:12,y:0,title:"main",tipe:"table"}],
+                    stateTools:[
+                    {
+                        name:"reload",
+                        tools:[
+                            {name:"config",show:true},
+                            {name:"load",show:true},
+                            
+                            {name:"excel",show:false},
+                            {name:"pdf",show:false},
+                
+                            {name:"sizes",show:true,value:10},
+                            {name:"reload",show:true},
+                            {name:"update",show:false},
+                            {name:"new",show:true},
+                            {name:"insert",show:false},
+                            {name:"cancel",show:false},
+                            
+                            {name:"pages",show:false},
+                        ],
+                    }
+                    ],
 
-            tableMain:"class_access",
-            selects:[
-            {table:"class_access",field:"ID_CLASS_ACCESS",primary:true},
-            {table:"class_access",field:"ID_CLASS"},
-            {table:"class_access",field:"ID_ACCESS"},
-            {table:"class_access",field:"ACTIVE"},
-            ],
-            orders:[
-            {field:"ID_CLASS",asc:true},
-            ],
-            loads:[
-            {
-                name:"ld-class",
-                tableMain:"class",
-                selects:[
-                {table:"class",field:"ID_CLASS",as:"value"},
-                {table:"class",field:"NAME",as:"show"},
-                ],
-                conditions:[
-                {
-                    table:"class",
-                    field:"ID_COMPANY",
-                    inter:"=",
-                    value:id_company
+                    tableMain:"class",
+                    selects:[
+                    {table:"class",field:"ID_CLASS",primary:true},
+                    {table:"class",field:"NAME"},
+                    ],
+                    conditions:[
+                    {
+                        table:"class",
+                        field:"ID_COMPANY",
+                        inter:"=",
+                        value:id_company,
+                    }
+                    ],
+                    inserts:[
+                    {field:"ID_COMPANY",value:id_company},
+                    ],
+
+                    fields:[
+                    (user_delete_data_import?{panel:"main",...fld_delete}:null),
+                    {panel:"main",name:"clase",box:{tipe:1,class:"w-100"},select:"NAME"},
+                    ],
+                    events:[
+                    {
+                        name:"insertAfter",
+                        actions:[{
+                        action:({k,field,value})=>{
+
+                            k.Loading_SetActive({active:true});
+
+                            var count = 0;
+                            var total = op_access.length;
+
+                            for (let t = 0; t < total; t++) {
+                            
+                            var conection = k.Conection_Get();
+                            var sql = conection.GetSql_Insert({
+                                tableMain:"class_access",
+                                inserts:[
+                                {field:"ID_CLASS",value},
+                                {field:"ID_ACCESS",value:op_access[t].value},
+                                {field:"ACTIVE",value:1},
+                                ],
+                            });
+                            conection.Request({
+                                sql,php:"success",
+                                success:()=>{
+
+                                OneInserted();
+                                }
+                            })
+                            
+                            }
+
+                            function OneInserted() {
+                            
+                            count++;
+                            if(count>=total){
+
+                                k.Loading_SetActive({active:false});
+                            }
+                            }
+                            
+                        }
+                        }]
+                    }
+                    ],
                 }
-                ],
-            }
-            ],
+            },
+            {
+                name:"access",
+                active:true,
+                script:{
+                    parent:prnt_accs,
+                    title:"control de accesos",
+                    panels:[{col:12,y:0,title:"main",tipe:"table"}],
+                    stateTools:[
+                    {
+                        name:"reload",
+                        tools:[
+                            {name:"config",show:true},
+                            {name:"load",show:true},
+                            
+                            {name:"excel",show:false},
+                            {name:"pdf",show:false},
+                
+                            {name:"sizes",show:true,value:10},
+                            {name:"reload",show:true},
+                            {name:"update",show:false},
+                            {name:"new",show:user_delete_data_import},
+                            {name:"insert",show:false},
+                            {name:"cancel",show:false},
+                            
+                            {name:"pages",show:false},
+                        ],
+                    }
+                    ],
 
-            configShow:true,
-            filters:[
-            {name:"clase",box:{tipe:3},select:{table:"class_access",field:"ID_CLASS"},load:{name:"ld-class",show:"show",value:"value"}},
-            //{name:"accesso",box:{tipe:3},select:{table:"id_"}}
-            ],
-            fields:[
-            (user_delete_data_import?{panel:"main",...fld_delete}:null),
-            //{panel:"main",name:"clase",box:{tipe:3,class:"w-100"},select:"ID_CLASS",load:{name:"ld-class",show:"show",value:"value"}},
-            {panel:"main",name:"acceso",box:{tipe:0,options:op_access},select:"ID_ACCESS"},
-            {panel:"main",name:"activo",box:bx_active_input,select:"ACTIVE"},
-            ],
-        }
-        }
-    ],
+                    tableMain:"class_access",
+                    selects:[
+                        {table:"class_access",field:"ID_CLASS_ACCESS",primary:true},
+                        {table:"class_access",field:"ID_CLASS"},
+                        {table:"class_access",field:"ID_ACCESS"},
+                        {table:"class_access",field:"ACTIVE"},
+                    ],
+                    orders:[
+                        {field:"ID_CLASS",asc:true},
+                    ],
+                    inserts:[],
+                    loads:[
+                    {
+                        name:"ld-class",
+                        tableMain:"class",
+                        selects:[
+                        {table:"class",field:"ID_CLASS",as:"value"},
+                        {table:"class",field:"NAME",as:"show"},
+                        ],
+                        conditions:[
+                        {
+                            table:"class",
+                            field:"ID_COMPANY",
+                            inter:"=",
+                            value:id_company
+                        }
+                        ],
+                    }
+                    ],
+
+                    configShow:true,
+                    filters:[
+                    {name:"clase",box:{tipe:3},select:{table:"class_access",field:"ID_CLASS"},load:{name:"ld-class",show:"show",value:"value"}},
+                    //{name:"accesso",box:{tipe:3},select:{table:"id_"}}
+                    ],
+                    fields:[
+                    (user_delete_data_import?{panel:"main",...fld_delete}:null),
+                    //{panel:"main",name:"clase",box:{tipe:3,class:"w-100"},select:"ID_CLASS",load:{name:"ld-class",show:"show",value:"value"}},
+                    (user_delete_data_import?{panel:"main",name:"acceso",box:{tipe:8,options:op_access},select:"ID_ACCESS"}:{panel:"main",name:"acceso",box:{tipe:0,options:op_access},select:"ID_ACCESS"}),
+                    {panel:"main",name:"activo",box:bx_active_input,select:"ACTIVE"},
+                    ],
+
+                    events:[
+                        {
+                            name:"insertBefore",
+                            actions:[{
+                                action:({k,inserts=[]})=>{
+
+                                    var id_class = k.Filters_Get().Filter_GetBox({filterName:"clase"}).GetValue();
+                                    inserts.push({
+                                        field:"ID_CLASS",
+                                        value:id_class,
+                                    });
+
+                                    return {inserts}
+                                }
+                            }]
+                        }
+                    ],
+                }
+            }
+        ],
     });
 
 }
 
+function scr_produccNew({parent}) {
+    
+    
+
+}
 
 //--------------------
 
