@@ -23,6 +23,7 @@ $(document).ready(function() {
           {table:'customers', field:'PHONE'},
           {table:'customers', field:'EMAIL'},
           {table:'customers', field:'DESCRIPCION'},
+          {table:'customers', field:'DIRECCION'},
         ],
         conditions:[
           {
@@ -57,6 +58,7 @@ $(document).ready(function() {
           {panel:"main",name:"empresa",box:{tipe:6,name:"empresa"},select:"COMPANY"},
           {panel:"main",name:"documento",attributes:[{name:"style",value:"min-width: 150px;"}],box:bx_input,select:"NRO_DOCUMENT"},
           {panel:"main",name:"telefono",attributes:[{name:"style",value:"min-width: 200px;"}],box:bx_input,select:"PHONE"},
+          {panel:"main",name:"direccion",attributes:[{name:"style",value:"min-width: 250px;"}],box:bx_input,select:"DIRECCION"},
           {panel:"main",name:"correo",attributes:[{name:"style",value:"min-width: 250px;"}],box:bx_input,select:"EMAIL"},
           {panel:"main",name:"descripcion",attributes:[{name:"style",value:"min-width: 250px;"}],box:bx_input,select:"DESCRIPCION"},
         ],

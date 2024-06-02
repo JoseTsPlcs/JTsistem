@@ -161,6 +161,11 @@ function Login({uss,pss,fail}){
             {db:"lip_dv",table:"class",field:"ID_CLASS"},
             {db:"lip_dv",table:"companies",field:"ID_COMPANY",as:"COMPANY_ID"},
             {db:"lip_dv",table:"companies",field:"NAME",as:"COMPANY_NAME"},
+            {db:"lip_dv",table:"companies",field:"RUC",as:"COMPANY_RUC"},
+            {db:"lip_dv",table:"companies",field:"NAME_REAL",as:"COMPANY_NAME_REAL"},   
+            {db:"lip_dv",table:"companies",field:"TELF",as:"COMPANY_TELF"},    
+            {db:"lip_dv",table:"companies",field:"DIRECCION",as:"COMPANY_DIRECCION"},        
+            {db:"lip_dv",table:"companies",field:"EMAIL",as:"COMPANY_EMAIL"},
             {db:"lip_dv",table:"companies",field:"ACTIVE",as:"COMPANY_ACTIVE"},
         ],
         joins:[
@@ -219,6 +224,11 @@ function Login({uss,pss,fail}){
                 company:{
                   id:result[0]["COMPANY_ID"],
                   name:result[0]["COMPANY_NAME"],
+                  ruc:result[0]["COMPANY_RUC"],
+                  telf:result[0]["COMPANY_TELF"],
+                  nameReal:result[0]["COMPANY_NAME_REAL"],
+                  email:result[0]["COMPANY_EMAIL"],
+                  direccion:result[0]["COMPANY_DIRECCION"],
                 },
                 class:{
                   name:result[0]["CLASS_NAME"],

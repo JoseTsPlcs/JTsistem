@@ -8,7 +8,10 @@
   
   /*select*/echo '<script src="'.$srcPathReturn.'libs/bootstrap-select-1.13.14/dist/js/bootstrap-select.js"></script>';
   /*graficos*/echo '<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>';
-  /*pdf*/ echo '<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.16.0/dist/pdf-lib.js"></script>';
+  /*pdf*/ //echo '<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.16.0/dist/pdf-lib.js"></script>';
+
+  echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>';
+  echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>';
 
 
   $src= $srcPathReturn."libs/case-1.0.1/"; 

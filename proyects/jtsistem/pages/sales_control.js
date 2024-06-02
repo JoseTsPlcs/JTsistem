@@ -144,7 +144,10 @@ $(document).ready(function() {
             script:{
               parent:mdGr.GetColData({x:0,y:0}).col,
               title:"venta",
-              panels:[{col:12,y:0,tipe:"form",title:"informacion"}],
+              panels:[
+                {col:6,y:0,tipe:"form",title:"informacion"},
+                {col:6,y:0,tipe:"form",title:"cliente"},
+              ],
               stateStart:"block",
               stateTools:[
                 {
@@ -180,22 +183,26 @@ $(document).ready(function() {
                 {table:'sales', field:'COMMENT'},
                 {table:'customers',field:'NAME'},
                 {table:'customers',field:'PHONE'},
+                {table:'customers',field:'DIRECCION'},
                 {table:'customers',field:'EMAIL'},
+                {table:'customers',field:'COMPANY'},
+                {table:'customers',field:'NRO_DOCUMENT'},
               ],
               joins:[
                 {main:{table:"sales",field:"ID_CUSTOMER"},join:{table:"customers",field:"ID_CUSTOMER"},tipe:"LEFT"}
               ],
     
               fields:[
-                //{panel:"main",name:"id",box:{tipe:0},select:"ID_SALE"},
+                {panel:"informacion",name:"nro",box:{tipe:0},select:"ID_SALE"},
                 {panel:"informacion",name:"fecha de emision",box:{tipe:0},select:"DATE_EMMIT"},
-                {panel:"informacion",name:"cliente",box:{tipe:0},select:"NAME"},
-                {panel:"informacion",name:"telefono",box:{tipe:0},select:"PHONE"},
-                {panel:"informacion",name:"correo",box:{tipe:0},select:"EMAIL"},
-    
-                //{panel:"informacion",name:"servicios",box:bx_money,action:"show"},
-                //{panel:"informacion",name:"productos",box:bx_money,action:"show"},
                 {panel:"informacion",name:"total",box:bx_moneyh1,select:"TOTAL"},
+
+                {panel:"cliente",name:"cliente",box:{tipe:0},select:"NAME"},
+                {panel:"cliente",name:"telefono",box:{tipe:0},select:"PHONE"},
+                {panel:"cliente",name:"correo",box:{tipe:0},select:"EMAIL"},
+                {panel:"cliente",name:"documento",box:{tipe:0,options:op_identity_document_tipe},select:"COMPANY"},
+                {panel:"cliente",name:"nro documento",box:{tipe:0},select:"NRO_DOCUMENT"},
+                {panel:"cliente",name:"direccion",box:{tipe:0},select:"DIRECCION"},
                 
                 //{panel:"informacion",name:"comentario",box:{tipe:0,value:""},select:"COMMENT"},
     
@@ -339,84 +346,40 @@ $(document).ready(function() {
         alert("informacion de venta copiada!");
       }
 
-      async function SalePDF() {
+      function SalePDF() {
 
         var sale_fm = cruds.Crud_GetBuild({name:"show-form"});
         var sale_tb = cruds.Crud_GetBuild({name:"show-table"});
-        
-        // Obtener información de la factura (fecha de emisión, cliente, total y lista de elementos)
-        const fechaEmision = sale_fm.GetValue({fieldName:"fecha de emision",y:0});
-        const cliente = sale_fm.GetValue({fieldName:"cliente",y:0});
-        const telefono = sale_fm.GetValue({fieldName:"telefono",y:0});
-        const correo = sale_fm.GetValue({fieldName:"correo",y:0});
-        const total = parseFloat(sale_fm.GetValue({fieldName:"total",y:0}));
 
-        var data = sale_tb.Reload_GetData();
-        var items = data.map((d)=>{
+        var items = [];
+        var itemsCount = sale_tb.Reload_GetData().length;
+        for (let y = 0; y < itemsCount; y++) {
 
-          return {
-            descripcion: d["PRODUCT_NAME"],
-            cantidad: parseFloat(d["CANT"]),
-            precioUnitario: parseFloat(d["PRICE_UNIT"]),
-            precioTotal: parseFloat(d["PRICE_TOTAL"]),
-          }
+          items.push({
+            detail: sale_tb.GetValue({fieldName:"descripcion",y}),
+            type: op_products_tipe.find(op=>op.value==sale_tb.GetValue({fieldName:"tipo",y})).show,
+            quantity: sale_tb.GetValue({fieldName:"cantidad",y}), 
+            unitPrice: parseFloat(sale_tb.GetValue({fieldName:"precio unitario",y})),
+            totalPrice: parseFloat(sale_tb.GetValue({fieldName:"precio total",y})),
+          });
+        }
+
+        generateInvoicePDF({
+          invoiceNumber: sale_fm.GetValue({fieldName:"nro",y:0}),
+          invoiceDate: sale_fm.GetValue({fieldName:"fecha de emision",y:0}),
+
+          companyName: userData.company.nameReal,
+          companyRUC:  userData.company.ruc,
+          companyAddress: userData.company.direccion,
+          companyPhone: userData.company.telf,
+
+          customerName: sale_fm.GetValue({fieldName:"cliente",y:0}),
+          customerDocumentType: op_identity_document_tipe.find(op=>op.value==sale_fm.GetValue({fieldName:"documento",y:0})).show,
+          customerDocumentNumber: sale_fm.GetValue({fieldName:"nro documento",y:0}),
+          customerPhone: sale_fm.GetValue({fieldName:"telefono",y:0}),
+          customerAddress: sale_fm.GetValue({fieldName:"direccion",y:0}),
+          items,
         });
-
-        // Crear un nuevo documento PDF
-        const pdfDoc = await PDFLib.PDFDocument.create();
-
-        // Agregar una nueva página al documento
-        const page = pdfDoc.addPage([600, 800]); // Tamaño de la página: ancho x alto
-
-        // Agregar contenido a la página
-        const { width, height } = page.getSize();
-        const fontSize = 12;
-        let y = height - 50;
-        const lineHeight = 20;
-
-        // Agregar encabezado de la factura
-        page.drawText('Factura', { x: 50, y, size: 18 });
-        y -= lineHeight;
-        page.drawText(`Fecha de Emisión: ${fechaEmision}`, { x: 50, y, size: fontSize });
-        y -= lineHeight;
-        page.drawText(`Cliente: ${cliente}`, { x: 50, y, size: fontSize });
-        y -= lineHeight;
-        page.drawText(`Telefono: ${telefono}`, { x: 50, y, size: fontSize });
-        y -= lineHeight;
-        page.drawText(`Correo: ${correo}`, { x: 50, y, size: fontSize });
-        y -= lineHeight;
-
-        // Agregar encabezados de la tabla
-        page.drawText('Descripción', { x: 50, y, size: fontSize });
-        page.drawText('Cantidad', { x: 200, y, size: fontSize });
-        page.drawText('Precio Unitario', { x: 300, y, size: fontSize });
-        page.drawText('Precio Total', { x: 450, y, size: fontSize });
-        y -= lineHeight;
-
-        // Agregar filas de la tabla con los items
-        items.forEach(item => {
-            page.drawText(item.descripcion, { x: 50, y, size: fontSize });
-            page.drawText(item.cantidad.toString(), { x: 200, y, size: fontSize });
-            page.drawText(`S/.${item.precioUnitario.toFixed(2)}`, { x: 300, y, size: fontSize });
-            page.drawText(`S/.${item.precioTotal.toFixed(2)}`, { x: 450, y, size: fontSize });
-            y -= lineHeight;
-        });
-
-        // Agregar total
-        y -= lineHeight;
-        page.drawText(`Total: S/.${total.toFixed(2)}`, { x: 450, y, size: fontSize });
-
-        // Obtener el contenido del documento como ArrayBuffer
-        const pdfBytes = await pdfDoc.save();
-
-        // Convierte ArrayBuffer a Blob
-        const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
-
-        // Crea una URL a partir del Blob
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-
-        // Abre el PDF en una nueva ventana
-        window.open(pdfUrl, '_blank');
       }
 
     }

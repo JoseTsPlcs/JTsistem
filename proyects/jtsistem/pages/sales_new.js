@@ -396,6 +396,7 @@ $(document).ready(function() {
                 {table:'customers', field:'PHONE'},
                 {table:'customers', field:'EMAIL'},
                 {table:'customers', field:'DESCRIPCION'},
+                {table:'customers', field:'DIRECCION'},
               ],
               conditions:[{
                 table:"customers",
@@ -413,6 +414,7 @@ $(document).ready(function() {
                 
                 {panel:"main",col:12,name:"telefono",box:{tipe:1,value:""},select:"PHONE"},
                 {panel:"main",col:12,name:"correo",box:{tipe:1,value:""},select:"EMAIL"},
+                {panel:"main",col:12,name:"direccion",box:{tipe:1,value:""},select:"DIRECCION"},
                 {panel:"main",col:12,tipe:2,name:"descripcion",box:{tipe:9,value:""},select:"DESCRIPCION"},
               ],
 
@@ -565,8 +567,8 @@ $(document).ready(function() {
                 {panel:"main",name:"producto-servicio",box:{tipe:8,class:"w-100"},attributes:att_ln,select:"ID_PRODUCT",load:{name:"products-services",show:"show"}},
                 {panel:"main",name:"unidad",box:bx_shw,attributes:att_shw,select:"SIMBOL"},
                 {panel:"main",name:"cantidad",box:bx_cant,attributes:att_cnt,select:"CANT"},
-                {panel:"main",name:"precio unitario",box:(acc_price_update?{tipe:1}:bx_money),attributes:att_shw,select:"PRICE_UNIT"},
-                {panel:"main",name:"precio total",box:(acc_price_update?{tipe:1}:bx_money),attributes:att_shw,select:"PRICE_TOTAL"},
+                {panel:"main",name:"precio unitario",box:(acc_price_update?{tipe:1,value:0}:bx_money),attributes:att_shw,select:"PRICE_UNIT"},
+                {panel:"main",name:"precio total",box:(acc_price_update?{tipe:1,value:0}:bx_money),attributes:att_shw,select:"PRICE_TOTAL"},
               ],
               events:[
                 {

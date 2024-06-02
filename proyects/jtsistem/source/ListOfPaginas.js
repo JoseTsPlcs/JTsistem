@@ -6,6 +6,7 @@ paginas = [
         paginas:[
             
           {name:"control de ventas diarias",href:"sales_control.php"},
+          {name:"ventas - por cobrar",href:"inform_nopaid.php"},
           {name:"venta nueva",href:"sales_new.php"},
           {name:"caja",href:"pays_account.php"},
         ],
@@ -59,6 +60,7 @@ paginas = [
     {
         seccion:'<i class="bi bi-person"></i> usuario',
         paginas:[
+            {name:"cuenta",href:"admin_account.php"},
             {name:"config",href:"admin_config.php"},
             {name:"salir",href:"login.php"},
         ],
