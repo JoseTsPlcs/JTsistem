@@ -565,6 +565,7 @@ class Box {
       this.#Build();
       this.#Paint();
       this.SetValue(lastvalue);
+      this.#Show_SetActive({show:this.#show});
       
 
       //console.log("set options",this.#blocks);

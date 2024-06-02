@@ -5,6 +5,9 @@ $(document).ready(function() {
 
     success:({userData})=>{
 
+      var acc_control_update_total = userData.access.find(acc=>acc.value=="acc-6") &&  userData.access.find(acc=>acc.value=="acc-6").active == "true";
+      var acc_control_update_state = userData.access.find(acc=>acc.value=="acc-7") &&  userData.access.find(acc=>acc.value=="acc-7").active == "true";
+
       var gr = new Grid({
         cols:[[6,6],[12]],
         attributes:[
@@ -76,9 +79,8 @@ $(document).ready(function() {
         fields:[
           //{panel:"main",...fld_delete},
           {panel:"main",name:"cuenta",attributes:[{name:"style",value:"min-width: 250px"}],box:bx_input,select:"NAME"},
-          {panel:"main",name:"total",box:bx_money,select:"TOTAL"},
-          {panel:"main",name:"estado",box:{tipe:0,options:op_account_state},select:"OPEN"},
-          (user_delete_data_import?{panel:"main",name:"abierto",box:{tipe:6,name:"abierto"},select:"OPEN"}:null),
+          {panel:"main",name:"total",box:(acc_control_update_total?{tipe:1}:bx_money),select:"TOTAL"},
+          {panel:"main",name:"abierto",box:(acc_control_update_state?{tipe:6,name:"abierto"}:{tipe:0,options:op_account_state}),select:"OPEN"},
           {panel:"main",name:"controlado",box:{tipe:6,name:"controlado"},select:"CONTROL_BY_OPEN"},
           {panel:"main",name:"activo",box:bx_active_input,select:"ACTIVE"},
         ],

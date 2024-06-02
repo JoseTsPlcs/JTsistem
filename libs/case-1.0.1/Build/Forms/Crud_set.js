@@ -123,7 +123,7 @@ class Crud_set extends ODD {
         {x:2,y:1,index:0,name:"excel",box:{id:"btn1",tipe:5,value:"excel",class:"btn btn-outline-success btn-sm"},dom:null},
         {x:2,y:1,index:1,name:"pdf",box:{id:"btn2",tipe:5,value:"pdf",class:"btn btn-outline-danger btn-sm"},dom:null},
 
-        {x:0,y:3,index:0,name:"sizes",box:{tipe:3,value:1,options:[{show:1,value:1},{show:10,value:10},{show:25,value:25},{show:50,value:50},{show:999,value:999}]},dom:null},
+        {x:0,y:3,index:0,name:"sizes",box:{tipe:3,value:1,options:[{show:1,value:1},{show:10,value:10},{show:25,value:25},{show:50,value:50},{show:999,value:999}],update:()=>{this.#Event_UpdateToolPages({})}},dom:null},
 
         {x:1,y:3,index:0,name:"reload",box:{id:"btn1",tipe:5,value:"recargar",class:"btn btn-outline-primary btn-sm",update:()=>{this.#Event_UpdateToolReload({})}},dom:null},
         {x:1,y:3,index:1,name:"update",box:{id:"btn2",tipe:5,value:"actualizar",class:"btn btn-outline-primary btn-sm",update:()=>{this.#Event_UpdateToolUpdate({})}},dom:null},
@@ -551,8 +551,8 @@ class Crud_set extends ODD {
         this.#Load({success:()=>{
 
             k.Loading_SetActive({active:false});
-            k.#Event_LoadsReseted({});
             if(success!=null) success();
+            k.#Event_LoadsReseted({});
         }});
     }
 
@@ -597,6 +597,10 @@ class Crud_set extends ODD {
                 var pagesBox = k.Tools_GetBox({toolName:"pages"});
                 var lastpage = pagesBox.GetValue();
                 pagesBox.SetOptions(pagesOptions);
+
+                var lastPageFound = pagesOptions.find(op=>op.value == lastpage);
+                if(!lastPageFound) lastpage = pagesOptions[pagesOptions.length-1].value;
+
                 pagesBox.SetValue(lastpage);
                 
                 k.#Reload_RequestData({success:({result})=>{
@@ -1404,7 +1408,7 @@ class Crud_set extends ODD {
         let k = this;
         u.k = this;
         u.primaryValues = this.#reloadData.map(ln=>{return ln[k.#selectPrimary.field]});
-        console.log("crud -> event box update",u);
+        //console.log("crud -> event box update",u);
         
 
         if(u.field.action == "delete"){
@@ -1459,7 +1463,7 @@ class Crud_set extends ODD {
         //-------load change----------
 
         var fieldsLoadByField = this.#fields.filter(f=>f.load!=null&&f.load.field!=null);
-        console.log("fieldsload",fieldsLoadByField);
+        //console.log("fieldsload",fieldsLoadByField);
         if(fieldsLoadByField.length>0){
 
             fieldsLoadByField.forEach(f_ld => {

@@ -197,6 +197,10 @@ $(document).ready(function() {
                     //{table:'customers', field:'ID_CUSTOMER_TIPE'},
                     {table:'customers', field:'COMPANY'},
                     {table:'customers', field:'NRO_DOCUMENT'},
+                    {table:'customers', field:'PHONE'},
+                    {table:'customers', field:'DIRECCION'},
+                    {table:'customers', field:'EMAIL'},
+                    {table:'customers', field:'DESCRIPCION'},
                   ],
                   conditions:[
                     {
@@ -220,7 +224,7 @@ $(document).ready(function() {
                 //{panel:"principal",col:12,y:5,name:"servicios",box:bx_money},
                 {panel:"principal",col:12,y:6,name:"productos",box:bx_money},
                 {panel:"principal",col:12,y:7,name:"pagado",box:bx_money},
-                {panel:"principal",col:12,y:8,name:"comentario",box:{tipe:9,value:""},select:"COMMENT"},
+                {panel:"principal",col:12,y:8,name:"comentario*",box:{tipe:9,value:""},select:"COMMENT"},
                 //{panel:"principal",col:12,y:8,name:"pdf",tipe:2,box:{tipe:5,value:"pdf",class:"btn btn-danger text-white btn-sm",style:"min-weigth:100px"},action:"pdf"},
 
                 {panel:"cliente",col:8,colAllLevel:true,y:0,name:"cliente",box:{tipe:8},select:"ID_CUSTOMER",load:{name:"customers",show:"show"}},
@@ -230,6 +234,11 @@ $(document).ready(function() {
                 {panel:"cliente",col:12,y:2,name:"empresa",box:{tipe:0,options:[{value:0,show:"natural"},{value:1,show:"empresa"}]}},
                 {panel:"cliente",col:12,y:3,name:"cliente documento",box:{tipe:0,options:op_identity_document_tipe}},
                 {panel:"cliente",col:12,y:4,name:"nro de documento",box:{tipe:0}},
+                {panel:"cliente",col:12,y:4,name:"telefono",box:{tipe:0}},
+                {panel:"cliente",col:12,y:4,name:"direccion",box:{tipe:0}},
+                {panel:"cliente",col:12,y:4,name:"correo",box:{tipe:0}},
+                {panel:"cliente",col:12,y:4,name:"comentario",box:{tipe:0}},
+
               ],
 
               events:[
@@ -251,6 +260,29 @@ $(document).ready(function() {
                   }],
                 },
                 {
+                  name:"filterPagado",
+                  actions:[{
+                    action:({k})=>{
+
+                      var total = k.GetValue({fieldName:"total",y:0});
+                      var pagado = k.GetValue({fieldName:"pagado",y:0});
+
+                      var cancelado_lasValue = k.GetValue({fieldName:"cancelado",y:0});
+                      var cancelado_value = total > 0 && total == pagado ? 1 : 0;
+                      
+                      k.SetValue({fieldName:"cancelado",y:0,value:cancelado_value});
+                      if(cancelado_lasValue!= cancelado_value){
+
+                        k.Update_AddChange({
+                          fieldName:"cancelado",
+                          value:cancelado_value,
+                          primary:k.Reload_GetData_Primarys({})[0],
+                        });
+                      }
+                    }
+                  }]
+                },
+                {
                   name:"customerUpdate",
                   actions:[{
                     action:({k})=>{
@@ -268,20 +300,14 @@ $(document).ready(function() {
                       if(customer_line){
 
                         //k.SetValuesToBox({fieldName:"tipo",values:[0]});
-                        k.SetValuesToBox({fieldName:"empresa",values:[customer_line["COMPANY"]]});
+                        //k.SetValuesToBox({fieldName:"empresa",values:[customer_line["COMPANY"]]});
                         k.SetValuesToBox({fieldName:"cliente documento",values:[customer_line["COMPANY"]]});
                         k.SetValuesToBox({fieldName:"nro de documento",values:[customer_line["NRO_DOCUMENT"]]});
+                        k.SetValuesToBox({fieldName:"telefono",values:[customer_line["PHONE"]]});
+                        k.SetValuesToBox({fieldName:"direccion",values:[customer_line["DIRECCION"]]});
+                        k.SetValuesToBox({fieldName:"correo",values:[customer_line["EMAIL"]]});
+                        k.SetValuesToBox({fieldName:"comentario",values:[customer_line["DESCRIPCION"]]});
                       }
-
-                    }
-                  }],
-                },
-                {
-                  name:"PdfDownland",
-                  actions:[{
-                    action:({k})=>{
-
-                      
 
                     }
                   }],
@@ -296,10 +322,7 @@ $(document).ready(function() {
                         k.CallEvent({name:"customerUpdate"});
                       }
 
-                      if(field.name=="pdf"){
-
-                        k.CallEvent({name:"PdfDownland"});
-                      }
+                      
                     }
                   }],
                 },
@@ -325,6 +348,8 @@ $(document).ready(function() {
                   name:"loadsReseted",
                   actions:[{
                       action:({k})=>{
+
+                        //console.log("cliente id set",  k.GetValue({fieldName:"cliente",y:0}));
 
                         k.CallEvent({name:"customerUpdate"});
                       }
@@ -527,6 +552,7 @@ $(document).ready(function() {
                       {table:'products', field:'NAME',as:"show"},
                       {table:'products',field:"PRICE_UNIT"},
                       {table:'products',field:"STOCK_TOTAL"},
+                      {table:'products',field:"ID_PRODUCT_TIPE"},
                   ],
                   conditions:[
                     {
@@ -613,6 +639,10 @@ $(document).ready(function() {
 
                         priceUnit = parseFloat(productData["PRICE_UNIT"]);
                         priceTotal =  priceUnit * cantValue;
+
+                        var stock = parseFloat(productData["STOCK_TOTAL"]);
+                        var tipe = parseInt(productData["ID_PRODUCT_TIPE"]);
+                        if(tipe != 1 && cantValue >= stock) alert("solo quedan " + stock + " unidades ");
                       }
                       
                       
@@ -833,7 +863,10 @@ $(document).ready(function() {
       
                           total += data.reduce((acum,v)=>{return acum + parseFloat(v)},0); 
                         }
-                        conections.Crud_GetBuild({name:"sale"}).SetValuesToBox({values:[total],fieldName:"pagado"});
+                        var cr_main = conections.Crud_GetBuild({name:"sale"});
+                        cr_main.SetValuesToBox({values:[total],fieldName:"pagado"});
+                        cr_main.CallEvent({name:"filterPagado"});
+                        
                       }
                     }],
                   },

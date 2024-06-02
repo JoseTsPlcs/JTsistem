@@ -40,7 +40,7 @@ class windowFilters extends ODD {
                 break;
 
                 case 3:
-                    value = options[options.length-1].value;
+                    value = options[0].value;
                 break;
 
                 default:
@@ -52,7 +52,7 @@ class windowFilters extends ODD {
         box.SetOptions(options);
         box.SetValue(value);
 
-        console.log("filterName:",filterName,"options:",options,"value:",value);
+        //console.log("filterName:",filterName,"options:",options,"value:",value);
     }
 
     Filter_GetBox({filterName}){
