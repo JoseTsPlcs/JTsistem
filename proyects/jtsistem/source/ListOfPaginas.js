@@ -30,9 +30,9 @@ paginas = [
     {
         seccion:'<i class="bi bi-box"></i> inventario',
         paginas:[
-            {name:"lista de productos",href:"products.php"},
-            {name:"precios de productos",href:"products_prices.php"},
-            {name:"stock de productos",href:"products_stock.php"},
+            {name:"lista de items",href:"products.php"},
+            {name:"precios de items",href:"products_prices.php"},
+            {name:"stock de items",href:"products_stock.php"},
             {name:"recetas",href:"products_recipe.php"},
             {name:"orden de produccion",href:"produccions.php"},
             {name:"configuracion",href:"products_config.php"},
@@ -60,7 +60,7 @@ paginas = [
     {
         seccion:'<i class="bi bi-person"></i> usuario',
         paginas:[
-            {name:"cuenta",href:"admin_account.php"},
+            {name:"empresa",href:"admin_account.php"},
             {name:"config",href:"admin_config.php"},
             {name:"salir",href:"login.php"},
         ],

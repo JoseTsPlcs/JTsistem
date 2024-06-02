@@ -122,6 +122,29 @@ $(document).ready(function() {
               title:"receta",
               panels:[{col:12,y:0,title:"main",tipe:"form",head:false}],
               stateStart:"block",
+              afterCancel:"block",
+              //afterUpdate:"block",
+              stateTools:[
+                {
+                    name:"reload",
+                    tools:[
+                        {name:"config",show:false},
+                        {name:"load",show:false},
+                        
+                        {name:"excel",show:false},
+                        {name:"pdf",show:false},
+            
+                        {name:"sizes",show:false,value:1},
+                        {name:"reload",show:true},
+                        {name:"update",show:true},
+                        {name:"new",show:false},
+                        {name:"insert",show:false},
+                        {name:"cancel",show:true},
+                        
+                        {name:"pages",show:false},
+                    ],
+                }
+              ],
     
               tableMain:"products",
               selects:[
@@ -193,8 +216,29 @@ $(document).ready(function() {
             script:{
               parent:prt_rec_tb,
               title:"lista de inputs",head:false,
-              panels:[{col:12,y:0,title:"main",tipe:"table"}],
+              panels:[{col:12,y:0,title:"main",tipe:"table",h:500}],
               stateStart:"block",
+              stateTools:[
+                {
+                    name:"reload",
+                    tools:[
+                        {name:"config",show:false},
+                        {name:"load",show:false},
+                        
+                        {name:"excel",show:false},
+                        {name:"pdf",show:false},
+            
+                        {name:"sizes",show:false,value:999},
+                        {name:"reload",show:true},
+                        {name:"update",show:false},
+                        {name:"new",show:true},
+                        {name:"insert",show:false},
+                        {name:"cancel",show:false},
+                        
+                        {name:"pages",show:false},
+                    ],
+                },
+              ],
     
               tableMain:"recipe_input",
               selects:[
@@ -219,13 +263,13 @@ $(document).ready(function() {
                 },
               ],
               loads:[
-                ld_supplies,
+                ld_supplies_products,
               ],
     
               fields:[
                 {panel:"main",...fld_delete},
-                {panel:"main",name:"id product",box:{tipe:0},select:"ID_PRODUCT"},
-                {panel:"main",name:"input",box:bx_op({ops:[]}),select:"ID_INPUT",load:{name:"supplies",show:"show"}},
+                //{panel:"main",name:"id product",box:{tipe:0},select:"ID_PRODUCT"},
+                {panel:"main",name:"input",attributes:[{name:"style",value:"min-width: 300px;"}],box:{tipe:8,class:"w-100"},select:"ID_INPUT",load:{name:"ld-supplies-products",show:"show"}},
                 {panel:"main",name:"cantidad",box:bx_input,select:"CANT"},
                 {panel:"main",name:"unidad",box:bx_shw,select:"UNID"},
               ],

@@ -5,6 +5,9 @@ $(document).ready(function() {
 
     success:({userData})=>{
 
+      var acc_control_update_open = userData.access.find(acc=>acc.value=="acc-4") &&  userData.access.find(acc=>acc.value=="acc-4").active == "true";
+      var acc_control_update_close = userData.access.find(acc=>acc.value=="acc-4") &&  userData.access.find(acc=>acc.value=="acc-5").active == "true";
+
       
       var gr = new Grid({
         cols:[
@@ -134,7 +137,14 @@ $(document).ready(function() {
                         field:"ID_COMPANY",
                         inter:"=",
                         value:company_id,
-                      }
+                      },
+                      {
+                        before:" AND ", 
+                        table:"accounts",
+                        field:"CONTROL_BY_OPEN",
+                        inter:"=",
+                        value:1
+                    },
                   ],
                 }
               ],
@@ -251,7 +261,7 @@ $(document).ready(function() {
               
 
               fields:[
-                {panel:"main",...fld_delete},
+                //(acc_control_update?{panel:"main",...fld_delete}:null),
                 {panel:"main",...fld_edit},
                 //{panel:"main",name:"cuenta",box:{tipe:0},select:"ACCOUNT_NAME"},
                 {panel:"main",name:"abre/cierre",box:{tipe:0,options:op_account_state},select:"OPEN"},
@@ -305,8 +315,8 @@ $(document).ready(function() {
                         {name:"pdf",show:false},
             
                         {name:"sizes",show:false,value:1},
-                        {name:"reload",show:false},
-                        {name:"update",show:false},
+                        {name:"reload",show:true},
+                        {name:"update",show:(acc_control_update_close || acc_control_update_open)},
                         {name:"new",show:false},
                         {name:"insert",show:false},
                         {name:"cancel",show:false},
@@ -342,14 +352,14 @@ $(document).ready(function() {
 
               fields:[
                 {panel:"cuenta",name:"cuenta",box:{tipe:0},select:"ACCOUNT_NAME"},
-                {panel:"cuenta",name:"estado",box:{tipe:0,options:op_account_state},select:"OPEN"},
+                {panel:"cuenta",name:"estado",box:((acc_control_update_close || acc_control_update_open) ?{tipe:6,name:"abierto"}:{tipe:0,options:op_account_state}),select:"OPEN"},
                 {panel:"cuenta",name:"total actual",box:bx_money,select:"ACCOUNT_TOTAL"},
 
-                {panel:"control",name:"fecha de apertura",box:{tipe:0},select:"DATE_EMMIT_OPEN"},
-                {panel:"control",name:"total de apertura",box:bx_money,select:"TOTAL_OPEN"},
+                {panel:"control",name:"fecha de apertura",box:(acc_control_update_open?{tipe:2}:{tipe:0}),select:"DATE_EMMIT_OPEN"},
+                {panel:"control",name:"total de apertura",box:(acc_control_update_open?{tipe:1,value:0}:bx_money),select:"TOTAL_OPEN"},
 
-                {panel:"control",name:"fecha de cierre",box:{tipe:0},select:"DATE_EMMIT_CLOSE"},
-                {panel:"control",name:"total de cierre",box:bx_money,select:"TOTAL_CLOSE"},
+                {panel:"control",name:"fecha de cierre",box:(acc_control_update_close?{tipe:2}:{tipe:0}),select:"DATE_EMMIT_CLOSE"},
+                {panel:"control",name:"total de cierre",box:(acc_control_update_close?{tipe:1,value:0}:bx_money),select:"TOTAL_CLOSE"},
                 {panel:"control",name:"close",tipe:0,box:{tipe:5,value:"cerrar",class:"btn btn-danger btn-sm"},action:"close"},
               ],
 

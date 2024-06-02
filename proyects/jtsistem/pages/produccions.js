@@ -113,10 +113,10 @@ $(document).ready(function() {
               fields:[
                 {panel:"main",...fld_delete},
                 {panel:"main",...fld_edit},
-                {panel:"main",name:"fecha de emision",box:bx_date,select:"DATE_EMMIT"},
-                {panel:"main",name:"producto",box:{tipe:3},select:"ID_PRODUCT",load:{name:"products",show:"show"}},
+                {panel:"main",name:"fecha de emision",box:bx_shw,select:"DATE_EMMIT"},
+                {panel:"main",name:"producto",box:{tipe:0},select:"ID_PRODUCT",load:{name:"products",show:"show"}},
                 {panel:"main",name:"unidad",box:{tipe:0},select:"SIMBOL"},
-                {panel:"main",name:"cantidad total",box:bx_cant,select:"RESULT_CANT"},
+                {panel:"main",name:"cantidad total",box:bx_shw,select:"RESULT_CANT"},
               ],
             }
           },
@@ -126,8 +126,8 @@ $(document).ready(function() {
             script:{
 
               parent:prnt_fm,
-              title:"orden de produccion",
-              panels:[{col:12,y:0,title:"main",tipe:"form"}],
+              title:"orden de produccion",head:false,
+              panels:[{col:12,y:0,title:"main",tipe:"form",head:false}],
               //stateTools:stTls_tb,
               stateStart:"block",
               //afterInsert:"block",
@@ -135,6 +135,27 @@ $(document).ready(function() {
               afterDelete:"block",
               afterCancel:"block",
               //afterReload:"block",
+              stateTools:[
+                {
+                    name:"reload",
+                    tools:[
+                        {name:"config",show:false},
+                        {name:"load",show:false},
+                        
+                        {name:"excel",show:false},
+                        {name:"pdf",show:false},
+            
+                        {name:"sizes",show:false,value:1},
+                        {name:"reload",show:true},
+                        {name:"update",show:true},
+                        {name:"new",show:false},
+                        {name:"insert",show:false},
+                        {name:"cancel",show:true},
+                        
+                        {name:"pages",show:false},
+                    ],
+                },
+              ],
     
               tableMain:"produccions",
               selects:[
@@ -192,7 +213,7 @@ $(document).ready(function() {
 
               fields:[
                 {panel:"main",name:"fecha de emision",box:bx_date,select:"DATE_EMMIT"},
-                {panel:"main",name:"producto",box:{tipe:3},select:"ID_PRODUCT",load:{name:"products",show:"show"}},
+                {panel:"main",name:"producto",box:{tipe:8,class:"w-100"},select:"ID_PRODUCT",load:{name:"products",show:"show"}},
                 {panel:"main",name:"unidad",box:{tipe:0},select:"SIMBOL"},
                 {panel:"main",name:"cantidad total",box:bx_cant,select:"RESULT_CANT"},
               ],
@@ -217,9 +238,50 @@ $(document).ready(function() {
     
               parent:prnt_tb,
               title:"entradas de produccion",head:false,
-              panels:[{col:12,y:0,title:"main",tipe:"table"}],
+              panels:[{col:12,y:0,title:"main",tipe:"table",head:false,h:500}],
               stateTools:stTls_tb,
               stateStart:"block",
+              stateTools:[
+                {
+                    name:"reload",
+                    tools:[
+                        {name:"config",show:false},
+                        {name:"load",show:true},
+                        
+                        {name:"excel",show:false},
+                        {name:"pdf",show:false},
+            
+                        {name:"sizes",show:false,value:999},
+                        {name:"reload",show:false},
+                        {name:"update",show:false},
+                        {name:"new",show:true},
+                        {name:"insert",show:false},
+                        {name:"cancel",show:false},
+                        
+                        {name:"pages",show:false},
+                    ],
+                },
+                {
+                  name:"new",
+                  tools:[
+                      {name:"config",show:false},
+                      {name:"load",show:true},
+                      
+                      {name:"excel",show:false},
+                      {name:"pdf",show:false},
+          
+                      {name:"sizes",show:false,value:999},
+                      {name:"reload",show:false},
+                      {name:"update",show:false},
+                      {name:"new",show:false},
+                      {name:"insert",show:true},
+                      {name:"cancel",show:true},
+                      {name:"addLine",show:true},
+                      
+                      {name:"pages",show:false},
+                  ],
+              },
+              ],
               
               tableMain:"produccions_input",
               selects:[
@@ -234,7 +296,7 @@ $(document).ready(function() {
                 {main:{table:"products",field:"UNID_ID"},join:{table:"unids",field:"ID_UNID"},tipe:"LEFT"}
               ],
               loads:[
-                ld_supplies,
+                ld_supplies_products,
               ],
     
     
@@ -242,7 +304,7 @@ $(document).ready(function() {
                 {panel:"main",...fld_delete},
                 //{panel:"main",name:"id produccion entrada",box:{tipe:0},select:"ID_PRODUCCION_INPUT"},
                 //{panel:"main",name:"id produccion",box:{tipe:0},select:"ID_PRODUCCION"},
-                {panel:"main",name:"insumo",box:{tipe:3},select:"ID_INPUT",load:{name:"supplies",show:"show"}},
+                {panel:"main",name:"insumo",box:{tipe:8,class:"w-100"},select:"ID_INPUT",load:{name:"ld-supplies-products",show:"show"}},
                 {panel:"main",name:"unidad",box:{tipe:0},select:"SIMBOL"},
                 {panel:"main",name:"cantidad total",box:bx_cant,select:"CANT_TOTAL"},
               ],
@@ -255,9 +317,49 @@ $(document).ready(function() {
             active:true,
             script:{
               parent:prt_rec_fm,
-              title:"receta",
+              title:"receta",head:false,
               panels:[{col:12,y:0,title:"main",tipe:"form",head:false}],
               stateStart:"block",
+              stateTools:[
+                {
+                    name:"reload",
+                    tools:[
+                        {name:"config",show:false},
+                        {name:"load",show:false},
+                        
+                        {name:"excel",show:false},
+                        {name:"pdf",show:false},
+            
+                        {name:"sizes",show:false,value:1},
+                        {name:"reload",show:true},
+                        {name:"update",show:false},
+                        {name:"new",show:false},
+                        {name:"insert",show:false},
+                        {name:"cancel",show:false},
+                        
+                        {name:"pages",show:false},
+                    ],
+                },
+                {
+                  name:"new",
+                  tools:[
+                      {name:"config",show:false},
+                      {name:"load",show:false},
+                      
+                      {name:"excel",show:false},
+                      {name:"pdf",show:false},
+          
+                      {name:"sizes",show:false,value:1},
+                      {name:"reload",show:false},
+                      {name:"update",show:false},
+                      {name:"new",show:false},
+                      {name:"insert",show:false},
+                      {name:"cancel",show:false},
+                      
+                      {name:"pages",show:false},
+                  ],
+              },
+              ],
     
               tableMain:"products",
               selects:[
@@ -269,46 +371,13 @@ $(document).ready(function() {
                 {table:'products', field:'ACTIVE'},
               ],
               loads:[
-                {
-                  name:"ld-unids",
-                  tableMain:"unids",
-                  selects:[
-                      {table:'unids', field:'ID_UNID',as:"value"},
-                      {table:'unids', field:'SIMBOL',as:"show"},
-                  ],
-                  conditions:[
-                    {
-                      table:"unids",
-                      field:"ID_COMPANY",
-                      inter:"=",
-                      value:userData.company.id,
-                    }
-                  ]
-                },
-                {
-                  name:"ld-products_tags",
-                  tableMain:"products_tags",
-                  selects:[
-                    {table:'products_tags', field:'ID_PRODUCT_TAG',as:"value"},
-                    {table:'products_tags', field:'NAME',as:"show"},
-                  ],
-                  conditions:[
-                    {
-                      table:"products_tags",
-                      field:"ID_COMPANY",
-                      inter:"=",
-                      value:userData.company.id,
-                    }
-                  ]
-                }
+                ld_unids,
               ],
     
               fields:[
                 {panel:"main",name:"producto",box:bx_shw,select:"NAME"},
-                //{panel:"main",name:"tipo",box:{...bx_shw,options:op_products_tipe},select:"ID_PRODUCT_TIPE"},
                 {col:9,panel:"main",name:"cantidad",box:bx_shw,select:"RECIPE_CANT"},
                 {col:3,panel:"main",tipe:0,name:"unidad",box:bx_shw,select:"UNID_ID",load:{name:"ld-unids",show:"show"}},
-                //{panel:"main",name:"activo",box:bx_active_show,select:"ACTIVE"},
               ],
               events:[
                 {
@@ -329,8 +398,29 @@ $(document).ready(function() {
             script:{
               parent:prt_rec_tb,
               title:"lista de inputs",head:false,
-              panels:[{col:12,y:0,title:"main",tipe:"table"}],
+              panels:[{col:12,y:0,title:"main",tipe:"table",head:false}],
               stateStart:"block",
+              stateTools:[
+                {
+                    name:"reload",
+                    tools:[
+                        {name:"config",show:false},
+                        {name:"load",show:false},
+                        
+                        {name:"excel",show:false},
+                        {name:"pdf",show:false},
+            
+                        {name:"sizes",show:false,value:999},
+                        {name:"reload",show:false},
+                        {name:"update",show:false},
+                        {name:"new",show:false},
+                        {name:"insert",show:false},
+                        {name:"cancel",show:false},
+                        
+                        {name:"pages",show:false},
+                    ],
+                },
+              ],
     
               tableMain:"recipe_input",
               selects:[
@@ -341,10 +431,11 @@ $(document).ready(function() {
                 {table:'recipe_input', field:'COST_UNIT'},
                 {table:'recipe_input', field:'COST_TOTAL'},
                 {table:"unids",field:"SIMBOL",as:"UNID"},
+                {table:"products",field:"NAME",as:"PRODUCT_NAME"},
               ],
               joins:[
                 {
-                  main:{table:"recipe_input",field:"ID_PRODUCT"},
+                  main:{table:"recipe_input",field:"ID_INPUT"},
                   join:{table:"products",field:"ID_PRODUCT"},
                   tipe:"LEFT",
                 },
@@ -354,14 +445,11 @@ $(document).ready(function() {
                   tipe:"LEFT",
                 },
               ],
-              loads:[
-                ld_supplies,
-              ],
     
               fields:[
                 //{panel:"main",...fld_delete},
                 //{panel:"main",name:"id product",box:{tipe:0},select:"ID_PRODUCT"},
-                {panel:"main",name:"input",box:bx_shw,select:"ID_INPUT",load:{name:"supplies",show:"show"}},
+                {panel:"main",name:"input",box:bx_shw,select:"PRODUCT_NAME"},
                 {panel:"main",name:"cantidad",box:bx_shw,select:"CANT"},
                 {panel:"main",name:"unidad",box:bx_shw,select:"UNID"},
               ],

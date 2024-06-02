@@ -205,6 +205,7 @@ $(document).ready(function() {
                 {panel:"main",name:"cp",attributes:att_btn,box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-arrow-left-short"></i><i class="bi bi-clipboard"></i>'},action:"copy"},
                 {panel:"main",name:"tipo",attributes:att_cnt,box:{tipe:0,options:op_products_tipe},select:"ID_PRODUCT_TIPE"},
                 {panel:"main",name:"cantidad",attributes:att_cnt,box:{tipe:0,class:"text-center"},select:"CANT"},
+                {panel:"main",name:"cn",attributes:att_btn,box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-arrow-left-short"></i><i class="bi bi-clipboard"></i>'},action:"copy"},
                 {panel:"main",name:"precio unitario",attributes:att_cnt,box:bx_money,select:"PRICE_UNIT"},
                 {panel:"main",name:"cu",attributes:att_btn,box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-arrow-left-short"></i><i class="bi bi-clipboard"></i>'},action:"copy"},
                 {panel:"main",name:"precio total",attributes:att_cnt,box:bx_money,select:"PRICE_TOTAL"},
@@ -242,6 +243,11 @@ $(document).ready(function() {
                       if(field.name=="cp"){
     
                         navigator.clipboard.writeText(data[y]["NAME"]);
+                      }
+
+                      if(field.name=="cn"){
+    
+                        navigator.clipboard.writeText(data[y]["CANT"]);
                       }
     
                       if(field.name=="cu"){

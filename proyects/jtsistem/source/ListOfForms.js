@@ -1,12 +1,16 @@
 //---------options--------
 
 var company_id = 1;
-var user_delete_data_import = true;
+//var user_delete_data_import = true;
 
 var op_access = [
     {value:"acc-1",show:"borrar data importante"},
     {value:"acc-2",show:"actualizar lista de productos"},
     {value:"acc-3",show:"asignar precio a producto en venta"},
+    {value:"acc-4",show:"modificar la apertura de los controles de cuentas"},
+    {value:"acc-5",show:"modificar el cierre de los controles de cuentas"},
+    {value:"acc-6",show:"modificar el total de cuentas"},
+    {value:"acc-7",show:"modificar el estado de cuentas"},
     ...paginasOptions,
 ];
 
@@ -761,9 +765,10 @@ var scr_sales_control = {
 
 }
 
-function scr_admin({id_company,admin=false}){
+function scr_admin({id_company,parent}){
 
     var gr = new Grid({
+        parent,
         cols:[
           [8,4],
           [12],
@@ -844,11 +849,11 @@ function scr_admin({id_company,admin=false}){
                     ],
 
                     fields:[
-                    (user_delete_data_import?{panel:"main",...fld_delete}:null),
-                    {panel:"main",name:"usuario",box:{tipe:1},select:"NAME"},
-                    {panel:"main",name:"clase",box:{tipe:3},select:"ID_CLASS",load:{name:"ld-class",show:"show",value:"value"}},
-                    {panel:"main",name:"contraseña",box:{tipe:1},select:"PASSWORD"},
-                    {panel:"main",name:"activo",box:bx_active_input,select:"ACTIVE"},
+                        //{panel:"main",...fld_delete},
+                        {panel:"main",name:"usuario",box:{tipe:1},select:"NAME"},
+                        {panel:"main",name:"clase",box:{tipe:3},select:"ID_CLASS",load:{name:"ld-class",show:"show",value:"value"}},
+                        {panel:"main",name:"contraseña",box:{tipe:1},select:"PASSWORD"},
+                        {panel:"main",name:"activo",box:bx_active_input,select:"ACTIVE"},
                     ],
 
                 }
@@ -861,92 +866,149 @@ function scr_admin({id_company,admin=false}){
                     title:"lista de classes",
                     panels:[{col:12,y:0,title:"main",tipe:"table"}],
                     stateTools:[
-                    {
-                        name:"reload",
-                        tools:[
-                            {name:"config",show:true},
-                            {name:"load",show:true},
-                            
-                            {name:"excel",show:false},
-                            {name:"pdf",show:false},
-                
-                            {name:"sizes",show:true,value:10},
-                            {name:"reload",show:true},
-                            {name:"update",show:false},
-                            {name:"new",show:true},
-                            {name:"insert",show:false},
-                            {name:"cancel",show:false},
-                            
-                            {name:"pages",show:false},
-                        ],
-                    }
+                        {
+                            name:"reload",
+                            tools:[
+                                {name:"config",show:true},
+                                {name:"load",show:true},
+                                
+                                {name:"excel",show:false},
+                                {name:"pdf",show:false},
+                    
+                                {name:"sizes",show:true,value:10},
+                                {name:"reload",show:true},
+                                {name:"update",show:false},
+                                {name:"new",show:true},
+                                {name:"insert",show:false},
+                                {name:"cancel",show:false},
+                                
+                                {name:"pages",show:false},
+                            ],
+                        }
                     ],
 
                     tableMain:"class",
                     selects:[
-                    {table:"class",field:"ID_CLASS",primary:true},
-                    {table:"class",field:"NAME"},
+                        {table:"class",field:"ID_CLASS",primary:true},
+                        {table:"class",field:"NAME"},
                     ],
                     conditions:[
-                    {
-                        table:"class",
-                        field:"ID_COMPANY",
-                        inter:"=",
-                        value:id_company,
-                    }
+                        {
+                            table:"class",
+                            field:"ID_COMPANY",
+                            inter:"=",
+                            value:id_company,
+                        }
                     ],
                     inserts:[
-                    {field:"ID_COMPANY",value:id_company},
+                        {field:"ID_COMPANY",value:id_company},
                     ],
 
                     fields:[
-                    (user_delete_data_import?{panel:"main",...fld_delete}:null),
-                    {panel:"main",name:"clase",box:{tipe:1,class:"w-100"},select:"NAME"},
+                        //{panel:"main",...fld_delete},
+                        {panel:"main",name:"clase",box:{tipe:1,class:"w-100"},select:"NAME"},
+                        {panel:"main",name:"btn",box:{tipe:5,value:'actualizar accesos',class:"btn btn-outline-primary btn-sm"},action:"update_access"},
                     ],
                     events:[
-                    {
-                        name:"insertAfter",
-                        actions:[{
-                        action:({k,field,value})=>{
+                        {
+                            name:"insertAfter",
+                            actions:[{
+                            action:({k,field,value})=>{
 
-                            k.Loading_SetActive({active:true});
+                                k.Loading_SetActive({active:true});
 
-                            var count = 0;
-                            var total = op_access.length;
+                                var count = 0;
+                                var total = op_access.length;
 
-                            for (let t = 0; t < total; t++) {
-                            
-                            var conection = k.Conection_Get();
-                            var sql = conection.GetSql_Insert({
-                                tableMain:"class_access",
-                                inserts:[
-                                {field:"ID_CLASS",value},
-                                {field:"ID_ACCESS",value:op_access[t].value},
-                                {field:"ACTIVE",value:1},
-                                ],
-                            });
-                            conection.Request({
-                                sql,php:"success",
-                                success:()=>{
+                                for (let t = 0; t < total; t++) {
+                                
+                                var conection = k.Conection_Get();
+                                var sql = conection.GetSql_Insert({
+                                    tableMain:"class_access",
+                                    inserts:[
+                                    {field:"ID_CLASS",value},
+                                    {field:"ID_ACCESS",value:op_access[t].value},
+                                    {field:"ACTIVE",value:1},
+                                    ],
+                                });
+                                conection.Request({
+                                    sql,php:"success",
+                                    success:()=>{
 
-                                OneInserted();
+                                    OneInserted();
+                                    }
+                                })
+                                
                                 }
-                            })
-                            
-                            }
 
-                            function OneInserted() {
-                            
-                            count++;
-                            if(count>=total){
+                                function OneInserted() {
+                                
+                                count++;
+                                if(count>=total){
 
-                                k.Loading_SetActive({active:false});
+                                    k.Loading_SetActive({active:false});
+                                }
+                                }
+                                
                             }
-                            }
-                            
+                            }]
+                        },
+                        {
+                            name:"boxUpdate",
+                            actions:[{
+                                action:({k,field,y})=>{
+
+                                    if(field.action=="update_access"){
+
+                                        k.Loading_SetActive({active:true});
+                                        var class_id = k.Reload_GetData({})[y]["ID_CLASS"];
+                                        var conection = k.Conection_Get({});
+
+                                        conection.Request({
+                                            php:"success",
+                                            sql:conection.GetSql_Delete({
+                                                tableMain:"class_access",
+                                                conditions:[{
+                                                    table:"class_access",
+                                                    field:"ID_CLASS",
+                                                    inter:"=",
+                                                    value:class_id,
+                                                }],
+                                            }),
+                                            success:()=>{
+
+                                                var inserts = op_access.map(op=>{
+
+                                                    return {
+                                                        field:"ID_ACCESS",
+                                                        value:op.value,
+                                                        tipe:"values",
+                                                    };
+                                                });
+                                                inserts.push({
+                                                    field:"ID_CLASS",
+                                                    value:class_id,
+                                                    tipe:"const",
+                                                });
+
+                                                conection.Request({
+                                                    php:"success",
+                                                    sql:conection.GetSql_Insert({
+                                                        tableMain:"class_access",
+                                                        inserts,
+                                                    }),
+                                                    success:()=>{
+
+                                                        k.Loading_SetActive({active:false});
+                                                    }
+                                                });
+                                            }
+                                        });
+
+                                    }
+                                }
+                            }]
                         }
-                        }]
-                    }
                     ],
                 }
             },
@@ -956,7 +1018,7 @@ function scr_admin({id_company,admin=false}){
                 script:{
                     parent:prnt_accs,
                     title:"control de accesos",
-                    panels:[{col:12,y:0,title:"main",tipe:"table"}],
+                    panels:[{col:12,y:0,title:"main",tipe:"table",h:500}],
                     stateTools:[
                     {
                         name:"reload",
@@ -970,7 +1032,7 @@ function scr_admin({id_company,admin=false}){
                             {name:"sizes",show:true,value:10},
                             {name:"reload",show:true},
                             {name:"update",show:false},
-                            {name:"new",show:user_delete_data_import},
+                            {name:"new",show:false},
                             {name:"insert",show:false},
                             {name:"cancel",show:false},
                             
@@ -991,34 +1053,33 @@ function scr_admin({id_company,admin=false}){
                     ],
                     inserts:[],
                     loads:[
-                    {
-                        name:"ld-class",
-                        tableMain:"class",
-                        selects:[
-                        {table:"class",field:"ID_CLASS",as:"value"},
-                        {table:"class",field:"NAME",as:"show"},
-                        ],
-                        conditions:[
                         {
-                            table:"class",
-                            field:"ID_COMPANY",
-                            inter:"=",
-                            value:id_company
+                            name:"ld-class",
+                            tableMain:"class",
+                            selects:[
+                                {table:"class",field:"ID_CLASS",as:"value"},
+                                {table:"class",field:"NAME",as:"show"},
+                            ],
+                            conditions:[
+                                {
+                                    table:"class",
+                                    field:"ID_COMPANY",
+                                    inter:"=",
+                                    value:id_company
+                                }
+                            ],
                         }
-                        ],
-                    }
                     ],
 
                     configShow:true,
                     filters:[
-                    {name:"clase",box:{tipe:3},select:{table:"class_access",field:"ID_CLASS"},load:{name:"ld-class",show:"show",value:"value"}},
-                    //{name:"accesso",box:{tipe:3},select:{table:"id_"}}
+                        {name:"clase",box:{tipe:3},select:{table:"class_access",field:"ID_CLASS"},load:{name:"ld-class",show:"show",value:"value"}},
+                        //{name:"accesso",box:{tipe:3},select:{table:"id_"}}
                     ],
                     fields:[
-                    (user_delete_data_import?{panel:"main",...fld_delete}:null),
-                    //{panel:"main",name:"clase",box:{tipe:3,class:"w-100"},select:"ID_CLASS",load:{name:"ld-class",show:"show",value:"value"}},
-                    (user_delete_data_import?{panel:"main",name:"acceso",box:{tipe:8,options:op_access},select:"ID_ACCESS"}:{panel:"main",name:"acceso",box:{tipe:0,options:op_access},select:"ID_ACCESS"}),
-                    {panel:"main",name:"activo",box:bx_active_input,select:"ACTIVE"},
+                        //{panel:"main",name:"clase",box:{tipe:3,class:"w-100"},select:"ID_CLASS",load:{name:"ld-class",show:"show",value:"value"}},
+                        {panel:"main",name:"acceso",box:{tipe:0,options:op_access},select:"ID_ACCESS"},
+                        {panel:"main",name:"activo",box:bx_active_input,select:"ACTIVE"},
                     ],
 
                     events:[
@@ -1135,7 +1196,7 @@ const invoiceData = {
 */
 async function generateInvoicePDF(invoiceData) {
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'pt', 'a4');
+    const pdf = new jsPDF('p', 'pt', 'a3');  // Mantener tamaño A3
 
     const margin = 40;
     const startY = 50;
@@ -1143,13 +1204,16 @@ async function generateInvoicePDF(invoiceData) {
     const pageWidth = pdf.internal.pageSize.getWidth();
     const usableWidth = pageWidth - 2 * margin;
 
+    const fontSizeNormal = 12 * 0.85;  // Incremento del 15%
+    const fontSizeHeader = 20 * 0.85;  // Incremento del 15%
+
     // Header
-    pdf.setFontSize(20);
+    pdf.setFontSize(fontSizeHeader);
     pdf.setTextColor(40, 40, 40);
     pdf.text('Factura', margin, startY);
 
     // Company Details
-    pdf.setFontSize(12);
+    pdf.setFontSize(fontSizeNormal);
     pdf.setTextColor(100, 100, 100);
     pdf.text(`Número de Factura: ${invoiceData.invoiceNumber}`, margin, startY + 2 * lineHeight);
     pdf.text(`Fecha: ${invoiceData.invoiceDate}`, margin, startY + 3 * lineHeight);
@@ -1167,21 +1231,25 @@ async function generateInvoicePDF(invoiceData) {
     pdf.setFillColor(230, 230, 230);
     pdf.rect(companyBoxX, companyBoxY, companyBoxWidth, companyBoxHeight, 'F');
     pdf.setTextColor(40, 40, 40);
-    pdf.text(`Razón Social: ${invoiceData.companyName}`, pageWidth - margin - 10, startY + 2.5 * lineHeight, null, null, 'right');
-    pdf.text(`RUC: ${invoiceData.companyRUC}`, pageWidth - margin - 10, startY + 3.5 * lineHeight, null, null, 'right');
-    pdf.text(`Dirección: ${invoiceData.companyAddress}`, pageWidth - margin - 10, startY + 4.5 * lineHeight, null, null, 'right');
-    pdf.text(`Teléfono: ${invoiceData.companyPhone}`, pageWidth - margin - 10, startY + 5.5 * lineHeight, null, null, 'right');
+    pdf.text(`Razón Social: ${invoiceData.companyName}`, companyBoxX + 10, startY + 2.5 * lineHeight);
+    pdf.text(`RUC: ${invoiceData.companyRUC}`, companyBoxX + 10, startY + 3.5 * lineHeight);
+    pdf.text(`Dirección: ${invoiceData.companyAddress}`, companyBoxX + 10, startY + 4.5 * lineHeight);
+    pdf.text(`Teléfono: ${invoiceData.companyPhone}`, companyBoxX + 10, startY + 5.5 * lineHeight);
 
     // Table Headers
+    const precioUnitarioWidth = 480 + 50;
+    const precioTotalWidth = 570 + 100;
+
     pdf.setFillColor(230, 230, 230);
     pdf.rect(margin, startY + 10 * lineHeight, usableWidth, lineHeight, 'F');
     pdf.setTextColor(0, 0, 0);
-    pdf.setFontSize(12);
+    pdf.setFontSize(fontSizeNormal);
     pdf.text('Detalle', margin + 5, startY + 10.7 * lineHeight);
-    pdf.text('Tipo', margin + 150, startY + 10.7 * lineHeight);
-    pdf.text('Cantidad', margin + 250, startY + 10.7 * lineHeight);
-    pdf.text('Precio Unitario', margin + 350, startY + 10.7 * lineHeight);
-    pdf.text('Precio Total', margin + 450, startY + 10.7 * lineHeight);
+    pdf.text('Tipo', margin + 250, startY + 10.7 * lineHeight);
+    pdf.text('Cantidad', margin + 330, startY + 10.7 * lineHeight);
+    pdf.text('Unidad', margin + 410, startY + 10.7 * lineHeight);
+    pdf.text('Precio Unitario', margin + precioUnitarioWidth, startY + 10.7 * lineHeight);
+    pdf.text('Precio Total', margin + precioTotalWidth, startY + 10.7 * lineHeight);
 
     // Table Content
     let positionY = startY + 11.5 * lineHeight;
@@ -1190,30 +1258,31 @@ async function generateInvoicePDF(invoiceData) {
     invoiceData.items.forEach(item => {
         pdf.setTextColor(100, 100, 100);
         pdf.text(item.detail, margin + 5, positionY);
-        pdf.text(item.type, margin + 150, positionY);
-        pdf.text(String(item.quantity), margin + 250, positionY);
-        pdf.text(`S/. ${item.unitPrice.toFixed(2)}`, margin + 350, positionY);
-        pdf.text(`S/. ${item.totalPrice.toFixed(2)}`, margin + 450, positionY);
+        pdf.text(item.type, margin + 250, positionY);
+        pdf.text(String(item.quantity), margin + 330, positionY);
+        pdf.text('und', margin + 410, positionY);
+        pdf.text(`S/. ${item.unitPrice.toFixed(2)}`, margin + precioUnitarioWidth, positionY);
+        pdf.text(`S/. ${item.totalPrice.toFixed(2)}`, margin + precioTotalWidth, positionY);
         positionY += lineHeight;
 
-        if (item.type === 'Servicio') {
+        if (item.type === 'servicio') {
             totalServices += item.totalPrice;
         } else {
             totalProducts += item.totalPrice;
         }
     });
 
+    const TotalWidth = 100;
+
     // Total
     pdf.setTextColor(0, 0, 0);
-    pdf.setFontSize(14);
-    pdf.text(`Total Productos: S/. ${totalProducts.toFixed(2)}`, margin + 350, positionY + lineHeight);
-    pdf.text(`Total Servicios: S/. ${totalServices.toFixed(2)}`, margin + 350, positionY + 2 * lineHeight);
-    pdf.text(`Total: S/. ${(totalProducts + totalServices).toFixed(2)}`, margin + 350, positionY + 3 * lineHeight);
+    pdf.setFontSize(fontSizeNormal);
+    pdf.text(`Total Productos: S/. ${totalProducts.toFixed(2)}`, margin + precioUnitarioWidth + TotalWidth, positionY + lineHeight);
+    pdf.text(`Total Servicios: S/. ${totalServices.toFixed(2)}`, margin + precioUnitarioWidth + TotalWidth, positionY + 2 * lineHeight);
+    pdf.text(`Total: S/. ${(totalProducts + totalServices).toFixed(2)}`, margin + precioUnitarioWidth + TotalWidth, positionY + 3 * lineHeight);
 
     // Open PDF in New Tab
     const pdfDataUri = pdf.output('datauristring');
     const newTab = window.open();
     newTab.document.body.innerHTML = '<embed width="100%" height="100%" src="' + pdfDataUri + '" type="application/pdf">';
-    }
-
-
+}

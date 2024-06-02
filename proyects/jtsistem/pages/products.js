@@ -131,7 +131,7 @@ $(document).ready(function() {
                 
                 {panel:"main",col:12,tipe:1,name:"tipo",box:bx_op({ops:op_products_tipe}),select:"ID_PRODUCT_TIPE"},
 
-                {panel:"main",col:8,tipe:1,colAllLevel:true,name:"etiqueta",box:bx_op({ops:op_products_tipe}),select:"ID_PRODUCT_TAG",load:{name:"ld-products_tags",show:"show"}},
+                {panel:"main",col:8,tipe:1,colAllLevel:true,name:"etiqueta",box:{tipe:3},select:"ID_PRODUCT_TAG",load:{name:"ld-products_tags",show:"show"}},
                 {panel:"main",col:2,tipe:0,colAllLevel:true,name:"edit-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-pencil-square"></i>'},action:"edit-tag"},
                 {panel:"main",col:2,tipe:0,colAllLevel:true,name:"add-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-plus-circle"></i>'},action:"add-tag"},
 
