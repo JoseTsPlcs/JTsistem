@@ -4,9 +4,10 @@ var company_id = 1;
 //var user_delete_data_import = true;
 
 const op_company_type = [
-    {value:1,show:"ecommerse"},
+    {value:1,show:"all"},
     {value:2,show:"taller"},
-    {value:3,show:"inmobiliaria"},
+    {value:4,show:"tienda"},
+    {value:5,show:"consultorio"},
 ];
 
 var op_access = [
@@ -809,7 +810,7 @@ function scr_admin({id_company,parent}){
                             {name:"insert",show:false},
                             {name:"cancel",show:false},
                             
-                            {name:"pages",show:false},
+                            {name:"pages",show:true},
                         ],
                     }
                     ],
@@ -886,7 +887,7 @@ function scr_admin({id_company,parent}){
                                 {name:"insert",show:false},
                                 {name:"cancel",show:false},
                                 
-                                {name:"pages",show:false},
+                                {name:"pages",show:true},
                             ],
                         }
                     ],
@@ -1033,14 +1034,14 @@ function scr_admin({id_company,parent}){
                             {name:"excel",show:false},
                             {name:"pdf",show:false},
                 
-                            {name:"sizes",show:true,value:10},
+                            {name:"sizes",show:true,value:999},
                             {name:"reload",show:true},
                             {name:"update",show:false},
                             {name:"new",show:false},
                             {name:"insert",show:false},
                             {name:"cancel",show:false},
                             
-                            {name:"pages",show:false},
+                            {name:"pages",show:true},
                         ],
                     }
                     ],
@@ -1368,30 +1369,30 @@ async function generateCheckInPDF(checkInData) {
     // Header
     pdf.setFontSize(fontSizeHeader);
     pdf.setTextColor(40, 40, 40);
-    pdf.text('Vehicle Check-In', margin, startY);
+    pdf.text('Vehiculo Check-In', margin, startY);
 
     // Customer Details
     pdf.setFontSize(fontSizeNormal);
     pdf.setTextColor(100, 100, 100);
     pdf.text(`Check-In Number: ${checkInData.checkInNumber}`, margin, startY + 2 * lineHeight);
-    pdf.text(`Date: ${checkInData.checkInDate}`, margin, startY + 3 * lineHeight);
-    pdf.text(`Customer: ${checkInData.customerName}`, margin, startY + 4 * lineHeight);
-    pdf.text(`Customer ID: ${checkInData.customerId}`, margin, startY + 5 * lineHeight);
-    pdf.text(`Phone: ${checkInData.customerPhone}`, margin, startY + 6 * lineHeight);
-    pdf.text(`Address: ${checkInData.customerAddress}`, margin, startY + 7 * lineHeight);
+    pdf.text(`Fecha de Entrada: ${checkInData.checkInDate}`, margin, startY + 3 * lineHeight);
+    pdf.text(`Cliente: ${checkInData.customerName}`, margin, startY + 4 * lineHeight);
+    pdf.text(`Nro de Identificacion: ${checkInData.customerId}`, margin, startY + 5 * lineHeight);
+    pdf.text(`Telefono: ${checkInData.customerPhone}`, margin, startY + 6 * lineHeight);
+    pdf.text(`Direccion: ${checkInData.customerAddress}`, margin, startY + 7 * lineHeight);
 
     // Vehicle Details
-    pdf.text('Vehicle Details:', margin, startY + 9 * lineHeight);
-    pdf.text(`Plate: ${checkInData.vehicle.plate}`, margin, startY + 10 * lineHeight);
-    pdf.text(`Brand: ${checkInData.vehicle.brand}`, margin, startY + 11 * lineHeight);
-    pdf.text(`Model: ${checkInData.vehicle.model}`, margin, startY + 12 * lineHeight);
-    pdf.text(`Engine Number: ${checkInData.vehicle.engineNumber}`, margin, startY + 13 * lineHeight);
-    pdf.text(`VIN Number: ${checkInData.vehicle.vinNumber}`, margin, startY + 14 * lineHeight);
-    pdf.text(`Year: ${checkInData.vehicle.year}`, margin, startY + 15 * lineHeight);
+    pdf.text('Detalles del Vehiculo:', margin, startY + 9 * lineHeight);
+    pdf.text(`Placa: ${checkInData.vehicle.plate}`, margin, startY + 10 * lineHeight);
+    pdf.text(`Marca: ${checkInData.vehicle.brand}`, margin, startY + 11 * lineHeight);
+    pdf.text(`Modelo: ${checkInData.vehicle.model}`, margin, startY + 12 * lineHeight);
+    pdf.text(`Nro de Motor: ${checkInData.vehicle.engineNumber}`, margin, startY + 13 * lineHeight);
+    pdf.text(`Nro de Vin: ${checkInData.vehicle.vinNumber}`, margin, startY + 14 * lineHeight);
+    pdf.text(`año: ${checkInData.vehicle.year}`, margin, startY + 15 * lineHeight);
     pdf.text(`Color: ${checkInData.vehicle.color}`, margin, startY + 16 * lineHeight);
 
     // Comments
-    pdf.text('Comments:', margin, startY + 18 * lineHeight);
+    pdf.text('Comentarios:', margin, startY + 18 * lineHeight);
     pdf.text(`${checkInData.comments}`, margin, startY + 19 * lineHeight, { maxWidth: usableWidth / 2 });
 
     // Company Box
@@ -1402,10 +1403,10 @@ async function generateCheckInPDF(checkInData) {
     pdf.setFillColor(230, 230, 230);
     pdf.rect(companyBoxX, companyBoxY, companyBoxWidth, companyBoxHeight, 'F');
     pdf.setTextColor(40, 40, 40);
-    pdf.text(`Company Name: ${checkInData.companyName}`, companyBoxX + 10, startY + 2.5 * lineHeight);
-    pdf.text(`Company RUC: ${checkInData.companyRUC}`, companyBoxX + 10, startY + 3.5 * lineHeight);
-    pdf.text(`Address: ${checkInData.companyAddress}`, companyBoxX + 10, startY + 4.5 * lineHeight);
-    pdf.text(`Phone: ${checkInData.companyPhone}`, companyBoxX + 10, startY + 5.5 * lineHeight);
+    pdf.text(`Razon Social: ${checkInData.companyName}`, companyBoxX + 10, startY + 2.5 * lineHeight);
+    pdf.text(`RUC: ${checkInData.companyRUC}`, companyBoxX + 10, startY + 3.5 * lineHeight);
+    pdf.text(`Direccion: ${checkInData.companyAddress}`, companyBoxX + 10, startY + 4.5 * lineHeight);
+    pdf.text(`Telefono: ${checkInData.companyPhone}`, companyBoxX + 10, startY + 5.5 * lineHeight);
 
     // Load Image
     const image = new Image();
@@ -1431,7 +1432,7 @@ async function generateCheckInPDF(checkInData) {
         pdf.rect(margin + targetWidth + 10, startY + 20 * lineHeight - yless, usableWidth * 0.6, lineHeight, 'F');
         pdf.setTextColor(0, 0, 0);
         pdf.setFontSize(fontSizeNormal);
-        pdf.text('Detail', margin + targetWidth + 15, startY + 20.7 * lineHeight - yless);
+        pdf.text('Detalle', margin + targetWidth + 15, startY + 20.7 * lineHeight - yless);
         pdf.text('Check', margin + targetWidth + 15 + detailWidth, startY + 20.7 * lineHeight - yless);
 
         // Table Content
@@ -1439,7 +1440,7 @@ async function generateCheckInPDF(checkInData) {
         checkInData.items.forEach(item => {
             pdf.setTextColor(100, 100, 100);
             pdf.text(item.detail, margin + targetWidth + 15, positionY);
-            pdf.text(item.check ? 'Yes' : 'No', margin + targetWidth + 15 + detailWidth, positionY);
+            pdf.text(item.check ? 'X' : '', margin + targetWidth + 15 + detailWidth, positionY);
             positionY += lineHeight;
         });
 

@@ -246,7 +246,7 @@ function Date_GetPeriod({ data, dataField, period = "day" }) {
 }
 
 function Date_GetDetails({ dateString }) {
-    const date = new Date(dateString);
+    const date = new Date(dateString+"T00:00:00");
 
     // Obtener el día del mes
     const dayOfMonth = date.getDate();
@@ -295,7 +295,7 @@ function Date_GetLabel({dateString,period="day"}) {
     switch(period){
 
         case "day":
-        return detail.dayName.substring(0, 3) + "-" + detail.dayOfMonth;
+        return detail.dayName.substring(0, 3) + "-" + detail.dayOfMonth + "-" + detail.monthName.substring(0,3);
 
         case "week":
         return detail.monthName.substring(0, 3) + "-semana #" + detail.weekNumber;
@@ -353,7 +353,6 @@ function UniqueLabels({ data, labelField }) {
 
     return result;
 }
-
 
 function NewChart({parent,chart,width=null,height=null}) {
         

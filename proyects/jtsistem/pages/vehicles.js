@@ -65,6 +65,15 @@ $(document).ready(function() {
               inserts:[
                 ...ins_general,
               ],
+              conditions:[
+                {
+                  before:" AND ",
+                  table:"items_vehicles",
+                  field:"ID_COMPANY",
+                  inter:"=",
+                  value:company_id,
+                }
+              ],
 
               filters:[
                 {name:"placa",box:{tipe:1,class:"w-100"},select:{table:"items_vehicles",field:"PLACA"}},
