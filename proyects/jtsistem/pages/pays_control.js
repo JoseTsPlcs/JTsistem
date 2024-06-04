@@ -5,6 +5,8 @@ $(document).ready(function() {
 
     success:({userData})=>{
 
+      var acc_trasn = op_access.find(acc=>acc.value=="acc-1") && op_access.find(acc=>acc.value=="acc-1").value=="true";
+
       var gr = new Grid({
         cols:[
           [6,6],//0
@@ -99,7 +101,7 @@ $(document).ready(function() {
                 {col:12,y:1,name:"cuentas",box:{tipe:4,class:"w-100"},load:{name:"accounts",show:"show"},select:{table:"payments",field:"ID_ACCOUNT"}},
               ],
               fields:[
-                (user_delete_data_import?{panel:"main",...fld_delete}:null),
+                (acc_trasn?{panel:"main",...fld_delete}:null),
                 {panel:"main",...fld_edit},
                 //{panel:"main",name:"id",box:bx_shw,select:"ID_PAY"},
                 {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"fecha de emision",box:bx_shw,select:"DATE_EMMIT"},

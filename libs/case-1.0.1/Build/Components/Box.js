@@ -14,6 +14,7 @@ class Box {
 
   #parent = undefined;
   #blocks = [];
+  Blocks_Get(){return this.#blocks};
   #name = "";
   #id = "";
 

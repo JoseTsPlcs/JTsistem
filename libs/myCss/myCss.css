@@ -30,3 +30,22 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+.editable-image-container {
+    position: relative;
+    width: 100%;
+  }
+
+  .editable-image-canvas {
+    display: block;
+    margin: 0 auto;
+    cursor: crosshair;
+    border: 1px solid #ccc;
+    width: 100%;
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+  }

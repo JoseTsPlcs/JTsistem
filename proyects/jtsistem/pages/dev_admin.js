@@ -1,7 +1,7 @@
 
 $(document).ready(function() {
 
-  var test = true;
+  var test = false;
 
   var use = test ? "" : prompt("Por favor, ingresa tu usuario:");
   var pass = test ? "" : prompt("Por favor, ingresa la contraseña:");
@@ -48,6 +48,7 @@ $(document).ready(function() {
       tableMain:"companies",
       selects:[
         {table:"companies",field:"ID_COMPANY",primary:true},
+        {table:"companies",field:"ID_COMPANY_TYPE"},
         {table:"companies",field:"NAME"},
         {table:"companies",field:"RUC"},
         {table:"companies",field:"ACTIVE"},
@@ -60,6 +61,7 @@ $(document).ready(function() {
       fields:[
         {panel:"main",...fld_edit},
         {panel:"main",name:"id",box:{tipe:0},select:"ID_COMPANY"},
+        {panel:"main",name:"tipo",attributes:[{name:"style",value:"min-width:100px"}],box:{tipe:3,options:op_company_type},select:"ID_COMPANY_TYPE"},
         {panel:"main",name:"nombre",attributes:[{name:"style",value:"min-width:300px"}],box:{tipe:1,class:"w-100"},select:"NAME"},
         {panel:"main",name:"active",box:{tipe:6,name:"active"},select:"ACTIVE"},
         {panel:"main",name:"ruc",attributes:[{name:"style",value:"min-width:300px"}],box:{tipe:1,class:"w-100"},select:"RUC"},

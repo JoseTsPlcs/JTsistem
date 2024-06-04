@@ -10,7 +10,7 @@ var paginas = [
   /*{
     seccion:"",
     paginas:[
-      {name:"",href:""},
+      {name:"",href:"",show:false},
     ],
   }*/
 ];
@@ -39,6 +39,8 @@ class Pag_Base {
 
     //console.log(access);
 
+    console.log("build nav",paginas);
+
     var nav = `
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <a class="navbar-brand text-white" id="iconTittle">`+title+`</a>
@@ -63,9 +65,10 @@ class Pag_Base {
               const pag = seccion.paginas[pg];
               var accessData = access.find(acc=>acc.value == pag.value);
               var active = accessData ? accessData.active == "true" : false;
+              var show = pag.show == null ? true : pag.show;
               //console.log(pag,active);
               active=true;
-              nav += `<a class="dropdown-item `+(active?"":"disabled")+`" href="`+(active?pag.href:"#")+`">`+pag.name+`</a>`;
+              if(show) nav += `<a class="dropdown-item `+(active?"":"disabled")+`" href="`+(active?pag.href:"#")+`">`+pag.name+`</a>`;
             }
 
             nav += `
@@ -97,8 +100,6 @@ class Pag_Base {
       var userData = resp;
 
       console.log("userData:",userData);
-
-      //--------------------
 
       //--------------------
 
@@ -146,7 +147,6 @@ function PageRecive(){
   return data;
 }
 
-
 function Login({uss,pss,fail}){
 
     var loginSql = conectionOfUsers.GetSql_Select({
@@ -160,6 +160,7 @@ function Login({uss,pss,fail}){
             {db:"lip_dv",table:"class",field:"NAME",as:"CLASS_NAME"},
             {db:"lip_dv",table:"class",field:"ID_CLASS"},
             {db:"lip_dv",table:"companies",field:"ID_COMPANY",as:"COMPANY_ID"},
+            {db:"lip_dv",table:"companies",field:"ID_COMPANY_TYPE",as:"COMPANY_TYPE"},
             {db:"lip_dv",table:"companies",field:"NAME",as:"COMPANY_NAME"},
             {db:"lip_dv",table:"companies",field:"RUC",as:"COMPANY_RUC"},
             {db:"lip_dv",table:"companies",field:"NAME_REAL",as:"COMPANY_NAME_REAL"},   
@@ -224,6 +225,7 @@ function Login({uss,pss,fail}){
                 company:{
                   id:result[0]["COMPANY_ID"],
                   name:result[0]["COMPANY_NAME"],
+                  tipe:result[0]["COMPANY_TYPE"],
                   ruc:result[0]["COMPANY_RUC"],
                   telf:result[0]["COMPANY_TELF"],
                   nameReal:result[0]["COMPANY_NAME_REAL"],
