@@ -133,7 +133,15 @@ $(document).ready(function() {
               ],
               inserts:ins_general,
 
+              filters:[
+                {name:"cliente",box:bx_input,select:{table:"customers",field:"NAME"}},
+                {name:"placa",box:bx_input,select:{table:"items_vehicles",field:"PLACA"}},
+                {name:"marca",box:bx_input,select:{table:"items_vehicles",field:"MARCA"}},
+                {col:6,name:"fecha min",box:bx_date,select:{table:"checkin_vehicles",field:"DATE_ENTER",tipe:"min"}},
+                {col:6,name:"fechamax",box:bx_date,select:{table:"checkin_vehicles",field:"DATE_ENTER",tipe:"max"}},
+              ],
               fields:[
+                //{panel:"main",...fld_delete},
                 {panel:"main",...fld_edit},
                 //{panel:"main",name:"pdf",box:{tipe:5,value:'<i class="bi bi-filetype-pdf"></i>',class:"btn btn-danger btn-sm"},action:"pdf"},
                 {panel:"main",name:"fecha de entrada",box:{tipe:0},select:"DATE_ENTER"},
@@ -205,7 +213,7 @@ $(document).ready(function() {
                 {table: "checkin_vehicles", field: "FUEL"},
                 {table: "checkin_vehicles", field: "MILEAGE"},
                 {table: "checkin_vehicles", field: "COMENT"},
-                //{table: "checkin_vehicles", field: "OBSERVATIONS"},
+                {table: "checkin_vehicles", field: "OBSERVATIONS"},
                 {table: "checkin_vehicles", field: "CHECK_1"},
                 {table: "checkin_vehicles", field: "CHECK_2"},
                 {table: "checkin_vehicles", field: "CHECK_3"},
@@ -327,7 +335,7 @@ $(document).ready(function() {
                 {panel:"vehiculo",col:6,name:"fecha de entrada",box:bx_date,select:"DATE_ENTER"},
                 {panel:"vehiculo",col:6,name:"combustible",box:{tipe:1,value:0,attributes:[{name:"type",value:"range"},{name:"min",value:0},{name:"max",value:100}]},select:"FUEL"},
                 {panel:"vehiculo",col:6,name:"kilometraje",box:{tipe:1,value:0},select:"MILEAGE"},
-                {panel:"vehiculo",col:6,name:"comentario",box:{tipe:9,value:""},select:"COMENT"},
+                {panel:"vehiculo",col:6,name:"requerimiento",box:{tipe:9,value:""},select:"COMENT"},
 
                 
                 {panel:"checklist",name:"check in 1",tipe:0,box:{tipe:6,value:0,name:"radio"},select:"CHECK_1"},
@@ -358,6 +366,7 @@ $(document).ready(function() {
                 {panel:"checklist",name:"check in 26",tipe:0,box:{tipe:6,value:0,name:"plimillas/otros"},select:"CHECK_26"},
 
                 {panel:"chasis",name:"front",tipe:2,box:{tipe:0,class:"w-100 px-0 mx-0"},action:"img"},
+                {panel:"chasis",name:"observacion",box:{tipe:9,class:"w-100 px-0 mx-0",value:""},select:"OBSERVATIONS"},
                 //{panel:"chasis",name:"comentario",tipe:2,box:{tipe:9,value:""},select:"COMENT"},
                 //type="file" class="form-control-file" id="imageInput" value="../images/mi_imagen.jpg"
                 
@@ -693,6 +702,7 @@ $(document).ready(function() {
               color: data["COLOR"],
           },
           comments: data["COMENT"],
+          observations: data["OBSERVATIONS"],
           items: [
               { detail: 'Oil level', check: true, comment: 'Good condition' },
               { detail: 'Brake fluid', check: false, comment: 'Needs replacement' },
