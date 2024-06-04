@@ -1392,7 +1392,7 @@ async function generateCheckInPDF(checkInData) {
     pdf.text(`Color: ${checkInData.vehicle.color}`, margin, startY + 16 * lineHeight);
 
     // Comments
-    pdf.text('Comentarios:', margin, startY + 18 * lineHeight);
+    pdf.text('requerimiento:', margin, startY + 18 * lineHeight);
     pdf.text(`${checkInData.comments}`, margin, startY + 19 * lineHeight, { maxWidth: usableWidth / 2 });
 
     // Company Box
@@ -1423,6 +1423,9 @@ async function generateCheckInPDF(checkInData) {
         // Add image to PDF
         pdf.addImage(image, 'PNG', margin, startY + 20 * lineHeight, targetWidth, targetHeight);
 
+        pdf.text('observaciones:', margin, startY + 21 * lineHeight + targetHeight);
+        pdf.text(`${checkInData.observations}`, margin, startY + 22 * lineHeight + targetHeight, { maxWidth: usableWidth / 2 });
+
         // Table Headers
         const yless = 200;
         const checkWidth = 40;
@@ -1443,6 +1446,8 @@ async function generateCheckInPDF(checkInData) {
             pdf.text(item.check ? 'X' : '', margin + targetWidth + 15 + detailWidth, positionY);
             positionY += lineHeight;
         });
+
+        
 
         // Open PDF in a new window
         window.open(pdf.output('bloburl'), '_blank');
