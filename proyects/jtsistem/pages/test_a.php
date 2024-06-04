@@ -1,17 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Generar Factura PDF</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Check-In PDF</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-    <button id="generate">Generar PDF</button>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
-        async function generateInvoicePDF(invoiceData) {
+        async function generateCheckInPDF(checkInData) {
             const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'pt', 'a3');  // Mantener tamaño A3
+            const pdf = new jsPDF('p', 'pt', 'a4');
 
             const margin = 40;
             const startY = 50;
@@ -19,25 +18,38 @@
             const pageWidth = pdf.internal.pageSize.getWidth();
             const usableWidth = pageWidth - 2 * margin;
 
-            const fontSizeNormal = 12 * 0.85;  // Incremento del 15%
-            const fontSizeHeader = 20 * 0.85;  // Incremento del 15%
+            const fontSizeNormal = 12 * 0.85;
+            const fontSizeHeader = 20 * 0.85;
 
             // Header
             pdf.setFontSize(fontSizeHeader);
             pdf.setTextColor(40, 40, 40);
-            pdf.text('Factura', margin, startY);
+            pdf.text('Vehicle Check-In', margin, startY);
 
-            // Company Details
+            // Customer Details
             pdf.setFontSize(fontSizeNormal);
             pdf.setTextColor(100, 100, 100);
-            pdf.text(`Número de Factura: ${invoiceData.invoiceNumber}`, margin, startY + 2 * lineHeight);
-            pdf.text(`Fecha: ${invoiceData.invoiceDate}`, margin, startY + 3 * lineHeight);
-            pdf.text(`Cliente: ${invoiceData.customerName}`, margin, startY + 4 * lineHeight);
-            pdf.text(`Tipo de Documento: ${invoiceData.customerDocumentType}`, margin, startY + 5 * lineHeight);
-            pdf.text(`Número de Documento: ${invoiceData.customerDocumentNumber}`, margin, startY + 6 * lineHeight);
-            pdf.text(`Número de Teléfono: ${invoiceData.customerPhone}`, margin, startY + 7 * lineHeight);
-            pdf.text(`Dirección: ${invoiceData.customerAddress}`, margin, startY + 8 * lineHeight);
-            
+            pdf.text(`Check-In Number: ${checkInData.checkInNumber}`, margin, startY + 2 * lineHeight);
+            pdf.text(`Date: ${checkInData.checkInDate}`, margin, startY + 3 * lineHeight);
+            pdf.text(`Customer: ${checkInData.customerName}`, margin, startY + 4 * lineHeight);
+            pdf.text(`Customer ID: ${checkInData.customerId}`, margin, startY + 5 * lineHeight);
+            pdf.text(`Phone: ${checkInData.customerPhone}`, margin, startY + 6 * lineHeight);
+            pdf.text(`Address: ${checkInData.customerAddress}`, margin, startY + 7 * lineHeight);
+
+            // Vehicle Details
+            pdf.text('Vehicle Details:', margin, startY + 9 * lineHeight);
+            pdf.text(`Plate: ${checkInData.vehicle.plate}`, margin, startY + 10 * lineHeight);
+            pdf.text(`Brand: ${checkInData.vehicle.brand}`, margin, startY + 11 * lineHeight);
+            pdf.text(`Model: ${checkInData.vehicle.model}`, margin, startY + 12 * lineHeight);
+            pdf.text(`Engine Number: ${checkInData.vehicle.engineNumber}`, margin, startY + 13 * lineHeight);
+            pdf.text(`VIN Number: ${checkInData.vehicle.vinNumber}`, margin, startY + 14 * lineHeight);
+            pdf.text(`Year: ${checkInData.vehicle.year}`, margin, startY + 15 * lineHeight);
+            pdf.text(`Color: ${checkInData.vehicle.color}`, margin, startY + 16 * lineHeight);
+
+            // Comments
+            pdf.text('Comments:', margin, startY + 18 * lineHeight);
+            pdf.text(`${checkInData.comments}`, margin, startY + 19 * lineHeight, { maxWidth: usableWidth / 2 });
+
             // Company Box
             const companyBoxWidth = 200;
             const companyBoxHeight = 6 * lineHeight;
@@ -46,82 +58,83 @@
             pdf.setFillColor(230, 230, 230);
             pdf.rect(companyBoxX, companyBoxY, companyBoxWidth, companyBoxHeight, 'F');
             pdf.setTextColor(40, 40, 40);
-            pdf.text(`Razón Social: ${invoiceData.companyName}`, companyBoxX + 10, startY + 2.5 * lineHeight);
-            pdf.text(`RUC: ${invoiceData.companyRUC}`, companyBoxX + 10, startY + 3.5 * lineHeight);
-            pdf.text(`Dirección: ${invoiceData.companyAddress}`, companyBoxX + 10, startY + 4.5 * lineHeight);
-            pdf.text(`Teléfono: ${invoiceData.companyPhone}`, companyBoxX + 10, startY + 5.5 * lineHeight);
+            pdf.text(`Company Name: ${checkInData.companyName}`, companyBoxX + 10, startY + 2.5 * lineHeight);
+            pdf.text(`Company RUC: ${checkInData.companyRUC}`, companyBoxX + 10, startY + 3.5 * lineHeight);
+            pdf.text(`Address: ${checkInData.companyAddress}`, companyBoxX + 10, startY + 4.5 * lineHeight);
+            pdf.text(`Phone: ${checkInData.companyPhone}`, companyBoxX + 10, startY + 5.5 * lineHeight);
 
-            // Table Headers
-            const precioUnitarioWidth = 480 + 50;
-            const precioTotalWidth = 570 + 100;
+            // Load Image
+            const image = new Image();
+            image.src = checkInData.imageUrl;
 
-            pdf.setFillColor(230, 230, 230);
-            pdf.rect(margin, startY + 10 * lineHeight, usableWidth, lineHeight, 'F');
-            pdf.setTextColor(0, 0, 0);
-            pdf.setFontSize(fontSizeNormal);
-            pdf.text('Detalle', margin + 5, startY + 10.7 * lineHeight);
-            pdf.text('Tipo', margin + 250, startY + 10.7 * lineHeight);
-            pdf.text('Cantidad', margin + 330, startY + 10.7 * lineHeight);
-            pdf.text('Unidad', margin + 410, startY + 10.7 * lineHeight);
-            pdf.text('Precio Unitario', margin + precioUnitarioWidth, startY + 10.7 * lineHeight);
-            pdf.text('Precio Total', margin + precioTotalWidth, startY + 10.7 * lineHeight);
+            image.onload = function() {
+                // Calculate image width and height proportionally
+                const originalWidth = image.width;
+                const originalHeight = image.height;
+                const targetWidth = usableWidth * 0.6;
+                const scaleFactor = targetWidth / originalWidth;
+                const targetHeight = originalHeight * scaleFactor;
 
-            // Table Content
-            let positionY = startY + 11.5 * lineHeight;
-            let totalServices = 0;
-            let totalProducts = 0;
-            invoiceData.items.forEach(item => {
-                pdf.setTextColor(100, 100, 100);
-                pdf.text(item.detail, margin + 5, positionY);
-                pdf.text(item.type, margin + 250, positionY);
-                pdf.text(String(item.quantity), margin + 330, positionY);
-                pdf.text('und', margin + 410, positionY);
-                pdf.text(`S/. ${item.unitPrice.toFixed(2)}`, margin + precioUnitarioWidth, positionY);
-                pdf.text(`S/. ${item.totalPrice.toFixed(2)}`, margin + precioTotalWidth, positionY);
-                positionY += lineHeight;
+                // Add image to PDF
+                pdf.addImage(image, 'PNG', margin, startY + 20 * lineHeight, targetWidth, targetHeight);
 
-                if (item.type === 'servicio') {
-                    totalServices += item.totalPrice;
-                } else {
-                    totalProducts += item.totalPrice;
-                }
-            });
+                // Table Headers
+                const yless = 200;
+                const checkWidth = 40;
+                const detailWidth = usableWidth * 0.4 - checkWidth - 20;
 
-            // Total
-            pdf.setTextColor(0, 0, 0);
-            pdf.setFontSize(fontSizeNormal);
-            pdf.text(`Total Productos: S/. ${totalProducts.toFixed(2)}`, margin + precioUnitarioWidth, positionY + lineHeight);
-            pdf.text(`Total Servicios: S/. ${totalServices.toFixed(2)}`, margin + precioUnitarioWidth, positionY + 2 * lineHeight);
-            pdf.text(`Total: S/. ${(totalProducts + totalServices).toFixed(2)}`, margin + precioUnitarioWidth, positionY + 3 * lineHeight);
+                pdf.setFillColor(230, 230, 230);
+                pdf.rect(margin + targetWidth + 10, startY + 20 * lineHeight - yless, usableWidth * 0.6, lineHeight, 'F');
+                pdf.setTextColor(0, 0, 0);
+                pdf.setFontSize(fontSizeNormal);
+                pdf.text('Detail', margin + targetWidth + 15, startY + 20.7 * lineHeight - yless);
+                pdf.text('Check', margin + targetWidth + 15 + detailWidth, startY + 20.7 * lineHeight - yless);
 
-            // Open PDF in New Tab
-            const pdfDataUri = pdf.output('datauristring');
-            const newTab = window.open();
-            newTab.document.body.innerHTML = '<embed width="100%" height="100%" src="' + pdfDataUri + '" type="application/pdf">';
+                // Table Content
+                let positionY = startY + 21.5 * lineHeight - yless;
+                checkInData.items.forEach(item => {
+                    pdf.setTextColor(100, 100, 100);
+                    pdf.text(item.detail, margin + targetWidth + 15, positionY);
+                    pdf.text(item.check ? 'Yes' : 'No', margin + targetWidth + 15 + detailWidth, positionY);
+                    positionY += lineHeight;
+                });
+
+                // Open PDF in a new window
+                window.open(pdf.output('bloburl'), '_blank');
+            }
         }
 
-        document.getElementById('generate').addEventListener('click', () => {
-            const invoiceData = {
-                invoiceNumber: '001-001-0000001',
-                invoiceDate: '01/06/2024',
-                companyName: 'Razón Social S.A.',
-                companyRUC: '12345678901',
-                companyAddress: 'Calle Falsa 123',
-                companyPhone: '555-1234',
-                customerName: 'Juan Pérez',
-                customerDocumentType: 'DNI',
-                customerDocumentNumber: '12345678',
-                customerPhone: '555-5678',
-                customerAddress: 'Av. Principal 456',
-                items: [
-                    { detail: 'Servicio de Consultoría', type: 'servicio', quantity: 1, unitPrice: 150, totalPrice: 150 },
-                    { detail: 'Producto 1', type: 'producto', quantity: 2, unitPrice: 50, totalPrice: 100 },
-                    { detail: 'Producto 2', type: 'producto', quantity: 1, unitPrice: 200, totalPrice: 200 }
-                ]
-            };
+        const checkInData = {
+            checkInNumber: '12345',
+            checkInDate: '2024-06-01',
+            customerName: 'John Doe',
+            customerId: 'DNI 12345678',
+            customerPhone: '987654321',
+            customerAddress: '123 Main St, City, Country',
+            companyName: 'My Workshop',
+            companyRUC: '20123456789',
+            companyAddress: '456 Workshop St, City, Country',
+            companyPhone: '123456789',
+            vehicle: {
+                plate: 'XYZ-123',
+                brand: 'Toyota',
+                model: 'Corolla',
+                engineNumber: 'ABC123456',
+                vinNumber: '1HGBH41JXMN109186',
+                year: '2020',
+                color: 'Blue'
+            },
+            comments: 'The vehicle is in good condition. Minor scratches on the front bumper.',
+            items: [
+                { detail: 'Oil level', check: true, comment: 'Good condition' },
+                { detail: 'Brake fluid', check: false, comment: 'Needs replacement' },
+                { detail: 'Tire pressure', check: true, comment: 'Checked' },
+                // More items...
+            ],
+            imageUrl: '../imagenes/vehiculo_4ruedas.png' // Ruta de la imagen
+        };
 
-            generateInvoicePDF(invoiceData);
-        });
+        generateCheckInPDF(checkInData);
     </script>
 </body>
 </html>

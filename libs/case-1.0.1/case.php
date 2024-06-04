@@ -16,6 +16,7 @@ echo '<script src="'.$src.'Build/Components/Panel.js"></script>';
 echo '<script src="'.$src.'Build/Components/Steps.js"></script>';
 echo '<script src="'.$src.'Build/Components/LoadingScreen.js"></script>';
 echo '<script src="'.$src.'Build/Components/Toggle.js"></script>';
+echo '<script src="'.$src.'Build/Components/EditableImage.js"></script>';
 
 echo '<script src="'.$src.'BaseData/Conection.js"></script>';
 echo '<script src="'.$src.'BaseData/Loads.js"></script>';

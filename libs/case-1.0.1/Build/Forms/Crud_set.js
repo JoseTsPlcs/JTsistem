@@ -85,6 +85,11 @@ class Crud_set extends ODD {
     //------fields-------
 
     #fields;
+    Field_Get({fieldName}){
+
+        return this.#fields.find(f=>f.name==fieldName);
+    }
+
     #Fields_SetOptions({options}){
 
 
@@ -113,6 +118,8 @@ class Crud_set extends ODD {
 
         this.#Loading_Build({parent:this.#body_w.Conteiner_Dom()});
         this.Loading_SetActive({active:false});
+
+        this.CallEvent({name:"build"});
     }
 
     #body_w;
@@ -121,7 +128,6 @@ class Crud_set extends ODD {
         {x:0,y:1,index:1,name:"load",box:{tipe:5,value:'<i class="bi bi-database"></i>',class:"btn btn-outline-primary btn-sm",update:()=>{this.#Load({})}},dom:null},
 
         {x:2,y:1,index:0,name:"excel",box:{id:"btn1",tipe:5,value:"excel",class:"btn btn-outline-success btn-sm"},dom:null},
-        {x:2,y:1,index:1,name:"pdf",box:{id:"btn2",tipe:5,value:"pdf",class:"btn btn-outline-danger btn-sm"},dom:null},
 
         {x:0,y:3,index:0,name:"sizes",box:{tipe:3,value:1,options:[{show:1,value:1},{show:10,value:10},{show:25,value:25},{show:50,value:50},{show:999,value:999}],update:()=>{this.#Event_UpdateToolPages({})}},dom:null},
 
@@ -132,6 +138,7 @@ class Crud_set extends ODD {
         {x:1,y:3,index:4,name:"delete",box:{id:"btn5",tipe:5,value:"borrar",class:"btn btn-outline-danger btn-sm",update:()=>{this.#Event_UpdateToolDelete({})}},dom:null},
         {x:1,y:3,index:5,name:"cancel",box:{id:"btn6",tipe:5,value:"cancelar",class:"btn btn-outline-danger btn-sm",update:()=>{this.#Event_UpdateToolCancel({})}},dom:null},
         {x:1,y:3,index:6,name:"addLine",box:{id:"btn7",tipe:5,value:"añadir linea",class:"btn btn-outline-primary btn-sm",update:()=>{this.#New_AddLine({})}},dom:null},
+        {x:1,y:3,index:7,name:"pdf",box:{id:"btn8",tipe:5,value:"pdf",class:"btn btn-outline-danger btn-sm",update:()=>{this.#Event_UpdateToolPDF({})}},dom:null},
 
         {x:2,y:3,index:0,name:"pages",box:{tipe:3,value:1,options:[{show:"pag1",value:1}],update:()=>{this.#Event_UpdateToolPages({})}},dom:null},
     ];
@@ -478,13 +485,16 @@ class Crud_set extends ODD {
                     loadName:field.load.name,
                     loadShow:field.load.show,
                 });
+
+
                 var valueDefault = loadOptions.length > 0 ? loadOptions[0].value : 1;
                 var rsp = this.#Event_SetOptionsToFields({field,loadOptions});
-
                 if(rsp !=null && rsp.loadOptions) loadOptions = rst.loadOptions;
 
                 field.box.options = loadOptions;
                 field.box.value = valueDefault;
+
+                //console.log("set options",field.load.name,this.Loaded_GetLoadData({loadName:field.load.name}),loadOptions);
 
                 var boxes = k.GetBoxs({fieldName:field.name});
                 boxes.forEach(box => {
@@ -637,8 +647,8 @@ class Crud_set extends ODD {
             sql: reloadGetSizeData_sql,
             success:(result)=>{
 
-                var sizeResult = result[0]["size"];
-                var size = parseFloat(sizeResult);
+                var size = 0;
+                if(result && result.length>0) size = parseFloat(result[0]["size"]);
                 
                 //console.log("crud set -> count data",size);
                 success({size});
@@ -1006,11 +1016,14 @@ class Crud_set extends ODD {
 
         let k = this;
         k.Loading_SetActive({active:true});
-        if(this.#update_listOfChanges.length > 0 && this.#update_listOfChanges[0].fields.length > 0){
 
-            //----sql----
-            
-            var updateConditions = [];
+         //----sql----
+
+         var updateConditions = [];
+         var updateSets = [];
+        
+         if(this.#update_listOfChanges.length>0){
+
             var updateChangeFist = this.#update_listOfChanges[0];
             updateConditions.push({
                 table:this.#selectPrimary.table,
@@ -1018,8 +1031,7 @@ class Crud_set extends ODD {
                 inter:"=",
                 value:updateChangeFist.primary,
             });
-
-            var updateSets = [];
+            
             updateChangeFist.fields.forEach(fch => {
                 
                 var field = this.#fields.find(fd=>fd.name==fch.fieldName);
@@ -1032,29 +1044,42 @@ class Crud_set extends ODD {
                     });
                 }
             });
+         }
 
-            //----request----
+         var e_resp = this.CallEvent({name:"updateBefore",params:{conditions:updateConditions,sets:updateSets}})
+         if(e_resp!=null){
 
-            if(updateSets.length>0){
+            console.log("updatebefore",e_resp);
 
-                this.#conection.Request({
-                    php:"success",log:k.#ctr_log["update"],
-                    name:k.#title+" -> update-request",
-                    sql:k.#conection.GetSql_Update({
-                        tableMain:k.#tableMain,
-                        sets: updateSets,
-                        conditions:updateConditions,
-                    }),
-                    success:()=>{
-        
-                        k.#Update_success({success});
-                    },
-                })
-            }
-            else this.#Update_success({success});           
-            
-        }
-        else this.#Update_success({success});
+             if(e_resp.sets!=null)updateSets = e_resp.sets;
+             if(e_resp.conditions!=null)updateConditions = e_resp.conditions;
+         }        
+
+         //----request----
+
+         console.log("update:",updateSets,updateConditions);
+
+         if(updateConditions.length>0){
+
+            var updateSql = k.#conection.GetSql_Update({
+                tableMain:k.#tableMain,
+                sets: updateSets,
+                conditions:updateConditions,
+            });
+   
+            console.log("update:sel",updateSql);
+
+            this.#conection.Request({
+                php:"success",log:k.#ctr_log["update"],
+                name:k.#title+" -> update-request",
+                sql:updateSql,
+                success:()=>{
+    
+                    k.#Update_success({success});
+                },
+            });
+         }
+         else this.#Update_success({success});       
     }
 
     #Update_success({success,result}){
@@ -1228,7 +1253,7 @@ class Crud_set extends ODD {
                     {name:"cancel",show:false},
                     {name:"addLine",show:false},
                     
-                    {name:"pages",show:false},
+                    {name:"pages",show:true},
                 ],
             },
             {
@@ -1316,6 +1341,8 @@ class Crud_set extends ODD {
             break;
         }
 
+        this.CallEvent({name:"setStateAfter",params:{stateName}});
+
     }
 
     #State_SetTools({stateName,toolsSet=[]}){
@@ -1363,6 +1390,11 @@ class Crud_set extends ODD {
     }    
 
     //---------events----------
+
+    #Event_UpdateToolPDF({}){
+
+        this.CallEvent({name:"toolPdfUpdate"});
+    }
 
     #Event_UpdateToolReload({}){
 

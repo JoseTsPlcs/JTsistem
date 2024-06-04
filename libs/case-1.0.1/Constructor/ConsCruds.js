@@ -361,7 +361,7 @@ class ConsCruds extends ODD {
                                     if(field.action==conection.masterActionEdit){
 
                                         var fieldValue = k.GetValue({fieldName:masterField,y:0});
-                                        if(fieldValue){
+                                        if(fieldValue != null && fieldValue != ""){
 
                                             maidbuild.CrudJoins_Set({
                                                 field:maidField,
@@ -369,6 +369,7 @@ class ConsCruds extends ODD {
                                             });
                                             maidbuild.SetState({stateName:"reload"});
                                         }
+                                        else maidbuild.SetState({stateName:"new"});
                                     }    
                                     
                                     if(field.action==conection.masterActionAdd){

@@ -2,7 +2,8 @@
 
 var control = [
     {name:"window",active:false},
-    {name:"form",active:true},
+    {name:"form",active:false},
+    {name:"editImage",active:true},
 ];
 
 function ControlActive(name) {
@@ -57,6 +58,17 @@ control.forEach(cn => {
                     {position:"botton-right",name:"config",box:{tipe:5,class:"btn btn-outline-primary btn-sm",value:'<i class="bi bi-gear-wide"></i>'}},
                 ],
             });
+
+            break;
+
+            case "editImage":
+
+                var grid = new Grid({cols:[[6,6]]}); 
+                var parent = grid.GetColData({x:0,y:0}).col;
+                new EditableImage({
+                    parent,
+                    imageUrl:"../imagenes/vehiculo_4ruedas.png",
+                });
 
             break;
         }

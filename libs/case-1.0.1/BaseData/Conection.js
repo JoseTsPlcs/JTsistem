@@ -110,6 +110,7 @@ class Conection extends ODD {
     for (let slc = 0; slc < selects_length; slc++) {
 
       const select = selects[slc];
+      var selectSql = select["sql"] ? select["sql"] : "";
       var selectLast = slc == selects_length-1;
       var selectDb = select["db"];
       var selectTable = select["table"];
@@ -117,12 +118,18 @@ class Conection extends ODD {
       var selectAs = select["as"];
       var selectAction = select["action"];
 
-      if(selectAction) sql += selectAction + "(";
-      sql += (selectDb?selectDb+".":"") + selectTable + "." + selectField;
-      if(selectAction) sql += ")";
-      if(selectAs) sql += " AS '" + selectAs + "'";
+      if(selectSql == ""){
+
+        if(selectAction) selectSql += selectAction + "(";
+        selectSql += (selectDb?selectDb+".":"") + selectTable + "." + selectField;
+        if(selectAction) selectSql += ")";
+        if(selectAs) selectSql += " AS '" + selectAs + "'";
+      }
+
+      sql += selectSql;
       if(!selectLast) sql += ", ";
 
+      
     }
 
     sql += " FROM " +(dbMain?dbMain+".":"") + tableMain;

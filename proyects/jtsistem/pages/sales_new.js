@@ -7,15 +7,18 @@ $(document).ready(function() {
 
       var acc_products_update = userData.access.find(acc=>acc.value=="acc-2") && userData.access.find(acc=>acc.value=="acc-2").active == "true";
       var acc_price_update = userData.access.find(acc=>acc.value=="acc-3") && userData.access.find(acc=>acc.value=="acc-2").active == "true";
-      //acc_products_update = false;
 
       //-------------
+
+      var test_search = false;
+      var test_item = false;
 
       var gr = new Grid({
         cols:[
           [12],//modal customer
           [6,6],//venta
           [12],//steps
+          [12],//modal item
         ],
         attributes:[
           {x:0,y:1,attributes:[{name:"class",value:"col-12 col-md-4 pb-4"}/*,{name:"style",value:"background-color: lightcoral;"}*/]},
@@ -26,6 +29,7 @@ $(document).ready(function() {
       var prnt_customer = gr.GetColData({x:0,y:0}).col;
       var prnt_sale = gr.GetColData({x:0,y:1}).col;
       var prnt_stps = gr.GetColData({x:1,y:1}).col;
+      var prnt_modal_item =  gr.GetColData({x:0,y:3}).col;
 
       var stps = new Steps({
         parent:prnt_stps,
@@ -66,22 +70,44 @@ $(document).ready(function() {
               grid:{cols:[[12],[12]]},
             }
           },
+          /*{
+            name:"checkin",
+            window:{
+              grid:{cols:[[12],[12]]},
+              boxs:[],
+            }
+          },*/
+          /*{
+            name:"item",
+            window:{
+              grid:{cols:[[12],[12]]},
+              boxs:[],
+            }
+          }*/
         ],
       });
 
       var bx_product_update = stps.GetStep({stepIndex:0}).window.Conteiner_GetColData({x:0,y:0}).boxs[0];
-
       if(!acc_products_update) bx_product_update.Hide();
+
+      var stp_items = stps.GetStep({stepIndex:0});
+      var stp_vehi = stps.GetStep({stepIndex:3});
+      //var stp_item = stps.GetStep({stepIndex:4});
 
       var md = new Modal({parent:stps.GetStep({stepIndex:2}).window.Conteiner_GetColData({x:0,y:1}).col});
       var md2 = new Modal({parent:prnt_customer});
-      var md3 = new Modal({parent:stps.GetStep({stepIndex:0}).window.Conteiner_GetColData({x:0,y:2}).col});
-      var md4 = new Modal({parent:stps.GetStep({stepIndex:0}).window.Conteiner_GetColData({x:0,y:3}).col});
-      var md5 = new Modal({parent:stps.GetStep({stepIndex:0}).window.Conteiner_GetColData({x:0,y:4}).col});
+      var md3 = new Modal({parent:stp_items.window.Conteiner_GetColData({x:0,y:2}).col});
+      var md4 = new Modal({parent:stp_items.window.Conteiner_GetColData({x:0,y:3}).col});
+      var md5 = new Modal({parent:stp_items.window.Conteiner_GetColData({x:0,y:4}).col});
+      var md_item = new Modal({parent:prnt_modal_item});
 
       var prnt_items_fm = md3.GetContent();
+      //var prnt_checkin = stp_vehi.window.Conteiner_GetColData({x:0,y:0}).col;
+      var prnt_item = md_item.GetContent();
 
       stps.SetStepIndex({stepIndex:0});
+
+      var front = null;
 
       var conections = new ConsCruds({
 
@@ -92,7 +118,7 @@ $(document).ready(function() {
             active:true,
             script:{
               parent:prnt_sale,
-              title:"venta",
+              title:(userData.company.tipe == 2 ? "orden de trabajo" : "venta"),
               //h:"100%",
               panels:[
                 {col:12,tipe:"form",title:"principal",h:0,show:true,blocked:false},
@@ -171,6 +197,8 @@ $(document).ready(function() {
                 {table:'sales', field:'ID_CUSTOMER'},
                 {table:'sales', field:'TOTAL'},
                 {table:'sales', field:'COMMENT'},
+                {table:'sales', field:'ID_CHECKIN'},
+                {table:'sales', field:'ID_ITEM'},
               ],
               conditions:[
                 {
@@ -210,7 +238,30 @@ $(document).ready(function() {
                       value:company_id,
                     }
                   ],
-                }
+                },
+                (userData.company.tipe=="2"?{
+                  name:"ld-items",
+                  tableMain:"items_vehicles",
+                  selects:[
+                    {table:"items_vehicles",field:"ID_VEHICLE",as:"value"},
+                    {sql:"CONCAT(items_vehicles.PLACA,'-',items_vehicles.MARCA) AS 'show'"},
+                    {table:"items_vehicles",field:"PLACA"},
+                    {table:"items_vehicles",field:"MARCA"},
+                    {table:"items_vehicles",field:"MODELO"},
+                    {table:"items_vehicles",field:"NRO_MOTO"},
+                    {table:"items_vehicles",field:"NRO_VIN"},                
+                    {table:"items_vehicles",field:"ANIO"},
+                    {table:"items_vehicles",field:"COLOR"},
+                  ],
+                  conditions:[
+                    {
+                      table:"items_vehicles",
+                      field:"ID_COMPANY",
+                      inter:"=",
+                      value:company_id,
+                    }
+                  ],
+                }:null),
               ],
 
               fields:[
@@ -238,6 +289,14 @@ $(document).ready(function() {
                 {panel:"cliente",col:12,y:4,name:"direccion",box:{tipe:0}},
                 {panel:"cliente",col:12,y:4,name:"correo",box:{tipe:0}},
                 {panel:"cliente",col:12,y:4,name:"comentario",box:{tipe:0}},
+
+                //{panel:"principal",col:10,colAllLevel:true,y:0,name:"checkin",box:{tipe:0},select:"ID_CHECKIN"},
+                //{panel:"principal",col:2,colAllLevel:true,name:"edit",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit-checkin"},
+                //{panel:"principal",col:2,colAllLevel:true,name:"add",box:{tipe:5,value:'<i class="bi bi-plus-circle"></i>',class:"btn btn-primary btn-sm"},action:"add-checkin"},
+
+                (userData.company.tipe == "2"?{panel:"principal",col:8,colAllLevel:true,y:0,name:"vehiculo",box:{tipe:8,class:"w-100"},select:"ID_ITEM",load:{name:"ld-items",value:"value",show:"show"}}:null),
+                (userData.company.tipe == "2"?{panel:"principal",col:2,colAllLevel:true,name:"edit",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit-item"}:null),
+                (userData.company.tipe == "2"?{panel:"principal",col:2,colAllLevel:true,name:"add",box:{tipe:5,value:'<i class="bi bi-plus-circle"></i>',class:"btn btn-primary btn-sm"},action:"add-item"}:null),
 
               ],
 
@@ -1176,6 +1235,295 @@ $(document).ready(function() {
                 },
               ],
             }
+          },
+          {
+            name:"checkin",
+            active:false,
+            script:{
+              //parent:prnt_checkin,
+              title:"checkin de vehiculo",head:false,
+              panels:[
+                {col:12,y:0,title:"vehiculo",tipe:"form",blocked:false},
+                {col:4,y:1,title:"checklist",tipe:"form",blocked:false},
+                {col:8,y:1,title:"chasis",tipe:"form",blocked:false},
+              ],
+              stateStart:"block",
+              afterUpdate:"block",
+              afterCancel:"block",
+              afterInsert:"block",
+              stateTools:[
+                {
+                  name:"reload",
+                  tools:[
+                      {name:"config",show:false},
+                      {name:"load",show:true},
+                      
+                      {name:"excel",show:false},
+                      {name:"pdf",show:false},
+          
+                      {name:"sizes",show:false,value:1},
+                      {name:"reload",show:true},
+                      {name:"update",show:true},
+                      {name:"new",show:true},
+                      {name:"insert",show:false},
+                      {name:"cancel",show:false},
+                      
+                      {name:"pages",show:true},
+                  ],
+                }
+              ],
+              
+              tableMain:"checkin_vehicles",
+              selects:[
+                {table: "checkin_vehicles", field: "ID_CHECKIN_VEHICLE", primary: true},
+                {table: "checkin_vehicles", field: "ID_COMPANY"},
+                {table: "checkin_vehicles", field: "ID_SALE"},
+                {table: "checkin_vehicles", field: "ID_ITEM_VEHICLE"},
+                {table: "checkin_vehicles", field: "DATE_ENTER"},
+                {table: "checkin_vehicles", field: "FUEL"},
+                {table: "checkin_vehicles", field: "MILEAGE"},
+                {table: "checkin_vehicles", field: "COMENT"},
+                //{table: "checkin_vehicles", field: "OBSERVATIONS"},
+                {table: "checkin_vehicles", field: "CHECK_1"},
+                {table: "checkin_vehicles", field: "CHECK_2"},
+                {table: "checkin_vehicles", field: "CHECK_3"},
+                {table: "checkin_vehicles", field: "CHECK_4"},
+                {table: "checkin_vehicles", field: "CHECK_5"},
+                {table: "checkin_vehicles", field: "CHECK_6"},
+                {table: "checkin_vehicles", field: "CHECK_7"},
+                {table: "checkin_vehicles", field: "CHECK_8"},
+                {table: "checkin_vehicles", field: "CHECK_9"},
+                {table: "checkin_vehicles", field: "CHECK_10"},
+                {table: "checkin_vehicles", field: "CHECK_11"},
+                {table: "checkin_vehicles", field: "CHECK_12"},
+                {table: "checkin_vehicles", field: "CHECK_13"},
+                {table: "checkin_vehicles", field: "CHECK_14"},
+                {table: "checkin_vehicles", field: "CHECK_15"},
+                {table: "checkin_vehicles", field: "CHECK_16"},
+                {table: "checkin_vehicles", field: "CHECK_17"},
+                {table: "checkin_vehicles", field: "CHECK_18"},
+                {table: "checkin_vehicles", field: "CHECK_19"},
+                {table: "checkin_vehicles", field: "CHECK_20"},
+                {table: "checkin_vehicles", field: "CHECK_21"},
+                {table: "checkin_vehicles", field: "CHECK_22"},
+                {table: "checkin_vehicles", field: "CHECK_23"},
+                {table: "checkin_vehicles", field: "CHECK_24"},
+                {table: "checkin_vehicles", field: "CHECK_25"},
+                {table: "checkin_vehicles", field: "CHECK_26"},
+                
+                {table: "checkin_vehicles", field: "IMG_FRONT"},
+              ],
+              loads:[
+                {
+                  name:"ld-items",
+                  tableMain:"items_vehicles",
+                  selects:[
+                    {table:"items_vehicles",field:"ID_VEHICLE",as:"value"},
+                    {sql:"CONCAT(items_vehicles.PLACA,'-',items_vehicles.MARCA) AS 'show'"},
+                    {table:"items_vehicles",field:"PLACA"},
+                    {table:"items_vehicles",field:"MARCA"},
+                    {table:"items_vehicles",field:"MODELO"},
+                    {table:"items_vehicles",field:"NRO_MOTO"},
+                    {table:"items_vehicles",field:"NRO_VIN"},                
+                    {table:"items_vehicles",field:"ANIO"},
+                    {table:"items_vehicles",field:"COLOR"},
+                  ],
+                  conditions:[
+                    {
+                      table:"items_vehicles",
+                      field:"ID_COMPANY",
+                      inter:"=",
+                      value:company_id,
+                    }
+                  ],
+                },
+              ],
+
+              fields:[
+                {panel:"vehiculo",name:"vehiculo",box:{tipe:3},select:"ID_ITEM_VEHICLE",load:{name:"ld-items",value:"value",show:"show"}},
+                //{panel:"vehiculo",col:2,colAllLevel:true,...fld_edit},{panel:"vehiculo",col:2,colAllLevel:true,...fld_add},
+                {panel:"vehiculo",col:6,name:"fecha de entrada",box:bx_date,select:"DATE_ENTER"},
+                {panel:"vehiculo",col:6,name:"combustible",box:{tipe:1,value:0,attributes:[{name:"type",value:"range"},{name:"min",value:0},{name:"max",value:100}]},select:"FUEL"},
+                {panel:"vehiculo",col:6,name:"kilometraje",box:{tipe:1,value:0},select:"MILEAGE"},
+                {panel:"vehiculo",col:6,name:"comentario",box:{tipe:9,value:""},select:"COMENT"},
+
+                
+                {panel:"checklist",name:"check in 01",tipe:0,box:{tipe:6,value:0,name:"radio"},select:"CHECK_1"},
+                {panel:"checklist",name:"check in 02",tipe:0,box:{tipe:6,value:0,name:"tapa aceite motor"},select:"CHECK_2"},
+                {panel:"checklist",name:"check in 03",tipe:0,box:{tipe:6,value:0,name:"antena de radio"},select:"CHECK_3"},
+                {panel:"checklist",name:"check in 04",tipe:0,box:{tipe:6,value:0,name:"brazo de plumilla"},select:"CHECK_4"},
+                {panel:"checklist",name:"check in 05",tipe:0,box:{tipe:6,value:0,name:"cabezales de asiento"},select:"CHECK_5"},
+                {panel:"checklist",name:"check in 06",tipe:0,box:{tipe:6,value:0,name:"cenicero"},select:"CHECK_6"},
+                {panel:"checklist",name:"check in 07",tipe:0,box:{tipe:6,value:0,name:"cinturon de seguridad"},select:"CHECK_7"},
+                {panel:"checklist",name:"check in 08",tipe:0,box:{tipe:6,value:0,name:"claxon"},select:"CHECK_8"},
+                {panel:"checklist",name:"check in 09",tipe:0,box:{tipe:6,value:0,name:"alarma y control"},select:"CHECK_9"},
+                {panel:"checklist",name:"check in 10",tipe:0,box:{tipe:6,value:0,name:"emblemas"},select:"CHECK_10"},
+                {panel:"checklist",name:"check in 11",tipe:0,box:{tipe:6,value:0,name:"encendedor"},select:"CHECK_11"},
+                {panel:"checklist",name:"check in 12",tipe:0,box:{tipe:6,value:0,name:"escarpines"},select:"CHECK_12"},
+                {panel:"checklist",name:"check in 13",tipe:0,box:{tipe:6,value:0,name:"espejos externos"},select:"CHECK_13"},
+                {panel:"checklist",name:"check in 14",tipe:0,box:{tipe:6,value:0,name:"espejo initerior"},select:"CHECK_14"},
+                {panel:"checklist",name:"check in 15",tipe:0,box:{tipe:6,value:0,name:"gata y palanca"},select:"CHECK_15"},
+                {panel:"checklist",name:"check in 16",tipe:0,box:{tipe:6,value:0,name:"juego de herramientas"},select:"CHECK_16"},
+                {panel:"checklist",name:"check in 17",tipe:0,box:{tipe:6,value:0,name:"llantas de repuesto"},select:"CHECK_17"},
+                {panel:"checklist",name:"check in 18",tipe:0,box:{tipe:6,value:0,name:"llave de ruedas"},select:"CHECK_18"},
+                {panel:"checklist",name:"check in 19",tipe:0,box:{tipe:6,value:0,name:"llave de seguro vasos"},select:"CHECK_19"},
+                {panel:"checklist",name:"check in 20",tipe:0,box:{tipe:6,value:0,name:"llave de seguro rueda"},select:"CHECK_20"},
+                {panel:"checklist",name:"check in 21",tipe:0,box:{tipe:6,value:0,name:"llavero"},select:"CHECK_21"},
+                {panel:"checklist",name:"check in 22",tipe:0,box:{tipe:6,value:0,name:"luz de salon"},select:"CHECK_22"},
+                {panel:"checklist",name:"check in 23",tipe:0,box:{tipe:6,value:0,name:"manija de puertas"},select:"CHECK_23"},
+                {panel:"checklist",name:"check in 24",tipe:0,box:{tipe:6,value:0,name:"parlantes"},select:"CHECK_24"},
+                {panel:"checklist",name:"check in 25",tipe:0,box:{tipe:6,value:0,name:"pisos de jebe"},select:"CHECK_25"},
+                {panel:"checklist",name:"check in 26",tipe:0,box:{tipe:6,value:0,name:"plimillas/otros"},select:"CHECK_26"},
+
+                {panel:"chasis",name:"front",tipe:2,box:{tipe:0},action:"img"},
+                //{panel:"chasis",name:"comentario",tipe:2,box:{tipe:9,value:""},select:"COMENT"},
+                //type="file" class="form-control-file" id="imageInput" value="../images/mi_imagen.jpg"
+                
+              ],
+
+              events:[
+                {
+                  name:"setStateAfter",
+                  actions:[{
+                    action:({k,stateName})=>{
+
+                      console.log("set satet",stateName);
+
+                      if(stateName == "new"){
+
+                        var box = k.GetBoxs({fieldName:"front"})[0];
+                        var content = box.Blocks_Get()[0];
+
+                        front = new EditableImage({
+                          parent:content,
+                          imageUrl:"../imagenes/vehiculo_4ruedas.png",
+                        });
+
+                      }
+
+                    }
+                  }]
+                },
+                {
+                  name:"insertBefore",
+                  actions:[{
+                    action:({k,inserts})=>{
+
+                      inserts.push({
+                        field:"IMG_FRONT",
+                        value:front.ImageGet(),
+                        tipe:"values",
+                      });
+
+                      return {inserts};
+                    }
+                  }]
+                },
+                {
+                  name:"printAfter",
+                  actions:[{
+                    action:({k,result})=>{
+
+                      var box = k.GetBoxs({fieldName:"front"})[0];
+                      var content = box.Blocks_Get()[0];
+                      var img = result[0]["IMG_FRONT"];
+                      //console.log("load imgage:",img);
+
+                      front = new EditableImage({
+                        parent:content,
+                        imageUrl:"../imagenes/vehiculo_4ruedas.png",
+                      });
+
+                      if(img!=null) front.loadImage(img);
+                    }
+                  }]
+                },
+                {
+                  name:"updateBefore",
+                  actions:[{
+                    action:({k,conditions=[],sets=[]})=>{
+
+                      if(conditions.length==0){
+
+                        conditions.push({
+                          table:"checkin_vehicles",
+                          field:"ID_CHECKIN_VEHICLE",
+                          inter:"=",
+                          value:k.Reload_GetData_Primarys({})[0],
+                        });
+                      }
+
+                      if(front){
+
+                        sets.push({
+                          field:"IMG_FRONT",
+                          value:front.ImageGet(),
+                        });
+                      }
+
+                      return {conditions, sets};
+                    }
+                  }],
+                },
+                {
+                  name:"modalSetActive",
+                  actions:[{
+                    action:({active})=>{
+
+                      stps.SetStepIndex({stepIndex:3});
+                    }
+                  }]
+                }
+              ],
+            }
+          },
+          {
+            name:"item",
+            active:userData.company.tipe == "2",
+            script:{
+              parent:prnt_item,
+              title:"vehiculo",
+              panels:[{col:12,y:0,title:"main",head:false,tipe:"form"}],
+              stateStart:"block",
+              afterCancel:"block",
+
+              tableMain:"items_vehicles",
+              selects:[
+                {table:"items_vehicles",field:"ID_VEHICLE",primary:true},
+                {table:"items_vehicles",field:"PLACA"},
+                {table:"items_vehicles",field:"MARCA"},
+                {table:"items_vehicles",field:"MODELO"},
+                {table:"items_vehicles",field:"NRO_MOTO"},
+                {table:"items_vehicles",field:"NRO_VIN"},                
+                {table:"items_vehicles",field:"ANIO"},
+                {table:"items_vehicles",field:"COLOR"},
+              ],
+              inserts:[
+                ...ins_general,
+              ],
+
+              fields:[
+                {panel:"main",name:"placa",box:{tipe:1,value:""},select:"PLACA"},
+                {panel:"main",name:"marca",box:{tipe:1,value:""},select:"MARCA"},
+                {panel:"main",name:"modelo",box:{tipe:1,value:""},select:"MODELO"},
+                {panel:"main",name:"nro de motor",box:{tipe:1,value:""},select:"NRO_MOTO"},
+                {panel:"main",name:"nro de vin",box:{tipe:1,value:""},select:"NRO_VIN"},
+                {panel:"main",name:"año",box:{tipe:1,value:""},select:"ANIO"},
+                {panel:"main",name:"color",box:{tipe:1,value:""},select:"COLOR"},
+              ],
+
+              events:[
+                {
+                  name:"modalSetActive",
+                  actions:[{
+                    action:({active})=>{
+
+                      md_item.SetActive({active});
+                    }
+                  }]
+                }
+              ],
+            }
           }
         ],
 
@@ -1235,6 +1583,24 @@ $(document).ready(function() {
             maid:"fm-und",
             maidField:"ID_UNID",
           },
+          {
+            tipe:"fm-fm",
+            master:"sale",
+            masterActionEdit:"edit-checkin",
+            masterActionAdd:"add-checkin",
+            masterField:"checkin",
+            maid:"checkin",
+            maidField:"ID_CHECKIN_VEHICLE",
+          },
+          {
+            tipe:"fm-fm",
+            master:"sale",
+            masterActionEdit:"edit-item",
+            masterActionAdd:"add-item",
+            masterField:"vehiculo",
+            maid:"item",
+            maidField:"ID_VEHICLE",
+          },
         ],
 
         searchs:[
@@ -1249,6 +1615,9 @@ $(document).ready(function() {
 
     }
   });
+
+
+  
 
   
   
