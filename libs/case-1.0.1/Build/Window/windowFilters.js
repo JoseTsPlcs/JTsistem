@@ -180,23 +180,37 @@ class windowFilters extends ODD {
                 break;
 
                 case 1:
+                    //console.log("value:",values,select);
+                    if(values!=""){
 
-                    conditions.push({
-                        before:(existBefore?" AND (":"("),
-                        table:select.table,
-                        field:select.field,
-                        inter:" LIKE ",
-                        value:values,
-                    });
+                        conditions.push({
+                            before:(existBefore?" AND (":"("),
+                            table:select.table,
+                            field:select.field,
+                            inter:" LIKE ",
+                            value:values,
+                            after:")"
+                        });
+                    }
+                    else
+                    {
+                        conditions.push({
+                            before:(existBefore?" AND (":"("),
+                            table:select.table,
+                            field:select.field,
+                            inter:" LIKE ",
+                            value:values,
+                        });
 
-                    conditions.push({
-                        before:" OR ",
-                        table:select.table,
-                        field:select.field,
-                        inter:" IS NULL",
-                        after:")",
-                        value:null,
-                    });
+                        conditions.push({
+                            before:" OR ",
+                            table:select.table,
+                            field:select.field,
+                            inter:" IS NULL",
+                            after:")",
+                            value:null,
+                        });
+                    }                 
 
                 break;
             

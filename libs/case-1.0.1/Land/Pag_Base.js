@@ -67,7 +67,7 @@ class Pag_Base {
               var active = accessData ? accessData.active == "true" : false;
               var show = pag.show == null ? true : pag.show;
               //console.log(pag,active);
-              active=true;
+              //active=true;
               if(show) nav += `<a class="dropdown-item `+(active?"":"disabled")+`" href="`+(active?pag.href:"#")+`">`+pag.name+`</a>`;
             }
 

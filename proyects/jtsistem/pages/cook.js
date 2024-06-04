@@ -76,6 +76,10 @@ $(document).ready(function() {
                   value:userData.company.id,
                 }
               ],
+              orders:[
+                {field:"DATE_EMMIT",asc:true},
+                {field:"ID_STATUS",act:false},
+              ],
           
               configShow:false,
               filters:[

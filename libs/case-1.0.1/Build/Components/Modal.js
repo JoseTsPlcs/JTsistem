@@ -29,7 +29,7 @@ class Modal extends ODD {
     #content = null;
 
     //sizes xl, lg && sm
-    #Build({parent,size}){
+    #Build({parent,size,index=-1}){
 
         if(parent==null) parent = document.body;
 
@@ -57,9 +57,10 @@ class Modal extends ODD {
 
         this.#modal = document.createElement("div");
         this.#modal.setAttribute("class","modal");
-        this.#modal.setAttribute("tabindex","-1");
+        this.#modal.setAttribute("tabindex",index);
         this.#modal.setAttribute("role","dialog");
         var id = parent.id + "_modal_" + this._name;
+        this._id = id;
         this.#modal.setAttribute("id", id);
         parent.appendChild(this.#modal);
 
@@ -74,6 +75,13 @@ class Modal extends ODD {
         modal_dialog.appendChild(this.#content);
 
         this.CallEvent({name:'builded'});
+
+        let k = this;
+        $('#'+this._id).on('hidden.bs.modal', function (e) {
+            
+            //console.log("hiden ", id);
+            k.CallEvent({name:"hiden"});
+        });
     }
 
     GetContent(){
@@ -97,4 +105,5 @@ class Modal extends ODD {
         }
         
     }
+
 }

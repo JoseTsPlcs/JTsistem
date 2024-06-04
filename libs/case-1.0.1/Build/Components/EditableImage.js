@@ -64,9 +64,9 @@ class EditableImage extends ODD {
     this.originalImage = new Image();
     this.originalImage.onload = () => {
       const ratio = this.originalImage.height / this.originalImage.width;
-      var canvasWidth = this.parentElement.clientWidth * 1.1;
-      var canvasHeight = canvasWidth * ratio * 1.1;
-      canvasHeight = canvasWidth = 600;
+      var canvasWidth = this.parentElement.clientWidth
+      var canvasHeight = canvasWidth * ratio;
+      //canvasHeight = canvasWidth = 600;
       this.canvas.width = canvasWidth;
       this.canvas.height = canvasHeight;
       this.ctx.drawImage(this.originalImage, 0, 0, canvasWidth, canvasHeight);

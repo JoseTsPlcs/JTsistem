@@ -15,11 +15,55 @@ $(document).ready(function() {
       });
       
       var md_checkin_fm = new Modal({parent:gr.GetColData({x:0,y:1}).col,size:"lg",active:false});
-      var md_vehicle_fm = new Modal({parent:gr.GetColData({x:0,y:2}).col,size:"xl",active:false});
-      var md_customer_fm = new Modal({parent:gr.GetColData({x:0,y:3}).col,size:"xl",active:false});
+      var md_vehicle_fm = new Modal({
+        parent:gr.GetColData({x:0,y:2}).col,
+        index:-2,
+        size:null,
+        active:false,
+        events:[
+          {
+            name:"hiden",
+            actions:[{
+              action:({k})=>{
+
+                md_checkin_fm.SetActive({active:false});
+                md_checkin_fm.SetActive({active:true});
+              }
+            }]
+          }
+        ],
+      });
+      var md_customer_fm = new Modal({
+        parent:gr.GetColData({x:0,y:3}).col,
+        index:-2,
+        size:null,
+        active:false,
+        events:[
+          {
+            name:"hiden",
+            actions:[{
+              action:({k})=>{
+
+                md_checkin_fm.SetActive({active:false});
+                md_checkin_fm.SetActive({active:true});
+              }
+            }]
+          }
+        ],
+      });
+
+      var fm_checkin_fm = new Form({
+        parent:md_checkin_fm.GetContent(),head:false,
+        fields:[
+          {name:"content",tipe:0,box:{tipe:0,class:"w-100 px-0 mx-0"}},
+        ],
+        tools:[
+          {position:"botton-center",name:"pdf",box:{tipe:5,value:'pdf <i class="bi bi-filetype-pdf"></i>',class:"btn btn-danger btn-sm",update:()=>{SavePdf()}}},
+        ],
+      });
 
       var prnt_checkin_tb = gr.GetColData({x:0,y:0}).col;
-      var prnt_checkin_fm = md_checkin_fm.GetContent();
+      var prnt_checkin_fm = fm_checkin_fm.Field_GetBox({fieldName:"content"}).Blocks_Get()[0];
       var prnt_vehicle_fm = md_vehicle_fm.GetContent();
       var prnt_customer_fm = md_customer_fm.GetContent();
 
@@ -91,12 +135,26 @@ $(document).ready(function() {
 
               fields:[
                 {panel:"main",...fld_edit},
+                //{panel:"main",name:"pdf",box:{tipe:5,value:'<i class="bi bi-filetype-pdf"></i>',class:"btn btn-danger btn-sm"},action:"pdf"},
                 {panel:"main",name:"fecha de entrada",box:{tipe:0},select:"DATE_ENTER"},
                 {panel:"main",name:"cliente",box:{tipe:0},select:"NAME"},
                 {panel:"main",name:"marca",box:{tipe:0},select:"MARCA"},
                 {panel:"main",name:"placa",box:{tipe:0},select:"PLACA"},
               ],
-            }
+
+              events:[
+                {
+                  name:"boxUpdate",
+                  actions:[{
+                    action:({field})=>{
+  
+                      
+                    }
+                  }]
+                }
+              ]
+            },
+
           },
           {
             name:"checkin-fm",
@@ -111,7 +169,7 @@ $(document).ready(function() {
                 {col:8,y:1,title:"chasis",tipe:"form",blocked:false},
               ],
               stateStart:"block",
-              afterUpdate:"block",
+              //afterUpdate:"block",
               afterCancel:"block",
               afterInsert:"block",
               stateTools:[
@@ -122,16 +180,16 @@ $(document).ready(function() {
                       {name:"load",show:true},
                       
                       {name:"excel",show:false},
-                      {name:"pdf",show:true},
+                      {name:"pdf",show:false},
           
                       {name:"sizes",show:false,value:1},
                       {name:"reload",show:true},
                       {name:"update",show:true},
-                      {name:"new",show:true},
+                      {name:"new",show:false},
                       {name:"insert",show:false},
-                      {name:"cancel",show:false},
+                      {name:"cancel",show:true},
                       
-                      {name:"pages",show:true},
+                      {name:"pages",show:false},
                   ],
                 }
               ],
@@ -258,13 +316,13 @@ $(document).ready(function() {
 
               fields:[
 
-                {panel:"cliente",col:8,collAllLevel:true,name:"cliente",box:{tipe:8,class:"w-100"},load:{name:"ld-customers",value:"value",show:"show"},select:"ID_CUSTOMER"},
-                {panel:"cliente",col:2,collAllLevel:true,name:"cus-edit",...fld_edit,action:"cus-edit"},
-                {panel:"cliente",col:2,collAllLevel:true,name:"cus-add",...fld_add,action:"cus-add"},
+                {panel:"cliente",col:8,colAllLevel:true,name:"cliente",box:{tipe:8,class:"w-100"},load:{name:"ld-customers",value:"value",show:"show"},select:"ID_CUSTOMER"},
+                {panel:"cliente",col:2,colAllLevel:true,name:"cus-edit",...fld_edit,action:"cus-edit"},
+                {panel:"cliente",col:2,colAllLevel:true,name:"cus-add",...fld_add,action:"cus-add"},
 
-                {panel:"vehiculo",col:8,collAllLevel:true,name:"vehiculo",box:{tipe:8,class:"w-100"},select:"ID_ITEM_VEHICLE",load:{name:"ld-items",value:"value",show:"show"}},
-                {panel:"vehiculo",col:2,collAllLevel:true,name:"veh-edit",...fld_edit,action:"veh-edit"},
-                {panel:"vehiculo",col:2,collAllLevel:true,name:"veh-add",...fld_add,action:"veh-add"},
+                {panel:"vehiculo",col:8,colAllLevel:true,name:"vehiculo",box:{tipe:8,class:"w-100"},select:"ID_ITEM_VEHICLE",load:{name:"ld-items",value:"value",show:"show"}},
+                {panel:"vehiculo",col:2,colAllLevel:true,name:"veh-edit",...fld_edit,action:"veh-edit"},
+                {panel:"vehiculo",col:2,colAllLevel:true,name:"veh-add",...fld_add,action:"veh-add"},
                 //{panel:"vehiculo",col:2,colAllLevel:true,...fld_edit},{panel:"vehiculo",col:2,colAllLevel:true,...fld_add},
                 {panel:"vehiculo",col:6,name:"fecha de entrada",box:bx_date,select:"DATE_ENTER"},
                 {panel:"vehiculo",col:6,name:"combustible",box:{tipe:1,value:0,attributes:[{name:"type",value:"range"},{name:"min",value:0},{name:"max",value:100}]},select:"FUEL"},
@@ -299,7 +357,7 @@ $(document).ready(function() {
                 {panel:"checklist",name:"check in 25",tipe:0,box:{tipe:6,value:0,name:"pisos de jebe"},select:"CHECK_25"},
                 {panel:"checklist",name:"check in 26",tipe:0,box:{tipe:6,value:0,name:"plimillas/otros"},select:"CHECK_26"},
 
-                {panel:"chasis",name:"front",tipe:2,box:{tipe:0},action:"img"},
+                {panel:"chasis",name:"front",tipe:2,box:{tipe:0,class:"w-100 px-0 mx-0"},action:"img"},
                 //{panel:"chasis",name:"comentario",tipe:2,box:{tipe:9,value:""},select:"COMENT"},
                 //type="file" class="form-control-file" id="imageInput" value="../images/mi_imagen.jpg"
                 
