@@ -12,8 +12,9 @@ class windowFilters extends ODD {
 
     //------set variables
 
-    #SetVariables({filters}){
+    #SetVariables({filters=[]}){
 
+        filters = filters.filter(f=>f!=null);
         this.#filters = filters;
     }
 
