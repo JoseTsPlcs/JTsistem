@@ -103,6 +103,9 @@ class Conection extends ODD {
     FROM Orders
     INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
     */
+    selects = selects.filter(slc=>slc!=null);
+    joins = joins.filter(slc=>slc!=null);
+    conditions = conditions.filter(slc=>slc!=null);
 
     var sql = "SELECT ";
 
@@ -347,6 +350,8 @@ class Conection extends ODD {
   }
 
   GetSql_Where({conditions=[]}){
+
+    
 
     var cond_length = conditions.length
     if(cond_length==0) return "";

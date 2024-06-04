@@ -82,6 +82,7 @@ class Form extends ODD {
     #fields=[];
     _Fields_Set({fields=[]}){
 
+        fields = fields.filter(f=>f!=null);
         this.#fields=fields;
     }
     Fields_Get(){return this.#fields};
