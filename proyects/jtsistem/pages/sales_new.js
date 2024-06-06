@@ -140,7 +140,7 @@ $(document).ready(function() {
                         {name:"sizes",show:false,value:1},
                         {name:"reload",show:true},
                         {name:"update",show:true},
-                        {name:"new",show:true},
+                        {name:"new",show:false},
                         {name:"insert",show:false},
                         {name:"cancel",show:false},
                         
