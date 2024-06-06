@@ -252,7 +252,7 @@ $(document).ready(function() {
                       {name:"sizes",show:false,value:999},
                       {name:"reload",show:false},
                       {name:"update",show:false},
-                      {name:"new",show:true},
+                      {name:"new",show:false},
                       {name:"insert",show:false},
                       {name:"cancel",show:false},
                       {name:"addLine",show:false},
