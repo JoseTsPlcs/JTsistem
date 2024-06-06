@@ -76,7 +76,7 @@ $(document).ready(function() {
             active:true,
             script:{
               parent:prnt_checkin_tb,
-              title:"lista de ingreso vehicular",
+              title:"Ordenes de Trabajo",
               panels:[{title:"main",col:12,y:0,tipe:"table"}],
               stateTools:[
                 {
@@ -169,12 +169,12 @@ $(document).ready(function() {
             active:true,
             script:{
               parent:prnt_checkin_fm,
-              title:"checkin de vehiculo",head:true,
+              title:"Orden de Trabajo",head:true,
               panels:[
-                {col:12,y:0,title:"cliente",tipe:"form",h:0,blocked:false},
-                {col:12,y:0,title:"vehiculo",tipe:"form",blocked:false},
-                {col:4,y:1,title:"checklist",tipe:"form",blocked:false},
-                {col:8,y:1,title:"chasis",tipe:"form",blocked:false},
+                {col:12,y:0,title:"Datos del Cliente",tipe:"form",h:0,blocked:false},
+                {col:12,y:0,title:"Datos del Vehiculo",tipe:"form",blocked:false},
+                {col:4,y:1,title:"Inventario de Recepcion",tipe:"form",blocked:false},
+                {col:8,y:1,title:"Chasis",tipe:"form",blocked:false},
               ],
               stateStart:"block",
               //afterUpdate:"block",
@@ -207,6 +207,8 @@ $(document).ready(function() {
                 {table: "checkin_vehicles", field: "ID_CHECKIN_VEHICLE", primary: true},
                 {table: "checkin_vehicles", field: "ID_COMPANY"},
                 {table: "checkin_vehicles", field:"ID_CUSTOMER"},
+                {table: "checkin_vehicles", field:"ID_CUSTOMER_RECEPTOR"},
+                {table: "checkin_vehicles", field:"ID_USER_RECEPTOR"},
                 {table: "checkin_vehicles", field: "ID_SALE"},
                 {table: "checkin_vehicles", field: "ID_ITEM_VEHICLE"},
                 {table: "checkin_vehicles", field: "DATE_ENTER"},
@@ -320,53 +322,87 @@ $(document).ready(function() {
                     }
                   ],
                 },
+                {
+                  name:"ld-workers",
+                  tableMain:"workers",
+                  selects:[
+                    {table:"workers",field:"ID_WORKER",as:"value"},
+                    {sql:'CONCAT(customers.NAME,"-",work_areas.NAME) AS "show"'},
+                  ],
+                  joins:[
+                    {
+                      main:{table:"workers",field:"ID_CUSTOMER"},
+                      join:{table:"customers",field:"ID_CUSTOMER"},
+                      tipe:"LEFT",
+                    },
+                    {
+                      main:{table:"workers",field:"ID_WORK_AREA"},
+                      join:{table:"work_areas",field:"ID_WORK_AREA"},
+                      tipe:"LEFT",
+                    },
+                  ],
+                  conditions:[
+                    {
+                      table:"workers",
+                      field:"ID_COMPANY",
+                      inter:"=",
+                      value:company_id,
+                    }
+                  ],
+                },
               ],
 
               fields:[
 
-                {panel:"cliente",col:8,colAllLevel:true,name:"cliente",box:{tipe:8,class:"w-100"},load:{name:"ld-customers",value:"value",show:"show"},select:"ID_CUSTOMER"},
-                {panel:"cliente",col:2,colAllLevel:true,name:"cus-edit",...fld_edit,action:"cus-edit"},
-                {panel:"cliente",col:2,colAllLevel:true,name:"cus-add",...fld_add,action:"cus-add"},
+                {panel:"Datos del Cliente",col:8,colAllLevel:true,name:"cliente",box:{tipe:8,class:"w-100"},load:{name:"ld-customers",value:"value",show:"show"},select:"ID_CUSTOMER"},
+                {panel:"Datos del Cliente",col:2,colAllLevel:true,name:"cus-edit",...fld_edit,action:"cus-edit"},
+                {panel:"Datos del Cliente",col:2,colAllLevel:true,name:"cus-add",...fld_add,action:"cus-add"},
 
-                {panel:"vehiculo",col:8,colAllLevel:true,name:"vehiculo",box:{tipe:8,class:"w-100"},select:"ID_ITEM_VEHICLE",load:{name:"ld-items",value:"value",show:"show"}},
-                {panel:"vehiculo",col:2,colAllLevel:true,name:"veh-edit",...fld_edit,action:"veh-edit"},
-                {panel:"vehiculo",col:2,colAllLevel:true,name:"veh-add",...fld_add,action:"veh-add"},
-                //{panel:"vehiculo",col:2,colAllLevel:true,...fld_edit},{panel:"vehiculo",col:2,colAllLevel:true,...fld_add},
-                {panel:"vehiculo",col:6,name:"fecha de entrada",box:bx_date,select:"DATE_ENTER"},
-                {panel:"vehiculo",col:6,name:"combustible",box:{tipe:1,value:0,attributes:[{name:"type",value:"range"},{name:"min",value:0},{name:"max",value:100}]},select:"FUEL"},
-                {panel:"vehiculo",col:6,name:"kilometraje",box:{tipe:1,value:0},select:"MILEAGE"},
-                {panel:"vehiculo",col:6,name:"requerimiento",box:{tipe:9,value:""},select:"COMENT"},
+                {panel:"Datos del Cliente",col:8,colAllLevel:true,name:"solicitante",box:{tipe:8,class:"w-100"},load:{name:"ld-customers",value:"value",show:"show"},select:"ID_CUSTOMER_RECEPTOR"},
+                {panel:"Datos del Cliente",col:2,colAllLevel:true,name:"sol-edit",...fld_edit,action:"cus-edit"},
+                {panel:"Datos del Cliente",col:2,colAllLevel:true,name:"sol-add",...fld_add,action:"cus-add"},
+
+                {panel:"Datos del Cliente",col:12,colAllLevel:true,name:"recepcionista",box:{tipe:8,class:"w-100"},load:{name:"ld-workers",value:"value",show:"show"},select:"ID_USER_RECEPTOR"},
+
+                {panel:"Datos del Vehiculo",col:8,colAllLevel:true,name:"vehiculo",box:{tipe:8,class:"w-100"},select:"ID_ITEM_VEHICLE",load:{name:"ld-items",value:"value",show:"show"}},
+                {panel:"Datos del Vehiculo",col:2,colAllLevel:true,name:"veh-edit",...fld_edit,action:"veh-edit"},
+                {panel:"Datos del Vehiculo",col:2,colAllLevel:true,name:"veh-add",...fld_add,action:"veh-add"},
+                //{panel:"Datos del Vehiculo",col:2,colAllLevel:true,...fld_edit},{panel:"Datos del Vehiculo",col:2,colAllLevel:true,...fld_add},
+                {panel:"Datos del Vehiculo",col:6,name:"fecha de entrada",box:bx_date,select:"DATE_ENTER"},
+                {panel:"Datos del Vehiculo",col:6,name:"combustible",box:{tipe:1,value:0,attributes:[{name:"type",value:"range"},{name:"min",value:0},{name:"max",value:100}]},select:"FUEL"},
+                {panel:"Datos del Vehiculo",col:6,name:"kilometraje",box:{tipe:1,value:0},select:"MILEAGE"},
+                {panel:"Datos del Vehiculo",col:6,name:"requerimiento",box:{tipe:9,value:""},select:"COMENT"},
 
                 
-                {panel:"checklist",name:"check in 1",tipe:0,box:{tipe:6,value:0,name:"radio"},select:"CHECK_1"},
-                {panel:"checklist",name:"check in 2",tipe:0,box:{tipe:6,value:0,name:"tapa aceite motor"},select:"CHECK_2"},
-                {panel:"checklist",name:"check in 3",tipe:0,box:{tipe:6,value:0,name:"antena de radio"},select:"CHECK_3"},
-                {panel:"checklist",name:"check in 4",tipe:0,box:{tipe:6,value:0,name:"brazo de plumilla"},select:"CHECK_4"},
-                {panel:"checklist",name:"check in 5",tipe:0,box:{tipe:6,value:0,name:"cabezales de asiento"},select:"CHECK_5"},
-                {panel:"checklist",name:"check in 6",tipe:0,box:{tipe:6,value:0,name:"cenicero"},select:"CHECK_6"},
-                {panel:"checklist",name:"check in 7",tipe:0,box:{tipe:6,value:0,name:"cinturon de seguridad"},select:"CHECK_7"},
-                {panel:"checklist",name:"check in 8",tipe:0,box:{tipe:6,value:0,name:"claxon"},select:"CHECK_8"},
-                {panel:"checklist",name:"check in 9",tipe:0,box:{tipe:6,value:0,name:"alarma y control"},select:"CHECK_9"},
-                {panel:"checklist",name:"check in 10",tipe:0,box:{tipe:6,value:0,name:"emblemas"},select:"CHECK_10"},
-                {panel:"checklist",name:"check in 11",tipe:0,box:{tipe:6,value:0,name:"encendedor"},select:"CHECK_11"},
-                {panel:"checklist",name:"check in 12",tipe:0,box:{tipe:6,value:0,name:"escarpines"},select:"CHECK_12"},
-                {panel:"checklist",name:"check in 13",tipe:0,box:{tipe:6,value:0,name:"espejos externos"},select:"CHECK_13"},
-                {panel:"checklist",name:"check in 14",tipe:0,box:{tipe:6,value:0,name:"espejo initerior"},select:"CHECK_14"},
-                {panel:"checklist",name:"check in 15",tipe:0,box:{tipe:6,value:0,name:"gata y palanca"},select:"CHECK_15"},
-                {panel:"checklist",name:"check in 16",tipe:0,box:{tipe:6,value:0,name:"juego de herramientas"},select:"CHECK_16"},
-                {panel:"checklist",name:"check in 17",tipe:0,box:{tipe:6,value:0,name:"llantas de repuesto"},select:"CHECK_17"},
-                {panel:"checklist",name:"check in 18",tipe:0,box:{tipe:6,value:0,name:"llave de ruedas"},select:"CHECK_18"},
-                {panel:"checklist",name:"check in 19",tipe:0,box:{tipe:6,value:0,name:"llave de seguro vasos"},select:"CHECK_19"},
-                {panel:"checklist",name:"check in 20",tipe:0,box:{tipe:6,value:0,name:"llave de seguro rueda"},select:"CHECK_20"},
-                {panel:"checklist",name:"check in 21",tipe:0,box:{tipe:6,value:0,name:"llavero"},select:"CHECK_21"},
-                {panel:"checklist",name:"check in 22",tipe:0,box:{tipe:6,value:0,name:"luz de salon"},select:"CHECK_22"},
-                {panel:"checklist",name:"check in 23",tipe:0,box:{tipe:6,value:0,name:"manija de puertas"},select:"CHECK_23"},
-                {panel:"checklist",name:"check in 24",tipe:0,box:{tipe:6,value:0,name:"parlantes"},select:"CHECK_24"},
-                {panel:"checklist",name:"check in 25",tipe:0,box:{tipe:6,value:0,name:"pisos de jebe"},select:"CHECK_25"},
-                {panel:"checklist",name:"check in 26",tipe:0,box:{tipe:6,value:0,name:"plimillas/otros"},select:"CHECK_26"},
+                {panel:"Inventario de Recepcion",name:"check in 1",tipe:0,box:{tipe:6,value:0,name:"radio"},select:"CHECK_1"},
+                {panel:"Inventario de Recepcion",name:"check in 2",tipe:0,box:{tipe:6,value:0,name:"tapa aceite motor"},select:"CHECK_2"},
+                {panel:"Inventario de Recepcion",name:"check in 3",tipe:0,box:{tipe:6,value:0,name:"antena de radio"},select:"CHECK_3"},
+                {panel:"Inventario de Recepcion",name:"check in 4",tipe:0,box:{tipe:6,value:0,name:"brazo de plumilla"},select:"CHECK_4"},
+                {panel:"Inventario de Recepcion",name:"check in 5",tipe:0,box:{tipe:6,value:0,name:"cabezales de asiento"},select:"CHECK_5"},
+                {panel:"Inventario de Recepcion",name:"check in 6",tipe:0,box:{tipe:6,value:0,name:"cenicero"},select:"CHECK_6"},
+                {panel:"Inventario de Recepcion",name:"check in 7",tipe:0,box:{tipe:6,value:0,name:"cinturon de seguridad"},select:"CHECK_7"},
+                {panel:"Inventario de Recepcion",name:"check in 8",tipe:0,box:{tipe:6,value:0,name:"claxon"},select:"CHECK_8"},
+                {panel:"Inventario de Recepcion",name:"check in 9",tipe:0,box:{tipe:6,value:0,name:"alarma y control"},select:"CHECK_9"},
+                {panel:"Inventario de Recepcion",name:"check in 10",tipe:0,box:{tipe:6,value:0,name:"emblemas"},select:"CHECK_10"},
+                {panel:"Inventario de Recepcion",name:"check in 11",tipe:0,box:{tipe:6,value:0,name:"encendedor"},select:"CHECK_11"},
+                {panel:"Inventario de Recepcion",name:"check in 12",tipe:0,box:{tipe:6,value:0,name:"escarpines"},select:"CHECK_12"},
+                {panel:"Inventario de Recepcion",name:"check in 13",tipe:0,box:{tipe:6,value:0,name:"espejos externos"},select:"CHECK_13"},
+                {panel:"Inventario de Recepcion",name:"check in 14",tipe:0,box:{tipe:6,value:0,name:"espejo initerior"},select:"CHECK_14"},
+                {panel:"Inventario de Recepcion",name:"check in 15",tipe:0,box:{tipe:6,value:0,name:"gata y palanca"},select:"CHECK_15"},
+                {panel:"Inventario de Recepcion",name:"check in 16",tipe:0,box:{tipe:6,value:0,name:"juego de herramientas"},select:"CHECK_16"},
+                {panel:"Inventario de Recepcion",name:"check in 17",tipe:0,box:{tipe:6,value:0,name:"llantas de repuesto"},select:"CHECK_17"},
+                {panel:"Inventario de Recepcion",name:"check in 18",tipe:0,box:{tipe:6,value:0,name:"llave de ruedas"},select:"CHECK_18"},
+                {panel:"Inventario de Recepcion",name:"check in 19",tipe:0,box:{tipe:6,value:0,name:"llave de seguro vasos"},select:"CHECK_19"},
+                {panel:"Inventario de Recepcion",name:"check in 20",tipe:0,box:{tipe:6,value:0,name:"llave de seguro rueda"},select:"CHECK_20"},
+                {panel:"Inventario de Recepcion",name:"check in 21",tipe:0,box:{tipe:6,value:0,name:"llavero"},select:"CHECK_21"},
+                {panel:"Inventario de Recepcion",name:"check in 22",tipe:0,box:{tipe:6,value:0,name:"luz de salon"},select:"CHECK_22"},
+                {panel:"Inventario de Recepcion",name:"check in 23",tipe:0,box:{tipe:6,value:0,name:"manija de puertas"},select:"CHECK_23"},
+                {panel:"Inventario de Recepcion",name:"check in 24",tipe:0,box:{tipe:6,value:0,name:"parlantes"},select:"CHECK_24"},
+                {panel:"Inventario de Recepcion",name:"check in 25",tipe:0,box:{tipe:6,value:0,name:"pisos de jebe"},select:"CHECK_25"},
+                {panel:"Inventario de Recepcion",name:"check in 26",tipe:0,box:{tipe:6,value:0,name:"plimillas/otros"},select:"CHECK_26"},
 
-                {panel:"chasis",name:"front",tipe:2,box:{tipe:0,class:"w-100 px-0 mx-0"},action:"img"},
-                {panel:"chasis",name:"observacion",box:{tipe:9,class:"w-100 px-0 mx-0",value:""},select:"OBSERVATIONS"},
+                {panel:"Chasis",name:"front",tipe:2,box:{tipe:0,class:"w-100 px-0 mx-0"},action:"img"},
+                {panel:"Chasis",name:"observacion",box:{tipe:9,class:"w-100 px-0 mx-0",value:""},select:"OBSERVATIONS"},
                 //{panel:"chasis",name:"comentario",tipe:2,box:{tipe:9,value:""},select:"COMENT"},
                 //type="file" class="form-control-file" id="imageInput" value="../images/mi_imagen.jpg"
                 
@@ -492,19 +528,19 @@ $(document).ready(function() {
                   name:"reload",
                   tools:[
                       {name:"config",show:false},
-                      {name:"load",show:true},
+                      {name:"load",show:false},
                       
                       {name:"excel",show:false},
-                      {name:"pdf",show:true},
+                      {name:"pdf",show:false},
           
                       {name:"sizes",show:false,value:1},
                       {name:"reload",show:true},
                       {name:"update",show:true},
-                      {name:"new",show:true},
+                      {name:"new",show:false},
                       {name:"insert",show:false},
                       {name:"cancel",show:true},
                       
-                      {name:"pages",show:true},
+                      {name:"pages",show:false},
                   ],
                 }
               ],
@@ -682,6 +718,7 @@ $(document).ready(function() {
         var data = cr_checkin.Reload_GetData({})[0];
 
         var checkInData = {
+          logo:userData.company.logo,
           checkInNumber: data["ID_CHECKIN_VEHICLE"],
           checkInDate: data["DATE_ENTER"],
           customerName: data["CUSTOMER_NAME"],

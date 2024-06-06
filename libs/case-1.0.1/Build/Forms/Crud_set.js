@@ -66,6 +66,7 @@ class Crud_set extends ODD {
         this.#stateData.afterUpdate = afterUpdate;
         this.#stateData.newLinesStart = newLinesStart;
 
+        loads=loads.filter(ld=>ld!=null);
         this.#loadData.max = loads.length;
         this.#loadData.data = loads;
     }
@@ -184,6 +185,11 @@ class Crud_set extends ODD {
     #conteiner_panels = [];
     #Build_Panels({panels=[],breaklevel}){
 
+        panels.forEach(pn => {
+            
+            if(pn.tag == null && pn.title != null) pn.tag = pn.title;
+        });
+
         var lastY = 0;
         var lastX = 0;
         var colless = 12;
@@ -252,7 +258,7 @@ class Crud_set extends ODD {
                 case "form":
                     panel.build = new Window({
                         parent: panel.parent,
-                        title: panel.title,
+                        title: panel.tag,
                         blocked:panel.blocked,
                         show:panel.show,
                         head:panel.head,

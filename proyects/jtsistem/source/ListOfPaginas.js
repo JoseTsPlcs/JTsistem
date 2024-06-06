@@ -4,13 +4,13 @@ paginas = [
     {
         seccion:'<i class="bi bi-shop"></i> tienda',
         paginas:[
-          {name:"check-in",href:"check-in.php"},
-          {name:"vehiculos",href:"vehicles.php"},
-          {name:"control de ventas diarias",href:"sales_control.php"},
+          {name:"ordenes de Trabajos",href:"check-in.php"},
           {name:"venta nueva",href:"sales_new.php"},
-          {name:"cocina",href:"cook.php"},
-          {name:"ventas - por cobrar",href:"inform_nopaid.php"},
+          {name:"control de ventas",href:"sales_control.php"},
+          {name:"ventas confirmadas y en proceso",href:"cook.php"},
+          {name:"ventas terminadas por cobrar",href:"inform_nopaid.php"},
           {name:"caja",href:"pays_account.php"},
+          {name:"vehiculos",href:"vehicles.php"},
         ],
     },
     {

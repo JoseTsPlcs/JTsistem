@@ -168,6 +168,7 @@ function Login({uss,pss,fail}){
             {db:"lip_dv",table:"companies",field:"DIRECCION",as:"COMPANY_DIRECCION"},        
             {db:"lip_dv",table:"companies",field:"EMAIL",as:"COMPANY_EMAIL"},
             {db:"lip_dv",table:"companies",field:"ACTIVE",as:"COMPANY_ACTIVE"},
+            {db:"lip_dv",table:"companies",field:"LOGO",as:"COMPANY_LOGO"},
         ],
         joins:[
             {
@@ -231,6 +232,7 @@ function Login({uss,pss,fail}){
                   nameReal:result[0]["COMPANY_NAME_REAL"],
                   email:result[0]["COMPANY_EMAIL"],
                   direccion:result[0]["COMPANY_DIRECCION"],
+                  logo:result[0]["COMPANY_LOGO"],
                 },
                 class:{
                   name:result[0]["CLASS_NAME"],

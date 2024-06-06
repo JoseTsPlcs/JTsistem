@@ -5,6 +5,8 @@ $(document).ready(function() {
 
     success:({userData})=>{
 
+      var acc_work_update = userData.access.find(acc=>acc.value=="acc-8") && userData.access.find(acc=>acc.value=="acc-8").active == "true";
+
       var gr = new Grid({
         cols:[
           [12],
@@ -47,8 +49,8 @@ $(document).ready(function() {
             script:{
               parent:prnt_sales_tb,
               parent:gr.GetColData({x:0,y:1}).col,
-              title:"control de ventas",
-              panels:[{col:12,y:0,title:"main",tipe:"table"}],
+              title:"control de ventas",head:false,
+              panels:[{col:12,y:0,title:"main",tipe:"table",h:600}],
               stateTools:stTls_tb_all,
           
               tableMain:"sales",
@@ -62,10 +64,13 @@ $(document).ready(function() {
                 {table:'sales', field:'TOTAL'},
                 {table:'sales', field:'DOCUMENT_EMMIT'},
                 {table:'sales', field:'COMMENT'},
-                {table:'customers',field:'NAME'},
+                {table:'customer_client',field:'NAME'},
+                {sql:'CONCAT(items_vehicles.PLACA,"-",items_vehicles.MODELO) AS ITEM_NAME'},
+                {table:"sales",field:"ID_WORK_PROCESS"},
               ],
               joins:[
-                {main:{table:"sales",field:"ID_CUSTOMER"},join:{table:"customers",field:"ID_CUSTOMER"},tipe:"LEFT"}
+                {main:{table:"sales",field:"ID_CUSTOMER"},join:{table:"customers",field:"ID_CUSTOMER",as:"customer_client"},tipe:"LEFT"},
+                {main:{table:"sales",field:"ID_ITEM"},join:{table:"items_vehicles",field:"ID_VEHICLE"},tipe:"LEFT"},
               ],
               conditions:[
                 {
@@ -80,13 +85,37 @@ $(document).ready(function() {
                 {field:"DATE_EMMIT",asc:true},
                 {field:"ID_STATUS",act:false},
               ],
+              loads:[
+                {
+                  name:"ld-workers",
+                  tableMain:"workers",
+                  selects:[
+                    {table:"workers",field:"ID_WORKER",as:"value"},
+                    {sql:'CONCAT(workers.NAME,"-",work_areas.NAME) AS "show"'},
+                  ],
+                  joins:[
+                    {
+                      main:{table:"workers",field:"ID_WORK_AREA"},
+                      join:{table:"work_areas",field:"ID_WORK_AREA"},
+                      tipe:"LEFT",
+                    },
+                  ],
+                  conditions:[
+                    {
+                      table:"workers",
+                      field:"ID_COMPANY",
+                      inter:"=",
+                      value:company_id,
+                    }
+                  ],
+                }
+              ],
           
               configShow:false,
               filters:[
-                {col:12,y:0,name:"cliente",box:bx_input,select:{table:"customers",field:"NAME"}},
-                //{col:6,y:1,name:"fecha min",box:bx_date,select:{table:"sales",field:"DATE_EMMIT",tipe:"min"}},
-                //{col:6,y:1,name:"fecha max",box:bx_date,select:{table:"sales",field:"DATE_EMMIT",tipe:"max"}},
-                {col:12,y:2,name:"estado",box:{tipe:4,options:op_sales_status,value:["cotizacion","confirmado","en proceso"]},select:{table:"sales",field:"ID_STATUS"}},
+                {col:12,y:0,name:"cliente",box:bx_input,select:{table:"customer_client",field:"NAME"}},
+                
+                {col:12,y:2,name:"estado",box:{tipe:4,options:op_sales_status,value:[op_sales_status[1].show,op_sales_status[2].show]},select:{table:"sales",field:"ID_STATUS"}},
                 //{col:12,y:2,name:"cancelado",box:{tipe:4,options:op_sales_paid},select:{table:"sales",field:"PAID"}},
                 //{col:12,y:2,name:"documento",box:{tipe:4,options:op_sales_document},select:{table:"sales",field:"ID_DOCUMENT"}},
                 //{col:12,name:"emitido",box:{tipe:4,options:op_document_emmit},select:{table:"sales",field:"DOCUMENT_EMMIT"}},
@@ -96,12 +125,14 @@ $(document).ready(function() {
           
                 {panel:"main",...fld_edit},
                 
+                {panel:"main",name:"fecha de emision",attributes:[{name:"style",value:"min-width:160px"}],box:{tipe:0},select:"DATE_EMMIT"},
                 {panel:"main",name:"cliente",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"NAME"},
+                {panel:"main",name:"trabajador",attributes:[{name:"style",value:"min-width: 400px;"}],box:(acc_work_update?{tipe:8,class:"w-100"}:{tipe:0}),select:"ID_WORK_PROCESS",load:{name:"ld-workers",show:"show",value:"value"}},
+                (userData.company.tipe=="2"?{panel:"main",name:"vehiculo",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"ITEM_NAME"}:null),
                 {panel:"main",name:"estado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_status},select:"ID_STATUS"},
                 //{panel:"main",name:"cancelado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_paid},select:"PAID"},
 
-                {panel:"main",name:"comentario",box:{tipe:9,value:""},select:"COMMENT"},
-                {panel:"main",name:"fecha de emision",attributes:[{name:"style",value:"min-width:160px"}],box:{tipe:0},select:"DATE_EMMIT"},
+                {panel:"main",name:"comentario",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0,value:""},select:"COMMENT"},
 
               ],
               events:[
@@ -180,7 +211,7 @@ $(document).ready(function() {
                 
                 {panel:"main",name:"fecha de emision",box:{tipe:0},select:"DATE_EMMIT"},
                 {panel:"main",name:"cliente",box:{tipe:0},select:"NAME"},
-                {panel:"main",name:"estado",box:{tipe:3,options:[op_sales_status[0],op_sales_status[1],op_sales_status[2],op_sales_status[3]]},select:"ID_STATUS"},
+                {panel:"main",name:"estado",box:{tipe:3,options:[op_sales_status[1],op_sales_status[2],op_sales_status[3]]},select:"ID_STATUS"},
                 //{panel:"main",name:"cancelado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_paid},select:"PAID"},
 
                 {panel:"main",name:"comentario",box:{tipe:9,value:""},select:"COMMENT"},
