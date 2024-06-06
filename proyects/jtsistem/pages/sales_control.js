@@ -157,8 +157,9 @@ $(document).ready(function() {
               parent:mdGr.GetColData({x:0,y:0}).col,
               title:"venta",
               panels:[
-                {col:6,y:0,tipe:"form",title:"informacion"},
-                {col:6,y:0,tipe:"form",title:"cliente"},
+                {col:6,y:0,tipe:"form",title:"informacion",tag:"Informacion General"},
+                {col:6,y:0,tipe:"form",title:"cliente",tag:"Datos del Cliente"},
+                (userData.company.tipe=="2"?{col:12,y:0,tipe:"form",title:"vehicle",tag:"Datos del Vehiculo"}:null),
               ],
               stateStart:"block",
               stateTools:[
@@ -199,9 +200,21 @@ $(document).ready(function() {
                 {table:'customers',field:'EMAIL'},
                 {table:'customers',field:'COMPANY'},
                 {table:'customers',field:'NRO_DOCUMENT'},
+                (userData.company.tipe=="2"?{table:"items_vehicles",field:"PLACA"}:null),
+                (userData.company.tipe=="2"?{table:"items_vehicles",field:"MARCA"}:null),
+                (userData.company.tipe=="2"?{table:"items_vehicles",field:"MODELO"}:null),
+                (userData.company.tipe=="2"?{table:"items_vehicles",field:"NRO_MOTO"}:null),
+                (userData.company.tipe=="2"?{table:"items_vehicles",field:"NRO_VIN"}:null),
+                (userData.company.tipe=="2"?{table:"items_vehicles",field:"ANIO"}:null),
+                (userData.company.tipe=="2"?{table:"items_vehicles",field:"COLOR"}:null),
               ],
               joins:[
-                {main:{table:"sales",field:"ID_CUSTOMER"},join:{table:"customers",field:"ID_CUSTOMER"},tipe:"LEFT"}
+                {main:{table:"sales",field:"ID_CUSTOMER"},join:{table:"customers",field:"ID_CUSTOMER"},tipe:"LEFT"},
+                (userData.company.tipe=="2"?{
+                  main:{table:"sales",field:"ID_ITEM"},
+                  join:{table:"items_vehicles",field:"ID_VEHICLE"},
+                  tipe:"LEFT",
+                }:null),
               ],
     
               fields:[
@@ -215,6 +228,14 @@ $(document).ready(function() {
                 {panel:"cliente",name:"documento",box:{tipe:0,options:op_identity_document_tipe},select:"COMPANY"},
                 {panel:"cliente",name:"nro documento",box:{tipe:0},select:"NRO_DOCUMENT"},
                 {panel:"cliente",name:"direccion",box:{tipe:0},select:"DIRECCION"},
+
+                (userData.company.tipe=="2"?{panel:"vehicle",col:12,name:"placa",box:{tipe:0},select:"PLACA"}:null),
+                (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"marca",box:{tipe:0},select:"MARCA"}:null),
+                (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"modelo",box:{tipe:0},select:"MODELO"}:null),
+                (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"nro de motor",box:{tipe:0},select:"NRO_MOTO"}:null),
+                (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"nro de vin",box:{tipe:0},select:"NRO_VIN"}:null),
+                (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"año",box:{tipe:0},select:"ANIO"}:null),
+                (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"color",box:{tipe:0},select:"COLOR"}:null),
                 
                 //{panel:"informacion",name:"comentario",box:{tipe:0,value:""},select:"COMMENT"},
     
@@ -384,6 +405,17 @@ $(document).ready(function() {
           companyRUC:  userData.company.ruc,
           companyAddress: userData.company.direccion,
           companyPhone: userData.company.telf,
+          companyLogo:userData.company.logo,
+
+          vehicle: (userData.company.tipe=="2"?{
+            placa:sale_fm.GetValue({fieldName:"placa",y:0}),
+            marca:sale_fm.GetValue({fieldName:"marca",y:0}),
+            modelo:sale_fm.GetValue({fieldName:"modelo",y:0}),
+            nro_motor:sale_fm.GetValue({fieldName:"nro de motor",y:0}),
+            nro_vin:sale_fm.GetValue({fieldName:"nro de vin",y:0}),
+            anio:sale_fm.GetValue({fieldName:"año",y:0}),
+            color:sale_fm.GetValue({fieldName:"color",y:0}),
+          }:null),
 
           customerName: sale_fm.GetValue({fieldName:"cliente",y:0}),
           customerDocumentType: op_identity_document_tipe.find(op=>op.value==sale_fm.GetValue({fieldName:"documento",y:0})).show,

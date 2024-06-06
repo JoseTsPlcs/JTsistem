@@ -148,15 +148,16 @@ class Conection extends ODD {
       var joinMainField = join["main"]["field"];
 
       var joinJoinDb = join["join"]["db"];
+      var joinJoinAs = join["join"]["as"];
       var joinJoinTable = join["join"]["table"];
       var joinJoinField = join["join"]["field"];
 
       var joinTipe = join["tipe"];
 
-      sql += " " + joinTipe + " JOIN " + (joinJoinDb?joinJoinDb+".":"") + joinJoinTable + " ON " 
+      sql += " " + joinTipe + " JOIN " + (joinJoinDb?joinJoinDb+".":"") + joinJoinTable + (joinJoinAs?" AS " + joinJoinAs :"") + " ON " 
       sql += (joinMainDb?joinMainDb+".":"") + joinMainTable + "." + joinMainField;
       sql += " = ";
-      sql+= (joinJoinDb?joinJoinDb+".":"") + joinJoinTable + "." + joinJoinField;
+      sql+= (joinJoinDb?joinJoinDb+".":"") + (joinJoinAs?joinJoinAs:joinJoinTable) + "." + joinJoinField;
 
       if(!joinLast) sql += " ";
 

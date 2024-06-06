@@ -143,7 +143,7 @@ $(document).ready(function() {
                 {panel:"main",col:6,tipe:1,name:"precio unitario",box:{tipe:1,value:0},select:"PRICE_UNIT"},
 
                 {panel:"main",col:6,tipe:1,name:"stock total",box:{tipe:1,value:0},select:"STOCK_TOTAL"},
-                {panel:"main",col:6,tipe:1,name:"stock limite",box:{tipe:1,value:0},select:"STOCK_LIMIT"},
+                {panel:"main",col:6,tipe:1,name:"stock minimo",box:{tipe:1,value:0},select:"STOCK_LIMIT"},
               ],
 
               events:[

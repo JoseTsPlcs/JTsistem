@@ -11,6 +11,7 @@ class Box {
   //7 -> switch
   //8 -> search
   //9 -> text area (need to build)
+  //10 -> img
 
   #parent = undefined;
   #blocks = [];
@@ -126,6 +127,8 @@ class Box {
       this.#parent.appendChild(this.#blocks[0]);
 
       this.#blocks[0].setAttribute("class","w-100 m-0 p-0");
+
+      //this.#att.find(att=>att.name=="style" && att.value=="file");
 
       break;
 
@@ -270,6 +273,13 @@ class Box {
 
       break;
 
+      case 10:
+
+        this.#blocks[0] = document.createElement("img");
+        this.#parent.appendChild(this.#blocks[0]);
+
+      break;
+
       default:
 
     }
@@ -315,12 +325,33 @@ class Box {
       break;
 
       default:
-      $('#' + this.#blocks[0]['id']).change(function() {
+
+      if(this.#blocks[0].type == "file"){
+
+        this.#blocks[0].addEventListener('change', function(event) {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              const preview = document.getElementById('preview');
+              u.#value = e.target.result;
+              //console.log("u:", u.#value);
+              u.#CallUpdate(u.#value);
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+      else
+      {
+
+        $('#' + this.#blocks[0]['id']).change(function() {
 
         
-        // console.log("----------------setvalue----");
-        u.#CallUpdate(this.value);
-      });
+          // console.log("----------------setvalue----");
+          u.#CallUpdate(this.value);
+        });
+      }     
 
     }
   }
@@ -398,6 +429,8 @@ class Box {
         //d.setAttribute("style",this.#style);
 
       break;
+
+      
 
 
       default:
@@ -481,9 +514,24 @@ class Box {
         
       break;
 
+      case 10:
+
+        //console.log(this.#value);
+        //const url = URL.createObjectURL(this.#value);
+        this.#blocks[0].src = this.#value;
+        //this.#blocks[0].style.display = 'block';
+
+        
+        //this.#blocks[0].src = this.#value;
+
+      break;
+
       default:
-        //if(this.#tipe==9) console.log(this.#value);
-        this.#blocks[0].value = this.#value;
+        
+        var isFile = this.#blocks[0].type == "file";
+        //console.log(isFile,this.#blocks[0]);
+        if(!isFile) this.#blocks[0].value = this.#value;
+        else  this.#blocks[0].file = this.#value;
     }
   }
 
@@ -513,6 +561,7 @@ class Box {
     switch (this.#tipe) {
 
       case 1:
+      if(this.#blocks[0].type=="file") return this.#value;
       return this.#blocks[0].value;
 
       case 3:
@@ -542,6 +591,7 @@ class Box {
       return chk ? 1 : 0;
 
       default:
+
       return this.#value;
     }
 

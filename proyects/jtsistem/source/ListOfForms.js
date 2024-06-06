@@ -18,6 +18,7 @@ var op_access = [
     {value:"acc-5",show:"modificar el cierre de los controles de cuentas"},
     {value:"acc-6",show:"modificar el total de cuentas"},
     {value:"acc-7",show:"modificar el estado de cuentas"},
+    {value:"acc-8",show:"asignar trabajador a venta"},
     ...paginasOptions,
 ];
 
@@ -30,7 +31,7 @@ const op_sales_status = [
     {value:2,show:"confirmado",class:"rounded text-center bg-primary text-white"},
     {value:3,show:"en proceso",class:"rounded text-center bg-warning text-white"},
     {value:4,show:"terminado",class:"rounded text-center bg-success text-white"},
-    {value:5,show:"cancelado",class:"rounded text-center bg-danger text-white"},
+    {value:5,show:"anulado",class:"rounded text-center bg-danger text-white"},
 ];
 const op_sales_paid = [
     {value:1,show:"pagado",class:"rounded text-center bg-success text-white"},
@@ -61,7 +62,7 @@ const op_buys_status = [
     {value:2,show:"confirmado",class:"rounded text-center bg-primary text-white"},
     {value:3,show:"en proceso",class:"rounded text-center bg-warning text-white"},
     {value:4,show:"entregado",class:"rounded text-center bg-success text-white"},
-    {value:5,show:"cancelado",class:"rounded text-center bg-danger text-white"},
+    {value:5,show:"anulado",class:"rounded text-center bg-danger text-white"},
 ];
 const op_active = [
     {value:0,show:"desactivo",class:"rounded text-center bg-danger text-white"},
@@ -1180,7 +1181,7 @@ function UserLog_ChangePagesByCompany(userData){
         case "1":
             
             paginas[0].paginas[0].show = false;
-            paginas[0].paginas[1].show = false;
+            paginas[0].paginas[6].show = false;
 
         break;
 
@@ -1189,10 +1190,10 @@ function UserLog_ChangePagesByCompany(userData){
         console.log("asdaksdmasd");
 
             paginas[0].seccion = '<i class="bi bi-wrench-adjustable"></i> taller';
-            paginas[0].paginas[2].name = "ordenes de trabajo/cotizaciones";
-            paginas[0].paginas[3].name = "nueva orden/cotizacion";
-            paginas[0].paginas[4].name = "ordenes de trabajos";
-            paginas[0].paginas[5].name = "trabajos por cobrar";
+            //paginas[0].paginas[1].name = "nueva cotizacion";
+            //paginas[0].paginas[2].name = "control de cotizaciones";
+            paginas[0].paginas[3].name = "lista de trabajos";
+            paginas[0].paginas[4].name = "trabajos terminados por cobrar";
 
             paginas[3].paginas[3].show = false;
             paginas[3].paginas[4].show = false;
@@ -1230,7 +1231,7 @@ const invoiceData = {
 */
 async function generateInvoicePDF(invoiceData) {
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'pt', 'a3');  // Mantener tamaño A3
+    const pdf = new jsPDF('landscape', 'pt', 'a4'); // Mantener tamaño A4 horizontal
 
     const margin = 40;
     const startY = 50;
@@ -1240,85 +1241,112 @@ async function generateInvoicePDF(invoiceData) {
 
     const fontSizeNormal = 12 * 0.85;  // Incremento del 15%
     const fontSizeHeader = 20 * 0.85;  // Incremento del 15%
-
-    // Header
-    pdf.setFontSize(fontSizeHeader);
-    pdf.setTextColor(40, 40, 40);
-    pdf.text('Factura', margin, startY);
-
-    // Company Details
-    pdf.setFontSize(fontSizeNormal);
-    pdf.setTextColor(100, 100, 100);
-    pdf.text(`Número de Factura: ${invoiceData.invoiceNumber}`, margin, startY + 2 * lineHeight);
-    pdf.text(`Fecha: ${invoiceData.invoiceDate}`, margin, startY + 3 * lineHeight);
-    pdf.text(`Cliente: ${invoiceData.customerName}`, margin, startY + 4 * lineHeight);
-    pdf.text(`Tipo de Documento: ${invoiceData.customerDocumentType}`, margin, startY + 5 * lineHeight);
-    pdf.text(`Número de Documento: ${invoiceData.customerDocumentNumber}`, margin, startY + 6 * lineHeight);
-    pdf.text(`Número de Teléfono: ${invoiceData.customerPhone}`, margin, startY + 7 * lineHeight);
-    pdf.text(`Dirección: ${invoiceData.customerAddress}`, margin, startY + 8 * lineHeight);
     
-    // Company Box
-    const companyBoxWidth = 200;
-    const companyBoxHeight = 6 * lineHeight;
-    const companyBoxX = pageWidth - margin - companyBoxWidth;
-    const companyBoxY = startY + 2 * lineHeight;
-    pdf.setFillColor(230, 230, 230);
-    pdf.rect(companyBoxX, companyBoxY, companyBoxWidth, companyBoxHeight, 'F');
-    pdf.setTextColor(40, 40, 40);
-    pdf.text(`Razón Social: ${invoiceData.companyName}`, companyBoxX + 10, startY + 2.5 * lineHeight);
-    pdf.text(`RUC: ${invoiceData.companyRUC}`, companyBoxX + 10, startY + 3.5 * lineHeight);
-    pdf.text(`Dirección: ${invoiceData.companyAddress}`, companyBoxX + 10, startY + 4.5 * lineHeight);
-    pdf.text(`Teléfono: ${invoiceData.companyPhone}`, companyBoxX + 10, startY + 5.5 * lineHeight);
+    // Logo
+    
+    const logoImg = new Image();
+    logoImg.src = invoiceData.companyLogo;
+    logoImg.onload = function() {
+        
+        const aspectRatio = logoImg.width / logoImg.height;
+        const logoWidth = 120;
+        const logoHeight = logoWidth / aspectRatio;
+        pdf.addImage(logoImg, 'JPEG', pageWidth - margin - logoWidth, margin, logoWidth, logoHeight);
 
-    // Table Headers
-    const precioUnitarioWidth = 480 + 50;
-    const precioTotalWidth = 570 + 100;
+        // Header
+        pdf.setFontSize(fontSizeHeader);
+        pdf.setTextColor(40, 40, 40);
+        pdf.text('Cotizacion', margin, startY);
 
-    pdf.setFillColor(230, 230, 230);
-    pdf.rect(margin, startY + 10 * lineHeight, usableWidth, lineHeight, 'F');
-    pdf.setTextColor(0, 0, 0);
-    pdf.setFontSize(fontSizeNormal);
-    pdf.text('Detalle', margin + 5, startY + 10.7 * lineHeight);
-    pdf.text('Tipo', margin + 250, startY + 10.7 * lineHeight);
-    pdf.text('Cantidad', margin + 330, startY + 10.7 * lineHeight);
-    pdf.text('Unidad', margin + 410, startY + 10.7 * lineHeight);
-    pdf.text('Precio Unitario', margin + precioUnitarioWidth, startY + 10.7 * lineHeight);
-    pdf.text('Precio Total', margin + precioTotalWidth, startY + 10.7 * lineHeight);
-
-    // Table Content
-    let positionY = startY + 11.5 * lineHeight;
-    let totalServices = 0;
-    let totalProducts = 0;
-    invoiceData.items.forEach(item => {
+        // Company Details
+        pdf.setFontSize(fontSizeNormal);
         pdf.setTextColor(100, 100, 100);
-        pdf.text(item.detail, margin + 5, positionY);
-        pdf.text(item.type, margin + 250, positionY);
-        pdf.text(String(item.quantity), margin + 330, positionY);
-        pdf.text('und', margin + 410, positionY);
-        pdf.text(`S/. ${item.unitPrice.toFixed(2)}`, margin + precioUnitarioWidth, positionY);
-        pdf.text(`S/. ${item.totalPrice.toFixed(2)}`, margin + precioTotalWidth, positionY);
-        positionY += lineHeight;
+        pdf.text(`Número: ${invoiceData.invoiceNumber}`, margin, startY + 2 * lineHeight);
+        pdf.text(`Fecha: ${invoiceData.invoiceDate}`, margin, startY + 3 * lineHeight);
+        pdf.text(`Cliente: ${invoiceData.customerName}`, margin, startY + 4 * lineHeight);
+        pdf.text(`Tipo de Documento: ${invoiceData.customerDocumentType}`, margin, startY + 5 * lineHeight);
+        pdf.text(`Número de Documento: ${invoiceData.customerDocumentNumber}`, margin, startY + 6 * lineHeight);
+        pdf.text(`Número de Teléfono: ${invoiceData.customerPhone}`, margin, startY + 7 * lineHeight);
+        pdf.text(`Dirección: ${invoiceData.customerAddress}`, margin, startY + 8 * lineHeight);
 
-        if (item.type === 'servicio') {
-            totalServices += item.totalPrice;
-        } else {
-            totalProducts += item.totalPrice;
+        //vehicle Details
+        if(invoiceData.vehicle!=null){
+
+            pdf.setFontSize(fontSizeNormal);
+            pdf.setTextColor(100, 100, 100);
+            pdf.text(`Placa: ${invoiceData.vehicle.placa}`, margin+250, startY + 2 * lineHeight);
+            pdf.text(`Marca: ${invoiceData.vehicle.marca}`, margin+250, startY + 3 * lineHeight);
+            pdf.text(`Modelo: ${invoiceData.vehicle.modelo}`, margin+250, startY + 4 * lineHeight);
+            pdf.text(`Nro de Motor: ${invoiceData.vehicle.nro_motor}`, margin+250, startY + 5 * lineHeight);
+            pdf.text(`Nro de Vin: ${invoiceData.vehicle.nro_vin}`, margin+250, startY + 6 * lineHeight);
+            pdf.text(`Año: ${invoiceData.vehicle.anio}`, margin+250, startY + 7 * lineHeight);
+            pdf.text(`Color: ${invoiceData.vehicle.color}`, margin+250, startY + 8 * lineHeight);   
         }
-    });
+        
+        // Company Box
+        const companyBoxWidth = 200;
+        const companyBoxHeight = 6 * lineHeight;
+        const companyBoxX = pageWidth - margin - companyBoxWidth - logoWidth - 10;
+        const companyBoxY = startY + 2 * lineHeight - 50;
+        pdf.setFillColor(230, 230, 230);
+        pdf.rect(companyBoxX, companyBoxY, companyBoxWidth, companyBoxHeight, 'F');
+        pdf.setTextColor(40, 40, 40);
+        pdf.text(`Razón Social: ${invoiceData.companyName}`, companyBoxX + 10, startY + 2.5 * lineHeight - 50);
+        pdf.text(`RUC: ${invoiceData.companyRUC}`, companyBoxX + 10, startY + 3.5 * lineHeight - 50);
+        pdf.text(`Dirección: ${invoiceData.companyAddress}`, companyBoxX + 10, startY + 4.5 * lineHeight - 50);
+        pdf.text(`Teléfono: ${invoiceData.companyPhone}`, companyBoxX + 10, startY + 5.5 * lineHeight - 50);
 
-    const TotalWidth = 100;
+        // Table Headers
+        const precioUnitarioWidth = 480 + 50;
+        const precioTotalWidth = 570 + 100;
 
-    // Total
-    pdf.setTextColor(0, 0, 0);
-    pdf.setFontSize(fontSizeNormal);
-    pdf.text(`Total Productos: S/. ${totalProducts.toFixed(2)}`, margin + precioUnitarioWidth + TotalWidth, positionY + lineHeight);
-    pdf.text(`Total Servicios: S/. ${totalServices.toFixed(2)}`, margin + precioUnitarioWidth + TotalWidth, positionY + 2 * lineHeight);
-    pdf.text(`Total: S/. ${(totalProducts + totalServices).toFixed(2)}`, margin + precioUnitarioWidth + TotalWidth, positionY + 3 * lineHeight);
+        pdf.setFillColor(230, 230, 230);
+        pdf.rect(margin, startY + 10 * lineHeight, usableWidth, lineHeight, 'F');
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFontSize(fontSizeNormal);
+        pdf.text('Detalle', margin + 5, startY + 10.7 * lineHeight);
+        pdf.text('Tipo', margin + 250, startY + 10.7 * lineHeight);
+        pdf.text('Cantidad', margin + 330, startY + 10.7 * lineHeight);
+        pdf.text('Unidad', margin + 410, startY + 10.7 * lineHeight);
+        pdf.text('Precio Unitario', margin + precioUnitarioWidth, startY + 10.7 * lineHeight);
+        pdf.text('Precio Total', margin + precioTotalWidth, startY + 10.7 * lineHeight);
 
-    // Open PDF in New Tab
-    const pdfDataUri = pdf.output('datauristring');
-    const newTab = window.open();
-    newTab.document.body.innerHTML = '<embed width="100%" height="100%" src="' + pdfDataUri + '" type="application/pdf">';
+        // Table Content
+        let positionY = startY + 11.5 * lineHeight;
+        let totalServices = 0;
+        let totalProducts = 0;
+        invoiceData.items.forEach(item => {
+            pdf.setTextColor(100, 100, 100);
+            pdf.text(item.detail, margin + 5, positionY);
+            pdf.text(item.type, margin + 250, positionY);
+            pdf.text(String(item.quantity), margin + 330, positionY);
+            pdf.text('und', margin + 410, positionY);
+            pdf.text(`S/. ${item.unitPrice.toFixed(2)}`, margin + precioUnitarioWidth, positionY);
+            pdf.text(`S/. ${item.totalPrice.toFixed(2)}`, margin + precioTotalWidth, positionY);
+            positionY += lineHeight;
+
+            if (item.type === 'servicio') {
+                totalServices += item.totalPrice;
+            } else {
+                totalProducts += item.totalPrice;
+            }
+        });
+
+        const TotalWidth = 100;
+
+        // Total
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFontSize(fontSizeNormal);
+        pdf.text(`Total Productos: S/. ${totalProducts.toFixed(2)}`, margin + precioUnitarioWidth + TotalWidth, positionY + lineHeight);
+        pdf.text(`Total Servicios: S/. ${totalServices.toFixed(2)}`, margin + precioUnitarioWidth + TotalWidth, positionY + 2 * lineHeight);
+        pdf.text(`Total: S/. ${(totalProducts + totalServices).toFixed(2)}`, margin + precioUnitarioWidth + TotalWidth, positionY + 3 * lineHeight);
+        
+        // Open PDF in New Tab
+        const pdfDataUri = pdf.output('datauristring');
+        const newTab = window.open();
+        newTab.document.body.innerHTML = '<embed width="100%" height="100%" src="' + pdfDataUri + '" type="application/pdf">';
+    };
+    
 }
 
 /*
@@ -1356,9 +1384,10 @@ const checkInData = {
 async function generateCheckInPDF(checkInData) {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'pt', 'a4');
+    //const pdf = new jsPDF('landscape', 'pt', 'a4'); // Mantener tamaño A4 horizontal
 
-    const margin = 40;
-    const startY = 50;
+    const margin = 20;
+    const startY = 20;
     const lineHeight = 20;
     const pageWidth = pdf.internal.pageSize.getWidth();
     const usableWidth = pageWidth - 2 * margin;
@@ -1366,90 +1395,104 @@ async function generateCheckInPDF(checkInData) {
     const fontSizeNormal = 12 * 0.85;
     const fontSizeHeader = 20 * 0.85;
 
-    // Header
-    pdf.setFontSize(fontSizeHeader);
-    pdf.setTextColor(40, 40, 40);
-    pdf.text('Vehiculo Check-In', margin, startY);
+    // Logo
+    const logoImg = new Image();
+    logoImg.src = checkInData.logo; // Logo en base64 desde checkInData
+    logoImg.onload = function() {
+        console.log('Logo cargado correctamente');
+        const logoWidth = 120; // Ajusta el tamaño del logo según tu preferencia
+        const aspectRatio = logoImg.width / logoImg.height;
+        const logoHeight = logoWidth / aspectRatio;
+        pdf.addImage(logoImg, 'JPEG', pageWidth - logoWidth - margin, startY + 1 * lineHeight, logoWidth, logoHeight);
 
-    // Customer Details
-    pdf.setFontSize(fontSizeNormal);
-    pdf.setTextColor(100, 100, 100);
-    pdf.text(`Check-In Number: ${checkInData.checkInNumber}`, margin, startY + 2 * lineHeight);
-    pdf.text(`Fecha de Entrada: ${checkInData.checkInDate}`, margin, startY + 3 * lineHeight);
-    pdf.text(`Cliente: ${checkInData.customerName}`, margin, startY + 4 * lineHeight);
-    pdf.text(`Nro de Identificacion: ${checkInData.customerId}`, margin, startY + 5 * lineHeight);
-    pdf.text(`Telefono: ${checkInData.customerPhone}`, margin, startY + 6 * lineHeight);
-    pdf.text(`Direccion: ${checkInData.customerAddress}`, margin, startY + 7 * lineHeight);
+        // Header
+        pdf.setFontSize(fontSizeHeader);
+        pdf.setTextColor(40, 40, 40);
+        pdf.text('Orden de Trabajo', margin, startY);
 
-    // Vehicle Details
-    pdf.text('Detalles del Vehiculo:', margin, startY + 9 * lineHeight);
-    pdf.text(`Placa: ${checkInData.vehicle.plate}`, margin, startY + 10 * lineHeight);
-    pdf.text(`Marca: ${checkInData.vehicle.brand}`, margin, startY + 11 * lineHeight);
-    pdf.text(`Modelo: ${checkInData.vehicle.model}`, margin, startY + 12 * lineHeight);
-    pdf.text(`Nro de Motor: ${checkInData.vehicle.engineNumber}`, margin, startY + 13 * lineHeight);
-    pdf.text(`Nro de Vin: ${checkInData.vehicle.vinNumber}`, margin, startY + 14 * lineHeight);
-    pdf.text(`año: ${checkInData.vehicle.year}`, margin, startY + 15 * lineHeight);
-    pdf.text(`Color: ${checkInData.vehicle.color}`, margin, startY + 16 * lineHeight);
-
-    // Comments
-    pdf.text('requerimiento:', margin, startY + 18 * lineHeight);
-    pdf.text(`${checkInData.comments}`, margin, startY + 19 * lineHeight, { maxWidth: usableWidth / 2 });
-
-    // Company Box
-    const companyBoxWidth = 200;
-    const companyBoxHeight = 6 * lineHeight;
-    const companyBoxX = pageWidth - margin - companyBoxWidth;
-    const companyBoxY = startY + 2 * lineHeight;
-    pdf.setFillColor(230, 230, 230);
-    pdf.rect(companyBoxX, companyBoxY, companyBoxWidth, companyBoxHeight, 'F');
-    pdf.setTextColor(40, 40, 40);
-    pdf.text(`Razon Social: ${checkInData.companyName}`, companyBoxX + 10, startY + 2.5 * lineHeight);
-    pdf.text(`RUC: ${checkInData.companyRUC}`, companyBoxX + 10, startY + 3.5 * lineHeight);
-    pdf.text(`Direccion: ${checkInData.companyAddress}`, companyBoxX + 10, startY + 4.5 * lineHeight);
-    pdf.text(`Telefono: ${checkInData.companyPhone}`, companyBoxX + 10, startY + 5.5 * lineHeight);
-
-    // Load Image
-    const image = new Image();
-    image.src = checkInData.imageUrl;
-
-    image.onload = function() {
-        // Calculate image width and height proportionally
-        const originalWidth = image.width;
-        const originalHeight = image.height;
-        const targetWidth = usableWidth * 0.6;
-        const scaleFactor = targetWidth / originalWidth;
-        const targetHeight = originalHeight * scaleFactor;
-
-        // Add image to PDF
-        pdf.addImage(image, 'PNG', margin, startY + 20 * lineHeight, targetWidth, targetHeight);
-
-        pdf.text('observaciones:', margin, startY + 21 * lineHeight + targetHeight);
-        pdf.text(`${checkInData.observations}`, margin, startY + 22 * lineHeight + targetHeight, { maxWidth: usableWidth / 2 });
-
-        // Table Headers
-        const yless = 200;
-        const checkWidth = 40;
-        const detailWidth = usableWidth * 0.4 - checkWidth - 20;
-
-        pdf.setFillColor(230, 230, 230);
-        pdf.rect(margin + targetWidth + 10, startY + 20 * lineHeight - yless, usableWidth * 0.6, lineHeight, 'F');
-        pdf.setTextColor(0, 0, 0);
+        // Customer Details
         pdf.setFontSize(fontSizeNormal);
-        pdf.text('Detalle', margin + targetWidth + 15, startY + 20.7 * lineHeight - yless);
-        pdf.text('Check', margin + targetWidth + 15 + detailWidth, startY + 20.7 * lineHeight - yless);
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(`Orden de Trabajo: ${checkInData.checkInNumber}`, margin, startY + 2 * lineHeight);
+        pdf.text(`Fecha de Entrada: ${checkInData.checkInDate}`, margin, startY + 3 * lineHeight);
+        pdf.text(`Cliente: ${checkInData.customerName}`, margin, startY + 4 * lineHeight);
+        pdf.text(`Nro de Identificacion: ${checkInData.customerId}`, margin, startY + 5 * lineHeight);
+        pdf.text(`Telefono: ${checkInData.customerPhone}`, margin, startY + 6 * lineHeight);
+        pdf.text(`Direccion: ${checkInData.customerAddress}`, margin, startY + 7 * lineHeight);
 
-        // Table Content
-        let positionY = startY + 21.5 * lineHeight - yless;
-        checkInData.items.forEach(item => {
-            pdf.setTextColor(100, 100, 100);
-            pdf.text(item.detail, margin + targetWidth + 15, positionY);
-            pdf.text(item.check ? 'X' : '', margin + targetWidth + 15 + detailWidth, positionY);
-            positionY += lineHeight;
-        });
+        // Vehicle Details
+        pdf.text('Detalles del Vehiculo:', margin, startY + 9 * lineHeight);
+        pdf.text(`Placa: ${checkInData.vehicle.plate}`, margin, startY + 10 * lineHeight);
+        pdf.text(`Marca: ${checkInData.vehicle.brand}`, margin, startY + 11 * lineHeight);
+        pdf.text(`Modelo: ${checkInData.vehicle.model}`, margin, startY + 12 * lineHeight);
+        pdf.text(`Nro de Motor: ${checkInData.vehicle.engineNumber}`, margin, startY + 13 * lineHeight);
+        pdf.text(`Nro de Vin: ${checkInData.vehicle.vinNumber}`, margin, startY + 14 * lineHeight);
+        pdf.text(`año: ${checkInData.vehicle.year}`, margin, startY + 15 * lineHeight);
+        pdf.text(`Color: ${checkInData.vehicle.color}`, margin, startY + 16 * lineHeight);
 
-        
+        // Comments
+        pdf.text('requerimiento:', margin, startY + 18 * lineHeight);
+        pdf.text(`${checkInData.comments}`, margin, startY + 19 * lineHeight, { maxWidth: usableWidth / 2 });
 
-        // Open PDF in a new window
-        window.open(pdf.output('bloburl'), '_blank');
-    }
+        // Company Box
+        const companyBoxWidth = 200;
+        const companyBoxHeight = 6 * lineHeight;
+        const companyBoxX = pageWidth - margin - companyBoxWidth - logoWidth - 10;
+        const companyBoxY = startY + 1 * lineHeight;
+        pdf.setFillColor(230, 230, 230);
+        pdf.rect(companyBoxX, companyBoxY, companyBoxWidth, companyBoxHeight, 'F');
+        pdf.setTextColor(40, 40, 40);
+        pdf.text(`Razon Social: ${checkInData.companyName}`, companyBoxX + 10, startY + 2.5 * lineHeight);
+        pdf.text(`RUC: ${checkInData.companyRUC}`, companyBoxX + 10, startY + 3.5 * lineHeight);
+        pdf.text(`Direccion: ${checkInData.companyAddress}`, companyBoxX + 10, startY + 4.5 * lineHeight);
+        pdf.text(`Telefono: ${checkInData.companyPhone}`, companyBoxX + 10, startY + 5.5 * lineHeight);
+
+        // Load Image
+        const image = new Image();
+        image.src = checkInData.imageUrl;
+
+        image.onload = function() {
+            // Calculate image width and height proportionally
+            const originalWidth = image.width;
+            const originalHeight = image.height;
+            const targetWidth = usableWidth * 0.6;
+            const scaleFactor = targetWidth / originalWidth;
+            const targetHeight = originalHeight * scaleFactor;
+
+            // Add image to PDF
+            pdf.addImage(image, 'PNG', margin, startY + 20 * lineHeight, targetWidth, targetHeight);
+
+            pdf.text('observaciones:', margin, startY + 21 * lineHeight + targetHeight);
+            pdf.text(`${checkInData.observations}`, margin, startY + 22 * lineHeight + targetHeight, { maxWidth: usableWidth / 2 });
+
+            // Table Headers
+            const yless = 200;
+            const checkWidth = 40;
+            const detailWidth = usableWidth * 0.4 - checkWidth - 20;
+
+            pdf.setFillColor(230, 230, 230);
+            pdf.rect(margin + targetWidth + 10, startY + 20 * lineHeight - yless, usableWidth * 0.6, lineHeight, 'F');
+            pdf.setTextColor(0, 0, 0);
+            pdf.setFontSize(fontSizeNormal);
+            pdf.text('Detalle', margin + targetWidth + 15, startY + 20.7 * lineHeight - yless);
+            pdf.text('Check', margin + targetWidth + 15 + detailWidth, startY + 20.7 * lineHeight - yless);
+
+            // Table Content
+            let positionY = startY + 21.5 * lineHeight - yless;
+            checkInData.items.forEach(item => {
+                pdf.setTextColor(100, 100, 100);
+                pdf.text(item.detail, margin + targetWidth + 15, positionY);
+                pdf.text(item.check ? 'X' : '', margin + targetWidth + 15 + detailWidth, positionY);
+                positionY += lineHeight;
+            });
+
+            
+
+            // Open PDF in a new window
+            window.open(pdf.output('bloburl'), '_blank');
+        }
+    };
+
+    
 }
+

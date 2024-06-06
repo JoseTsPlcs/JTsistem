@@ -118,11 +118,11 @@ $(document).ready(function() {
             active:true,
             script:{
               parent:prnt_sale,
-              title:(userData.company.tipe == 2 ? "orden de trabajo" : "venta"),
+              title:(userData.company.tipe == 2 ? "Venta" : "Venta"),
               //h:"100%",
               panels:[
-                {col:12,tipe:"form",title:"principal",h:0,show:true,blocked:false},
-                {col:12,tipe:"form",title:"cliente",h:0,show:true,blocked:false},
+                {col:12,tipe:"form",title:"principal",tag:"Informacion",h:0,show:true,blocked:false},
+                {col:12,tipe:"form",title:"cliente",tag:"Datos del Cliente",h:0,show:true,blocked:false},
               ],
               //breaklevel:"sm",
               stateStart:"block",
@@ -199,6 +199,7 @@ $(document).ready(function() {
                 {table:'sales', field:'COMMENT'},
                 {table:'sales', field:'ID_CHECKIN'},
                 {table:'sales', field:'ID_ITEM'},
+                {table:'sales', field:'ID_WORK_PROCESS'},
               ],
               conditions:[
                 {
@@ -239,6 +240,29 @@ $(document).ready(function() {
                     }
                   ],
                 },
+                {
+                  name:"ld-workers",
+                  tableMain:"workers",
+                  selects:[
+                    {table:"workers",field:"ID_WORKER",as:"value"},
+                    {sql:'CONCAT(workers.NAME,"-",work_areas.NAME) AS "show"'},
+                  ],
+                  joins:[
+                    {
+                      main:{table:"workers",field:"ID_WORK_AREA"},
+                      join:{table:"work_areas",field:"ID_WORK_AREA"},
+                      tipe:"LEFT",
+                    },
+                  ],
+                  conditions:[
+                    {
+                      table:"workers",
+                      field:"ID_COMPANY",
+                      inter:"=",
+                      value:company_id,
+                    }
+                  ],
+                },
                 (userData.company.tipe=="2"?{
                   name:"ld-items",
                   tableMain:"items_vehicles",
@@ -269,13 +293,14 @@ $(document).ready(function() {
                 {panel:"principal",col:12,y:1,name:"fecha de emision",box:bx_date,select:"DATE_EMMIT"},
                 {panel:"principal",col:12,y:2,tipe:1,name:"estado",box:bx_op({ops:op_sales_status}),select:"ID_STATUS"},
                 {panel:"principal",col:12,y:2,tipe:1,name:"cancelado",box:{...bx_op({ops:op_sales_paid}),value:0},select:"PAID"},
-                {panel:"principal",col:12,y:3,tipe:1,name:"venta documento",box:bx_op({ops:op_sales_document}),select:"ID_DOCUMENT"},
+                {panel:"principal",col:12,y:3,tipe:1,name:"documento de venta",box:bx_op({ops:op_sales_document}),select:"ID_DOCUMENT"},
 
                 {panel:"principal",col:12,y:4,name:"total",box:bx_moneyh1,select:"TOTAL"},
                 //{panel:"principal",col:12,y:5,name:"servicios",box:bx_money},
                 {panel:"principal",col:12,y:6,name:"productos",box:bx_money},
                 {panel:"principal",col:12,y:7,name:"pagado",box:bx_money},
                 {panel:"principal",col:12,y:8,name:"comentario*",box:{tipe:9,value:""},select:"COMMENT"},
+                {panel:"principal",col:12,colAllLevel:true,y:0,name:"trabajador asignado",box:{tipe:8},select:"ID_WORK_PROCESS",load:{name:"ld-workers",show:"show"}},
                 //{panel:"principal",col:12,y:8,name:"pdf",tipe:2,box:{tipe:5,value:"pdf",class:"btn btn-danger text-white btn-sm",style:"min-weigth:100px"},action:"pdf"},
 
                 {panel:"cliente",col:8,colAllLevel:true,y:0,name:"cliente",box:{tipe:8},select:"ID_CUSTOMER",load:{name:"customers",show:"show"}},
@@ -1046,7 +1071,7 @@ $(document).ready(function() {
                 {panel:"main",col:6,tipe:1,name:"precio unitario",box:{tipe:1,value:0},select:"PRICE_UNIT"},
 
                 {panel:"main",col:6,tipe:1,name:"stock total",box:{tipe:1,value:0},select:"STOCK_TOTAL"},
-                {panel:"main",col:6,tipe:1,name:"stock limite",box:{tipe:1,value:0},select:"STOCK_LIMIT"},
+                {panel:"main",col:6,tipe:1,name:"stock minimo",box:{tipe:1,value:0},select:"STOCK_LIMIT"},
               ],
 
               events:[
@@ -1482,10 +1507,31 @@ $(document).ready(function() {
             active:userData.company.tipe == "2",
             script:{
               parent:prnt_item,
-              title:"vehiculo",
+              title:"Vehiculo",
               panels:[{col:12,y:0,title:"main",head:false,tipe:"form"}],
               stateStart:"block",
               afterCancel:"block",
+              stateTools:[
+                {
+                  name:"reload",
+                  tools:[
+                      {name:"config",show:false},
+                      {name:"load",show:false},
+                      
+                      {name:"excel",show:false},
+                      {name:"pdf",show:false},
+          
+                      {name:"sizes",show:false,value:1},
+                      {name:"reload",show:true},
+                      {name:"update",show:true},
+                      {name:"new",show:false},
+                      {name:"insert",show:false},
+                      {name:"cancel",show:true},
+                      
+                      {name:"pages",show:false},
+                  ],
+              }
+              ],
 
               tableMain:"items_vehicles",
               selects:[

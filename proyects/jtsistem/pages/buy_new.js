@@ -348,6 +348,34 @@ $(document).ready(function() {
                       }
                     ],
                   },
+                  {
+                    name:"boxUpdate",
+                    actions:[{
+                      action:({field,k,y})=>{
+
+                        if(k.StateGet()=="new"){
+
+                          var cant = parseFloat(k.GetValue({fieldName:"cantidad",y}));
+                          var tot = parseFloat(k.GetValue({fieldName:"costo total",y}));
+                          var uni  = parseFloat(k.GetValue({fieldName:"costo unitario",y}));
+
+                          if(field.name == "cantidad"){
+
+                            if(tot!=0) uni = tot/cant;
+
+                            if(uni!=0) tot = cant * uni;
+                          }
+
+                          if(field.name == "costo unitario")  tot = cant * uni;
+                          if(field.name == "costo total")  uni = tot/cant;
+
+                          k.SetValue({fieldName:"cantidad",y,value:cant});
+                          k.SetValue({fieldName:"costo unitario",y,value:uni});
+                          k.SetValue({fieldName:"costo total",y,value:tot});
+                        }
+                      }
+                    }]
+                  }
                 ],
               }
             },

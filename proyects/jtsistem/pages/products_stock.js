@@ -43,7 +43,7 @@ $(document).ready(function() {
           {name:"etiqueta",box:{tipe:4,options:[]},select:{table:"products",field:"ID_PRODUCT_TAG"},load:{name:"ld-products_tags",show:"show"}},
           {name:"activo",box:{tipe:4,options:op_active,value:["activo"]},select:{table:"products",field:"ACTIVE"}},
           {name:"unidad",box:{tipe:4},select:{table:"products",field:"UNID_ID"},load:{name:"ld-unids",show:"show"}},
-          {name:"en limite",box:{tipe:4,options:[{value:0,show:"fuera de limite"},{value:1,show:"en limite"}]},select:{table:"products",field:"STOCK_ONLIMIT"}},
+          {name:"en el minimo",box:{tipe:4,options:[{value:0,show:"fuera del minimo"},{value:1,show:"en el minimo"}]},select:{table:"products",field:"STOCK_ONLIMIT"}},
         ],
         fields:[
           //{panel:"main",...fld_delete},
@@ -53,8 +53,8 @@ $(document).ready(function() {
     
           {panel:"main",name:"unidad",box:bx_shw,select:"UNID_ID",load:{name:"ld-unids",show:"show"}},
           {panel:"main",attributes:[{name:"style",value:"min-width: 100px;"}],name:"stock",box:bx_input,select:"STOCK_TOTAL"},
-          {panel:"main",attributes:[{name:"style",value:"min-width: 100px;"}],name:"limite",box:bx_input,select:"STOCK_LIMIT"},
-          {panel:"main",name:"en limite",box:{tipe:0,options:[{value:0,show:"-",class:"rounded text-center bg-success text-white"},{value:1,show:"limit!",class:"rounded text-center bg-danger text-white"}]},select:"STOCK_ONLIMIT"},
+          {panel:"main",attributes:[{name:"style",value:"min-width: 100px;"}],name:"stock minimo",box:bx_input,select:"STOCK_LIMIT"},
+          {panel:"main",name:"limite",box:{tipe:0,options:[{value:0,show:"-",class:"rounded text-center bg-success text-white"},{value:1,show:"limit!",class:"rounded text-center bg-danger text-white"}]},select:"STOCK_ONLIMIT"},
           
           {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"activa",box:bx_active_show,select:"ACTIVE"},
         ],
