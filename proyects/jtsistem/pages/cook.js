@@ -189,6 +189,31 @@ $(document).ready(function() {
                   ],
                 },
               ],
+              loads:[
+                {
+                  name:"ld-workers",
+                  tableMain:"workers",
+                  selects:[
+                    {table:"workers",field:"ID_WORKER",as:"value"},
+                    {sql:'CONCAT(workers.NAME,"-",work_areas.NAME) AS "show"'},
+                  ],
+                  joins:[
+                    {
+                      main:{table:"workers",field:"ID_WORK_AREA"},
+                      join:{table:"work_areas",field:"ID_WORK_AREA"},
+                      tipe:"LEFT",
+                    },
+                  ],
+                  conditions:[
+                    {
+                      table:"workers",
+                      field:"ID_COMPANY",
+                      inter:"=",
+                      value:company_id,
+                    }
+                  ],
+                }
+              ],
 
               tableMain:"sales",
               selects:[
@@ -202,6 +227,7 @@ $(document).ready(function() {
                 {table:'sales', field:'DOCUMENT_EMMIT'},
                 {table:'sales', field:'COMMENT'},
                 {table:'customers',field:'NAME'},
+                {table:"sales",field:"ID_WORK_PROCESS"},
               ],
               joins:[
                 {main:{table:"sales",field:"ID_CUSTOMER"},join:{table:"customers",field:"ID_CUSTOMER"},tipe:"LEFT"}
@@ -212,6 +238,7 @@ $(document).ready(function() {
                 {panel:"main",name:"fecha de emision",box:{tipe:0},select:"DATE_EMMIT"},
                 {panel:"main",name:"cliente",box:{tipe:0},select:"NAME"},
                 {panel:"main",name:"estado",box:{tipe:3,options:[op_sales_status[1],op_sales_status[2],op_sales_status[3]]},select:"ID_STATUS"},
+                {panel:"main",name:"trabajador",box:(acc_work_update?{tipe:8,class:"w-100"}:{tipe:0}),load:{name:"ld-workers",show:"show"},select:"ID_WORK_PROCESS"},
                 //{panel:"main",name:"cancelado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_paid},select:"PAID"},
 
                 {panel:"main",name:"comentario",box:{tipe:9,value:""},select:"COMMENT"},

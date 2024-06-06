@@ -1342,10 +1342,13 @@ async function generateInvoicePDF(invoiceData) {
         pdf.text(`Total Servicios: S/. ${totalServices.toFixed(2)}`, margin + precioUnitarioWidth + TotalWidth, positionY + 2 * lineHeight);
         pdf.text(`Total: S/. ${(totalProducts + totalServices).toFixed(2)}`, margin + precioUnitarioWidth + TotalWidth, positionY + 3 * lineHeight);
         
+        // Open PDF in a new window
+        window.open(pdf.output('bloburl'), '_blank');
+
         // Open PDF in New Tab
-        const pdfDataUri = pdf.output('datauristring');
-        const newTab = window.open();
-        newTab.document.body.innerHTML = '<embed width="100%" height="100%" src="' + pdfDataUri + '" type="application/pdf">';
+        //const pdfDataUri = pdf.output('datauristring');
+        //const newTab = window.open();
+        //newTab.document.body.innerHTML = '<embed width="100%" height="100%" src="' + pdfDataUri + '" type="application/pdf">';
     };
     
 }
