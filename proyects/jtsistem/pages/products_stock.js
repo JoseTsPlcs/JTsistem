@@ -11,7 +11,27 @@ $(document).ready(function() {
     
         title:"stock de productos",
         panels:[{col:12,y:0,title:"main",tipe:"table"}],
-        stateTools:stTls_tb,
+        stateTools:[
+          {
+            name:"reload",
+            tools:[
+                {name:"config",show:true},
+                {name:"load",show:true},
+                
+                {name:"excel",show:false},
+                {name:"pdf",show:false},
+    
+                {name:"sizes",show:true,value:10},
+                {name:"reload",show:true},
+                {name:"update",show:false},
+                {name:"new",show:false},
+                {name:"insert",show:false},
+                {name:"cancel",show:false},
+                
+                {name:"pages",show:true},
+            ],
+          }
+        ],
     
         tableMain:"products",
         selects:[
@@ -54,8 +74,8 @@ $(document).ready(function() {
           {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"etiqueta",box:bx_shw,select:"TAG_NAME"},
     
           {panel:"main",name:"unidad",box:bx_shw,select:"UNID_ID",load:{name:"ld-unids",show:"show"}},
-          {panel:"main",attributes:[{name:"style",value:"min-width: 100px;"}],name:"stock",box:(acc_stock_update?bx_input:bx_show),select:"STOCK_TOTAL"},
-          {panel:"main",attributes:[{name:"style",value:"min-width: 100px;"}],name:"stock minimo",box:bx_show,select:"STOCK_LIMIT"},
+          {panel:"main",attributes:[{name:"style",value:"min-width: 100px;"}],name:"stock total",box:(acc_stock_update?bx_input:{tipe:0,class:"text-center"}),select:"STOCK_TOTAL"},
+          {panel:"main",attributes:[{name:"style",value:"min-width: 100px;"}],name:"stock minimo",box:{tipe:0,class:"text-center"},select:"STOCK_LIMIT"},
           {panel:"main",name:"limite",box:{tipe:0,options:[{value:0,show:"-",class:"rounded text-center bg-success text-white"},{value:1,show:"limit!",class:"rounded text-center bg-danger text-white"}]},select:"STOCK_ONLIMIT"},
           
           {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"activa",box:bx_active_show,select:"ACTIVE"},

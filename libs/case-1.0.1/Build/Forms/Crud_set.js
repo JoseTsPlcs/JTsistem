@@ -485,6 +485,9 @@ class Crud_set extends ODD {
         //fields
         this.#fields.forEach(field => {
             
+            //console.log(field.name);
+            //console.log(field.box.options!=null);
+
             if(field.load!=null&&field.load.field==null){
                     
                 var loadOptions = this.Loaded_GetLoadOptions({
@@ -500,16 +503,20 @@ class Crud_set extends ODD {
                 field.box.options = loadOptions;
                 field.box.value = valueDefault;
 
-                //console.log("set options",field.load.name,this.Loaded_GetLoadData({loadName:field.load.name}),loadOptions);
-
                 var boxes = k.GetBoxs({fieldName:field.name});
+                //console.log(boxes);
                 boxes.forEach(box => {
                     
+                    //console.log(box);
                     box.SetOptions(loadOptions);
                 }); 
             }
 
+            //console.log(field.box.options!=null);
+
         });
+
+        console.log(this.#fields);
 
         //filters
         this.#filters.Filters_Get().forEach(filter=>{
