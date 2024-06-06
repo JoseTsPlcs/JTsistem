@@ -5,6 +5,8 @@ $(document).ready(function() {
 
     success:({userData})=>{
 
+      var acc_stock_update = userData.access.find(acc=>acc.value=="acc-9") && userData.access.find(acc=>acc.value=="acc-9").active == "true"; 
+      
       new Crud_set({
     
         title:"stock de productos",
@@ -52,8 +54,8 @@ $(document).ready(function() {
           {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"etiqueta",box:bx_shw,select:"TAG_NAME"},
     
           {panel:"main",name:"unidad",box:bx_shw,select:"UNID_ID",load:{name:"ld-unids",show:"show"}},
-          {panel:"main",attributes:[{name:"style",value:"min-width: 100px;"}],name:"stock",box:bx_input,select:"STOCK_TOTAL"},
-          {panel:"main",attributes:[{name:"style",value:"min-width: 100px;"}],name:"stock minimo",box:bx_input,select:"STOCK_LIMIT"},
+          {panel:"main",attributes:[{name:"style",value:"min-width: 100px;"}],name:"stock",box:(acc_stock_update?bx_input:bx_show),select:"STOCK_TOTAL"},
+          {panel:"main",attributes:[{name:"style",value:"min-width: 100px;"}],name:"stock minimo",box:bx_show,select:"STOCK_LIMIT"},
           {panel:"main",name:"limite",box:{tipe:0,options:[{value:0,show:"-",class:"rounded text-center bg-success text-white"},{value:1,show:"limit!",class:"rounded text-center bg-danger text-white"}]},select:"STOCK_ONLIMIT"},
           
           {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"activa",box:bx_active_show,select:"ACTIVE"},
