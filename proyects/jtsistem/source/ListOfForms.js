@@ -19,6 +19,7 @@ var op_access = [
     {value:"acc-6",show:"modificar el total de cuentas"},
     {value:"acc-7",show:"modificar el estado de cuentas"},
     {value:"acc-8",show:"asignar trabajador a venta"},
+    {value:"acc-9",show:"modificar stock"},
     ...paginasOptions,
 ];
 
