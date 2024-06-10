@@ -319,7 +319,7 @@ $(document).ready(function() {
                 //{panel:"principal",col:2,colAllLevel:true,name:"edit",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit-checkin"},
                 //{panel:"principal",col:2,colAllLevel:true,name:"add",box:{tipe:5,value:'<i class="bi bi-plus-circle"></i>',class:"btn btn-primary btn-sm"},action:"add-checkin"},
 
-                (userData.company.tipe == "2"?{panel:"principal",col:8,colAllLevel:true,y:0,name:"vehiculo",box:{tipe:8,class:"w-100"},select:"ID_ITEM",load:{name:"ld-items",value:"value",show:"show"}}:null),
+                (userData.company.tipe == "2"?{panel:"principal",col:8,colAllLevel:true,y:0,name:"vehiculo",box:{tipe:8,value:"null",options:[{value:"null",show:"seleccionar vehiculo"}],class:"w-100"},select:"ID_ITEM",load:{name:"ld-items",value:"value",show:"show"}}:null),
                 (userData.company.tipe == "2"?{panel:"principal",col:2,colAllLevel:true,name:"edit",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit-item"}:null),
                 (userData.company.tipe == "2"?{panel:"principal",col:2,colAllLevel:true,name:"add",box:{tipe:5,value:'<i class="bi bi-plus-circle"></i>',class:"btn btn-primary btn-sm"},action:"add-item"}:null),
 
