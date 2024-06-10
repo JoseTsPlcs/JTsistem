@@ -327,7 +327,7 @@ $(document).ready(function() {
                   tableMain:"workers",
                   selects:[
                     {table:"workers",field:"ID_WORKER",as:"value"},
-                    {sql:'CONCAT(customers.NAME,"-",work_areas.NAME) AS "show"'},
+                    {sql:'CONCAT(workers.NAME,"-",work_areas.NAME) AS "show"'},
                   ],
                   joins:[
                     {

@@ -6,6 +6,7 @@ $(document).ready(function() {
 
       scr_admin({
         id_company:company_id,
+        accessEdit:false,
       });
       
     }
