@@ -494,12 +494,16 @@ class Crud_set extends ODD {
                     loadName:field.load.name,
                     loadShow:field.load.show,
                 });
+                
 
 
                 var valueDefault = loadOptions.length > 0 ? loadOptions[0].value : 1;
+                if(field.box.value!=null) valueDefault = field.box.value;
                 var rsp = this.#Event_SetOptionsToFields({field,loadOptions});
                 if(rsp !=null && rsp.loadOptions) loadOptions = rst.loadOptions;
 
+                var lastOptions = field.box.options;
+                if(lastOptions!=null) loadOptions = [...lastOptions,...loadOptions];
                 field.box.options = loadOptions;
                 field.box.value = valueDefault;
 
