@@ -102,6 +102,7 @@ function CalculateJustIgv(val){
 //--------boxs---------
 
 const bx_shw = {tipe:0,value:"",class:"text-center"};
+const bx_shw_activo = {tipe:0,value:0,options:[{value:0,show:"desactivo",class:"rounded text-center bg-danger text-white"},{value:1,show:"activo",class:"rounded text-center bg-success text-white"}]}
 
 const bx_money = {tipe:0,class:"text-center",format:{decimals:2,start:"S/."},value:0};
 const bx_moneyh1 = {tipe:0,class:"h1 text-left",format:{decimals:2,start:"S/."},value:0};
@@ -772,13 +773,17 @@ var scr_sales_control = {
 
 }
 
-function scr_admin({id_company,parent}){
+function scr_admin({id_company,parent,editUsuarios=false,editClase=false,editAccess=false}){
 
     var gr = new Grid({
         parent,
         cols:[
           [8,4],
           [12],
+        ],
+        attributes:[
+            {x:0,y:0,attributes:[{name:"class",value:"col-md-8 col-12"}]},
+            {x:1,y:0,attributes:[{name:"class",value:"col-md-4 col-12"}]},
         ],
     });
 
@@ -808,7 +813,7 @@ function scr_admin({id_company,parent}){
                             {name:"sizes",show:true,value:10},
                             {name:"reload",show:true},
                             {name:"update",show:false},
-                            {name:"new",show:true},
+                            {name:"new",show:editUsuarios},
                             {name:"insert",show:false},
                             {name:"cancel",show:false},
                             
@@ -834,7 +839,7 @@ function scr_admin({id_company,parent}){
                     }
                     ],
                     inserts:[
-                    {field:"ID_COMPANY",value:id_company},
+                        {field:"ID_COMPANY",value:id_company},
                     ],
                     loads:[
                     {
@@ -857,10 +862,10 @@ function scr_admin({id_company,parent}){
 
                     fields:[
                         //{panel:"main",...fld_delete},
-                        {panel:"main",name:"usuario",box:{tipe:1},select:"NAME"},
-                        {panel:"main",name:"clase",box:{tipe:3},select:"ID_CLASS",load:{name:"ld-class",show:"show",value:"value"}},
-                        {panel:"main",name:"contraseña",box:{tipe:1},select:"PASSWORD"},
-                        {panel:"main",name:"activo",box:bx_active_input,select:"ACTIVE"},
+                        {panel:"main",name:"usuario",box:(editUsuarios?{tipe:1}:{tipe:0}),select:"NAME"},
+                        {panel:"main",name:"clase",box:(editUsuarios?{tipe:3}:{tipe:0}),select:"ID_CLASS",load:{name:"ld-class",show:"show",value:"value"}},
+                        {panel:"main",name:"contraseña",box:(editUsuarios?{tipe:1}:{tipe:0}),select:"PASSWORD"},
+                        {panel:"main",name:"activo",box:(editUsuarios?bx_active_input:bx_shw_activo),select:"ACTIVE"},
                     ],
 
                 }
@@ -885,7 +890,7 @@ function scr_admin({id_company,parent}){
                                 {name:"sizes",show:true,value:10},
                                 {name:"reload",show:true},
                                 {name:"update",show:false},
-                                {name:"new",show:true},
+                                {name:"new",show:editClase},
                                 {name:"insert",show:false},
                                 {name:"cancel",show:false},
                                 
@@ -913,51 +918,51 @@ function scr_admin({id_company,parent}){
 
                     fields:[
                         //{panel:"main",...fld_delete},
-                        {panel:"main",name:"clase",box:{tipe:1,class:"w-100"},select:"NAME"},
-                        {panel:"main",name:"btn",box:{tipe:5,value:'actualizar accesos',class:"btn btn-outline-primary btn-sm"},action:"update_access"},
+                        {panel:"main",name:"clase",box:(editClase?{tipe:1,class:"w-100"}:{tipe:0,class:"w-100"}),select:"NAME"},
+                        (editClase?{panel:"main",name:"btn",box:{tipe:5,value:'actualizar accesos',class:"btn btn-outline-primary btn-sm"},action:"update_access"}:null),
                     ],
                     events:[
                         {
                             name:"insertAfter",
                             actions:[{
-                            action:({k,field,value})=>{
+                                action:({k,field,value})=>{
 
-                                k.Loading_SetActive({active:true});
+                                    k.Loading_SetActive({active:true});
 
-                                var count = 0;
-                                var total = op_access.length;
+                                    var count = 0;
+                                    var total = op_access.length;
 
-                                for (let t = 0; t < total; t++) {
-                                
-                                var conection = k.Conection_Get();
-                                var sql = conection.GetSql_Insert({
-                                    tableMain:"class_access",
-                                    inserts:[
-                                    {field:"ID_CLASS",value},
-                                    {field:"ID_ACCESS",value:op_access[t].value},
-                                    {field:"ACTIVE",value:1},
-                                    ],
-                                });
-                                conection.Request({
-                                    sql,php:"success",
-                                    success:()=>{
+                                    for (let t = 0; t < total; t++) {
+                                    
+                                    var conection = k.Conection_Get();
+                                    var sql = conection.GetSql_Insert({
+                                        tableMain:"class_access",
+                                        inserts:[
+                                            {field:"ID_CLASS",value},
+                                            {field:"ID_ACCESS",value:op_access[t].value},
+                                            {field:"ACTIVE",value:1},
+                                        ],
+                                    });
+                                    conection.Request({
+                                        sql,php:"success",
+                                        success:()=>{
 
-                                    OneInserted();
+                                        OneInserted();
+                                        }
+                                    })
+                                    
                                     }
-                                })
-                                
-                                }
 
-                                function OneInserted() {
-                                
-                                count++;
-                                if(count>=total){
+                                    function OneInserted() {
+                                    
+                                    count++;
+                                    if(count>=total){
 
-                                    k.Loading_SetActive({active:false});
+                                        k.Loading_SetActive({active:false});
+                                    }
+                                    }
+                                    
                                 }
-                                }
-                                
-                            }
                             }]
                         },
                         {
@@ -1086,7 +1091,7 @@ function scr_admin({id_company,parent}){
                     fields:[
                         //{panel:"main",name:"clase",box:{tipe:3,class:"w-100"},select:"ID_CLASS",load:{name:"ld-class",show:"show",value:"value"}},
                         {panel:"main",name:"acceso",box:{tipe:0,options:op_access},select:"ID_ACCESS"},
-                        {panel:"main",name:"activo",box:bx_active_input,select:"ACTIVE"},
+                        {panel:"main",name:"activo",box:(editAccess?bx_active_input:bx_shw_activo),select:"ACTIVE"},
                     ],
 
                     events:[

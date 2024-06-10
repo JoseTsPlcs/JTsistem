@@ -90,7 +90,12 @@ $(document).ready(function() {
 
                 adminOpen = true;
                 var id_company = k.Reload_GetData({})[y]["ID_COMPANY"];
-                scr_admin({id_company,parent:prnt_admin});
+                scr_admin({
+                  id_company,parent:prnt_admin,
+                  editAccess:true,
+                  editClase:true,
+                  editUsuarios:true,
+                });
               }
             }
           }]
