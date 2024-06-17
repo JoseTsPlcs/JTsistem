@@ -200,6 +200,8 @@ $(document).ready(function() {
                 {table:'customers',field:'EMAIL'},
                 {table:'customers',field:'COMPANY'},
                 {table:'customers',field:'NRO_DOCUMENT'},
+                {table:'sales',field:'DSCTO'},
+                {table:'sales',field:'TOTAL_WITHOUT_DSCTO'},                
                 (userData.company.tipe=="2"?{table:"items_vehicles",field:"PLACA"}:null),
                 (userData.company.tipe=="2"?{table:"items_vehicles",field:"MARCA"}:null),
                 (userData.company.tipe=="2"?{table:"items_vehicles",field:"MODELO"}:null),
@@ -220,6 +222,8 @@ $(document).ready(function() {
               fields:[
                 {panel:"informacion",name:"nro",box:{tipe:0},select:"ID_SALE"},
                 {panel:"informacion",name:"fecha de emision",box:{tipe:0},select:"DATE_EMMIT"},
+                {panel:"informacion",name:"total sin descuento",box:bx_money,select:"TOTAL_WITHOUT_DSCTO"},
+                {panel:"informacion",name:"descuento",box:{tipe:0,format:{end:"%",decimals:2}},select:"DSCTO"},
                 {panel:"informacion",name:"total",box:bx_moneyh1,select:"TOTAL"},
 
                 {panel:"cliente",name:"cliente",box:{tipe:0},select:"NAME"},
@@ -400,6 +404,8 @@ $(document).ready(function() {
         generateInvoicePDF({
           invoiceNumber: sale_fm.GetValue({fieldName:"nro",y:0}),
           invoiceDate: sale_fm.GetValue({fieldName:"fecha de emision",y:0}),
+          
+          dscto: parseFloat(sale_fm.GetValue({fieldName:"descuento",y:0})),
 
           companyName: userData.company.nameReal,
           companyRUC:  userData.company.ruc,

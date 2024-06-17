@@ -244,6 +244,11 @@ class Window extends ODD {
     blocked:true,
     grid:null,
   };
+  Conteiner_isShow({}){
+
+    return this.#conteiner.show;
+  }
+
   Conteiner_Show({show=true,slow=true,ignoreBlock=false}){
 
     //console.log("window->conteiner_show->params; show:",show);

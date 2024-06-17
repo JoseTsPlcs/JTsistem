@@ -54,9 +54,9 @@ const op_identity_document_tipe = [
     {value:1,show:"ruc"},
 ];
 const op_products_tipe = [
-    {value:1,show:"servicio"},
-    {value:2,show:"insumo"},
-    {value:3,show:"producto"},
+    {value:1,show:"servicio",class:"rounded text-center bg-primary text-white"},
+    {value:2,show:"insumo",class:"rounded text-center bg-warning text-white"},
+    {value:3,show:"producto",class:"rounded text-center bg-success text-white"},
 ];
 const op_buys_status = [
     {value:1,show:"cotizacion",class:"rounded text-center bg-secondary text-white"},
@@ -1191,9 +1191,16 @@ function UserLog_ChangePagesByCompany(userData){
 
         break;
 
+        case "4":
+            
+            paginas[0].paginas[0].show = false;
+            paginas[0].paginas[6].show = false;
+
+        break;
+
         case "2":
 
-        console.log("asdaksdmasd");
+            //console.log("asdaksdmasd");
 
             paginas[0].seccion = '<i class="bi bi-wrench-adjustable"></i> taller';
             //paginas[0].paginas[1].name = "nueva cotizacion";
@@ -1339,13 +1346,16 @@ async function generateInvoicePDF(invoiceData) {
         });
 
         const TotalWidth = 100;
+        var dscto = invoiceData.dscto;
 
         // Total
         pdf.setTextColor(0, 0, 0);
         pdf.setFontSize(fontSizeNormal);
         pdf.text(`Total Productos: S/. ${totalProducts.toFixed(2)}`, margin + precioUnitarioWidth + TotalWidth, positionY + lineHeight);
         pdf.text(`Total Servicios: S/. ${totalServices.toFixed(2)}`, margin + precioUnitarioWidth + TotalWidth, positionY + 2 * lineHeight);
-        pdf.text(`Total: S/. ${(totalProducts + totalServices).toFixed(2)}`, margin + precioUnitarioWidth + TotalWidth, positionY + 3 * lineHeight);
+        pdf.text(`Total Sin Descuento: S/. ${(totalProducts + totalServices).toFixed(2)}`, margin + precioUnitarioWidth + TotalWidth, positionY + 3 * lineHeight);  
+        pdf.text(`Descuento: ${(dscto.toFixed(2))}%`, margin + precioUnitarioWidth + TotalWidth, positionY + 4 * lineHeight);
+        pdf.text(`Total: S/. ${((totalProducts + totalServices)*(1-dscto/100)).toFixed(2)}`, margin + precioUnitarioWidth + TotalWidth, positionY + 5 * lineHeight);
         
         // Open PDF in a new window
         window.open(pdf.output('bloburl'), '_blank');

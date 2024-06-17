@@ -373,6 +373,7 @@ class Box {
 
       if(this.#format.decimals) v = parseFloat(v).toFixed(this.#format.decimals);
       if(this.#format.start) v = this.#format.start + v;
+      if(this.#format.end) v =  v + this.#format.end;
     }
 
     return v;
