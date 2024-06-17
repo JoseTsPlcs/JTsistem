@@ -288,6 +288,11 @@ class Crud_set extends ODD {
         //console.log("build conteiners panels",this.#conteiner_panels);
     }
 
+    Panels_GetBuild({panelTitle}){
+
+        return this.#conteiner_panels.find(p=>p.title==panelTitle).build;
+    }
+
     //--------loading------
 
     #loading = {
@@ -835,8 +840,6 @@ class Crud_set extends ODD {
         let k = this;
         this.#Insert_Request_PrimaryNew({
             success:({primaryNew})=>{
-
-                
 
                 //-------------------------
 

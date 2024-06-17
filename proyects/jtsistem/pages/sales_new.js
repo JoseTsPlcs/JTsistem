@@ -47,7 +47,7 @@ $(document).ready(function() {
                   [12],//4 md-tags
                 ],
                 boxs:[
-                  {x:0,y:0,box:{tipe:5,value:'añadir producto',class:"btn btn-outline-primary btn-sm",update:()=>{
+                  {x:0,y:0,box:{tipe:5,value:'añadir nuevo producto',class:"btn btn-outline-primary btn-sm",update:()=>{
                     //console.log("aladainsndaskd");
                     var cr_item = conections.Crud_GetBuild({name:"fm-product"});
                     cr_item.SetState({stateName:"new"});
@@ -121,8 +121,9 @@ $(document).ready(function() {
               title:(userData.company.tipe == 2 ? "Venta" : "Venta"),
               //h:"100%",
               panels:[
-                {col:12,tipe:"form",title:"principal",tag:"Informacion",h:0,show:true,blocked:false},
-                {col:12,tipe:"form",title:"cliente",tag:"Datos del Cliente",h:0,show:true,blocked:false},
+                {col:12,tipe:"form",title:"principal",tag:"Informacion",h:0,show:false,blocked:false},
+                {col:12,tipe:"form",title:"total",tag:"Total",h:0,show:false,blocked:false},
+                {col:12,tipe:"form",title:"cliente",tag:"Datos del Cliente",h:0,show:false,blocked:false},
               ],
               //breaklevel:"sm",
               stateStart:"block",
@@ -200,6 +201,9 @@ $(document).ready(function() {
                 {table:'sales', field:'ID_CHECKIN'},
                 {table:'sales', field:'ID_ITEM'},
                 {table:'sales', field:'ID_WORK_PROCESS'},
+                {table:'sales', field:'ID_WORK_PROCESS'},
+                {table:'sales', field:'TOTAL_WITHOUT_DSCTO'},
+                {table:'sales', field:'DSCTO'},
               ],
               conditions:[
                 {
@@ -289,21 +293,24 @@ $(document).ready(function() {
               ],
 
               fields:[
-                //{panel:"principal",col:12,y:0,name:"id",box:bx_shw,select:"ID_SALE"},
+                
                 {panel:"principal",col:12,y:1,name:"fecha de emision",box:bx_date,select:"DATE_EMMIT"},
                 {panel:"principal",col:12,y:2,tipe:1,name:"estado",box:bx_op({ops:op_sales_status}),select:"ID_STATUS"},
                 {panel:"principal",col:12,y:2,tipe:1,name:"cancelado",box:{...bx_op({ops:op_sales_paid}),value:0},select:"PAID"},
                 {panel:"principal",col:12,y:3,tipe:1,name:"documento de venta",box:bx_op({ops:op_sales_document}),select:"ID_DOCUMENT"},
-
-                {panel:"principal",col:12,y:4,name:"total",box:bx_moneyh1,select:"TOTAL"},
-                //{panel:"principal",col:12,y:5,name:"servicios",box:bx_money},
-                {panel:"principal",col:12,y:6,name:"productos",box:bx_money},
-                {panel:"principal",col:12,y:7,name:"pagado",box:bx_money},
                 {panel:"principal",col:12,y:8,name:"comentario*",box:{tipe:9,value:""},select:"COMMENT"},
                 {panel:"principal",col:12,colAllLevel:true,y:0,name:"trabajador asignado",box:{tipe:8},select:"ID_WORK_PROCESS",load:{name:"ld-workers",show:"show"}},
-                //{panel:"principal",col:12,y:8,name:"pdf",tipe:2,box:{tipe:5,value:"pdf",class:"btn btn-danger text-white btn-sm",style:"min-weigth:100px"},action:"pdf"},
 
-                {panel:"cliente",col:8,colAllLevel:true,y:0,name:"cliente",box:{tipe:8},select:"ID_CUSTOMER",load:{name:"customers",show:"show"}},
+                
+                {panel:"total",col:12,y:6,name:"productos",box:bx_money},
+                {panel:"total",col:12,y:6,name:"servicios",box:bx_money},
+                {panel:"total",col:12,y:6,name:"total sin descuento",box:bx_money,select:"TOTAL_WITHOUT_DSCTO"},
+                {panel:"total",col:12,y:6,name:"descuento%",box:{tipe:1,value:0},select:"DSCTO"},
+                {panel:"total",col:12,y:6,name:"total del descuento",box:bx_money},
+                {panel:"total",col:12,y:4,name:"total",box:bx_moneyh1,select:"TOTAL"},
+                {panel:"total",col:12,y:7,name:"pagado",box:bx_money},
+
+                {panel:"cliente",col:8,colAllLevel:true,y:0,name:"cliente",box:{tipe:8,options:[{value:"null",show:"Seleccionar Cliente"}]},select:"ID_CUSTOMER",load:{name:"customers",show:"show"}},
                 {panel:"cliente",col:2,colAllLevel:true,...fld_edit},
                 {panel:"cliente",col:2,colAllLevel:true,...fld_add},
                 //{panel:"cliente",col:12,y:1,name:"tipo",box:{tipe:0}},
@@ -314,10 +321,6 @@ $(document).ready(function() {
                 {panel:"cliente",col:12,y:4,name:"direccion",box:{tipe:0}},
                 {panel:"cliente",col:12,y:4,name:"correo",box:{tipe:0}},
                 {panel:"cliente",col:12,y:4,name:"comentario",box:{tipe:0}},
-
-                //{panel:"principal",col:10,colAllLevel:true,y:0,name:"checkin",box:{tipe:0},select:"ID_CHECKIN"},
-                //{panel:"principal",col:2,colAllLevel:true,name:"edit",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit-checkin"},
-                //{panel:"principal",col:2,colAllLevel:true,name:"add",box:{tipe:5,value:'<i class="bi bi-plus-circle"></i>',class:"btn btn-primary btn-sm"},action:"add-checkin"},
 
                 (userData.company.tipe == "2"?{panel:"principal",col:8,colAllLevel:true,y:0,name:"vehiculo",box:{tipe:8,value:"null",options:[{value:"null",show:"seleccionar vehiculo"}],class:"w-100"},select:"ID_ITEM",load:{name:"ld-items",value:"value",show:"show"}}:null),
                 (userData.company.tipe == "2"?{panel:"principal",col:2,colAllLevel:true,name:"edit",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit-item"}:null),
@@ -331,15 +334,52 @@ $(document).ready(function() {
                   actions:[{
                     action:({k})=>{
 
-                      var total = 0;
-                      //var tservicios = parseFloat(k.GetValues({fieldName:"servicios"})[0]);
-                      var tproductos = parseFloat(k.GetValues({fieldName:"productos"})[0]);
-                      total = tproductos;
+                      var cr_sale = k;
+                      var cr_items = conections.Crud_GetBuild({name:"products"});
+                      var cr_pays = conections.Crud_GetBuild({name:"pays"});
 
-                      //console.log("sale -> total:",total);
-                      k.SetValuesToBox({values:[total],fieldName:"total"});
-                      var primary = k.Reload_GetData({})[0]["ID_SALE"];
-                      k.Update_AddChange({fieldName:"total",value:total,primary});
+                      var products_total = cr_items.GetValues({fieldName:"precio total"});
+                      var products_tipe = cr_items.GetValues({fieldName:"tipo"});
+                      var pays = cr_pays.GetValues({fieldName:"total"});
+                      var dscto = parseFloat(cr_sale.GetValue({fieldName:"descuento%",y:0}));
+
+                      var total_without_dscto = 0;
+                      var total_dscto = 0;
+                      var total_with_dscto = 0;
+                      
+                      var total_product = 0;
+                      var total_service = 0;
+                      var total_payed = 0;
+
+
+                      for (let item = 0; item < products_total.length; item++) {
+
+                        var pr_total = parseFloat(products_total[item]);
+                        var pr_tipe = products_tipe[item];
+
+                        if(pr_tipe==3) total_product+= pr_total;
+                        if(pr_tipe==1) total_service+= pr_total;      
+                        
+                        total_without_dscto += pr_total;                        
+                      }
+                      total_dscto = (dscto/100) * total_without_dscto;
+                      total_with_dscto = total_without_dscto - total_dscto;
+                      total_payed = pays.reduce((acc,v)=>{return acc + parseFloat(v)},0);
+
+
+                      cr_sale.SetValuesToBox({fieldName:"total sin descuento",values:[total_without_dscto]});
+                      cr_sale.SetValuesToBox({fieldName:"productos",values:[total_product]});
+                      cr_sale.SetValuesToBox({fieldName:"servicios",values:[total_service]});
+                      cr_sale.SetValuesToBox({fieldName:"total del descuento",values:[total_dscto]});
+                      cr_sale.SetValuesToBox({fieldName:"total",values:[total_with_dscto]});
+                      cr_sale.SetValuesToBox({fieldName:"pagado",values:[total_payed]});
+
+
+                      var primary = cr_sale.Reload_GetData({})[0]["ID_SALE"];
+                      k.Update_AddChange({fieldName:"total",value:total_with_dscto,primary});
+                      k.Update_AddChange({fieldName:"total sin descuento",value:total_without_dscto,primary});
+
+                      cr_sale.CallEvent({name:"filterPagado"});
                     }
                   }],
                 },
@@ -406,6 +446,11 @@ $(document).ready(function() {
                         k.CallEvent({name:"customerUpdate"});
                       }
 
+                      if(field.name=="descuento%"){
+
+                        k.CallEvent({name:"calculateTotalSale"});
+                      }
+
                       
                     }
                   }],
@@ -439,6 +484,31 @@ $(document).ready(function() {
                       }
                   }]
                 },
+                {
+                  name:"setStateAfter",
+                  actions:[{
+                    action:({k,stateName})=>{
+
+                      var w_main = k.Panels_GetBuild({panelTitle:"principal"});
+                      var w_total = k.Panels_GetBuild({panelTitle:"total"});
+                      var w_customer = k.Panels_GetBuild({panelTitle:"cliente"});
+
+                      if(stateName=="block"){
+
+                        //w_main.Conteiner_Show({show:false,slow:false,ignoreBlock:true});
+                        //w_total.Conteiner_Show({show:false,slow:false,ignoreBlock:true});
+                        //w_customer.Conteiner_Show({show:false,slow:false,ignoreBlock:true});
+                      } 
+                      
+                      if(stateName=="reload"){
+
+                        w_main.Conteiner_Show({show:true,slow:true,ignoreBlock:true});
+                        w_total.Conteiner_Show({show:true,slow:true,ignoreBlock:true});
+                        w_customer.Conteiner_Show({show:true,slow:true,ignoreBlock:true});
+                      } 
+                    }
+                  }],
+                }
               ],
             }
           },
@@ -614,6 +684,7 @@ $(document).ready(function() {
                 {table:'sales_products', field:'PRICE_UNIT'},
                 {table:'sales_products', field:'PRICE_TOTAL'},
                 {table:"unids",field:"SIMBOL"},
+                {table:"products",field:"ID_PRODUCT_TIPE"},
               ],
               joins:[
                 {
@@ -675,6 +746,7 @@ $(document).ready(function() {
                 {panel:"main",...fld_delete,attributes:att_btn},
                 (acc_products_update?{panel:"main",...fld_edit,attributes:att_btn}:null),
                 {panel:"main",name:"producto-servicio",box:{tipe:8,class:"w-100"},attributes:att_ln,select:"ID_PRODUCT",load:{name:"products-services",show:"show"}},
+                {panel:"main",name:"tipo",box:{tipe:0,options:op_products_tipe},attributes:att_shw,select:"ID_PRODUCT_TIPE"},
                 {panel:"main",name:"unidad",box:bx_shw,attributes:att_shw,select:"SIMBOL"},
                 {panel:"main",name:"cantidad",box:bx_cant,attributes:att_cnt,select:"CANT"},
                 {panel:"main",name:"precio unitario",box:(acc_price_update?{tipe:1,value:0}:bx_money),attributes:att_shw,select:"PRICE_UNIT"},
@@ -843,15 +915,6 @@ $(document).ready(function() {
                     }
                   }],
                 },
-                {
-                  name:"updateBefore",
-                  actions:[{
-                    action:({k})=>{
-
-
-                    }
-                  }]
-                }
               ],
             }
           },
@@ -948,7 +1011,7 @@ $(document).ready(function() {
                           total += data.reduce((acum,v)=>{return acum + parseFloat(v)},0); 
                         }
                         var cr_main = conections.Crud_GetBuild({name:"sale"});
-                        cr_main.SetValuesToBox({values:[total],fieldName:"pagado"});
+                        //cr_main.SetValuesToBox({values:[total],fieldName:"pagado"});
                         cr_main.CallEvent({name:"filterPagado"});
                         
                       }

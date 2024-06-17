@@ -65,7 +65,7 @@ $(document).ready(function() {
         {panel:"main",name:"tipo",attributes:[{name:"style",value:"min-width:100px"}],box:{tipe:3,options:op_company_type},select:"ID_COMPANY_TYPE"},
         {panel:"main",name:"nombre",attributes:[{name:"style",value:"min-width:300px"}],box:{tipe:1,class:"w-100"},select:"NAME"},
         {panel:"main",name:"logo show",box:{tipe:10,style:"max-width: 100px;"},select:"LOGO"},
-        {panel:"main",name:"logo update",box:{tipe:1,attributes:[{name:"type",value:"file"}]},select:"LOGO"},
+        {panel:"main",name:"logo update",box:{tipe:1,attributes:[{name:"type",value:"file"}]},select:"LOGO",action:"logo update"},
         {panel:"main",name:"active",box:{tipe:6,name:"active"},select:"ACTIVE"},
         {panel:"main",name:"ruc",attributes:[{name:"style",value:"min-width:300px"}],box:{tipe:1,class:"w-100"},select:"RUC"},
         {panel:"main",name:"razon social",attributes:[{name:"style",value:"min-width:300px"}],box:{tipe:1,class:"w-100"},select:"NAME_REAL"},

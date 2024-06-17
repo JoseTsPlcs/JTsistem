@@ -312,8 +312,10 @@ class Conection extends ODD {
 
           var value = values[v];
           var valueLast = v == valuesLength - 1;
-
-          sql += "'" + value + "'";
+          var useComillas = value != "null";
+          var sql_comillas = useComillas ? "'" : "";
+          
+          sql += sql_comillas + value + sql_comillas;
           sql += valueLast ? "" : ",";
         }
 
