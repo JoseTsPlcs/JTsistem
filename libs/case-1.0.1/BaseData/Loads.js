@@ -4,7 +4,7 @@ class Loads extends ODD {
     constructor(i){
 
         super(i);
-        this.#SetVariables(i);
+        this.SetVariables(i);
     }
 
     #loads = [];
@@ -13,11 +13,16 @@ class Loads extends ODD {
     #conection = null;
     #screenload = null;
 
-    #SetVariables({loads=[],conection,screenLoad}){
+    SetVariables({loads,conection,screenLoad}){
 
-        this.#loads=loads;
+        this.Loads_SetVariables({loads});
         this.#conection=conection;
         this.ScreenLoad_SetVariables({screenLoad});
+    }
+
+    Loads_SetVariables({loads=[]}){
+
+        this.#loads=loads;
     }
 
     ScreenLoad_SetVariables({screenLoad}){
@@ -32,8 +37,9 @@ class Loads extends ODD {
 
     //------
 
-    Load({success}){
+    Load({success,loads}){
 
+        if(loads!=null) this.Loads_SetVariables({loads});
         this.#total=this.#loads.length;
         this.#count=0;
 
@@ -54,7 +60,9 @@ class Loads extends ODD {
 
         let k = this;
         //console.log("loads -> one load, load:",load);
-        var loadSql = this.#conection.GetSql_Select({...load});
+        var loadSql = load.sql;
+        if(loadSql==null) loadSql = this.#conection.GetSql_Select({...load});
+        
         this.#conection.Request({
             php:"row",sql:loadSql,
             success:(result)=>{

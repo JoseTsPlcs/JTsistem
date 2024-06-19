@@ -12,15 +12,18 @@
 
   echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>';
   echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>';
+  echo '<script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.0/dist/xlsx.full.min.js"></script>';
 
 
   $src= $srcPathReturn."libs/case-1.0.1/"; 
   include $srcPathReturn.'libs/case-1.0.1/case.php';
 
+  echo '<script src="../source/ConfigProyect.js"></script>';
+  echo '<script src="../source/Constans.js"></script>';
   echo '<script src="../source/ListOfPaginas.js"></script>';
   echo '<script src="../source/ListOfConections.js"></script>';
   echo '<script src="../source/ListOfForms.js"></script>';
-  echo '<script src="../source/ConfigProyect.js"></script>';
+  echo '<script src="../source/LoadPage.js"></script>';
   
   //return;
   $url = $_SERVER["REQUEST_URI"];
