@@ -2,7 +2,7 @@
 $(document).ready(function() {
 
   new Pag_Base({
-    success:({userData})=>{
+    success:({userData,pageData})=>{
 
       //console.log("salesControl",userData);
 
@@ -84,8 +84,8 @@ $(document).ready(function() {
                 {name:"cliente",box:bx_input,select:{table:"customers",field:"NAME"}},
                 (userData.company.tipe == "2"?{name:"placa",box:bx_input,select:{table:"items_vehicles",field:"PLACA"}}:null),
                 (userData.company.tipe == "2"?{name:"marca",box:bx_input,select:{table:"items_vehicles",field:"MARCA"}}:null),
-                {col:6,name:"fecha min",box:bx_date,select:{table:"sales",field:"DATE_EMMIT",tipe:"min"}},
-                {col:6,name:"fechamax",box:bx_date,select:{table:"sales",field:"DATE_EMMIT",tipe:"max"}},
+                {col:6,name:"fecha min",box:{...bx_date,value:pageData.fechaMin},select:{table:"sales",field:"DATE_EMMIT",tipe:"min"}},
+                {col:6,name:"fechamax",box:{...bx_date,value:pageData.fechaMax},select:{table:"sales",field:"DATE_EMMIT",tipe:"max"}},
                 {name:"estado",box:{tipe:4,options:op_sales_status},select:{table:"sales",field:"ID_STATUS"}},
                 {name:"cancelado",box:{tipe:4,options:op_sales_paid},select:{table:"sales",field:"PAID"}},
                 {name:"documento",box:{tipe:4,options:op_sales_document},select:{table:"sales",field:"ID_DOCUMENT"}},

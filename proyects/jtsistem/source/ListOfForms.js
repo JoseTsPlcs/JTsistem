@@ -1,91 +1,4 @@
-//---------options--------
 
-var company_id = 1;
-//var user_delete_data_import = true;
-
-const op_company_type = [
-    {value:1,show:"all"},
-    {value:2,show:"taller"},
-    {value:4,show:"tienda"},
-    {value:5,show:"consultorio"},
-];
-
-var op_access = [
-    {value:"acc-1",show:"borrar data importante"},
-    {value:"acc-2",show:"actualizar lista de productos"},
-    {value:"acc-3",show:"asignar precio a producto en venta"},
-    {value:"acc-4",show:"modificar la apertura de los controles de cuentas"},
-    {value:"acc-5",show:"modificar el cierre de los controles de cuentas"},
-    {value:"acc-6",show:"modificar el total de cuentas"},
-    {value:"acc-7",show:"modificar el estado de cuentas"},
-    {value:"acc-8",show:"asignar trabajador a venta"},
-    {value:"acc-9",show:"modificar stock"},
-    ...paginasOptions,
-];
-
-const op_taller_check = [
-    {value:1,show:""},
-];
-
-const op_sales_status = [
-    {value:1,show:"cotizacion",class:"rounded text-center bg-secondary text-white"},
-    {value:2,show:"confirmado",class:"rounded text-center bg-primary text-white"},
-    {value:3,show:"en proceso",class:"rounded text-center bg-warning text-white"},
-    {value:4,show:"terminado",class:"rounded text-center bg-success text-white"},
-    {value:5,show:"anulado",class:"rounded text-center bg-danger text-white"},
-];
-const op_sales_paid = [
-    {value:1,show:"pagado",class:"rounded text-center bg-success text-white"},
-    {value:0,show:"sin pagar",class:"rounded text-center bg-danger text-white"},
-];
-const op_sales_document = [
-    {value:1,show:"nota de pago"},
-    {value:2,show:"boleta"},
-    {value:3,show:"factura"},
-];
-
-const op_document_emmit = [
-    {value:0,show:"sin emitir",class:"rounded text-center bg-danger text-white"},
-    {value:1,show:"emitido",class:"rounded text-center bg-success text-white"}
-];
-
-const op_identity_document_tipe = [
-    {value:0,show:"dni"},
-    {value:1,show:"ruc"},
-];
-const op_products_tipe = [
-    {value:1,show:"servicio",class:"rounded text-center bg-primary text-white"},
-    {value:2,show:"insumo",class:"rounded text-center bg-warning text-white"},
-    {value:3,show:"producto",class:"rounded text-center bg-success text-white"},
-];
-const op_buys_status = [
-    {value:1,show:"cotizacion",class:"rounded text-center bg-secondary text-white"},
-    {value:2,show:"confirmado",class:"rounded text-center bg-primary text-white"},
-    {value:3,show:"en proceso",class:"rounded text-center bg-warning text-white"},
-    {value:4,show:"entregado",class:"rounded text-center bg-success text-white"},
-    {value:5,show:"anulado",class:"rounded text-center bg-danger text-white"},
-];
-const op_active = [
-    {value:0,show:"desactivo",class:"rounded text-center bg-danger text-white"},
-    {value:1,show:"activo",class:"rounded text-center bg-success text-white"},
-];
-
-const op_date_ranges = [
-    {value:"day",show:"diario"},
-    {value:"week",show:"semanal"},
-    {value:"month",show:"mensual"},
-    {value:"tri",show:"trimestre"},
-];
-
-const op_control_type = [
-    {value:1,show:"abrir"},
-    {value:0,show:"cerrar"},
-];
-
-const op_account_state = [
-    {value:1,show:"abierto",class:"rounded text-center bg-success text-white"},
-    {value:0,show:"cerrado",class:"rounded text-center bg-danger text-white"},
-];
 
 const igvPorcent = 18;
 
@@ -98,59 +11,6 @@ function CalculateJustIgv(val){
 
     return val * igvPorcent/100;
 }
-
-//--------boxs---------
-
-const bx_shw = {tipe:0,value:"",class:"text-center"};
-const bx_shw_activo = {tipe:0,value:0,options:[{value:0,show:"desactivo",class:"rounded text-center bg-danger text-white"},{value:1,show:"activo",class:"rounded text-center bg-success text-white"}]}
-
-const bx_money = {tipe:0,class:"text-center",format:{decimals:2,start:"S/."},value:0};
-const bx_moneyh1 = {tipe:0,class:"h1 text-left",format:{decimals:2,start:"S/."},value:0};
-const bx_moneyh3 = {tipe:0,class:"h3 text-left",format:{decimals:2,start:"S/."},value:0};
-
-const bx_income = {tipe:0,format:{decimals:2,start:"S/.",limit:{value:0,less:{attributes:[{name:"class",value:"text-danger"}]},more:{attributes:[{name:"class",value:"text-success"}]}}},value:0};
-const bx_incomeh1 = {tipe:0,format:{decimals:2,start:"S/.",limit:{value:0,less:{attributes:[{name:"class",value:"h1 text-danger"}]},more:{attributes:[{name:"class",value:"h1 text-success"}]}}},value:0};
-
-const bx_date = {tipe:2,value:Date_Today()};
-const bx_date_start = {tipe:2,value:Date_FirstOfMoth()};
-const bx_date_end = {tipe:2,value:Date_LastOfMoth()};
-
-const bx_input = {tipe:1,class:"w-100 m-0 p-0",value:""};
-const bx_cant = {tipe:1,class:"w-100 m-0 p-0 text-center",value:1};
-const bx_active_input = {tipe:6,name:"activo",value:1};
-const bx_active_show = {tipe:0,name:"activo",value:1,options:op_active};
-
-function bx_op({ops}) {
-    
-    return {
-        tipe:3,
-        class:"w-100 m-0 p-0",
-        options:ops,
-        value:1,
-    }
-}
-
-//------attributes-----
-
-const att_btn = [{name:"class",value:"my-0 py-0"},{name:"style",value:"width: 50px"}];
-const att_shw = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"width: 130px"}];
-const att_ln = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"min-width: 300px;"}];
-const att_ln50 = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"min-width: 70px;"}];
-const att_cnt = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"width: 50px"}];
-const att_cnt2 = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"width: 100px"}];
-
-//---------fields---------
-
-const fld_delete = {name:"delete",box:{tipe:5,value:'<i class="bi bi-x-circle"></i>',class:"btn btn-danger btn-sm"},action:"delete"};
-const fld_edit = {name:"edit",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit"};
-const fld_add = {name:"add",box:{tipe:5,value:'<i class="bi bi-plus-circle"></i>',class:"btn btn-primary btn-sm"},action:"add"};
-const fld_show = {name:"add",box:{tipe:5,value:'<i class="bi bi-eye-fill"></i>',class:"btn btn-primary btn-sm"},action:"show"};
-
-
-//---------filter
-
-const flt_active = {name:"activo",box:{tipe:4,options:op_active,value:["activo"]}};
-
 
 //---------stateTools-----------
 
@@ -176,12 +36,34 @@ const stTls_tb = [
     }
 ];
 
-const stTls_fm_maid = [
+const stTls_tb_simple = [
     {
         name:"reload",
         tools:[
             {name:"config",show:false},
             {name:"load",show:false},
+            
+            {name:"excel",show:false},
+            {name:"pdf",show:false},
+
+            {name:"sizes",show:true,value:10},
+            {name:"reload",show:true},
+            {name:"update",show:false},
+            {name:"new",show:true},
+            {name:"insert",show:false},
+            {name:"cancel",show:false},
+            
+            {name:"pages",show:true},
+        ],
+    }
+];
+
+const stTls_fm_maid = [
+    {
+        name:"reload",
+        tools:[
+            {name:"config",show:false},
+            {name:"load",show:true},
             
             {name:"excel",show:false},
             {name:"pdf",show:false},
@@ -303,7 +185,7 @@ const stTls_tb_show = [
             {name:"pages",show:false},
         ],
     },
-  ];
+];
 
 //----loads--
 
@@ -433,6 +315,42 @@ var ld_products_tags = {
       {table:'products_tags', field:'NAME',as:"show"},
     ]
 };
+
+var ld_customers = {
+
+    name:"ld-customers",
+    tableMain:"customers",
+    selects:[
+        {table:'customers', field:'ID_CUSTOMER',as:"value"},
+        {table:'customers', field:'NAME',as:"show"},
+    ],
+    conditions:[
+        {
+            table:"customers",
+            field:"ID_COMPANY",
+            inter:"=",
+            value:company_id,
+        }
+    ],
+    startOptions:[{value:"null",show:"Seleccione Cliente"}],    
+}
+
+var ld_zones = {
+   name:"ld-zones",
+   tableMain:"zones",
+   selects:[
+    {table:"zones",field:"ID_ZONE",as:"value"},
+    {table:"zones",field:"NAME",as:"show"},
+   ],
+   conditions:[
+    {
+        table:"zones",
+        field:"ID_COMPANY",
+        inter:"=",
+        value:company_id,
+    }
+   ],
+}
 
 //------config----
 
@@ -1118,6 +1036,118 @@ function scr_admin({id_company,parent,editUsuarios=false,editClase=false,editAcc
 
 }
 
+function scr_customer({parent,modal}) {
+    
+    return {
+        parent,
+        title:"cliente",
+        panels:[{col:12,y:0,title:"main",head:false,tipe:"form"}],
+        stateStart:"block",
+        afterInsert:"block",
+        afterUpdate:"block",
+        afterCancel:"block",
+        stateTools:[
+        {
+            name:"reload",
+            tools:[
+                {name:"config",show:false},
+                {name:"load",show:true},
+                
+                {name:"excel",show:false},
+                {name:"pdf",show:false},
+    
+                {name:"sizes",show:false,value:1},
+                {name:"reload",show:true},
+                {name:"update",show:true},
+                {name:"new",show:false},
+                {name:"insert",show:false},
+                {name:"cancel",show:true},
+                
+                {name:"pages",show:false},
+            ],
+        },
+        {
+            name:"new",
+            tools:[
+                {name:"config",show:false},
+                {name:"load",show:true},
+                
+                {name:"excel",show:false},
+                {name:"pdf",show:false},
+    
+                {name:"sizes",show:false,value:1},
+                {name:"reload",show:false},
+                {name:"update",show:false},
+                {name:"new",show:false},
+                {name:"insert",show:true},
+                {name:"cancel",show:true},
+                
+                {name:"pages",show:false},
+            ],
+        }
+        ],
+
+        tableMain:"customers",
+        selects:[
+            {table:'customers', field:'ID_CUSTOMER',primary:true},
+            {table:'customers', field:'ID_COMPANY'},
+            {table:'customers', field:'NAME'},
+            //{table:'customers', field:'ID_CUSTOMER_TIPE'},
+            {table:'customers', field:'COMPANY'},
+            {table:'customers', field:'NRO_DOCUMENT'},
+            {table:'customers', field:'PHONE'},
+            {table:'customers', field:'EMAIL'},
+            {table:'customers', field:'DESCRIPCION'},
+            {table:'customers', field:'DIRECCION'},
+        ],
+        conditions:[{
+            table:"customers",
+            field:"ID_COMPANY",
+            inter:"=",
+            value:company_id,
+        }],
+        inserts:ins_general,
+
+        fields:[
+            {panel:"main",col:8,name:"cliente",box:bx_input,select:"NAME"},
+            {panel:"main",col:4,tipe:0,name:"empresa",box:{tipe:6,name:"empresa",value:0},select:"COMPANY"},
+            {panel:"main",col:6,name:"documento",box:{tipe:0,options:op_identity_document_tipe},select:"COMPANY"},
+            {panel:"main",col:6,name:"nro documento",box:bx_input,select:"NRO_DOCUMENT"},
+            
+            {panel:"main",col:12,name:"telefono",box:{tipe:1,value:""},select:"PHONE"},
+            {panel:"main",col:12,name:"correo",box:{tipe:1,value:""},select:"EMAIL"},
+            {panel:"main",col:12,name:"direccion",box:{tipe:1,value:""},select:"DIRECCION"},
+            {panel:"main",col:12,tipe:2,name:"descripcion",box:{tipe:9,value:""},select:"DESCRIPCION"},
+        ],
+
+        events:[
+        {
+            name:"modalSetActive",
+            actions:[{
+                action:({k,active})=>{
+
+                    if(modal) modal.SetActive({active});
+                }
+            }]
+        },
+        {
+            name:"insertAfter",
+            actions:[{
+            action:({k})=>{
+
+                //var fm_sale = conections.Crud_GetBuild({name:"sale"});
+
+            }
+            }]
+        }
+        ],
+    }
+}
+
+function scr_inmueble({parent,modal}) {
+    
+
+}
 
 //--------------------
 
@@ -1134,90 +1164,7 @@ var ins_general = [{
     value:1,
 }];
 
-function ListOfForm_UserLog(userData) {
-    
-    //console.log("listofform userlog");
-    company_id = userData.company.id;
 
-    cnds_products[0].value = userData.company.id;
-    ins_general[0].value = userData.company.id;
-
-    ld_unids.conditions = [{
-        table:"unids",
-        field:"ID_COMPANY",
-        inter:"=",
-        value:userData.company.id,
-    }];
-
-    ld_products_tags.conditions = [{
-        table:"products_tags",
-        field:"ID_COMPANY",
-        inter:"=",
-        value:userData.company.id,
-    }];
-
-    ld_supplies.conditions.push({
-        before:" AND ",
-        table:"products",
-        field:"ID_COMPANY",
-        inter:"=",
-        value:userData.company.id,
-    });
-
-    ld_pay_tag.conditions.push({
-        before:" AND ",
-        table:"pay_tag",
-        field:"ID_COMPANY",
-        inter:"=",
-        value:userData.company.id,
-    });
-
-    ld_accounts.conditions.push({
-        before:" AND ",
-        table:"accounts",
-        field:"ID_COMPANY",
-        inter:"=",
-        value:userData.company.id,
-    });
-}
-
-function UserLog_ChangePagesByCompany(userData){
-
-    switch (userData.company.tipe) {
-        case "1":
-            
-            paginas[0].paginas[0].show = false;
-            paginas[0].paginas[6].show = false;
-
-        break;
-
-        case "4":
-            
-            paginas[0].paginas[0].show = false;
-            paginas[0].paginas[6].show = false;
-
-        break;
-
-        case "2":
-
-            //console.log("asdaksdmasd");
-
-            paginas[0].seccion = '<i class="bi bi-wrench-adjustable"></i> taller';
-            //paginas[0].paginas[1].name = "nueva cotizacion";
-            //paginas[0].paginas[2].name = "control de cotizaciones";
-            paginas[0].paginas[3].name = "lista de trabajos";
-            paginas[0].paginas[4].name = "trabajos terminados por cobrar";
-
-            paginas[3].paginas[3].show = false;
-            paginas[3].paginas[4].show = false;
-
-        break;
-    }
-
-}
-
-functionOnlogPage.push(ListOfForm_UserLog);
-functionOnlogPage.push(UserLog_ChangePagesByCompany);
 
 
 //------------pdf----------

@@ -30,12 +30,29 @@ class Pag_Base {
     let k = this;
     this.#IsLog({success:(i)=>{
  
-      k.#BuildNav({access:i.userData.access,title:i.userData.company.name});
+      k.#BuildNav({
+        access:i.userData.access,
+        titleCompany:i.userData.company.name,
+      });
+
+      var url = window.location.href;
+      var urlArray = url.split("/");
+      var href = urlArray[urlArray.length-1];
+      paginas.forEach(secc => {
+        
+        secc.paginas.forEach(pag => {
+          
+          if(pag.href == href) i.pageData = pag;
+        });
+      });
+
+      document.title = i.pageData.title;
+
       if(success!=null)success(i);
     }});
   }
 
-  #BuildNav({access=[],title="EmpresaName"}){
+  #BuildNav({access=[],titleCompany="EmpresaName"}){
 
     //console.log(access);
 
@@ -43,7 +60,7 @@ class Pag_Base {
 
     var nav = `
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand text-white" id="iconTittle">`+title+`</a>
+        <a class="navbar-brand text-white" id="iconTittle">`+titleCompany+`</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -53,28 +70,31 @@ class Pag_Base {
           for (let scc = 0; scc < paginas.length; scc++) {
 
             const seccion = paginas[scc];
-            nav += `
-                  <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
-                    `+seccion.seccion+`
-                    </a>
-                    <div class="dropdown-menu">`;
+            if(seccion.show == null){
 
-            for (let pg = 0; pg < seccion.paginas.length; pg++) {
+              nav += `
+                    <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                      `+seccion.icon+seccion.title+`
+                      </a>
+                      <div class="dropdown-menu">`;
 
-              const pag = seccion.paginas[pg];
-              var accessData = access.find(acc=>acc.value == pag.value);
-              var active = accessData ? accessData.active == "true" : false;
-              var show = pag.show == null ? true : pag.show;
-              //console.log(pag,active);
-              //active=true;
-              if(show) nav += `<a class="dropdown-item `+(active?"":"disabled")+`" href="`+(active?pag.href:"#")+`">`+pag.name+`</a>`;
-            }
+              for (let pg = 0; pg < seccion.paginas.length; pg++) {
 
-            nav += `
-                    </div>
-                  </li>
-            `;
+                const pag = seccion.paginas[pg];
+                var accessData = access.find(acc=>acc.value == pag.value);
+                var active = accessData ? accessData.active == "true" : false;
+                var show = pag.show == null ? true : pag.show;
+                //console.log(pag,active);
+                //active=true;
+                if(show) nav += `<a class="dropdown-item `+(active?"":"disabled")+`" href="`+(active?pag.href:"#")+`">`+pag.title+`</a>`;
+              }
+
+              nav += `
+                      </div>
+                    </li>
+              `;
+            }           
 
           }; 
 

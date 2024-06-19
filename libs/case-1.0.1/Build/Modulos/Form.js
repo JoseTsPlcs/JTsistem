@@ -6,6 +6,7 @@ class Form extends ODD {
         super(i);
         this.#SetVariables(i);
         this.#Build(i);
+        this.CallEvent({name:"builded"});
     }
 
     /*{

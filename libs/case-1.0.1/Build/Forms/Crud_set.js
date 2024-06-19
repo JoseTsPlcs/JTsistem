@@ -128,7 +128,7 @@ class Crud_set extends ODD {
         {x:0,y:1,index:0,name:"config",box:{tipe:5,value:'<i class="bi bi-gear"></i>',class:"btn btn-outline-primary btn-sm",update:()=>{this.Config_ShowChange()}},dom:null},
         {x:0,y:1,index:1,name:"load",box:{tipe:5,value:'<i class="bi bi-database"></i>',class:"btn btn-outline-primary btn-sm",update:()=>{this.#Load({})}},dom:null},
 
-        {x:2,y:1,index:0,name:"excel",box:{id:"btn1",tipe:5,value:"excel",class:"btn btn-outline-success btn-sm"},dom:null},
+        {x:2,y:1,index:0,name:"excel",box:{id:"btn1",tipe:5,value:"excel",class:"btn btn-outline-success btn-sm",update:()=>{this.#Event_UpdateToolExcel({})}},dom:null},
 
         {x:0,y:3,index:0,name:"sizes",box:{tipe:3,value:1,options:[{show:1,value:1},{show:10,value:10},{show:25,value:25},{show:50,value:50},{show:999,value:999}],update:()=>{this.#Event_UpdateToolPages({})}},dom:null},
 
@@ -185,6 +185,7 @@ class Crud_set extends ODD {
     #conteiner_panels = [];
     #Build_Panels({panels=[],breaklevel}){
 
+        panels = panels.filter(p=>p!=null);
         panels.forEach(pn => {
             
             if(pn.tag == null && pn.title != null) pn.tag = pn.title;
@@ -507,7 +508,7 @@ class Crud_set extends ODD {
                 var rsp = this.#Event_SetOptionsToFields({field,loadOptions});
                 if(rsp !=null && rsp.loadOptions) loadOptions = rst.loadOptions;
 
-                var lastOptions = field.box.options;
+                var lastOptions = field.load.startOptions;
                 if(lastOptions!=null) loadOptions = [...lastOptions,...loadOptions];
                 field.box.options = loadOptions;
                 field.box.value = valueDefault;
@@ -1448,6 +1449,52 @@ class Crud_set extends ODD {
         this.Reload({});
     }
 
+    #Event_UpdateToolExcel({}){
+
+        var data = [];
+
+        var header = [];
+        this.#fields.forEach(field => {
+            
+            header.push(field.name);
+        });
+        data.push(header);
+
+        let k = this;
+        var total = this.GetValues({fieldName:this.#fields[0].name}).length;
+        for (let index = 0; index < total; index++) {
+            
+            var line = [];
+            this.#fields.forEach(field => {
+                
+                line.push(k.GetValue({
+                    fieldName:field.name,
+                    y:index,
+                }));
+            });
+            data.push(line);            
+        }
+
+
+        // Datos de ejemplo
+        /*const data = [
+            ["Nombre", "Edad", "Correo"],
+            ["Juan", 30, "juan@example.com"],
+            ["María", 25, "maria@example.com"],
+            ["Carlos", 35, "carlos@example.com"]
+        ];*/
+
+        // Crear una nueva hoja de trabajo
+        const worksheet = XLSX.utils.aoa_to_sheet(data);
+
+        // Crear un nuevo libro de trabajo
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Hoja1");
+
+        // Generar un archivo Excel
+        XLSX.writeFile(workbook, "Ejemplo.xlsx");
+    }
+
     #Event_UpdateToolDelete({}){
 
         this.Delete({
@@ -1499,7 +1546,7 @@ class Crud_set extends ODD {
         var value = this.GetValues({fieldName:u.field.name})[y];
         var primary = u.primaryValues[y];
 
-        if(this.#stateData.state!="new"){
+        if(this.#stateData.state!="new" && u.field.action==null){
 
             //console.log(this.#stateData.state,"boxupdate -> add update, field:",u.field.name,",value:",value,",primary:",primary);
 
@@ -1512,7 +1559,7 @@ class Crud_set extends ODD {
             }              
         }    
 
-        //-------load change----------
+        //-------if load change----------
 
         var fieldsLoadByField = this.#fields.filter(f=>f.load!=null&&f.load.field!=null);
         //console.log("fieldsload",fieldsLoadByField);

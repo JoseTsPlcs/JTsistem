@@ -118,12 +118,13 @@ $(document).ready(function() {
             active:true,
             script:{
               parent:prnt_sale,
-              title:(userData.company.tipe == 2 ? "Venta" : "Venta"),
+              title:(userData.company.tipe == 3 ? "Corretaje" : "Venta"),
               //h:"100%",
               panels:[
                 {col:12,tipe:"form",title:"principal",tag:"Informacion",h:0,show:false,blocked:false},
                 {col:12,tipe:"form",title:"total",tag:"Total",h:0,show:false,blocked:false},
                 {col:12,tipe:"form",title:"cliente",tag:"Datos del Cliente",h:0,show:false,blocked:false},
+                (userData.company.tipe=="3"?{col:12,tipe:"form",title:"inmueble",tag:"Inmueble",h:0,blocked:false,show:false}:null)
               ],
               //breaklevel:"sm",
               stateStart:"block",
@@ -290,6 +291,37 @@ $(document).ready(function() {
                     }
                   ],
                 }:null),
+                (userData.company.tipe=="3"?{
+                  name:"ld-inmuebles",
+                  tableMain:"inmuebles",
+                  selects:[
+                    {table:"inmuebles",field:"ID_INMUEBLE",as:"value"},
+                    {sql:'CONCAT(customers.NAME,"-",zones.NAME) as "show"'},
+                  ],
+                  joins:[
+                    {
+                      main:{table:"inmuebles",field:"ID_ZONE"},
+                      join:{table:"zones",field:"ID_ZONE"},
+                      tipe:"LEFT",
+                    },
+                    {
+                      main:{table:"inmuebles",field:"ID_CUSTOMER_OWNER"},
+                      join:{table:"customers",field:"ID_CUSTOMER"},
+                      tipe:"LEFT",
+                    },
+                  ],
+                  conditions:[
+                    {
+                      table:"inmuebles",
+                      field:"ID_COMPANY",
+                      inter:"=",
+                      value:company_id,
+                    }
+                  ],
+                  startOptions:[
+                    {value:"null",show:"Seleccionar Inmueble"},
+                  ],
+                }:null),
               ],
 
               fields:[
@@ -322,9 +354,13 @@ $(document).ready(function() {
                 {panel:"cliente",col:12,y:4,name:"correo",box:{tipe:0}},
                 {panel:"cliente",col:12,y:4,name:"comentario",box:{tipe:0}},
 
-                (userData.company.tipe == "2"?{panel:"principal",col:8,colAllLevel:true,y:0,name:"vehiculo",box:{tipe:8,value:"null",options:[{value:"null",show:"seleccionar vehiculo"}],class:"w-100"},select:"ID_ITEM",load:{name:"ld-items",value:"value",show:"show"}}:null),
-                (userData.company.tipe == "2"?{panel:"principal",col:2,colAllLevel:true,name:"edit",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit-item"}:null),
-                (userData.company.tipe == "2"?{panel:"principal",col:2,colAllLevel:true,name:"add",box:{tipe:5,value:'<i class="bi bi-plus-circle"></i>',class:"btn btn-primary btn-sm"},action:"add-item"}:null),
+                (userData.company.tipe=="2"?{panel:"principal",col:8,colAllLevel:true,y:0,name:"vehiculo",box:{tipe:8,value:"null",options:[{value:"null",show:"seleccionar vehiculo"}],class:"w-100"},select:"ID_ITEM",load:{name:"ld-items",value:"value",show:"show"}}:null),
+                (userData.company.tipe=="2"?{panel:"principal",col:2,colAllLevel:true,name:"edit",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit-item"}:null),
+                (userData.company.tipe=="2"?{panel:"principal",col:2,colAllLevel:true,name:"add",box:{tipe:5,value:'<i class="bi bi-plus-circle"></i>',class:"btn btn-primary btn-sm"},action:"add-item"}:null),
+
+                (userData.company.tipe=="3"?{panel:"inmueble",col:8,colAllLevel:true,y:0,name:"inmueble",box:{tipe:8,value:"null",options:[{value:"null",show:"seleccionar inmueble"}],class:"w-100"},select:"ID_ITEM",load:{name:"ld-inmuebles",value:"value",show:"show"}}:null),
+                (userData.company.tipe=="3"?{panel:"inmueble",col:2,colAllLevel:true,name:"edit",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit-item"}:null),
+                (userData.company.tipe=="3"?{panel:"inmueble",col:2,colAllLevel:true,name:"add",box:{tipe:5,value:'<i class="bi bi-plus-circle"></i>',class:"btn btn-primary btn-sm"},action:"add-item"}:null),
 
               ],
 
@@ -1023,6 +1059,8 @@ $(document).ready(function() {
                       action:({k})=>{
       
                         k.CallEvent({name:"calculateTotalPagos"});
+                        var cr_main = conections.Crud_GetBuild({name:"sale"});
+                        cr_main.CallEvent({name:"calculateTotalSale"});
                       }
                     }],
                   }
@@ -1632,7 +1670,7 @@ $(document).ready(function() {
                   }]
                 }
               ],
-            }
+            },
           }
         ],
 
