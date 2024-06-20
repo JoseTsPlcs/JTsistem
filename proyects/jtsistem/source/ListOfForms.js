@@ -374,9 +374,17 @@ var ld_workers = {
         value:company_id,
       }
     ],
-    startOptions:[
-        {value:"null",show:"Selecciona un Trabajador"},
-    ],
+}
+
+function fld_worker({panel="main",select="ID_WORKER",edit=true}) {
+    
+    return {
+        panel,
+        name:"trabajador Asignado",
+        box:(edit?{tipe:8,class:"w-100",startOptions:[{value:"null",show:"Seleccionar Trabajador"}]}:{...bx_shw}),
+        load:(edit?{name:"ld-workers",show:"show",value:"value"}:null),
+        select,
+    }
 }
 
 //------config----
@@ -397,6 +405,11 @@ var config_filters_products_supplies = [
 ];
 
 //-----scripts-----
+
+function src_GetFields({fieldsBase=[]}) {
+    
+    return fieldsBase;
+}
 
 function scr_pay({tags=[],tagValue=1,events=[]}) {
     
@@ -673,50 +686,6 @@ function scr_fm_pays({parent,head=true,tableName,priFieldName,joinFieldName,even
 
 }
 
-var scr_sales_control = {
-    
-    title:"control de ventas",
-    panels:[{col:12,y:0,title:"main",tipe:"table"}],
-    stateTools:stTls_tb_all,
-
-    tableMain:"sales",
-    selects:[
-      {table:'sales', field:'ID_SALE',primary:true},
-      {table:'sales', field:'DATE_EMMIT'},
-      {table:'sales', field:'ID_STATUS'},
-      {table:'sales', field:'ID_DOCUMENT'},
-      {table:'sales', field:'ID_CUSTOMER'},
-      {table:'sales', field:'TOTAL'},
-      {table:'sales', field:'DOCUMENT_EMMIT'},
-      {table:'customers',field:'NAME'},
-    ],
-    joins:[
-      {main:{table:"sales",field:"ID_CUSTOMER"},join:{table:"customers",field:"ID_CUSTOMER"},tipe:"LEFT"}
-    ],
-
-    configShow:true,
-    filters:[
-      {col:12,y:0,name:"cliente",box:bx_input,select:{table:"customers",field:"NAME"}},
-      {col:6,y:1,name:"fecha min",box:bx_date,select:{table:"sales",field:"DATE_EMMIT",tipe:"min"}},
-      {col:6,y:1,name:"fechamax",box:bx_date,select:{table:"sales",field:"DATE_EMMIT",tipe:"max"}},
-      {col:12,y:2,name:"estado",box:{tipe:4,options:op_sales_status},select:{table:"sales",field:"ID_STATUS"}},
-      {col:12,y:2,name:"documento",box:{tipe:4,options:op_sales_document},select:{table:"sales",field:"ID_DOCUMENT"}},
-      {col:12,name:"emitido",box:{tipe:4,options:op_document_emmit},select:{table:"sales",field:"DOCUMENT_EMMIT"}},
-    ],
-    fields:[
-      //{panel:"main",name:"id",box:{tipe:0},select:"ID_SALE"},
-
-      {panel:"main",...fld_edit},
-      {panel:"main",name:"cliente",box:{tipe:0},select:"NAME"},
-      {panel:"main",name:"estado",box:{tipe:0,options:op_sales_status},select:"ID_STATUS"},
-      {panel:"main",name:"total",box:bx_money,select:"TOTAL"},
-      {panel:"main",name:"documento",box:{tipe:0,options:op_sales_document},select:"ID_DOCUMENT"},
-      {panel:"main",name:"fecha de emision",box:{tipe:0},select:"DATE_EMMIT"},
-      {panel:"main",name:"emitido",box:{tipe:0,options:op_document_emmit},select:"DOCUMENT_EMMIT"},
-    ],
-
-
-}
 
 function scr_admin({id_company,parent,editUsuarios=false,editClase=false,editAccess=false}){
 
@@ -1171,6 +1140,618 @@ function scr_customer({parent,modal}) {
     }
 }
 
+function scr_sales_control({userData,title,fechaMin=Date_Today(),fechaMax=Date_Today(),status=[],fields=[]}) {
+    
+    if(status==null || status.length==0) status = op_sales_status.map((op)=>{return op.show});
+
+    var gr = new Grid({
+    cols:[[6,6],[12],[12]],
+    boxs:[
+        {x:0,y:0,box:{tipe:0,value:"Total:",class:"h1 text-center"}},
+        {x:1,y:0,box:bx_moneyh1},
+    ],
+    });
+
+    var md = new Modal({
+    parent:gr.GetColData({x:0,y:2}).col,
+    size:"lg",
+    });
+    var mdParent = md.GetContent();
+    //mdParent.setAttribute("style","min-width: 600px;");
+    var mdGr = new Grid({
+    parent:mdParent,
+    cols:[[12],[12],[12]],
+    boxs:[
+        {x:0,y:2,box:{tipe:5,id:"btn1",value:'PDF <i class="bi bi-filetype-pdf"></i>',class:"btn btn-danger btn-sm",update:()=>{SalePDF()}}},
+        {x:0,y:2,box:{tipe:5,id:"btn2",value:'Copiar <i class="bi bi-clipboard"></i>',class:"btn btn-primary btn-sm",update:()=>{SaleCopy()}}},
+    ],
+    attributes:[
+        {x:0,y:2,attributes:[{name:"class",value:"col-4 m-0 p-0 d-flex justify-content-center"}]},
+    ],
+    });
+
+    var cruds = new ConsCruds({
+
+    cruds:[
+        {
+        name:"control",
+        active:true,
+        script:{
+            parent:gr.GetColData({x:0,y:1}).col,
+            title:title,
+            panels:[{col:12,y:0,title:"main",tipe:"table"}],
+            stateTools:stTls_tb_all,
+        
+            tableMain:"sales",
+            selects:[
+            {table:'sales', field:'ID_SALE',primary:true},
+            {table:'sales', field:'DATE_EMMIT'},
+            {table:'sales', field:'ID_STATUS'},
+            {table:'sales', field:'PAID'},
+            {table:'sales', field:'ID_DOCUMENT'},
+            {table:'sales', field:'ID_CUSTOMER'},
+            {table:'sales', field:'TOTAL'},
+            {table:'sales', field:'DOCUMENT_EMMIT'},
+            {table:'sales', field:'COMMENT'},
+            {table:'customers',field:'NAME'},
+            (userData.company.tipe == "2"?{sql:"CONCAT(items_vehicles.PLACA,'-',items_vehicles.MARCA) AS 'VEHICLE'"}:null),
+            ],
+            joins:[
+            {main:{table:"sales",field:"ID_CUSTOMER"},join:{table:"customers",field:"ID_CUSTOMER"},tipe:"LEFT"},
+            (
+                userData.company.tipe == "2"?
+                {
+                main:{table:"sales",field:"ID_ITEM"},
+                join:{table:"items_vehicles",field:"ID_VEHICLE"},
+                tipe:"LEFT",
+                }:null
+            )
+            ],
+            conditions:[
+            {
+                before:" AND ",
+                table:"sales",
+                field:"ID_COMPANY",
+                inter:"=",
+                value:userData.company.id,
+            }
+            ],
+        
+            configShow:false,
+            filters:[
+            {name:"cliente",box:bx_input,select:{table:"customers",field:"NAME"}},
+            (userData.company.tipe == "2"?{name:"placa",box:bx_input,select:{table:"items_vehicles",field:"PLACA"}}:null),
+            (userData.company.tipe == "2"?{name:"marca",box:bx_input,select:{table:"items_vehicles",field:"MARCA"}}:null),
+            (fechaMin==null?null:{col:6,name:"fecha min",box:{...bx_date,value:fechaMin},select:{table:"sales",field:"DATE_EMMIT",tipe:"min"}}),
+            (fechaMax==null?null:{col:6,name:"fechamax",box:{...bx_date,value:fechaMax},select:{table:"sales",field:"DATE_EMMIT",tipe:"max"}}),
+            {name:"estado",box:{tipe:4,options:op_sales_status,value:status},select:{table:"sales",field:"ID_STATUS"}},
+            {name:"cancelado",box:{tipe:4,options:op_sales_paid},select:{table:"sales",field:"PAID"}},
+            {name:"documento",box:{tipe:4,options:op_sales_document},select:{table:"sales",field:"ID_DOCUMENT"}},
+            {name:"emitido",box:{tipe:4,options:op_document_emmit},select:{table:"sales",field:"DOCUMENT_EMMIT"}},
+            ],
+            fields:[
+            //{panel:"main",name:"id",box:{tipe:0},select:"ID_SALE"},
+        
+            {panel:"main",name:"edit",attributes:[{name:"class",value:"px-1"}],box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit-page"},
+            {panel:"main",name:"show",attributes:[{name:"class",value:"px-1"}],box:{tipe:5,value:'<i class="bi bi-eye-fill"></i>',class:"btn btn-primary btn-sm"},action:"edit"},
+            
+            {panel:"main",name:"cliente",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"NAME"},
+            (userData.company.tipe == "2"?{panel:"main",name:"vehiculo",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"VEHICLE"}:null),
+            {panel:"main",name:"estado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_status},select:"ID_STATUS"},
+            {panel:"main",name:"cancelado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_paid},select:"PAID"},
+            {panel:"main",name:"total",box:bx_money,select:"TOTAL"},
+            {panel:"main",name:"comentario",box:{tipe:9,value:""},select:"COMMENT"},
+            {panel:"main",name:"fecha de emision",attributes:[{name:"style",value:"min-width:160px"}],box:{tipe:0},select:"DATE_EMMIT"},
+            
+            {panel:"main",name:"documento",attributes:[{name:"style",value:"min-width:100px"}],box:{tipe:0,options:op_sales_document},select:"ID_DOCUMENT"},
+            {panel:"main",name:"emitido",attributes:[{name:"style",value:"min-width:100px"}],box:{tipe:0,options:op_document_emmit},select:"DOCUMENT_EMMIT"},
+            ],
+            events:[
+            {
+                name:"boxUpdate",
+                actions:[
+                {
+                    action:({field,y,k})=>{
+        
+                    if(field.action=="edit-page"){
+        
+                        var id_sale = k.Reload_GetData()[y]["ID_SALE"];
+                        PageSend({
+                        url:"sales_new.php",
+                        send:{id_sale},
+                        })
+                        //console.log("edit sale!!", sale_id);
+                    }
+                    }
+                }
+                ],
+            },
+            {
+                name:"calculateTotal",
+                actions:[{
+                action:({k})=>{
+        
+                    var total = k.Reload_GetData().reduce((acum,v)=>{return acum + parseFloat(v["TOTAL"])},0);
+                    gr.GetColData({x:1,y:0}).boxs[0].SetValue(total);
+                }
+                }]
+            },
+            {
+                name:"reloadAfter",
+                actions:[{
+                action:({k})=>{
+        
+                    k.CallEvent({name:"calculateTotal"});
+                }
+                }]
+            }
+            ],
+        },   
+        },
+        {
+        name:"show-form",
+        active:true,
+        script:{
+            parent:mdGr.GetColData({x:0,y:0}).col,
+            title:"venta",
+            panels:[
+            {col:6,y:0,tipe:"form",title:"informacion",tag:"Informacion General"},
+            {col:6,y:0,tipe:"form",title:"cliente",tag:"Datos del Cliente"},
+            (userData.company.tipe=="2"?{col:12,y:0,tipe:"form",title:"vehicle",tag:"Datos del Vehiculo"}:null),
+            ],
+            stateStart:"block",
+            stateTools:[
+            {
+                name:"reload",
+                tools:[
+                    {name:"config",show:false},
+                    {name:"load",show:false},
+                    
+                    {name:"excel",show:false},
+                    {name:"pdf",show:false},
+        
+                    {name:"sizes",show:false,value:50},
+                    {name:"reload",show:false},
+                    {name:"update",show:false},
+                    {name:"new",show:false},
+                    {name:"insert",show:false},
+                    {name:"cancel",show:false},
+                    
+                    {name:"pages",show:false},
+                ],
+            },
+            ],
+
+            tableMain:"sales",
+            selects:[
+            {table:'sales', field:'ID_SALE',primary:true},
+            {table:'sales', field:'DATE_EMMIT'},
+            {table:'sales', field:'ID_STATUS'},
+            {table:'sales', field:'ID_DOCUMENT'},
+            {table:'sales', field:'ID_CUSTOMER'},
+            {table:'sales', field:'TOTAL'},
+            {table:'sales', field:'DOCUMENT_EMMIT'},
+            {table:'sales', field:'COMMENT'},
+            {table:'customers',field:'NAME'},
+            {table:'customers',field:'PHONE'},
+            {table:'customers',field:'DIRECCION'},
+            {table:'customers',field:'EMAIL'},
+            {table:'customers',field:'COMPANY'},
+            {table:'customers',field:'NRO_DOCUMENT'},
+            {table:'sales',field:'DSCTO'},
+            {table:'sales',field:'TOTAL_WITHOUT_DSCTO'},                
+            (userData.company.tipe=="2"?{table:"items_vehicles",field:"PLACA"}:null),
+            (userData.company.tipe=="2"?{table:"items_vehicles",field:"MARCA"}:null),
+            (userData.company.tipe=="2"?{table:"items_vehicles",field:"MODELO"}:null),
+            (userData.company.tipe=="2"?{table:"items_vehicles",field:"NRO_MOTO"}:null),
+            (userData.company.tipe=="2"?{table:"items_vehicles",field:"NRO_VIN"}:null),
+            (userData.company.tipe=="2"?{table:"items_vehicles",field:"ANIO"}:null),
+            (userData.company.tipe=="2"?{table:"items_vehicles",field:"COLOR"}:null),
+            ],
+            joins:[
+            {main:{table:"sales",field:"ID_CUSTOMER"},join:{table:"customers",field:"ID_CUSTOMER"},tipe:"LEFT"},
+            (userData.company.tipe=="2"?{
+                main:{table:"sales",field:"ID_ITEM"},
+                join:{table:"items_vehicles",field:"ID_VEHICLE"},
+                tipe:"LEFT",
+            }:null),
+            ],
+
+            fields:[
+            {panel:"informacion",name:"nro",box:{tipe:0},select:"ID_SALE"},
+            {panel:"informacion",name:"fecha de emision",box:{tipe:0},select:"DATE_EMMIT"},
+            {panel:"informacion",name:"total sin descuento",box:bx_money,select:"TOTAL_WITHOUT_DSCTO"},
+            {panel:"informacion",name:"descuento",box:{tipe:0,format:{end:"%",decimals:2}},select:"DSCTO"},
+            {panel:"informacion",name:"total",box:bx_moneyh1,select:"TOTAL"},
+
+            {panel:"cliente",name:"cliente",box:{tipe:0},select:"NAME"},
+            {panel:"cliente",name:"telefono",box:{tipe:0},select:"PHONE"},
+            {panel:"cliente",name:"correo",box:{tipe:0},select:"EMAIL"},
+            {panel:"cliente",name:"documento",box:{tipe:0,options:op_identity_document_tipe},select:"COMPANY"},
+            {panel:"cliente",name:"nro documento",box:{tipe:0},select:"NRO_DOCUMENT"},
+            {panel:"cliente",name:"direccion",box:{tipe:0},select:"DIRECCION"},
+
+            (userData.company.tipe=="2"?{panel:"vehicle",col:12,name:"placa",box:{tipe:0},select:"PLACA"}:null),
+            (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"marca",box:{tipe:0},select:"MARCA"}:null),
+            (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"modelo",box:{tipe:0},select:"MODELO"}:null),
+            (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"nro de motor",box:{tipe:0},select:"NRO_MOTO"}:null),
+            (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"nro de vin",box:{tipe:0},select:"NRO_VIN"}:null),
+            (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"año",box:{tipe:0},select:"ANIO"}:null),
+            (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"color",box:{tipe:0},select:"COLOR"}:null),
+            
+            //{panel:"informacion",name:"comentario",box:{tipe:0,value:""},select:"COMMENT"},
+
+            ],
+            events:[
+            {
+                name:"modalSetActive",
+                actions:[{
+                action:({active})=>{
+
+                    md.SetActive({active});
+                }
+                }]
+            }
+            ],
+
+        }
+        },
+        {
+        name:"show-table",
+        active:true,
+        script:{
+            parent:mdGr.GetColData({x:0,y:1}).col,
+            title:"detalle",
+            panels:[{col:12,y:0,tipe:"table",title:"informacion"}],
+            stateStart:"block",
+            stateTools:[
+            {
+                name:"reload",
+                tools:[
+                    {name:"config",show:false},
+                    {name:"load",show:false},
+                    
+                    {name:"excel",show:false},
+                    {name:"pdf",show:false},
+        
+                    {name:"sizes",show:false,value:999},
+                    {name:"reload",show:false},
+                    {name:"update",show:false},
+                    {name:"new",show:false},
+                    {name:"insert",show:false},
+                    {name:"cancel",show:false},
+                    
+                    {name:"pages",show:false},
+                ],
+            },
+            ],
+
+            tableMain:"sales_products",
+            selects:[
+            {table:'sales_products', field:'ID',primary:true},
+            {table:'sales_products', field:'ID_SALE'},
+            {table:'sales_products', field:'ID_PRODUCT'},
+            {table:'sales_products', field:'CANT'},
+            {table:'sales_products', field:'PRICE_UNIT'},
+            {table:'sales_products', field:'PRICE_TOTAL'},
+            {table:"products",field:"NAME",as:"PRODUCT_NAME"},
+            {table:"products",field:"ID_PRODUCT_TIPE"},
+            {table:"unids",field:"SIMBOL",as:"UNID_SIMBOL"},
+            ],
+            joins:[
+            {
+                main:{table:"sales_products",field:"ID_PRODUCT"},
+                join:{table:"products",field:"ID_PRODUCT"},
+                tipe:"LEFT",
+            },
+            {
+                main:{table:"products",field:"UNID_ID"},
+                join:{table:"unids",field:"ID_UNID"},
+                tipe:"LEFT",
+            },
+            ],
+            orders:[
+            {field:"ID_PRODUCT_TIPE",asc:false},
+            ],
+
+            fields:[
+            {panel:"informacion",name:"descripcion",attributes:att_ln,box:{tipe:0},select:"PRODUCT_NAME"},
+            {panel:"informacion",name:"tipo",attributes:att_ln50,box:{tipe:0,options:op_products_tipe},select:"ID_PRODUCT_TIPE"},
+            {panel:"informacion",name:"unidad",attributes:att_cnt,box:{tipe:0,class:"text-center"},select:"UNID_SIMBOL"},
+            {panel:"informacion",name:"cantidad",attributes:att_cnt,box:{tipe:0,class:"text-center"},select:"CANT"},
+            {panel:"informacion",name:"precio unitario",attributes:att_cnt,box:bx_money,select:"PRICE_UNIT"},
+            {panel:"informacion",name:"precio total",attributes:att_cnt,box:bx_money,select:"PRICE_TOTAL"},
+            ],
+
+        }
+        }
+    ],
+
+    conections:[
+        {
+        tipe:"tb-fm",
+        master:"control",
+        masterField:"ID_SALE",
+        maid:"show-form",
+        maidField:"ID_SALE",
+        },
+        {
+        tipe:"fm-tb",
+        master:"show-form",
+        masterField:"ID_SALE",
+        maid:"show-table",
+        maidField:"ID_SALE",
+        }
+    ],
+
+
+    });
+
+    function SaleCopy() {
+    
+    var sale_fm = cruds.Crud_GetBuild({name:"show-form"});
+    var sale_tb = cruds.Crud_GetBuild({name:"show-table"});
+
+    var inform = '';
+    inform += 'fecha: ' + sale_fm.GetValue({fieldName:"fecha de emision",y:0});
+    inform += '\ncliente: ' + sale_fm.GetValue({fieldName:"cliente",y:0});
+    inform += '\ntelefono: ' + sale_fm.GetValue({fieldName:"telefono",y:0});
+    inform += '\ncorreo: ' + sale_fm.GetValue({fieldName:"correo",y:0});
+    inform += '\ntotal: S/.' + sale_fm.GetValue({fieldName:"total",y:0});
+
+    var itemsCount = sale_tb.Reload_GetData().length;
+    for (let y = 0; y < itemsCount; y++) {
+
+        var itemName = sale_tb.GetValue({fieldName:"descripcion",y});
+        var cant= sale_tb.GetValue({fieldName:"cantidad",y});
+        var priceUnit = sale_tb.GetValue({fieldName:"precio unitario",y});
+        var priceTotal = sale_tb.GetValue({fieldName:"precio total",y});
+        
+        inform += '\n';
+        inform += ' item: ' + itemName;
+        inform += ' ,cantidad: ' + cant;
+        inform += ' ,precio unitario: ' + priceUnit;
+        inform += ' ,precio total: ' + priceTotal;
+    }
+
+    navigator.clipboard.writeText(inform);
+    console.log("sale information:");
+    console.log(inform);
+
+    alert("informacion de venta copiada!");
+    }
+
+    function SalePDF() {
+
+    var sale_fm = cruds.Crud_GetBuild({name:"show-form"});
+    var sale_tb = cruds.Crud_GetBuild({name:"show-table"});
+
+    var items = [];
+    var itemsCount = sale_tb.Reload_GetData().length;
+    for (let y = 0; y < itemsCount; y++) {
+
+        items.push({
+        detail: sale_tb.GetValue({fieldName:"descripcion",y}),
+        type: op_products_tipe.find(op=>op.value==sale_tb.GetValue({fieldName:"tipo",y})).show,
+        quantity: sale_tb.GetValue({fieldName:"cantidad",y}), 
+        unitPrice: parseFloat(sale_tb.GetValue({fieldName:"precio unitario",y})),
+        totalPrice: parseFloat(sale_tb.GetValue({fieldName:"precio total",y})),
+        });
+    }
+
+    generateInvoicePDF({
+        invoiceNumber: sale_fm.GetValue({fieldName:"nro",y:0}),
+        invoiceDate: sale_fm.GetValue({fieldName:"fecha de emision",y:0}),
+        
+        dscto: parseFloat(sale_fm.GetValue({fieldName:"descuento",y:0})),
+
+        companyName: userData.company.nameReal,
+        companyRUC:  userData.company.ruc,
+        companyAddress: userData.company.direccion,
+        companyPhone: userData.company.telf,
+        companyLogo:userData.company.logo,
+
+        vehicle: (userData.company.tipe=="2"?{
+        placa:sale_fm.GetValue({fieldName:"placa",y:0}),
+        marca:sale_fm.GetValue({fieldName:"marca",y:0}),
+        modelo:sale_fm.GetValue({fieldName:"modelo",y:0}),
+        nro_motor:sale_fm.GetValue({fieldName:"nro de motor",y:0}),
+        nro_vin:sale_fm.GetValue({fieldName:"nro de vin",y:0}),
+        anio:sale_fm.GetValue({fieldName:"año",y:0}),
+        color:sale_fm.GetValue({fieldName:"color",y:0}),
+        }:null),
+
+        customerName: sale_fm.GetValue({fieldName:"cliente",y:0}),
+        customerDocumentType: op_identity_document_tipe.find(op=>op.value==sale_fm.GetValue({fieldName:"documento",y:0})).show,
+        customerDocumentNumber: sale_fm.GetValue({fieldName:"nro documento",y:0}),
+        customerPhone: sale_fm.GetValue({fieldName:"telefono",y:0}),
+        customerAddress: sale_fm.GetValue({fieldName:"direccion",y:0}),
+        items,
+    });
+    }
+
+}
+
+function scr_sales_products({parent,title="items-products",head=true,fieldsSet=[]}) {
+ 
+     var fielsData = [
+        {name:"delete",active:true,EditBox:{...fld_delete.box},ShowBox:{...fld_delete.box},state:"show",action:"delete",attributes:att_btn},
+        {name:"edit",active:true,EditBox:{...fld_edit.box},ShowBox:{...fld_edit.box},state:"show",action:"edit",attributes:att_btn},
+        {name:"item",active:true,EditBox:{tipe:1,class:"w-100"},ShowBox:bx_shw,state:"show",select:"ID_PRODUCT",att:att_ln,load:{name:"products-services",show:"show",value:"value"}},
+        {name:"tipo",active:true,EditBox:{tipe:3,options:op_products_tipe},ShowBox:{...bx_shw,options:op_products_tipe},state:"show",select:"ID_PRODUCT_TIPE",att:att_shw},
+        {name:"unidad",active:true,EditBox:bx_shw,ShowBox:bx_shw,state:"show",select:"SIMBOL",att:att_shw},
+        {name:"cantidad",active:true,EditBox:{...bx_input},ShowBox:bx_shw,state:"show",select:"CANT",att:att_cnt},
+        {name:"precio unitario",active:true,EditBox:{...bx_input},ShowBox:bx_money,state:"show",select:"PRICE_UNIT",att:att_shw},
+        {name:"precio total",active:true,EditBox:{...bx_input},ShowBox:bx_money,state:"show",select:"PRICE_TOTAL",att:att_shw},
+        {name:"trabajador asignado",active:true,EditBox:{tipe:8,select:"w-100"},ShowBox:bx_shw,state:"show",select:"ID_WORKER",load:{name:"ld-workers",show:"show",value:"value"}},
+    ];
+
+    fieldsSet.forEach(fSet => {
+        
+        var ffound = fielsData.find(f=>f.name == fSet.name);
+        if(ffound){
+
+            if(fSet.state!=null) ffound.state = fSet.state;
+            if(fSet.active!=null) ffound.active = fSet.active;
+        }
+    });
+
+    var field_item = fielsData.find(f=>f.name=="item");
+    var field_unidad = fielsData.find(f=>f.name=="unidad");
+    var field_worker = fielsData.find(f=>f.name=="trabajador asignado");
+
+    var fields = fielsData.map((fdata)=>{
+
+        if(fdata.active == false) return null;
+
+        return {
+            panel:"main",
+            name:fdata.name,
+            box:(fdata.state=="show"?fdata.ShowBox:fdata.EditBox),
+            select:fdata.select,
+            action:fdata.action,
+            load:fdata.load,
+            attributes:fdata.att,
+        }
+    });
+
+    console.log(fields);
+
+    return {
+        parent,
+        title,head,
+        panels:[{col:12,y:0,title:"main",tipe:"table",h:580}],
+        stateTools:[
+            {
+              name:"reload",
+              tools:[
+                  {name:"config",show:false},
+                  {name:"load",show:true},
+                  
+                  {name:"excel",show:false},
+                  {name:"pdf",show:false},
+      
+                  {name:"sizes",show:false,value:999},
+                  {name:"reload",show:false},
+                  {name:"update",show:false},
+                  {name:"new",show:true},
+                  {name:"insert",show:false},
+                  {name:"cancel",show:false},
+                  {name:"addLine",show:false},
+                  
+                  {name:"pages",show:false},
+              ],
+            },
+            {
+              name:"new",
+              tools:[
+                  {name:"config",show:false},
+                  {name:"load",show:false},
+                  
+                  {name:"excel",show:false},
+                  {name:"pdf",show:false},
+      
+                  {name:"sizes",show:false,value:999},
+                  {name:"reload",show:false},
+                  {name:"update",show:false},
+                  {name:"new",show:false},
+                  {name:"insert",show:true},
+                  {name:"cancel",show:true},
+                  {name:"addLine",show:true},
+                  
+                  {name:"pages",show:false},
+              ],
+            },
+        ],
+
+        stateStart:"block",
+        afterInsert:"reload",
+        newLineStart:1,
+
+        tableMain:"sales_products",
+        selects:[
+            {table:'sales_products', field:'ID',primary:true},
+            {table:'sales_products', field:'ID_SALE'},
+            {table:'sales_products', field:'ID_PRODUCT'},
+            {table:'sales_products', field:'CANT'},
+            {table:'sales_products', field:'PRICE_UNIT'},
+            {table:'sales_products', field:'PRICE_TOTAL'},
+            {table:'sales_products',field:'ID_WORKER'},
+            {table:"unids",field:"SIMBOL"},
+            {table:"products",field:"ID_PRODUCT_TIPE"},
+        ],
+        joins:[
+            {
+                main:{table:"sales_products",field:"ID_PRODUCT"},
+                join:{table:"products",field:"ID_PRODUCT"},
+                tipe:"LEFT",
+            },
+            {
+                main:{table:"products",field:"UNID_ID"},
+                join:{table:"unids",field:"ID_UNID"},
+                tipe:"LEFT",
+            },
+        ],
+        loads:[
+            {
+                name:"products-services",
+                tableMain:"products",
+                selects:[
+                    {table:'products', field:'ID_PRODUCT',as:"value"},
+                    {table:'products', field:'NAME',as:"show"},
+                    {table:'products',field:"PRICE_UNIT"},
+                    {table:'products',field:"STOCK_TOTAL"},
+                    {table:'products',field:"ID_PRODUCT_TIPE"},
+                ],
+                conditions:[
+                {
+                    table:"products",
+                    field:"ACTIVE",
+                    inter:"=",
+                    value:1,
+                },
+                {
+                    before:" AND (",
+                    table:"products",
+                    field:"ID_PRODUCT_TIPE",
+                    inter:"=",
+                    value:3,
+                },
+                {
+                    before:" OR ",
+                    table:"products",
+                    field:"ID_PRODUCT_TIPE",
+                    inter:"=",
+                    value:1,
+                    after:" ) ",
+                },
+                {
+                    before:" AND ",
+                    table:"products",
+                    field:"ID_COMPANY",
+                    inter:"=",
+                    value:company_id,
+                },
+                ],
+            },
+            (field_worker.active?{...ld_workers}:null),
+        ],
+
+        /*fields:[
+            {panel:"main",...fld_delete,attributes:att_btn},
+            (acc_products_update?{panel:"main",...fld_edit,attributes:att_btn}:null),
+            {panel:"main",name:"producto-servicio",box:{tipe:8,class:"w-100"},attributes:att_ln,select:"ID_PRODUCT",load:{name:"products-services",show:"show"}},
+            {panel:"main",name:"tipo",box:{tipe:0,options:op_products_tipe},attributes:att_shw,select:"ID_PRODUCT_TIPE"},
+            {panel:"main",name:"unidad",box:bx_shw,attributes:att_shw,select:"SIMBOL"},
+            {panel:"main",name:"cantidad",box:bx_cant,attributes:att_cnt,select:"CANT"},
+            {panel:"main",name:"precio unitario",box:(acc_price_update?{tipe:1,value:0}:bx_money),attributes:att_shw,select:"PRICE_UNIT"},
+            {panel:"main",name:"precio total",box:(acc_price_update?{tipe:1,value:0}:bx_money),attributes:att_shw,select:"PRICE_TOTAL"},
+            (acc_item_worker?{panel:"main",name:"trabajador asignado",attributes:att_ln50,box:{tipe:8,value:"null",class:"w-100"},select:"ID_WORKER",load:{name:"ld-workers",show:"show",value:"value"}}:null)
+        ],*/
+        fields,
+    }
+
+}
 
 //--------------------
 

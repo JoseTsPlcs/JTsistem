@@ -9,6 +9,8 @@ $(document).ready(function() {
       var acc_price_update = Access_Get(userData,"acc-3");
       var acc_item_worker = Access_Get(userData,"acc-10");
 
+      ld_workers.conditions[0].value = company_id;
+
       //-------------
 
       var test_search = false;
@@ -312,7 +314,8 @@ $(document).ready(function() {
                 {panel:"principal",col:12,y:2,tipe:1,name:"cancelado",box:{...bx_op({ops:op_sales_paid}),value:0},select:"PAID"},
                 {panel:"principal",col:12,y:3,tipe:1,name:"documento de venta",box:bx_op({ops:op_sales_document}),select:"ID_DOCUMENT"},
                 {panel:"principal",col:12,y:8,name:"comentario*",box:{tipe:9,value:""},select:"COMMENT"},
-                {panel:"principal",col:12,colAllLevel:true,y:0,name:"trabajador asignado",box:{tipe:8},select:"ID_WORK_PROCESS",load:{name:"ld-workers",show:"show"}},
+                fld_worker({panel:"principal",select:"ID_WORK_PROCESS",edit:true}),
+                //{panel:"principal",col:12,colAllLevel:true,y:0,name:"trabajador asignado",box:{tipe:8},select:"ID_WORK_PROCESS",load:{name:"ld-workers",show:"show"}},
 
                 
                 {panel:"total",col:12,y:6,name:"productos",box:bx_money},

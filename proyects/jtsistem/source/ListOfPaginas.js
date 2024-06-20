@@ -9,6 +9,7 @@ paginas = [
           {name:"orders",title:"ordenes de trabajos",href:"check-in.php"},
           {name:"sale new",title:"venta nueva",href:"sales_new.php"},
           {name:"sales control",title:"control de ventas",href:"sales_control.php",fechaMin:Date_Today(),fechaMax:Date_Today()},
+          {name:"sales in cotizacion",title:"ventas por confirmar",href:"sales_toConfirm.php"},
           {name:"sales in process",title:"ventas confirmadas y en proceso",href:"cook.php"},
           {name:"sales to pay",title:"ventas terminadas por cobrar",href:"inform_nopaid.php"},
           {name:"cash",title:"caja",href:"pays_account.php"},
