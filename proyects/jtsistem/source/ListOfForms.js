@@ -352,6 +352,33 @@ var ld_zones = {
    ],
 }
 
+var ld_workers = {
+    name:"ld-workers",
+    tableMain:"workers",
+    selects:[
+      {table:"workers",field:"ID_WORKER",as:"value"},
+      {sql:'CONCAT(workers.NAME,"-",work_areas.NAME) AS "show"'},
+    ],
+    joins:[
+      {
+        main:{table:"workers",field:"ID_WORK_AREA"},
+        join:{table:"work_areas",field:"ID_WORK_AREA"},
+        tipe:"LEFT",
+      },
+    ],
+    conditions:[
+      {
+        table:"workers",
+        field:"ID_COMPANY",
+        inter:"=",
+        value:company_id,
+      }
+    ],
+    startOptions:[
+        {value:"null",show:"Selecciona un Trabajador"},
+    ],
+}
+
 //------config----
 
 var config_filters_products = [
@@ -1144,10 +1171,6 @@ function scr_customer({parent,modal}) {
     }
 }
 
-function scr_inmueble({parent,modal}) {
-    
-
-}
 
 //--------------------
 

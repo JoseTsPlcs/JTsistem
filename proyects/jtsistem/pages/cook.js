@@ -5,7 +5,8 @@ $(document).ready(function() {
 
     success:({userData})=>{
 
-      var acc_work_update = userData.access.find(acc=>acc.value=="acc-8") && userData.access.find(acc=>acc.value=="acc-8").active == "true";
+      var acc_work_update = Access_Get(userData,"acc-8");
+      var acc_item_worker = Access_Get(userData,"acc-10");
 
       var gr = new Grid({
         cols:[
@@ -15,7 +16,7 @@ $(document).ready(function() {
         ]
       });
 
-      var md_edit = new Modal({parent:gr.GetColData({x:0,y:1}).col,size:"lg",active:true});
+      var md_edit = new Modal({parent:gr.GetColData({x:0,y:1}).col,size:"lg",active:false});
       var fm_edit = new Form({
         title:"orden de trabajo",
         parent:md_edit.GetContent(),
@@ -318,6 +319,7 @@ $(document).ready(function() {
                 {table:'products', field:'NAME',as:"PRODUCT_NAME"},
                 {table:'sales_products', field:'CANT'},
                 {table:"unids",field:"SIMBOL"},
+                (acc_item_worker?{table:"sales_products",field:"ID_WORKER"}:{sql:'CONCAT(workers.NAME,"-",work_areas.NAME) AS "WORKER"'}),
               ],
               joins:[
                 {
@@ -329,13 +331,24 @@ $(document).ready(function() {
                   main:{table:"products",field:"UNID_ID"},
                   join:{table:"unids",field:"ID_UNID"},
                   tipe:"LEFT",
-                }
+                },
+                (
+                  !acc_item_worker?
+                  {
+                    main:{table:"sales_product",field:"ID_WORKER"},
+                    join:{table:"workers",field:"ID_WORKER"},
+                  }:null
+                ),
+              ],
+              loads:[
+                (acc_item_worker?ld_workers:null),
               ],
 
               fields:[
                 {panel:"main",name:"detalle",box:{tipe:0,class:"w-100"},attributes:att_ln,select:"PRODUCT_NAME"},
                 {panel:"main",name:"cantidad",box:bx_shw,attributes:att_cnt,select:"CANT"},
                 {panel:"main",name:"unidad",box:bx_shw,attributes:att_shw,select:"SIMBOL"},
+                fld_ld_worker({edit:acc_item_worker}),
                 {panel:"main",name:"check",box:{tipe:6,name:"listo"},select:"CHECKLIST"},
               ],
 

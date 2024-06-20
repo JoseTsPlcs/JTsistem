@@ -500,8 +500,7 @@ class Crud_set extends ODD {
                     loadName:field.load.name,
                     loadShow:field.load.show,
                 });
-                
-
+            
 
                 var valueDefault = loadOptions.length > 0 ? loadOptions[0].value : 1;
                 if(field.box.value!=null) valueDefault = field.box.value;
