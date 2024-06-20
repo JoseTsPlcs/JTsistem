@@ -101,6 +101,9 @@ $(document).ready(function() {
                 }
               ],
               inserts:[ins_general],
+              loads:[
+                {...ld_zones},
+              ],
               
               filters:[
                 {name:"estado",box:{tipe:4,class:"w-100",options:op_inmuble_state},select:{table:"inmuebles",field:"ID_INMUEBLE_STATE"}},

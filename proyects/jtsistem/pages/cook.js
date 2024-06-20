@@ -87,29 +87,7 @@ $(document).ready(function() {
                 {field:"ID_STATUS",act:false},
               ],
               loads:[
-                {
-                  name:"ld-workers",
-                  tableMain:"workers",
-                  selects:[
-                    {table:"workers",field:"ID_WORKER",as:"value"},
-                    {sql:'CONCAT(workers.NAME,"-",work_areas.NAME) AS "show"'},
-                  ],
-                  joins:[
-                    {
-                      main:{table:"workers",field:"ID_WORK_AREA"},
-                      join:{table:"work_areas",field:"ID_WORK_AREA"},
-                      tipe:"LEFT",
-                    },
-                  ],
-                  conditions:[
-                    {
-                      table:"workers",
-                      field:"ID_COMPANY",
-                      inter:"=",
-                      value:company_id,
-                    }
-                  ],
-                }
+                ld_workers,
               ],
           
               configShow:false,
@@ -264,93 +242,17 @@ $(document).ready(function() {
             name:"edit-tb",
             active:true,
             script:{
-              parent:prnt_edit_tb,
-              title:"lista de productos/servicios",head:false,
-              panels:[{col:12,y:0,title:"main",tipe:"table"}],
-              stateTools:[
-                {
-                  name:"reload",
-                  tools:[
-                      {name:"config",show:false},
-                      {name:"load",show:true},
-                      
-                      {name:"excel",show:false},
-                      {name:"pdf",show:false},
-          
-                      {name:"sizes",show:false,value:999},
-                      {name:"reload",show:false},
-                      {name:"update",show:false},
-                      {name:"new",show:false},
-                      {name:"insert",show:false},
-                      {name:"cancel",show:false},
-                      {name:"addLine",show:false},
-                      
-                      {name:"pages",show:false},
-                  ],
-                },
-                {
-                  name:"new",
-                  tools:[
-                      {name:"config",show:false},
-                      {name:"load",show:false},
-                      
-                      {name:"excel",show:false},
-                      {name:"pdf",show:false},
-          
-                      {name:"sizes",show:false,value:999},
-                      {name:"reload",show:false},
-                      {name:"update",show:false},
-                      {name:"new",show:false},
-                      {name:"insert",show:true},
-                      {name:"cancel",show:true},
-                      {name:"addLine",show:true},
-                      
-                      {name:"pages",show:false},
-                  ],
-                },
-              ],
-              stateStart:"block",
-
-              tableMain:"sales_products",
-              selects:[
-                {table:'sales_products', field:'ID',primary:true},
-                {table:'sales_products', field:'ID_SALE'},
-                {table:'sales_products', field:'CHECKLIST'},
-                {table:'products', field:'NAME',as:"PRODUCT_NAME"},
-                {table:'sales_products', field:'CANT'},
-                {table:"unids",field:"SIMBOL"},
-                (acc_item_worker?{table:"sales_products",field:"ID_WORKER"}:{sql:'CONCAT(workers.NAME,"-",work_areas.NAME) AS "WORKER"'}),
-              ],
-              joins:[
-                {
-                  main:{table:"sales_products",field:"ID_PRODUCT"},
-                  join:{table:"products",field:"ID_PRODUCT"},
-                  tipe:"LEFT",
-                },
-                {
-                  main:{table:"products",field:"UNID_ID"},
-                  join:{table:"unids",field:"ID_UNID"},
-                  tipe:"LEFT",
-                },
-                (
-                  !acc_item_worker?
-                  {
-                    main:{table:"sales_product",field:"ID_WORKER"},
-                    join:{table:"workers",field:"ID_WORKER"},
-                  }:null
-                ),
-              ],
-              loads:[
-                (acc_item_worker?ld_workers:null),
-              ],
-
-              fields:[
-                {panel:"main",name:"detalle",box:{tipe:0,class:"w-100"},attributes:att_ln,select:"PRODUCT_NAME"},
-                {panel:"main",name:"cantidad",box:bx_shw,attributes:att_cnt,select:"CANT"},
-                {panel:"main",name:"unidad",box:bx_shw,attributes:att_shw,select:"SIMBOL"},
-                fld_ld_worker({edit:acc_item_worker}),
-                {panel:"main",name:"check",box:{tipe:6,name:"listo"},select:"CHECKLIST"},
-              ],
+              ...scr_sales_products({
+                parent:prnt_edit_tb,
+                head:false,
+                fieldsSet:[
+                  {name:"delete",active:false},
+                  {name:"edit",active:false},
+                  {name:"precio unitario",active:false},
+                  {name:"precio total",active:false},
+                  {name:"trabajador asignado",state:"edit"},
+                ],
+              }),
 
               events:[
                 {

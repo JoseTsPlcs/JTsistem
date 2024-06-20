@@ -9,7 +9,7 @@ var items = [
     {name:"insumos",title:"Insumos",incon:""},
 ];
 
-var company_id = 1;
+var company_id = 0;
 //var user_delete_data_import = true;
 
 const op_company_type = [
@@ -154,7 +154,7 @@ function bx_op({ops}) {
 
 const att_btn = [{name:"class",value:"my-0 py-0"},{name:"style",value:"width: 50px"}];
 const att_shw = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"width: 130px"}];
-const att_ln = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"min-width: 300px;"}];
+const att_ln = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"min-width:300px;"}];
 const att_ln50 = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"min-width: 70px;"}];
 const att_cnt = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"width: 50px"}];
 const att_cnt2 = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"width: 100px"}];

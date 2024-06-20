@@ -103,6 +103,8 @@ function ListOfForm_UserLog(userData) {
         value:userData.company.id,
     });
 
+    ld_workers.conditions[0].value=company_id;
+
     
 }
 
