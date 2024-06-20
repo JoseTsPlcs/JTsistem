@@ -5,8 +5,9 @@ $(document).ready(function() {
 
     success:({userData})=>{
 
-      var acc_products_update = userData.access.find(acc=>acc.value=="acc-2") && userData.access.find(acc=>acc.value=="acc-2").active == "true";
-      var acc_price_update = userData.access.find(acc=>acc.value=="acc-3") && userData.access.find(acc=>acc.value=="acc-2").active == "true";
+      var acc_products_update = Access_Get(userData,"acc-2");
+      var acc_price_update = Access_Get(userData,"acc-3");
+      var acc_item_worker = Access_Get(userData,"acc-10");
 
       //-------------
 
@@ -246,27 +247,7 @@ $(document).ready(function() {
                   ],
                 },
                 {
-                  name:"ld-workers",
-                  tableMain:"workers",
-                  selects:[
-                    {table:"workers",field:"ID_WORKER",as:"value"},
-                    {sql:'CONCAT(workers.NAME,"-",work_areas.NAME) AS "show"'},
-                  ],
-                  joins:[
-                    {
-                      main:{table:"workers",field:"ID_WORK_AREA"},
-                      join:{table:"work_areas",field:"ID_WORK_AREA"},
-                      tipe:"LEFT",
-                    },
-                  ],
-                  conditions:[
-                    {
-                      table:"workers",
-                      field:"ID_COMPANY",
-                      inter:"=",
-                      value:company_id,
-                    }
-                  ],
+                  ...ld_workers,
                 },
                 (userData.company.tipe=="2"?{
                   name:"ld-items",
@@ -719,6 +700,7 @@ $(document).ready(function() {
                 {table:'sales_products', field:'CANT'},
                 {table:'sales_products', field:'PRICE_UNIT'},
                 {table:'sales_products', field:'PRICE_TOTAL'},
+                {table:'sales_products',field:'ID_WORKER'},
                 {table:"unids",field:"SIMBOL"},
                 {table:"products",field:"ID_PRODUCT_TIPE"},
               ],
@@ -776,6 +758,7 @@ $(document).ready(function() {
                     },
                   ],
                 },
+                (acc_item_worker?{...ld_workers}:null),
               ],
 
               fields:[
@@ -787,6 +770,7 @@ $(document).ready(function() {
                 {panel:"main",name:"cantidad",box:bx_cant,attributes:att_cnt,select:"CANT"},
                 {panel:"main",name:"precio unitario",box:(acc_price_update?{tipe:1,value:0}:bx_money),attributes:att_shw,select:"PRICE_UNIT"},
                 {panel:"main",name:"precio total",box:(acc_price_update?{tipe:1,value:0}:bx_money),attributes:att_shw,select:"PRICE_TOTAL"},
+                (acc_item_worker?{panel:"main",name:"trabajador asignado",attributes:att_ln50,box:{tipe:8,value:"null",class:"w-100"},select:"ID_WORKER",load:{name:"ld-workers",show:"show",value:"value"}}:null)
               ],
               events:[
                 {

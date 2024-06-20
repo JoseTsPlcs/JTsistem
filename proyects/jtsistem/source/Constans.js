@@ -30,8 +30,17 @@ var op_access = [
     {value:"acc-7",show:"modificar el estado de cuentas"},
     {value:"acc-8",show:"asignar trabajador a venta"},
     {value:"acc-9",show:"modificar stock"},
+    {value:"acc-10",show:"asignar a un item un trabajador"},
     //...paginasOptions,
 ];
+
+function Access_Get(userData,accessValue) {
+    
+    var acc = userData.access.find(acc=>acc.value==accessValue);
+    var active = acc != null && acc.active == "true";
+    console.log(accessValue,acc,active);
+    return active;
+}
 
 const op_taller_check = [
     {value:1,show:""},
@@ -157,6 +166,16 @@ const fld_edit = {name:"edit",box:{tipe:5,value:'<i class="bi bi-pencil-square">
 const fld_add = {name:"add",box:{tipe:5,value:'<i class="bi bi-plus-circle"></i>',class:"btn btn-primary btn-sm"},action:"add"};
 const fld_show = {name:"add",box:{tipe:5,value:'<i class="bi bi-eye-fill"></i>',class:"btn btn-primary btn-sm"},action:"show"};
 
+function fld_ld_worker({panel="main",edit=true}){
+
+    return {
+        panel,
+        name:"trabajador asignado",
+        box:(edit?{tipe:8,class:"w-100",value:"null"}:{...bx_shw}),
+        load:(edit?{name:ld_workers.name,show:"show",value:"value",startOptions:[{value:"null",show:"Seleccionar Trabajador"}]}:null),
+        select:(edit?"ID_WORKER":"WORKER"),
+    }
+}
 
 //---------filter
 

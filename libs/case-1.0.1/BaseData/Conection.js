@@ -342,6 +342,7 @@ class Conection extends ODD {
       var setLast = st == sets_length-1;
       var setField = set["field"];
       var setValue = "'" + set["value"] + "'";
+      if(setValue=="'null'") setValue = "NULL";
 
       sql += setField + " = " + setValue;
       if(!setLast) sql += ", "; 
