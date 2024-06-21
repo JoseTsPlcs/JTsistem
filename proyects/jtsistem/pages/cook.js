@@ -244,7 +244,7 @@ $(document).ready(function() {
             script:{
               ...scr_sales_products({
                 parent:prnt_edit_tb,
-                head:false,
+                head:false,h:600,
                 fieldsSet:[
                   {name:"delete",active:false},
                   {name:"edit",active:false},
