@@ -1572,7 +1572,7 @@ function scr_sales_control({userData,title,fechaMin=Date_Today(),fechaMax=Date_T
 
 }
 
-function scr_sales_products({parent,title="items-products",head=true,fieldsSet=[]}) {
+function scr_sales_products({parent,title="items-products",head=true,h=600,fieldsSet=[]}) {
  
      var fielsData = [
         {name:"delete",active:true,EditBox:{...fld_delete.box},ShowBox:{...fld_delete.box},state:"show",action:"delete",attributes:att_btn},
@@ -1620,7 +1620,7 @@ function scr_sales_products({parent,title="items-products",head=true,fieldsSet=[
     return {
         parent,
         title,head,
-        panels:[{col:12,y:0,title:"main",tipe:"table",h:580}],
+        panels:[{col:12,y:0,title:"main",tipe:"table",h}],
         stateTools:[
             {
               name:"reload",
