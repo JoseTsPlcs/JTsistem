@@ -5,8 +5,8 @@ $(document).ready(function() {
 
     success:({userData})=>{
 
-      var acc_control_update_open = userData.access.find(acc=>acc.value=="acc-4") &&  userData.access.find(acc=>acc.value=="acc-4").active == "true";
-      var acc_control_update_close = userData.access.find(acc=>acc.value=="acc-4") &&  userData.access.find(acc=>acc.value=="acc-5").active == "true";
+      var acc_control_update_open = false && userData.access.find(acc=>acc.value=="acc-4") &&  userData.access.find(acc=>acc.value=="acc-4").active == "true";
+      var acc_control_update_close = false && userData.access.find(acc=>acc.value=="acc-4") &&  userData.access.find(acc=>acc.value=="acc-5").active == "true";
 
       
       var gr = new Grid({
@@ -64,7 +64,9 @@ $(document).ready(function() {
       var account_id = null;
       var account_total = 0;
       var account_date_start = null;
+      var account_hora_start = null;
       var account_date_end = null;
+      var account_hora_end = null;
       //var md = new Modal({parent:gr.GetColData({x:0,y:2}).col,size:"lg"});
     
       var control = new ConsCruds({
@@ -265,10 +267,12 @@ $(document).ready(function() {
                 {panel:"main",...fld_edit},
                 //{panel:"main",name:"cuenta",box:{tipe:0},select:"ACCOUNT_NAME"},
                 {panel:"main",name:"abre/cierre",box:{tipe:0,options:op_account_state},select:"OPEN"},
-                {panel:"main",name:"abre - fecha de emision",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"DATE_EMMIT_OPEN"},
-                {panel:"main",name:"abre - total",box:bx_money,select:"TOTAL_OPEN"},
-                {panel:"main",name:"cierre - fecha de emision",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"DATE_EMMIT_CLOSE"},
-                {panel:"main",name:"cierre - total",box:bx_money,select:"TOTAL_CLOSE"},
+                {panel:"main",name:"abre - fecha",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"DATE_EMMIT_OPEN"},
+                //{panel:"main",name:"abre - hora",attributes:[{name:"style",value:"min-width: 100px;"}],box:{tipe:0},select:"HORA_OPEN"},
+                {panel:"main",name:"abre - total",attributes:[{name:"style",value:"min-width: 200px;"}],box:bx_money,select:"TOTAL_OPEN"},
+                {panel:"main",name:"cierre - fecha",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"DATE_EMMIT_CLOSE"},
+                //{panel:"main",name:"cierre - hora",attributes:[{name:"style",value:"min-width: 100px;"}],box:{tipe:0},select:"HORA_CLOSE"},
+                {panel:"main",name:"cierre - total",attributes:[{name:"style",value:"min-width: 200px;"}],box:bx_money,select:"TOTAL_CLOSE"},
               ],
               orders:[
                 {field:"OPEN",asc:false},
@@ -288,7 +292,7 @@ $(document).ready(function() {
                       }
                     }
                   }]
-                }
+                },
               ]
 
               
@@ -375,7 +379,7 @@ $(document).ready(function() {
                       account_date_end = data["DATE_EMMIT_CLOSE"];
                       account_total = parseFloat(data["TOTAL_OPEN"]);
 
-                      console.log(account_date_start, account_date_end);
+                      //console.log(account_date_start, account_date_end);
 
                       var crud_pays = control.Crud_GetBuild({name:"pagos"});
                       crud_pays.SetState({stateName:"reload"});
@@ -412,7 +416,7 @@ $(document).ready(function() {
                           tableMain:"control_accounts",
                           sets:[
                             {field:"OPEN",value:"0"},
-                            //{field:"DATE_EMMIT_CLOSE",value:""},
+                            {field:"DATE_EMMIT_CLOSE",value:Date_Time_Today()},
                             //{field:"TOTAL_CLOSE",value:""},
                           ],
                           conditions:[
@@ -500,28 +504,6 @@ $(document).ready(function() {
                 {field:"DATE_EMMIT",asc:true},
                 {field:"ID_PAY",asc:true},
               ],
-              /*conditions:[
-                {
-                  table:"accounts",
-                  field:"ID_ACCOUNT",
-                  inter:"=",
-                  value:account_id,
-                },
-                {
-                  before:" AND ",
-                  table:"accounts",
-                  field:"DATE_EMMIT",
-                  inter:">=",
-                  value:account_date_start,
-                },
-                {
-                  before:" AND ",
-                  table:"accounts",
-                  field:"DATE_EMMIT",
-                  inter:"<=",
-                  value:account_date_end,
-                },
-              ],*/
               
   
               fields:[
@@ -542,6 +524,11 @@ $(document).ready(function() {
                   name:"printBefore",
                   actions:[{
                     action:({result})=>{
+
+                      result.forEach(line => {
+                        
+                        line["DATE_EMMIT"] += " " + (line["HORA"] ? line["HORA"]: "");
+                      });
 
                       var total_start = account_total;
                       var total_cal = total_start;
@@ -635,7 +622,7 @@ $(document).ready(function() {
                         value:account_date_start,
                       });
 
-                      console.log(account_date_end);
+                      
                       if(account_date_end!=""&&account_date_end!=null){
 
                         conditions.push({
@@ -741,7 +728,7 @@ $(document).ready(function() {
             inserts:[
               {field:"OPEN",value:"1"},
               {field:"ID_ACCOUNT",value:account_id},
-              {field:"DATE_EMMIT_OPEN",value:Date_Today()},
+              {field:"DATE_EMMIT_OPEN",value:Date_Time_Today()},
               //{field:"TOTAL_OPEN",value:account_total},
               //{field:""},
             ],

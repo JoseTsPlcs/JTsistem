@@ -251,6 +251,7 @@ $(document).ready(function() {
                   {name:"precio unitario",active:false},
                   {name:"precio total",active:false},
                   {name:"trabajador asignado",state:"edit"},
+                  {name:"check",state:"edit",active:true},
                 ],
               }),
 

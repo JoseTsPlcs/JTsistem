@@ -376,6 +376,24 @@ var ld_workers = {
     ],
 }
 
+var ld_rucs = {
+    name:"ld-rucs",
+    tableMain:"rucs",
+    selects:[
+        {table:"rucs",field:"ID_RUC",as:"value"},
+        {sql:'CONCAT(rucs.RUC,"-",rucs.RAZON_SOCIAL) AS "show"'},
+      ],
+      conditions:[
+        {
+          table:"rucs",
+          field:"ID_COMPANY",
+          inter:"=",
+          value:company_id,
+        }
+      ],
+      startOptions:[{value:"null",show:"Sin Ruc"}],  
+}
+
 function fld_worker({panel="main",select="ID_WORKER",edit=true}) {
     
     return {
@@ -408,6 +426,8 @@ var config_filters_products_supplies = [
 
 function src_GetFields({fieldsBase=[]}) {
     
+    
+
     return fieldsBase;
 }
 
@@ -430,12 +450,13 @@ function scr_pay({tags=[],tagValue=1,events=[]}) {
             {table:'payments', field:'INCOME'},
             {table:'payments', field:'ID_ACCOUNT'},
             {table:'payments', field:'ID_PAY_TAG'},
+            {table:'payments',field:'HORA'},
         ],
         inserts:[
             ...ins_general,
             {
                 field:"DATE_EMMIT",
-                value:Date_Today(),
+                value:Date_Time_Today(),
             }
         ],
         loads:[
@@ -491,9 +512,8 @@ function scr_pay({tags=[],tagValue=1,events=[]}) {
         ],
 
         fields:[
-            //{panel:"main",col:12,y:0,name:"id",box:bx_shw,select:"ID_PAY"},
-            {panel:"main",col:12,y:1,name:"fecha de emision",box:{tipe:0,value:Date_Today()},select:"DATE_EMMIT"},
-            {panel:"main",col:12,y:2,name:"total",box:bx_input,select:"TOTAL"},
+            {panel:"main",col:12,y:1,name:"fecha de emision",box:{tipe:0,value:Date_Time_Today()},select:"DATE_EMMIT"},
+            {panel:"main",col:12,y:2,name:"total",box:{tipe:1,value:0},select:"TOTAL"},
             //{panel:"main",col:12,name:"ingreso/egreso",box:{tipe:6,name:"ingreso"},select:"INCOME"},
             {panel:"main",tipe:1,name:"ingreso/egreso",box:{tipe:0,value:0,options:[{value:0,show:"egreso",class:"text-danger"},{value:1,show:"ingreso",class:"text-success"}]},select:"INCOME"},
             {panel:"main",tipe:1,col:12,y:2,name:"cuenta",box:bx_op({ops:[]}),select:"ID_ACCOUNT",load:{name:"ld-accounts",value:"value",show:"show"}},
@@ -573,6 +593,8 @@ function scr_pay({tags=[],tagValue=1,events=[]}) {
                             field:"INCOME",
                             value:income,
                         });
+
+                        console.log("------------inserts:",inserts);
 
                         return {inserts};
                     }
@@ -1572,6 +1594,7 @@ function scr_sales_control({userData,title,fechaMin=Date_Today(),fechaMax=Date_T
 
 }
 
+
 function scr_sales_products({parent,title="items-products",head=true,h=600,fieldsSet=[]}) {
  
      var fielsData = [
@@ -1583,7 +1606,8 @@ function scr_sales_products({parent,title="items-products",head=true,h=600,field
         {name:"cantidad",active:true,EditBox:{...bx_input},ShowBox:bx_shw,state:"show",select:"CANT",att:att_cnt},
         {name:"precio unitario",active:true,EditBox:{...bx_input},ShowBox:bx_money,state:"show",select:"PRICE_UNIT",att:att_shw},
         {name:"precio total",active:true,EditBox:{...bx_input},ShowBox:bx_money,state:"show",select:"PRICE_TOTAL",att:att_shw},
-        {name:"trabajador asignado",active:true,EditBox:{tipe:8,select:"w-100"},ShowBox:bx_shw,state:"show",select:"ID_WORKER",load:{name:"ld-workers",show:"show",value:"value"}},
+        {name:"trabajador asignado",active:true,EditBox:{tipe:8,class:"w-100"},ShowBox:bx_shw,state:"show",select:"ID_WORKER",load:{name:"ld-workers",show:"show",value:"value"}},
+        {name:"check",active:false,EditBox:{tipe:6,name:"listo"},ShowBox:{tipe:0,options:[{value:0,show:"pendiente"},{value:1,show:"check"}]},state:"show",select:"CHECKLIST"}
     ];
 
     fieldsSet.forEach(fSet => {
@@ -1677,6 +1701,7 @@ function scr_sales_products({parent,title="items-products",head=true,h=600,field
             {table:'sales_products', field:'PRICE_UNIT'},
             {table:'sales_products', field:'PRICE_TOTAL'},
             {table:'sales_products',field:'ID_WORKER'},
+            {table:"sales_products",field:"CHECKLIST"},
             {table:"unids",field:"SIMBOL"},
             {table:"products",field:"ID_PRODUCT_TIPE"},
         ],
@@ -1749,6 +1774,102 @@ function scr_sales_products({parent,title="items-products",head=true,h=600,field
             (acc_item_worker?{panel:"main",name:"trabajador asignado",attributes:att_ln50,box:{tipe:8,value:"null",class:"w-100"},select:"ID_WORKER",load:{name:"ld-workers",show:"show",value:"value"}}:null)
         ],*/
         fields,
+    }
+
+}
+
+function scr_sales_supplies({parent,title="supplies",head=true,h=600,fieldsSet=[]}) {
+    
+}
+
+function scr_inmueble({parent,modal}) {
+    
+    return {
+        parent,
+        title:"inmueble",
+        panels:[
+            {col:6,title:"main",tag:"Cliente",head:true,tipe:"form"},
+            {col:6,title:"sale",tag:"Precio",head:true,tipe:"form"},
+            {col:12,title:"ubi",tag:"Ubicacion",head:true,tipe:"form"},
+            {col:12,title:"desc",tag:"Descripcion",head:true,tipe:"form"},
+        ],
+        stateTools:stTls_fm_maid,
+        stateStart:"block",
+        afterCancel:"block",
+        afterInsert:"block",
+        afterUpdate:"block",
+        loads:[
+            {...ld_customers},
+            {...ld_zones},
+        ],
+
+        tableMain:"inmuebles",
+        selects:[
+            {table:"inmuebles",field:"ID_INMUEBLE",primary:true},
+            {table:"inmuebles",field:"ID_CUSTOMER_OWNER"},
+            {table:"inmuebles",field:"ID_INMUEBLE_STATE"},
+            {table:"inmuebles",field:"ID_ZONE"},
+            {table:"inmuebles",field:"DIRECCION"},
+            {table:"inmuebles",field:"AREA"},
+            {table:"inmuebles",field:"FRONT_MEASURE"},
+            {table:"inmuebles",field:"COST"},
+            {table:"inmuebles",field:"DESCRIPCION"},
+            {table:"inmuebles",field:"ID_COMPANY"},
+            {table:"inmuebles",field:"TELF_CONTACT"},
+            {table:"inmuebles",field:"URL_GPS"},
+            {table:"inmuebles",field:"PRICE_SALE"},
+            {table:"inmuebles",field:"PRICE_RENT"},
+            {table:"inmuebles",field:"URL_IMAGES"},
+            {table:"inmuebles",field:"URL_DOCUMENTS"},
+            {table:"inmuebles",field:"NUM_PISOS"},
+            {table:"inmuebles",field:"AREA_TECHADA"},
+            {table:"inmuebles",field:"ID_TIPO_INMUEBLE"},
+            {table:"inmuebles",field:"NRO_PARTIDA"},
+        ],
+        inserts:[...ins_general],
+        
+        fields:[
+            {panel:"main",name:"cliente",col:10,colAllLevel:true,select:"ID_CUSTOMER_OWNER",box:{tipe:8,class:"w-100"},load:{name:"ld-customers",show:"show",value:"value"}},
+            {panel:"main",name:"customer-edit",tipe:0,colAllLevel:true,col:1,...fld_edit,action:"customer-edit"},
+            {panel:"main",name:"customer-add",tipe:0,colAllLevel:true,col:1,...fld_add,action:"customer-add"},
+            {panel:"main",name:"telf de contacto",select:"TELF_CONTACT",box:{tipe:1,value:""}},
+
+            {panel:"sale",name:"estado",select:"ID_INMUEBLE_STATE",box:{tipe:3,value:1,options:op_inmuble_state}},
+            {panel:"sale",name:"precio de venta",select:"PRICE_SALE",box:{tipe:1,value:0}},
+            {panel:"sale",name:"precio de alquiler",select:"PRICE_RENT",box:{tipe:1,value:0}},
+
+            {panel:"ubi",name:"zona",colAllLevel:true,col:10,select:"ID_ZONE",box:{tipe:8,class:"w-100"},load:{name:"ld-zones",show:"show",value:"value"}},
+            {panel:"ubi",name:"zone-edit",tipe:0,colAllLevel:true,col:1,...fld_edit,action:"zone-edit"},
+            {panel:"ubi",name:"zone-add",tipe:0,colAllLevel:true,col:1,...fld_add,action:"zone-add"},
+            {panel:"ubi",name:"direccion",select:"DIRECCION",box:{tipe:1,value:"",class:"w-100"}},
+            {panel:"ubi",name:"gps",select:"URL_GPS",box:{tipe:1,value:"",class:"w-100"}},
+
+            
+            {panel:"desc",name:"nro partida",select:"NRO_PARTIDA",box:{tipe:1,value:"",class:"w-100"}},
+            //{panel:"desc",name:"url de fotos",select:"URL_IMAGES",box:{tipe:1,value:"",class:"w-100"}},
+            {panel:"desc",name:"url del inmueble",select:"URL_DOCUMENTS",box:{tipe:1,value:"",class:"w-100"}},
+            {panel:"desc",name:"tipo de inmueble",select:"ID_TIPO_INMUEBLE",box:{tipe:3,value:1,options:op_tipo_inmueble,class:"w-100"}},
+            {panel:"desc",name:"cantidad de pisos",select:"NUM_PISOS",box:{tipe:1,value:0,class:"w-100"}},
+            {panel:"desc",name:"area",select:"AREA",box:{tipe:1,value:0,class:"w-100"}},
+            {panel:"desc",name:"area techada",select:"AREA_TECHADA",box:{tipe:1,value:0,class:"w-100"}},
+            {panel:"desc",name:"medida del frontis",select:"FRONT_MEASURE",box:{tipe:1,value:0,class:"w-100"}},
+            
+
+            //{panel:"desc",name:"valoracion",select:"COST",box:{tipe:1,value:0,class:"w-100"}},
+            {panel:"desc",name:"detalles",select:"DESCRIPCION",tipe:2,box:{tipe:9,value:"",class:"w-100"}},
+        ],
+
+        events:[
+            {
+                name:"modalSetActive",
+                actions:[{
+                    action:({active})=>{
+
+                        modal.SetActive({active});
+                    }
+                }]
+            }
+        ],
     }
 
 }
@@ -1958,8 +2079,9 @@ async function generateCheckInPDF(checkInData) {
 
     const margin = 20;
     const startY = 20;
-    const lineHeight = 20;
+    const lineHeight = 15;
     const pageWidth = pdf.internal.pageSize.getWidth();
+    //const pageHeigth = pdf.internal.pageSize.getHeight();
     const usableWidth = pageWidth - 2 * margin;
 
     const fontSizeNormal = 12 * 0.85;
@@ -1970,7 +2092,7 @@ async function generateCheckInPDF(checkInData) {
     logoImg.src = checkInData.logo; // Logo en base64 desde checkInData
     logoImg.onload = function() {
         console.log('Logo cargado correctamente');
-        const logoWidth = 120; // Ajusta el tamaño del logo según tu preferencia
+        const logoWidth = 80; // Ajusta el tamaño del logo según tu preferencia
         const aspectRatio = logoImg.width / logoImg.height;
         const logoHeight = logoWidth / aspectRatio;
         pdf.addImage(logoImg, 'JPEG', pageWidth - logoWidth - margin, startY + 1 * lineHeight, logoWidth, logoHeight);
@@ -1983,26 +2105,37 @@ async function generateCheckInPDF(checkInData) {
         // Customer Details
         pdf.setFontSize(fontSizeNormal);
         pdf.setTextColor(100, 100, 100);
-        pdf.text(`Orden de Trabajo: ${checkInData.checkInNumber}`, margin, startY + 2 * lineHeight);
-        pdf.text(`Fecha de Entrada: ${checkInData.checkInDate}`, margin, startY + 3 * lineHeight);
-        pdf.text(`Cliente: ${checkInData.customerName}`, margin, startY + 4 * lineHeight);
-        pdf.text(`Nro de Identificacion: ${checkInData.customerId}`, margin, startY + 5 * lineHeight);
-        pdf.text(`Telefono: ${checkInData.customerPhone}`, margin, startY + 6 * lineHeight);
-        pdf.text(`Direccion: ${checkInData.customerAddress}`, margin, startY + 7 * lineHeight);
+        var customer_y = 2;
+        pdf.text(`Orden de Trabajo: ${checkInData.checkInNumber.toString().padStart(5, '0')}`, margin, startY + (customer_y+0) * lineHeight);
+        pdf.text(`Fecha de Ingreso: ${checkInData.checkInDate}`, margin, startY + (customer_y+1) * lineHeight);
+        pdf.text(`Fecha de Ingreso: ${checkInData.checkOutDate}`, margin, startY + (customer_y+2) * lineHeight);
+        pdf.text(`Cliente: ${checkInData.customerName}`, margin, startY + (customer_y+3) * lineHeight);
+        pdf.text(`Nro de Identificacion: ${checkInData.customerId}`, margin, startY + (customer_y+4) * lineHeight);
+        pdf.text(`Telefono: ${checkInData.customerPhone}`, margin, startY + (customer_y+5) * lineHeight);
+        pdf.text(`Direccion: ${checkInData.customerAddress}`, margin, startY + (customer_y+6) * lineHeight);
+
+        var receptor_y = 10;
+        pdf.text(`Recepcionista: ${checkInData.receptor.name}`, margin, startY +  (receptor_y+0) * lineHeight);
+        pdf.text(`Celular: ${checkInData.receptor.cel}`, margin, startY +  (receptor_y+1) * lineHeight);
 
         // Vehicle Details
-        pdf.text('Detalles del Vehiculo:', margin, startY + 9 * lineHeight);
-        pdf.text(`Placa: ${checkInData.vehicle.plate}`, margin, startY + 10 * lineHeight);
-        pdf.text(`Marca: ${checkInData.vehicle.brand}`, margin, startY + 11 * lineHeight);
-        pdf.text(`Modelo: ${checkInData.vehicle.model}`, margin, startY + 12 * lineHeight);
-        pdf.text(`Nro de Motor: ${checkInData.vehicle.engineNumber}`, margin, startY + 13 * lineHeight);
-        pdf.text(`Nro de Vin: ${checkInData.vehicle.vinNumber}`, margin, startY + 14 * lineHeight);
-        pdf.text(`año: ${checkInData.vehicle.year}`, margin, startY + 15 * lineHeight);
-        pdf.text(`Color: ${checkInData.vehicle.color}`, margin, startY + 16 * lineHeight);
+        var vehicle_y = 13;
+        pdf.text('Detalles del Vehiculo:', margin, startY + (vehicle_y+0) * lineHeight);
+        pdf.text(`Combustible: ${checkInData.vehicle.fuel}%`, margin, startY + (vehicle_y+1) * lineHeight);
+        pdf.text(`Kilometraje: ${checkInData.vehicle.mileage}`, margin, startY + (vehicle_y+2) * lineHeight);
+        pdf.text(`Kilometraje del Prox Servicio: ${checkInData.vehicle.mileage_prox}`, margin, startY + (vehicle_y+3) * lineHeight);
+        pdf.text(`Placa: ${checkInData.vehicle.plate}`, margin, startY + (vehicle_y+4) * lineHeight);
+        pdf.text(`Marca: ${checkInData.vehicle.brand}`, margin, startY + (vehicle_y+5) * lineHeight);
+        pdf.text(`Modelo: ${checkInData.vehicle.model}`, margin, startY + (vehicle_y+6) * lineHeight);
+        pdf.text(`Nro de Motor: ${checkInData.vehicle.engineNumber}`, margin, startY + (vehicle_y+7) * lineHeight);
+        pdf.text(`Nro de Vin: ${checkInData.vehicle.vinNumber}`, margin, startY + (vehicle_y+8) * lineHeight);
+        pdf.text(`año: ${checkInData.vehicle.year}`, margin, startY + (vehicle_y+9) * lineHeight);
+        pdf.text(`Color: ${checkInData.vehicle.color}`, margin, startY + (vehicle_y+10) * lineHeight);
 
         // Comments
-        pdf.text('requerimiento:', margin, startY + 18 * lineHeight);
-        pdf.text(`${checkInData.comments}`, margin, startY + 19 * lineHeight, { maxWidth: usableWidth / 2 });
+        var comment_y = 24;
+        pdf.text('requerimiento:', margin, startY + (comment_y + 0) * lineHeight);
+        pdf.text(`${checkInData.comments}`, margin, startY + (comment_y + 1) * lineHeight, { maxWidth: usableWidth / 2 });
 
         // Company Box
         const companyBoxWidth = 200;
@@ -2030,10 +2163,11 @@ async function generateCheckInPDF(checkInData) {
             const targetHeight = originalHeight * scaleFactor;
 
             // Add image to PDF
-            pdf.addImage(image, 'PNG', margin, startY + 20 * lineHeight, targetWidth, targetHeight);
+            var car_y = 26;
+            pdf.addImage(image, 'PNG', margin, startY + (car_y+0) * lineHeight, targetWidth, targetHeight);
 
-            pdf.text('observaciones:', margin, startY + 21 * lineHeight + targetHeight);
-            pdf.text(`${checkInData.observations}`, margin, startY + 22 * lineHeight + targetHeight, { maxWidth: usableWidth / 2 });
+            pdf.text('observaciones:', margin, startY + (car_y+1) * lineHeight + targetHeight);
+            pdf.text(`${checkInData.observations}`, margin, startY + (car_y+2) * lineHeight + targetHeight, { maxWidth: usableWidth / 2 });
 
             // Table Headers
             const yless = 200;
@@ -2041,14 +2175,14 @@ async function generateCheckInPDF(checkInData) {
             const detailWidth = usableWidth * 0.4 - checkWidth - 20;
 
             pdf.setFillColor(230, 230, 230);
-            pdf.rect(margin + targetWidth + 10, startY + 20 * lineHeight - yless, usableWidth * 0.6, lineHeight, 'F');
+            pdf.rect(margin + targetWidth + 10, startY + 22 * lineHeight - yless, usableWidth * 0.6, lineHeight, 'F');
             pdf.setTextColor(0, 0, 0);
             pdf.setFontSize(fontSizeNormal);
-            pdf.text('Detalle', margin + targetWidth + 15, startY + 20.7 * lineHeight - yless);
-            pdf.text('Check', margin + targetWidth + 15 + detailWidth, startY + 20.7 * lineHeight - yless);
+            pdf.text('Detalle', margin + targetWidth + 15, -5 + startY + 23 * lineHeight - yless);
+            pdf.text('Check', margin + targetWidth + 15 + detailWidth, -5 + startY + 23 * lineHeight - yless);
 
             // Table Content
-            let positionY = startY + 21.5 * lineHeight - yless;
+            let positionY = startY + 23.5 * lineHeight - yless;
             checkInData.items.forEach(item => {
                 pdf.setTextColor(100, 100, 100);
                 pdf.text(item.detail, margin + targetWidth + 15, positionY);
@@ -2056,7 +2190,41 @@ async function generateCheckInPDF(checkInData) {
                 positionY += lineHeight;
             });
 
-            
+            const pdfHeight = pdf.internal.pageSize.height;
+
+            const ln_weigth = (pageWidth - 2 * margin - 2 * 20)/3;
+
+            const solicitante_ln_startX = margin;
+            const solicitante_ln_startY = pdfHeight - margin - 2 * lineHeight;
+            const solicitante_ln_endX = solicitante_ln_startX + ln_weigth;
+            const solicitante_ln_endY = solicitante_ln_startY;
+
+            // Dibujar la línea en la página PDF
+            pdf.setLineWidth(1); // Grosor de la línea en puntos
+            pdf.line(solicitante_ln_startX, solicitante_ln_startY, solicitante_ln_endX, solicitante_ln_endY); // Dibujar la línea     
+            pdf.text(`Solicitante`, solicitante_ln_startX + ln_weigth/2 - 15, solicitante_ln_startY + lineHeight);   
+
+
+            const vb_ln_startX = margin + ln_weigth + 20;
+            const vb_ln_startY = pdfHeight - margin - 2 * lineHeight;
+            const vb_ln_endX = vb_ln_startX + ln_weigth;
+            const vb_ln_endY = vb_ln_startY;
+
+            // Dibujar la línea en la página PDF
+            pdf.setLineWidth(1); // Grosor de la línea en puntos
+            pdf.line(vb_ln_startX, vb_ln_startY, vb_ln_endX, vb_ln_endY); // Dibujar la línea     
+            pdf.text(`Visto Bueno`, vb_ln_startX + ln_weigth/2 - 15, vb_ln_startY + lineHeight);   
+
+
+            const receptor_ln_startX = pageWidth - margin - ln_weigth;
+            const receptor_ln_startY = pdfHeight - margin - 2 * lineHeight;
+            const receptor_ln_endX = receptor_ln_startX + ln_weigth;
+            const receptor_ln_endY = receptor_ln_startY;
+
+            // Dibujar la línea en la página PDF
+            pdf.setLineWidth(1); // Grosor de la línea en puntos
+            pdf.line(receptor_ln_startX, receptor_ln_startY, receptor_ln_endX, receptor_ln_endY); // Dibujar la línea     
+            pdf.text(`Receptor`, receptor_ln_startX + ln_weigth/2 - 15, receptor_ln_startY + lineHeight);   
 
             // Open PDF in a new window
             window.open(pdf.output('bloburl'), '_blank');

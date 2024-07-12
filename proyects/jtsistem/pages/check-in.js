@@ -214,6 +214,7 @@ $(document).ready(function() {
                 {table: "checkin_vehicles", field: "DATE_ENTER"},
                 {table: "checkin_vehicles", field: "FUEL"},
                 {table: "checkin_vehicles", field: "MILEAGE"},
+                {table: "checkin_vehicles", field: "MILEAGE_PROX"},
                 {table: "checkin_vehicles", field: "COMENT"},
                 {table: "checkin_vehicles", field: "OBSERVATIONS"},
                 {table: "checkin_vehicles", field: "CHECK_1"},
@@ -242,6 +243,7 @@ $(document).ready(function() {
                 {table: "checkin_vehicles", field: "CHECK_24"},
                 {table: "checkin_vehicles", field: "CHECK_25"},
                 {table: "checkin_vehicles", field: "CHECK_26"},
+                {table: "checkin_vehicles", field: "DATE_OUT"},
                 
                 {table: "checkin_vehicles", field: "IMG_FRONT"},
 
@@ -259,6 +261,9 @@ $(document).ready(function() {
                 {table:"items_vehicles",field:"NRO_VIN"},
                 {table:"items_vehicles",field:"ANIO"},
                 {table:"items_vehicles",field:"COLOR"},
+
+                {table:"workers",field:"NAME",as:"WORKER_NAME"},
+                {table:"workers",field:"CEL_NUMBER",as:"WORKER_CEL"},
               ],
               inserts:[
                 ...ins_general,
@@ -274,6 +279,11 @@ $(document).ready(function() {
                   join:{table:"items_vehicles",field:"ID_VEHICLE"},
                   tipe:"LEFT",
                 },
+                {
+                  main:{table:"checkin_vehicles",field:"ID_USER_RECEPTOR"},
+                  join:{table:"workers",field:"ID_WORKER"},
+                  tipe:"LEFT",
+                }
               ],
               loads:[
                 {
@@ -368,10 +378,12 @@ $(document).ready(function() {
                 {panel:"Datos del Vehiculo",col:2,colAllLevel:true,name:"veh-edit",...fld_edit,action:"veh-edit"},
                 {panel:"Datos del Vehiculo",col:2,colAllLevel:true,name:"veh-add",...fld_add,action:"veh-add"},
                 //{panel:"Datos del Vehiculo",col:2,colAllLevel:true,...fld_edit},{panel:"Datos del Vehiculo",col:2,colAllLevel:true,...fld_add},
-                {panel:"Datos del Vehiculo",col:6,name:"fecha de entrada",box:bx_date,select:"DATE_ENTER"},
-                {panel:"Datos del Vehiculo",col:6,name:"combustible",box:{tipe:1,value:0,attributes:[{name:"type",value:"range"},{name:"min",value:0},{name:"max",value:100}]},select:"FUEL"},
-                {panel:"Datos del Vehiculo",col:6,name:"kilometraje",box:{tipe:1,value:0},select:"MILEAGE"},
-                {panel:"Datos del Vehiculo",col:6,name:"requerimiento",box:{tipe:9,value:""},select:"COMENT"},
+                {panel:"Datos del Vehiculo",col:6,name:"fecha de ingreso",box:bx_date,select:"DATE_ENTER"},
+                {panel:"Datos del Vehiculo",col:6,name:"fecha de entrega",box:bx_date,select:"DATE_OUT"},
+                {panel:"Datos del Vehiculo",col:12,name:"combustible",box:{tipe:1,value:0,attributes:[{name:"type",value:"range"},{name:"min",value:0},{name:"max",value:100}]},select:"FUEL"},
+                {panel:"Datos del Vehiculo",col:4,name:"kilometraje",box:{tipe:1,value:0},select:"MILEAGE"},
+                {panel:"Datos del Vehiculo",col:8,name:"kilometraje del proximo servicio",box:{tipe:1,value:0},select:"MILEAGE_PROX"},
+                {panel:"Datos del Vehiculo",col:12,name:"requerimiento",box:{tipe:9,value:""},select:"COMENT"},
 
                 
                 {panel:"Inventario de Recepcion",name:"check in 1",tipe:0,box:{tipe:6,value:0,name:"radio"},select:"CHECK_1"},
@@ -721,6 +733,7 @@ $(document).ready(function() {
           logo:userData.company.logo,
           checkInNumber: data["ID_CHECKIN_VEHICLE"],
           checkInDate: data["DATE_ENTER"],
+          checkOutDate: data["DATE_OUT"],
           customerName: data["CUSTOMER_NAME"],
           customerId:(data["CUSTOMER_COMPANY"]=="1"?"RUC":"DNI") + " " + data["CUSTOMER_NRO"],
           customerPhone: data["CUSTOMER_CEL"],
@@ -729,7 +742,14 @@ $(document).ready(function() {
           companyRUC: userData.company.ruc,
           companyAddress: userData.company.email,
           companyPhone: userData.company.telf,
+          receptor:{
+            name:data["WORKER_NAME"],
+            cel:data["WORKER_CEL"],
+          },
           vehicle: {
+              fuel: data["FUEL"],
+              mileage: data["MILEAGE"],
+              mileage_prox: data["MILEAGE_PROX"],
               plate: data["PLACA"],
               brand: data["MARCA"],
               model: data["MODELO"],

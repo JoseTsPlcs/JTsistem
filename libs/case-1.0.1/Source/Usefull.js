@@ -140,12 +140,26 @@ function Param_GetField(field) {
 
 //-------
 
+function Time_Current() {
+
+    const ahora = new Date();
+    const horas = String(ahora.getHours()).padStart(2, '0');
+    const minutos = String(ahora.getMinutes()).padStart(2, '0');
+    const segundos = String(ahora.getSeconds()).padStart(2, '0');
+    return `${horas}:${minutos}:${segundos}`;
+}
+
 function Date_Today(days=0) {
   
     if(testing) return "2021-05-27";
 
     var today = new Date();
     return today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + (parseInt(today.getDate()) + days)).slice(-2);
+}
+
+function Date_Time_Today() {
+    
+    return Date_Today() + " " + Time_Current();
 }
 
 function Date_ToString({date=null}) {

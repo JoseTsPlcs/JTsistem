@@ -31,6 +31,7 @@ var op_access = [
     {value:"acc-8",show:"asignar trabajador a venta"},
     {value:"acc-9",show:"modificar stock"},
     {value:"acc-10",show:"asignar a un item un trabajador"},
+    {value:"acc-11",show:"asignar ruc a factura"},
     //...paginasOptions,
 ];
 
@@ -114,6 +115,13 @@ const op_inmuble_state = [
     {value:5,show:"alquilado"},
     {value:6,show:"edificio publico"},
 ];
+
+const op_tipo_inmueble = [
+    {value:1,show:"terreno"},
+    {value:2,show:"aires"},
+    {value:3,show:"casa"},
+    {value:4,show:"departamento"},
+]
 
 
 

@@ -499,16 +499,15 @@ class Crud_set extends ODD {
                 var loadOptions = this.Loaded_GetLoadOptions({
                     loadName:field.load.name,
                     loadShow:field.load.show,
-                });
-            
+                });            
 
                 var valueDefault = loadOptions.length > 0 ? loadOptions[0].value : 1;
                 if(field.box.value!=null) valueDefault = field.box.value;
                 var rsp = this.#Event_SetOptionsToFields({field,loadOptions});
                 if(rsp !=null && rsp.loadOptions) loadOptions = rst.loadOptions;
 
-                var lastOptions = field.load.startOptions;
-                if(lastOptions!=null) loadOptions = [...lastOptions,...loadOptions];
+                //var lastOptions = field.load.startOptions;
+                //if(lastOptions!=null) loadOptions = [...lastOptions,...loadOptions];
                 field.box.options = loadOptions;
                 field.box.value = valueDefault;
 
@@ -564,6 +563,7 @@ class Crud_set extends ODD {
     Loaded_GetLoadOptions({loadName,loadShow}){
 
         var data = this.Loaded_GetLoadData({loadName});
+        
         var ops = data.result.map((rst)=>{
 
             return {
@@ -571,7 +571,9 @@ class Crud_set extends ODD {
                 show:rst[loadShow],
             }
         });
-        //console.log(loadName,data,ops);
+        
+        if(data.startOptions) ops = [...data.startOptions,...ops];
+
         return ops;
 
     }
@@ -795,8 +797,8 @@ class Crud_set extends ODD {
             if(e_rst.block == true) return this.SetState({stateName:this.#stateData.afterInsert});;
             if( e_rst.inserts) inserts=e_rst.inserts;
         }
+        console.log(this.#title+"- before inserts -> ",inserts);
 
-        //console.log(this.#title+"-insert -> ",inserts);
         let k = this;
         k.Loading_SetActive({active:true});
         this.#Insert_Request({inserts,success:({primaryNew})=>{
@@ -845,8 +847,12 @@ class Crud_set extends ODD {
 
                 var insertSql_inserts = inserts;
 
+                console.log(this.#title+"- insert start -> ",[...insertSql_inserts]);
+
                 //insert by inserts saved
                 insertSql_inserts = [...insertSql_inserts,...k.#inserts];
+
+                console.log(this.#title+"- insert add insert in form -> ",[...insertSql_inserts]);
 
                 //insert by primary new
                 insertSql_inserts.push({
@@ -854,6 +860,8 @@ class Crud_set extends ODD {
                     value:primaryNew,
                     tipe:"secuence",
                 });
+
+                console.log(this.#title+"- insert add primary new -> ",[...insertSql_inserts]);
 
                 //inserst by crudjoins
                 k.#crudJoins.forEach(jn=>{
@@ -888,12 +896,14 @@ class Crud_set extends ODD {
                                     field: fieldSelecField,
                                     value: v,
                                 });
-                            });                            
+                            });    
+                            
+                            //console.log(field.name, fieldValues);
                         }                        
                     }
                 });    
                 
-                console.log(insertSql_inserts);
+                console.log(this.#title+"- go to insert -> ",[...insertSql_inserts]);
 
                 //-----request------
 
@@ -1491,7 +1501,7 @@ class Crud_set extends ODD {
         XLSX.utils.book_append_sheet(workbook, worksheet, "Hoja1");
 
         // Generar un archivo Excel
-        XLSX.writeFile(workbook, "Ejemplo.xlsx");
+        XLSX.writeFile(workbook, "Data.xlsx");
     }
 
     #Event_UpdateToolDelete({}){
