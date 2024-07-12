@@ -5,6 +5,8 @@ $(document).ready(function() {
 
     success:({userData})=>{
 
+      var acc_rucs = Access_Get(userData,"acc-11");
+
       var gr = new Grid({
         cols:[[6,6],[6,6],[12],[12]],
         boxs:[
@@ -62,6 +64,9 @@ $(document).ready(function() {
               orders:[
                 {field:"DATE_EMMIT",asc:false},
               ],
+              loads:[
+                (acc_rucs?{...ld_rucs}:null),
+              ],
           
               configShow:false,
               filters:[
@@ -72,6 +77,7 @@ $(document).ready(function() {
                 {col:12,y:2,name:"cancelado",box:{tipe:4,options:op_sales_paid},select:{table:"sales",field:"PAID"}},
                 {col:12,name:"emitido",box:{tipe:4,options:op_document_emmit},select:{table:"sales",field:"DOCUMENT_EMMIT"}},
                 {col:12,y:2,name:"documento",box:{tipe:4,options:op_sales_document,value:["factura","boleta"]},select:{table:"sales",field:"ID_DOCUMENT"}},
+                (acc_rucs?{name:"ruc",box:{tipe:4,options:[{value:"null",show:"Seleccionar Cliente"}]},load:{name:"ld-rucs",value:"value",show:"show"},select:{table:"sales",field:"ID_RUC"}}:null),
               ],
               fields:[
                 //{panel:"main",name:"id",box:{tipe:0},select:"ID_SALE"},
@@ -84,6 +90,7 @@ $(document).ready(function() {
                 {panel:"main",name:"documento",box:{tipe:0,options:op_sales_document},select:"ID_DOCUMENT"},
                 {panel:"main",name:"fecha de emision",box:{tipe:0},select:"DATE_EMMIT"},
                 {panel:"main",name:"emitido",box:{tipe:6,name:"emitido",options:op_document_emmit},select:"DOCUMENT_EMMIT"},
+                (acc_rucs?{panel:"main",name:"ruc",box:{tipe:4},load:{name:"ld-rucs",value:"value",show:"show"}}:null),
               ],   
               
               events:[

@@ -6,22 +6,22 @@ function UserLog_ChangePagesByCompany(userData){
         case "3":
             
             money_use = money_dolar_simbol;
-            Paginas_GetItem({seccName:"shop"}).title="trabajos";
+            Paginas_GetItem({seccName:"shop"}).title="Corretajes";
             Paginas_GetItem({seccName:"shop"}).icon='<i class="bi bi-buildings"></i>';
             Paginas_GetItem({pageName:"orders"}).show=false;
-            Paginas_GetItem({pageName:"sale new"}).title="nuevo trabajo";
-            Paginas_GetItem({pageName:"sales control"}).title="control de trabajo";
+            Paginas_GetItem({pageName:"sale new"}).title="Nuevo Corretaje";
+            Paginas_GetItem({pageName:"sales control"}).title="Control de Correctaje";
             //Paginas_GetItem({pageName:"sales control"}).fechaMin= Date_FirstOfMoth();
             //Paginas_GetItem({pageName:"sales control"}).fechaMax= Date_LastOfMoth();
-            Paginas_GetItem({pageName:"sales in process"}).title="trabajos en proceso o confirmados";
-            Paginas_GetItem({pageName:"sales to pay"}).title="trabajos por cobrar";
+            Paginas_GetItem({pageName:"sales in process"}).title="Corretaje en proceso o confirmados";
+            Paginas_GetItem({pageName:"sales to pay"}).title="Corretaje por cobrar";
             Paginas_GetItem({pageName:"cash"}).show=false;
             Paginas_GetItem({pageName:"vehicles"}).show=false;
 
             Paginas_GetItem({seccName:"buys"}).show=false;
 
             Paginas_GetItem({pageName:"contacts-provieeders"}).show=false;
-            Paginas_GetItem({seccName:"stock"}).show=false;
+            //Paginas_GetItem({seccName:"stock"}).show=false;
 
         break;
 
@@ -104,7 +104,7 @@ function ListOfForm_UserLog(userData) {
     });
 
     ld_workers.conditions[0].value=company_id;
-
+    ld_rucs.conditions[0].value=company_id;
     
 }
 

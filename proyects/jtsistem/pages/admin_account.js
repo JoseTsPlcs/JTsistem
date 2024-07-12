@@ -4,21 +4,23 @@ $(document).ready(function() {
   new Pag_Base({
     success:({userData})=>{
 
-      var acc_company_update = userData.access.find(acc=>acc.value = "acc-4") && userData.access.find(acc=>acc.value = "acc-4").active == "true";
+      var acc_company_update = Access_Get(userData,"acc-4");
+      var acc_rucs = Access_Get(userData,"acc-11");
 
       var gr = new Grid({
-        cols:[[12],[8,4],[12]],
+        cols:[[12],[12],[8,4],[12]],
         attributes:[
-          {x:0,y:1,attributes:[{name:"class",value:"col-12 col-md-8"}]},
-          {x:1,y:1,attributes:[{name:"class",value:"col-12 col-md-4"}]},
+          {x:0,y:2,attributes:[{name:"class",value:"col-12 col-md-8"}]},
+          {x:1,y:2,attributes:[{name:"class",value:"col-12 col-md-4"}]},
         ],
       });
 
       var md_customer_fm = new Modal({parent:gr.GetColData({x:0,y:2}).col});
 
       var prnt_company = gr.GetColData({x:0,y:0}).col;
-      var prnt_areas = gr.GetColData({x:1,y:1}).col;
-      var prnt_workes = gr.GetColData({x:0,y:1}).col;
+      var prnt_rucs = gr.GetColData({x:0,y:1}).col;
+      var prnt_areas = gr.GetColData({x:1,y:2}).col;
+      var prnt_workes = gr.GetColData({x:0,y:2}).col;
       var prnt_customer_fm = md_customer_fm.GetContent();
 
       new ConsCruds({
@@ -133,6 +135,40 @@ $(document).ready(function() {
             }
           },
           {
+            name:"rucs",
+            active:acc_rucs,
+            script:{
+              parent:prnt_rucs,
+              title:"lista de rucs",
+              panels:[{title:"main",tipe:"table",col:12,y:0,h:200}],
+              stateTools:stTls_tb_simple,
+
+              tableMain:"rucs",
+              selects:[
+                {table:"rucs",field:"ID_RUC",primary:true},
+                {table:"rucs",field:"ID_COMPANY"},
+                {table:"rucs",field:"RUC"},
+                {table:"rucs",field:"RAZON_SOCIAL"},
+              ],
+              inserts:[
+                ...ins_general,
+              ],
+              conditions:[
+                {
+                  table:"rucs",
+                  field:"ID_COMPANY",
+                  inter:"=",
+                  value:company_id,
+                }
+              ],
+
+              fields:[
+                {panel:"main",name:"ruc",box:bx_input,select:"RUC"},
+                {panel:"main",name:"razon social",box:bx_input,select:"RAZON_SOCIAL"},
+              ],
+            }
+          },
+          {
             name:"workes",
             active:true,
             script:{
@@ -144,7 +180,7 @@ $(document).ready(function() {
                     name:"reload",
                     tools:[
                         {name:"config",show:false},
-                        {name:"load",show:false},
+                        {name:"load",show:true},
                         
                         {name:"excel",show:false},
                         {name:"pdf",show:false},
@@ -167,6 +203,7 @@ $(document).ready(function() {
                 {table:"workers",field:"ID_CUSTOMER"},
                 {table:"workers",field:"NAME"},
                 {table:"workers",field:"ID_WORK_AREA"},
+                {table:"workers",field:"CEL_NUMBER"},
               ],
               conditions:[
                 {
@@ -199,6 +236,7 @@ $(document).ready(function() {
               fields:[
                 //{panel:"main",...fld_edit},
                 {panel:"main",name:"nombre",select:"NAME",box:{tipe:1,class:"w-100"}},
+                {panel:"main",name:"celular",select:"CEL_NUMBER",box:{tipe:1,class:"w-100"}},
                 {panel:"main",name:"area",select:"ID_WORK_AREA",box:{tipe:8,class:"w-100"},load:{name:"ld-areas",value:"value",show:"show"}},
               ],
 
