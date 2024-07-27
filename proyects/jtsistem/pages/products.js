@@ -127,24 +127,24 @@ $(document).ready(function() {
               inserts:ins_general,
               
               fields:[
-                {panel:"main",col:9,tipe:1,name:"producto",box:bx_input,select:"NAME"},
-                {panel:"main",col:3,tipe:0,name:"activo",box:bx_active_input,select:"ACTIVE"},
+                {panel:"main",col:9,tipe:1,name:"producto",box:{...bx_input,value:"nombre del producto"},select:"NAME"},
+                {panel:"main",col:3,tipe:0,name:"activo",box:{...bx_active_input,value:1},select:"ACTIVE"},
                 
-                {panel:"main",col:12,tipe:1,name:"tipo",box:bx_op({ops:op_products_tipe}),select:"ID_PRODUCT_TIPE"},
+                {panel:"main",col:12,tipe:1,name:"tipo",box:{...bx_op({ops:op_products_tipe})},select:"ID_PRODUCT_TIPE"},
 
-                {panel:"main",col:8,tipe:1,colAllLevel:true,name:"etiqueta",box:{tipe:3},select:"ID_PRODUCT_TAG",load:{name:"ld-products_tags",show:"show"}},
+                {panel:"main",col:8,tipe:1,colAllLevel:true,name:"etiqueta",box:{tipe:3,value:1},select:"ID_PRODUCT_TAG",load:{name:"ld-products_tags",show:"show"}},
                 {panel:"main",col:2,tipe:0,colAllLevel:true,name:"edit-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-pencil-square"></i>'},action:"edit-tag"},
                 {panel:"main",col:2,tipe:0,colAllLevel:true,name:"add-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-plus-circle"></i>'},action:"add-tag"},
 
-                {panel:"main",col:8,tipe:1,colAllLevel:true,name:"unidad",box:bx_op({ops:[]}),select:"UNID_ID",load:{name:"ld-unids",show:"show"}},
+                {panel:"main",col:8,tipe:1,colAllLevel:true,name:"unidad",box:{...bx_op({ops:[]})},select:"UNID_ID",load:{name:"ld-unids",show:"show"}},
                 {panel:"main",col:2,tipe:0,colAllLevel:true,name:"edit-und",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-pencil-square"></i>'},action:"edit-und"},
                 {panel:"main",col:2,tipe:0,colAllLevel:true,name:"add-und",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-plus-circle"></i>'},action:"add-und"},
 
                 {panel:"main",col:6,tipe:1,name:"costo unitario",box:{tipe:1,value:0},select:"COST_UNIT"},
                 {panel:"main",col:6,tipe:1,name:"precio unitario",box:{tipe:1,value:0},select:"PRICE_UNIT"},
 
-                {panel:"main",col:6,tipe:1,name:"stock total",box:{tipe:1,value:0},select:"STOCK_TOTAL"},
-                {panel:"main",col:6,tipe:1,name:"stock minimo",box:{tipe:1,value:0},select:"STOCK_LIMIT"},
+                {panel:"main",col:6,tipe:1,name:"stock total",box:{tipe:1,value:999},select:"STOCK_TOTAL"},
+                {panel:"main",col:6,tipe:1,name:"stock minimo",box:{tipe:1,value:1},select:"STOCK_LIMIT"},
               ],
 
               events:[
