@@ -3,6 +3,7 @@
 const money_dolar_simbol = "$";
 const money_sol_simbol = "S/.";
 var money_use = money_sol_simbol;
+const paddinForms = 3;
 
 var items = [
     {name:"venta",title:"Venta",icon:""},
@@ -21,27 +22,15 @@ const op_company_type = [
 ];
 
 var op_access = [
-    {value:"acc-1",show:"borrar data importante"},
-    {value:"acc-2",show:"actualizar lista de productos"},
-    {value:"acc-3",show:"asignar precio a producto en venta"},
-    {value:"acc-4",show:"modificar la apertura de los controles de cuentas"},
-    {value:"acc-5",show:"modificar el cierre de los controles de cuentas"},
-    {value:"acc-6",show:"modificar el total de cuentas"},
-    {value:"acc-7",show:"modificar el estado de cuentas"},
-    {value:"acc-8",show:"asignar trabajador a venta"},
-    {value:"acc-9",show:"modificar stock"},
-    {value:"acc-10",show:"asignar a un item un trabajador"},
-    {value:"acc-11",show:"asignar ruc a factura"},
-    //...paginasOptions,
+    //...acess
+    //...options,
 ];
 
-function Access_Get(userData,accessValue) {
-    
-    var acc = userData.access.find(acc=>acc.value==accessValue);
-    var active = acc != null && acc.active == "true";
-    console.log(accessValue,acc,active);
-    return active;
-}
+var op_access_type = [
+    //access type
+];
+
+
 
 const op_taller_check = [
     {value:1,show:""},

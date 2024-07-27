@@ -3,12 +3,12 @@ $(document).ready(function() {
 
   new Pag_Base({
 
-    success:({userData})=>{
+    success:({userData,pageData})=>{
 
       var acc_stock_update = userData.access.find(acc=>acc.value=="acc-9") && userData.access.find(acc=>acc.value=="acc-9").active == "true"; 
       
       new Crud_set({
-    
+        parent:pageData.body,
         title:"stock de productos",
         panels:[{col:12,y:0,title:"main",tipe:"table"}],
         stateTools:[

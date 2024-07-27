@@ -719,7 +719,8 @@ function scr_admin({id_company,parent,editUsuarios=false,editClase=false,editAcc
         ],
         attributes:[
             {x:0,y:0,attributes:[{name:"class",value:"col-md-8 col-12"}]},
-            {x:1,y:0,attributes:[{name:"class",value:"col-md-4 col-12"}]},
+            {x:1,y:0,attributes:[{name:"class",value:"col-md-4 col-12 px-"+paddinForms}]},
+            {x:0,y:1,attributes:[{name:"class",value:"mt-"+paddinForms}]}
         ],
     });
 
@@ -925,14 +926,27 @@ function scr_admin({id_company,parent,editUsuarios=false,editClase=false,editAcc
                                             }),
                                             success:()=>{
 
-                                                var inserts = op_access.map(op=>{
+                                                var inserts = [];
 
-                                                    return {
-                                                        field:"ID_ACCESS",
-                                                        value:op.value,
-                                                        tipe:"values",
-                                                    };
-                                                });
+                                                accessData.forEach(acc=>{
+
+                                                    inserts.push(
+                                                        {
+                                                            field:"ID_ACCESS",
+                                                            value:acc[0],
+                                                            tipe:"values",
+                                                        }
+                                                    );
+
+                                                    inserts.push(
+                                                        {
+                                                            field:"CLASS_ACCESS_TYPE",
+                                                            value:acc[2],
+                                                            tipe:"values",
+                                                        }
+                                                    );
+                                                });                                                
+
                                                 inserts.push({
                                                     field:"ID_CLASS",
                                                     value:class_id,
@@ -995,9 +1009,11 @@ function scr_admin({id_company,parent,editUsuarios=false,editClase=false,editAcc
                         {table:"class_access",field:"ID_CLASS"},
                         {table:"class_access",field:"ID_ACCESS"},
                         {table:"class_access",field:"ACTIVE"},
+                        {table:"class_access",field:"CLASS_ACCESS_TYPE"},
                     ],
                     orders:[
                         {field:"ID_CLASS",asc:true},
+                        {field:"CLASS_ACCESS_TYPE",asc:true},
                     ],
                     inserts:[],
                     loads:[
@@ -1022,11 +1038,12 @@ function scr_admin({id_company,parent,editUsuarios=false,editClase=false,editAcc
                     configShow:true,
                     filters:[
                         {name:"clase",box:{tipe:3},select:{table:"class_access",field:"ID_CLASS"},load:{name:"ld-class",show:"show",value:"value"}},
-                        //{name:"accesso",box:{tipe:3},select:{table:"id_"}}
+                        {name:"tipo",box:{tipe:4,options:op_access_type},select:{table:"class_access",field:"CLASS_ACCESS_TYPE"}}
                     ],
                     fields:[
                         //{panel:"main",name:"clase",box:{tipe:3,class:"w-100"},select:"ID_CLASS",load:{name:"ld-class",show:"show",value:"value"}},
                         {panel:"main",name:"acceso",box:{tipe:0,options:op_access},select:"ID_ACCESS"},
+                        {panel:"main",name:"tipo",box:{tipe:0,options:op_access_type},select:"CLASS_ACCESS_TYPE"},
                         {panel:"main",name:"activo",box:(editAccess?bx_active_input:bx_shw_activo),select:"ACTIVE"},
                     ],
 
@@ -1162,16 +1179,17 @@ function scr_customer({parent,modal}) {
     }
 }
 
-function scr_sales_control({userData,title,fechaMin=Date_Today(),fechaMax=Date_Today(),status=[],fields=[]}) {
+function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax=Date_Today(),status=[],fields=[]}) {
     
     if(status==null || status.length==0) status = op_sales_status.map((op)=>{return op.show});
 
     var gr = new Grid({
-    cols:[[6,6],[12],[12]],
-    boxs:[
-        {x:0,y:0,box:{tipe:0,value:"Total:",class:"h1 text-center"}},
-        {x:1,y:0,box:bx_moneyh1},
-    ],
+        parent,
+        cols:[[6,6],[12],[12]],
+        boxs:[
+            {x:0,y:0,box:{tipe:0,value:"Total:",class:"h1 text-center"}},
+            {x:1,y:0,box:bx_moneyh1},
+        ],
     });
 
     var md = new Modal({

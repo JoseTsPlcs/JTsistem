@@ -3,9 +3,10 @@ $(document).ready(function() {
 
   new Pag_Base({
 
-    success:({userData})=>{
+    success:({userData,pageData})=>{
 
       new Crud_set({
+        parent:pageData.body,
         title:"lista de compras",
         panels:[
           {col:12,y:0,title:"main",tipe:"table"},

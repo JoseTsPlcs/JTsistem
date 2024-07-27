@@ -73,7 +73,7 @@ class Steps extends ODD {
             parent,
             cols:[[12],stepsWindowsCols],
             attributes:[
-                {x:0,y:0,attributes:[{name:"class",value:"border"}]},
+                {x:0,y:0,attributes:[{name:"class",value:"border border-dark p-1 bg-white"}]},
                 ...stepsWindowsAttrb,
             ],
         });

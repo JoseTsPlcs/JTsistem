@@ -3,11 +3,11 @@ $(document).ready(function() {
 
   new Pag_Base({
 
-    success:({userData})=>{
+    success:({userData,pageData})=>{
 
-      var acc_products_update = Access_Get(userData,"acc-2");
-      var acc_price_update = Access_Get(userData,"acc-3");
-      var acc_item_worker = Access_Get(userData,"acc-10");
+      var acc_products_update = Access_Get(userData.access,"acc-2");
+      var acc_price_update = Access_Get(userData.access,"acc-3");
+      var acc_item_worker = Access_Get(userData.access,"acc-10");
 
       ld_workers.conditions[0].value = company_id;
 
@@ -17,6 +17,7 @@ $(document).ready(function() {
       var test_item = false;
 
       var gr = new Grid({
+        parent:pageData.body,
         cols:[
           [12],//modal customer
           [6,6],//venta
@@ -24,8 +25,8 @@ $(document).ready(function() {
           [12],//modal item
         ],
         attributes:[
-          {x:0,y:1,attributes:[{name:"class",value:"col-12 col-md-4 pb-4"}/*,{name:"style",value:"background-color: lightcoral;"}*/]},
-          {x:1,y:1,attributes:[{name:"class",value:"col-12 col-md-8"}/*,{name:"style",value:"background-color: lightblue; min-height: 600px; flex: 1;"}*/]},
+          {y:1,x:0,attributes:[{name:"class",value:"col-12 col-md-4"}/*,{name:"style",value:"background-color: lightcoral;"}*/]},
+          {y:1,x:1,attributes:[{name:"class",value:"col-12 col-md-8 px-"+paddinForms}/*,{name:"style",value:"background-color: lightblue; min-height: 600px; flex: 1;"}*/]},
         ],
       });
 

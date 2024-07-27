@@ -33,46 +33,6 @@ class Window extends ODD {
     var fields = i.fields;
     if(fields!=null){
 
-      /*var grid = {
-        cols:[[]],
-        labels:[],
-      }
-
-      var y=0;
-      var x=0;
-      var colLess = 12;
-
-      fields.forEach(field => {
-        
-        field.x = x;
-        field.y = y;
-        var col = field.col;
-        if(col == null) col = 12;
-
-        var box = Param_GetBox(field.box);
-
-        grid.cols[y].push(col);
-        grid.labels.push({
-          x,y,box,
-          tipe:field.tipe,
-          name:field.name,
-        });
-
-        colLess -= col;
-        x++;
-        if(colLess<=0){
-          y++;
-          x=0;
-          colLess=12;
-          grid.cols.push([]);
-        }
-
-      });
-      grid.cols.splice(grid.cols.length-1,1);
-
-      i.grid = grid;
-      i.fields = fields;*/
-
       var gridConfig = GetGridConfig({panels:fields});
       i.grid = gridConfig;
       //i.fields = i.panels;
@@ -108,8 +68,8 @@ class Window extends ODD {
       parent,
       cols:[[12],[12]],
       attributes:[
-        {y:0,x:0,attributes:[{name:'class',value:'border border-secondary h' + titleSize +' text-center'},{name:'style',value:'min-height:50px'}]},
-        {y:1,x:0,attributes:[{name:'class',value:'border-right border-left border-bottom border-secondary '},{name:'style',value:'min-height:'+h+'px'}]},
+        {y:0,x:0,attributes:[{name:'class',value:'border border-secondary h' + titleSize +' text-center bg-white'},{name:'style',value:'min-height:50px'}]},
+        {y:1,x:0,attributes:[{name:'class',value:'border-right border-left border-bottom border-secondary bg-white '},{name:'style',value:'min-height:'+h+'px'}]},
       ],
       events:[
         {

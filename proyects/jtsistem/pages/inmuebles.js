@@ -6,6 +6,7 @@ $(document).ready(function() {
     success:({userData,pageData})=>{
 
       var fm = new Form({
+        parent:pageData.body,
         title:"",head:false,
         fields:[
           {col:12,name:"precio promedio de m2",tipe:2,box:bx_moneyh1},

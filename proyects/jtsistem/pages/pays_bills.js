@@ -3,11 +3,12 @@ $(document).ready(function() {
 
   new Pag_Base({
 
-    success:({userData})=>{
+    success:({userData,pageData})=>{
 
-      var acc_rucs = Access_Get(userData,"acc-11");
+      var acc_rucs = Access_Get(userData.access,"acc-11");
 
       var gr = new Grid({
+        parent:pageData.body,
         cols:[[6,6],[6,6],[12],[12]],
         boxs:[
           {x:0,y:0,box:{tipe:0,value:"Igv:",class:"h1 text-center"}},

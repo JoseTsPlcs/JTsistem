@@ -3,9 +3,10 @@ $(document).ready(function() {
 
   new Pag_Base({
 
-    success:({userData})=>{
+    success:({userData,pageData})=>{
 
       var gr = new Grid({
+        parent:pageData.body,
         cols:[[12],[12],[12],[12]],
       });
 

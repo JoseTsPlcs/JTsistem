@@ -3,12 +3,11 @@ $(document).ready(function() {
 
   new Pag_Base({
 
-    success:({userData})=>{
+    success:({userData,pageData})=>{
 
-      var gr = new Grid({cols:[[12]]});
+      var gr = new Grid({parent:pageData.body,cols:[[12]]});
 
       new Crud_set({
-
         parent:gr.GetColData({x:0,y:0}).col,
         title:"lista de cliente",
         panels:[{col:12,y:0,title:"main",tipe:"table"}],
