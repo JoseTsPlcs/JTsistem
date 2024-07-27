@@ -5,6 +5,7 @@ $(document).ready(function() {
     success:({userData,pageData})=>{
 
       scr_sales_control({
+        parent:pageData.body,
         userData,
         title:pageData.title,
         fechaMin:null,

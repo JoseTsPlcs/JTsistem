@@ -3,11 +3,11 @@ $(document).ready(function() {
 
   new Pag_Base({
 
-    success:({userData})=>{
+    success:({userData,pageData})=>{
 
 
       var inform = new ConsInform({
-        parent:document.body,
+        parent:pageData.body,
         conection:db_lip,
         title:"informe - utilidades",
         loads:[

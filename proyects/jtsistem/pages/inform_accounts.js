@@ -4,9 +4,10 @@ $(document).ready(function() {
   new Pag_Base({
     success:({userData,pageData})=>{
 
-      var acc_rucs = Access_Get(userData,"acc-11");
+      var acc_rucs = Access_Get(userData.access,"acc-11");
 
       new Crud_set({
+        parent:pageData.body,
         title:"Reporte de Boletas y Facturas",
         panels:[
           {title:"main",tag:"",tipe:"table"},

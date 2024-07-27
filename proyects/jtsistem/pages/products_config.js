@@ -3,13 +3,14 @@ $(document).ready(function() {
 
   new Pag_Base({
 
-    success:({userData})=>{
+    success:({userData,pageData})=>{
 
       var gr = new Grid({
+        parent:pageData.body,
         cols:[[6,6]],
         attributes:[
           {x:0,y:0,attributes:[{name:"class",value:"col-12 col-md-6"}]},
-          {x:1,y:0,attributes:[{name:"class",value:"col-12 col-md-6"}]},
+          {x:1,y:0,attributes:[{name:"class",value:"col-12 col-md-6 px-"+paddinForms}]},
         ],
       });
     

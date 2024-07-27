@@ -7,6 +7,7 @@ $(document).ready(function() {
       //console.log("salesControl",userData);
 
       var gr = new Grid({
+        parent:pageData.body,
         cols:[[6,6],[12],[12]],
         boxs:[
           {x:0,y:0,box:{tipe:0,value:"Total:",class:"h1 text-center"}},
@@ -84,8 +85,8 @@ $(document).ready(function() {
                 {name:"cliente",box:bx_input,select:{table:"customers",field:"NAME"}},
                 (userData.company.tipe == "2"?{name:"placa",box:bx_input,select:{table:"items_vehicles",field:"PLACA"}}:null),
                 (userData.company.tipe == "2"?{name:"marca",box:bx_input,select:{table:"items_vehicles",field:"MARCA"}}:null),
-                {col:6,name:"fecha min",box:{...bx_date,value:pageData.fechaMin},select:{table:"sales",field:"DATE_EMMIT",tipe:"min"}},
-                {col:6,name:"fechamax",box:{...bx_date,value:pageData.fechaMax},select:{table:"sales",field:"DATE_EMMIT",tipe:"max"}},
+                {col:6,name:"fecha min",box:{...bx_date,value:Date_Today()},select:{table:"sales",field:"DATE_EMMIT",tipe:"min"}},
+                {col:6,name:"fechamax",box:{...bx_date,value:Date_Today()},select:{table:"sales",field:"DATE_EMMIT",tipe:"max"}},
                 {name:"estado",box:{tipe:4,options:op_sales_status},select:{table:"sales",field:"ID_STATUS"}},
                 {name:"cancelado",box:{tipe:4,options:op_sales_paid},select:{table:"sales",field:"PAID"}},
                 {name:"documento",box:{tipe:4,options:op_sales_document},select:{table:"sales",field:"ID_DOCUMENT"}},

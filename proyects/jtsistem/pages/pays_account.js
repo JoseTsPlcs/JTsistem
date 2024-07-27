@@ -3,13 +3,14 @@ $(document).ready(function() {
 
   new Pag_Base({
 
-    success:({userData})=>{
+    success:({userData,pageData})=>{
 
-      var acc_control_update_open = false && userData.access.find(acc=>acc.value=="acc-4") &&  userData.access.find(acc=>acc.value=="acc-4").active == "true";
-      var acc_control_update_close = false && userData.access.find(acc=>acc.value=="acc-4") &&  userData.access.find(acc=>acc.value=="acc-5").active == "true";
+      var acc_control_update_open =  Access_Get(userData.access,"acc-4");
+      var acc_control_update_close = Access_Get(userData.access,"acc-5");
 
       
       var gr = new Grid({
+        parent:pageData.body,
         cols:[
           [4,8],//0
           [12],//1-modal [12,12,12]
@@ -18,7 +19,7 @@ $(document).ready(function() {
         ],
         attributes:[
           {x:0,y:0,attributes:[{name:"class",value:"col-12 col-md-4"}]},
-          {x:1,y:0,attributes:[{name:"class",value:"col-12 col-md-8"}]},
+          {x:1,y:0,attributes:[{name:"class",value:"col-12 col-md-8 px-"+paddinForms}]},
         ],
       });
       

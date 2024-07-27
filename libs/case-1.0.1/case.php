@@ -43,7 +43,7 @@ echo '<script src="'.$src.'Build/Window/windowFilters.js"></script>';
 echo '<script src="'.$src.'Constructor/ConsCruds.js"></script>';
 echo '<script src="'.$src.'Constructor/ConsInform.js"></script>';
 
-echo '<script src="'.$src.'Land/UserLog.js"></script>';
+echo '<script src="'.$src.'Land/PageBase.js"></script>';
 echo '<script src="'.$src.'Land/Pag_Base.js"></script>';
 
 echo '<script src="'.$src.'Source/Usefull.js"></script>';

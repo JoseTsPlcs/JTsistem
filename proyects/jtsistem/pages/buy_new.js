@@ -3,19 +3,20 @@ $(document).ready(function() {
 
   new Pag_Base({
 
-    success:({userData})=>{
+    success:({userData,pageData})=>{
 
         //----------buid dooms--------
 
         var grBody = new Grid({
+          parent:pageData.body,
           cols:[
             [12],//modal provideer
             [6,6],//buy
             [12],//steps
           ],
           attributes:[
-            {x:0,y:1,attributes:[{name:"class",value:"col-12 col-md-4 pb-4"}/*,{name:"style",value:"background-color: lightcoral;"}*/]},
-            {x:1,y:1,attributes:[{name:"class",value:"col-12 col-md-8"}/*,{name:"style",value:"background-color: lightblue; min-height: 600px; flex: 1;"}*/]},
+            {x:0,y:1,attributes:[{name:"class",value:"col-12 col-md-4"}/*,{name:"style",value:"background-color: lightcoral;"}*/]},
+            {x:1,y:1,attributes:[{name:"class",value:"col-12 col-md-8 px-"+paddinForms}/*,{name:"style",value:"background-color: lightblue; min-height: 600px; flex: 1;"}*/]},
           ]
         });
         var stpGeneral = new Steps({

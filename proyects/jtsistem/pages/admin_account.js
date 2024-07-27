@@ -2,16 +2,19 @@
 $(document).ready(function() {
 
   new Pag_Base({
-    success:({userData})=>{
+    success:({userData,pageData})=>{
 
-      var acc_company_update = Access_Get(userData,"acc-4");
-      var acc_rucs = Access_Get(userData,"acc-11");
+      var acc_company_update = Access_Get(userData.access,"acc-4");
+      var acc_rucs = Access_Get(userData.access,"acc-11");
 
       var gr = new Grid({
+        parent:pageData.body,
         cols:[[12],[12],[8,4],[12]],
         attributes:[
+          {x:0,y:0,attributes:[{name:"class",value:"mb-"+paddinForms}]},
+          {x:0,y:1,attributes:[{name:"class",value:"mb-"+paddinForms}]},
           {x:0,y:2,attributes:[{name:"class",value:"col-12 col-md-8"}]},
-          {x:1,y:2,attributes:[{name:"class",value:"col-12 col-md-4"}]},
+          {x:1,y:2,attributes:[{name:"class",value:"col-12 col-md-4 px-"+paddinForms}]},
         ],
       });
 

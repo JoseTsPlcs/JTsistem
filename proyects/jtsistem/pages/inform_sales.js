@@ -1,9 +1,10 @@
 
 $(document).ready(function() {
 
-  new Pag_Base({});
+  new Pag_Base({pageData});
 
   var gr = new Grid({
+    parent:pageData.body,
     cols:[
       [12],//filters
       [6,6],//totals

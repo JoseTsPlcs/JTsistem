@@ -3,12 +3,13 @@ $(document).ready(function() {
 
   new Pag_Base({
 
-    success:({userData})=>{
+    success:({userData,pageData})=>{
 
-      var acc_work_update = Access_Get(userData,"acc-8");
-      var acc_item_worker = Access_Get(userData,"acc-10");
+      var acc_work_update = Access_Get(userData.access,"acc-8");
+      var acc_item_worker = Access_Get(userData.access,"acc-10");
 
       var gr = new Grid({
+        parent:pageData.body,
         cols:[
           [12],
           [12],

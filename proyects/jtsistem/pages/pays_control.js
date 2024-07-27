@@ -3,11 +3,12 @@ $(document).ready(function() {
 
   new Pag_Base({
 
-    success:({userData})=>{
+    success:({userData,pageData})=>{
 
       var acc_trasn = op_access.find(acc=>acc.value=="acc-1") && op_access.find(acc=>acc.value=="acc-1").value=="true";
 
       var gr = new Grid({
+        parent:pageData.body,
         cols:[
           [6,6],//0
           [6,6],//1

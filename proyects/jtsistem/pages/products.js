@@ -3,9 +3,10 @@ $(document).ready(function() {
 
   new Pag_Base({
 
-    success:({userData})=>{
+    success:({userData,pageData})=>{
 
       var gr = new Grid({
+        parent:pageData.body,
         cols:[[12],[6,3,3]],
       });
 
@@ -27,7 +28,7 @@ $(document).ready(function() {
             active:true,
             script:{
               parent:gr.GetColData({x:0,y:0}).col,
-              title:"lista de productos",
+              title:pageData.title,
               panels:[{col:12,y:0,title:"main",tipe:"table"}],
               stateTools:stTls_tb,
           

@@ -125,21 +125,21 @@ class Crud_set extends ODD {
 
     #body_w;
     #body_tools = [
-        {x:0,y:1,index:0,name:"config",box:{tipe:5,value:'<i class="bi bi-gear"></i>',class:"btn btn-outline-primary btn-sm",update:()=>{this.Config_ShowChange()}},dom:null},
-        {x:0,y:1,index:1,name:"load",box:{tipe:5,value:'<i class="bi bi-database"></i>',class:"btn btn-outline-primary btn-sm",update:()=>{this.#Load({})}},dom:null},
+        {x:0,y:1,index:0,name:"config",box:{tipe:5,value:'<i class="bi bi-gear"></i>',class:"btn btn-primary btn-sm",update:()=>{this.Config_ShowChange()}},dom:null},
+        {x:0,y:1,index:1,name:"load",box:{tipe:5,value:'<i class="bi bi-database"></i>',class:"btn btn-primary btn-sm",update:()=>{this.#Load({})}},dom:null},
 
-        {x:2,y:1,index:0,name:"excel",box:{id:"btn1",tipe:5,value:"excel",class:"btn btn-outline-success btn-sm",update:()=>{this.#Event_UpdateToolExcel({})}},dom:null},
+        {x:2,y:1,index:0,name:"excel",box:{id:"btn1",tipe:5,value:"excel",class:"btn btn-success btn-sm",update:()=>{this.#Event_UpdateToolExcel({})}},dom:null},
 
         {x:0,y:3,index:0,name:"sizes",box:{tipe:3,value:1,options:[{show:1,value:1},{show:10,value:10},{show:25,value:25},{show:50,value:50},{show:999,value:999}],update:()=>{this.#Event_UpdateToolPages({})}},dom:null},
 
-        {x:1,y:3,index:0,name:"reload",box:{id:"btn1",tipe:5,value:"recargar",class:"btn btn-outline-primary btn-sm",update:()=>{this.#Event_UpdateToolReload({})}},dom:null},
-        {x:1,y:3,index:1,name:"update",box:{id:"btn2",tipe:5,value:"actualizar",class:"btn btn-outline-primary btn-sm",update:()=>{this.#Event_UpdateToolUpdate({})}},dom:null},
-        {x:1,y:3,index:2,name:"new",box:{id:"btn3",tipe:5,value:"nuevo",class:"btn btn-outline-primary btn-sm",update:()=>{this.#Event_UpdateToolNew({})}},dom:null},
-        {x:1,y:3,index:3,name:"insert",box:{id:"btn4",tipe:5,value:"insertar",class:"btn btn-outline-primary btn-sm",update:()=>{this.#Event_UpdateToolInsert({})}},dom:null},
-        {x:1,y:3,index:4,name:"delete",box:{id:"btn5",tipe:5,value:"borrar",class:"btn btn-outline-danger btn-sm",update:()=>{this.#Event_UpdateToolDelete({})}},dom:null},
-        {x:1,y:3,index:5,name:"cancel",box:{id:"btn6",tipe:5,value:"cancelar",class:"btn btn-outline-danger btn-sm",update:()=>{this.#Event_UpdateToolCancel({})}},dom:null},
-        {x:1,y:3,index:6,name:"addLine",box:{id:"btn7",tipe:5,value:"añadir linea",class:"btn btn-outline-primary btn-sm",update:()=>{this.#New_AddLine({})}},dom:null},
-        {x:1,y:3,index:7,name:"pdf",box:{id:"btn8",tipe:5,value:"pdf",class:"btn btn-outline-danger btn-sm",update:()=>{this.#Event_UpdateToolPDF({})}},dom:null},
+        {x:1,y:3,index:0,name:"reload",box:{id:"btn1",tipe:5,value:"recargar",class:"btn btn-primary btn-sm",update:()=>{this.#Event_UpdateToolReload({})}},dom:null},
+        {x:1,y:3,index:1,name:"update",box:{id:"btn2",tipe:5,value:"actualizar",class:"btn btn-primary btn-sm",update:()=>{this.#Event_UpdateToolUpdate({})}},dom:null},
+        {x:1,y:3,index:2,name:"new",box:{id:"btn3",tipe:5,value:"nuevo",class:"btn btn-primary btn-sm",update:()=>{this.#Event_UpdateToolNew({})}},dom:null},
+        {x:1,y:3,index:3,name:"insert",box:{id:"btn4",tipe:5,value:"insertar",class:"btn btn-primary btn-sm",update:()=>{this.#Event_UpdateToolInsert({})}},dom:null},
+        {x:1,y:3,index:4,name:"delete",box:{id:"btn5",tipe:5,value:"borrar",class:"btn btn-danger btn-sm",update:()=>{this.#Event_UpdateToolDelete({})}},dom:null},
+        {x:1,y:3,index:5,name:"cancel",box:{id:"btn6",tipe:5,value:"cancelar",class:"btn btn-danger btn-sm",update:()=>{this.#Event_UpdateToolCancel({})}},dom:null},
+        {x:1,y:3,index:6,name:"addLine",box:{id:"btn7",tipe:5,value:"añadir linea",class:"btn btn-primary btn-sm",update:()=>{this.#New_AddLine({})}},dom:null},
+        {x:1,y:3,index:7,name:"pdf",box:{id:"btn8",tipe:5,value:"pdf",class:"btn btn-danger btn-sm",update:()=>{this.#Event_UpdateToolPDF({})}},dom:null},
 
         {x:2,y:3,index:0,name:"pages",box:{tipe:3,value:1,options:[{show:"pag1",value:1}],update:()=>{this.#Event_UpdateToolPages({})}},dom:null},
     ];
@@ -160,14 +160,17 @@ class Crud_set extends ODD {
                     ...this.#body_tools,
                 ],
                 attributes:[
-                    {y:1,x:0,attributes:[{name:"class",value:"d-flex justify-content-start"}]},
-                    {y:1,x:2,attributes:[{name:"class",value:"d-flex justify-content-end"}]},
+                    {y:0,x:0,attributes:[{name:"class",value:""}]},
 
-                    //{y:2,x:0,attributes},
+                    {y:1,x:0,attributes:[{name:"class",value:"d-flex justify-content-start "}]},
+                    {y:1,x:1,attributes:[{name:"class",value:""}]},
+                    {y:1,x:2,attributes:[{name:"class",value:"d-flex justify-content-end "}]},
 
-                    {y:3,x:0,attributes:[{name:"class",value:"d-flex justify-content-start"}]},
-                    {y:3,x:1,attributes:[{name:"class",value:"d-flex justify-content-center"}]},
-                    {y:3,x:2,attributes:[{name:"class",value:"d-flex justify-content-end"}]},
+                    {y:2,x:0,attributes:[{name:"class",value:""}]},
+
+                    {y:3,x:0,attributes:[{name:"class",value:"d-flex justify-content-start "}]},
+                    {y:3,x:1,attributes:[{name:"class",value:"d-flex justify-content-center "}]},
+                    {y:3,x:2,attributes:[{name:"class",value:"d-flex justify-content-end "}]},
                 ],
             }
         });
@@ -178,6 +181,11 @@ class Crud_set extends ODD {
         this.#body_tools.forEach(tool => {
             
             tool.dom = this.#body_w.Conteiner_GetColData({x:tool.x,y:tool.y}).boxs[tool.index];
+        });
+        let k = this;
+        this.#body_tools.forEach(tool=>{
+
+            k.Tools_OneToolSetShow({toolName:tool.name,show:false});
         });
     }
 
