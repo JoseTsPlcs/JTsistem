@@ -150,7 +150,9 @@ class Pag_Base {
     var pgOrders = PagesData[0].paginas[0];
     var pgVehicles = PagesData[0].paginas[3];
     var pgInmuebles = PagesData[0].paginas[4];
-    pgOrders.state = pgVehicles.state = pgInmuebles.state = "hide";
+    pgOrders.state = "hide";
+    pgVehicles.state = "hide";
+    pgInmuebles.state = "hide";
 
     switch (company.tipe) {
       case "2":
@@ -169,7 +171,7 @@ class Pag_Base {
       secc.paginas.forEach(pagina => {
         
         var acc = Access_Get(accessList,"pag-"+secc.seccion+"-"+pagina.name);
-        pagina.state = acc ? "active":"disactive";
+        pagina.state = pagina.state == "active" ? (acc ? "active":"disactive") : pagina.state;
 
       });
     });

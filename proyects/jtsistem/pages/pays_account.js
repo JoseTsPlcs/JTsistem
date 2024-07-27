@@ -19,7 +19,7 @@ $(document).ready(function() {
         ],
         attributes:[
           {x:0,y:0,attributes:[{name:"class",value:"col-12 col-md-4"}]},
-          {x:1,y:0,attributes:[{name:"class",value:"col-12 col-md-8 px-"+paddinForms}]},
+          {x:1,y:0,attributes:[{name:"class",value:"col-12 col-md-8 px-0 px-md-"+paddinForms+" pt-"+paddinForms + " pt-md-"+paddinForms}]},
         ],
       });
       

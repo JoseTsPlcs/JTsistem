@@ -13,7 +13,7 @@ $(document).ready(function() {
         cols:[[6,6],[12]],
         attributes:[
           {x:0,y:0,attributes:[{name:"class",value:"col-12 col-md-6"}]},
-          {x:1,y:0,attributes:[{name:"class",value:"col-12 col-md-6 px-"+paddinForms}]},
+          {x:1,y:0,attributes:[{name:"class",value:"col-12 col-md-6 px-0 px-md-"+paddinForms + " pt-"+paddinForms + " pt-md-0"}]},
         ],
       })
 
