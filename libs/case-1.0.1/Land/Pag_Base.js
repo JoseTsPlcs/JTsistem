@@ -233,7 +233,7 @@ class Pag_Base extends ODD {
 
     var nav = "";
 
-    nav +=`
+    /*nav +=`
 
       <div class="horizontal-bar">
             <button id="helpIcon" class="btn btn-light" data-bs-toggle="dropdown" aria-expanded="false">
@@ -242,7 +242,7 @@ class Pag_Base extends ODD {
             <ul class="dropdown-menu" aria-labelledby="helpIcon" id="itemsTutorials">
             </ul>
       </div>
-    `;
+    `;*/
 
     nav += `    
     <div class="wrapper">
@@ -252,7 +252,7 @@ class Pag_Base extends ODD {
                     <i class="lni lni-grid-alt"></i>
                 </button>
                 <div class="sidebar-logo">
-                    <a href="#">`+companyName+`</a>
+                    <a href="#">`+"JtSistem"+`</a>
                 </div>
             </div>
             <ul class="sidebar-nav">
@@ -307,7 +307,7 @@ class Pag_Base extends ODD {
                 </a>
             </div>
         </aside>
-        <div class="main p-3 mt-5 custom-bg-gray" id="bodyMain">
+        <div class="main p-3 mt-0 custom-bg-gray" id="bodyMain">
 
           <!-- Ventana emergente para descripciones -->
           <div id="popup" class="popup">
@@ -381,6 +381,7 @@ class Pag_Base extends ODD {
 
   AddTutorialtoPage({tutorialClass,name}){
 
+    return;
     //<li><a class="dropdown-item" href="#">¿prueba?</a></li>
     var item = document.createElement("li");
     var a = document.createElement("a");
