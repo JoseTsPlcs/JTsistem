@@ -8,7 +8,9 @@ $(document).ready(function() {
         parent:pageData.body,
         userData,
         title:pageData.title,
-        status:["cotizacion"],
+        fechaMax:null,
+        fechaMin:null,
+        status:[op_sales_status[0].show],
       });
 
     }

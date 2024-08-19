@@ -8,11 +8,11 @@ $(document).ready(function() {
         parent:pageData.body,
         userData,
         title:pageData.title,
-        status:[op_sales_status[3].show],
-        orderField:"DATE_EMMIT",
-        stateStart:"block",
-        fechaMin:Date_FirstOfMoth(),
-        fechaMax:Date_LastOfMoth(),
+        fechaMax:null,
+        fechaMin:null,
+        status:[op_sales_status[1].show,op_sales_status[2].show,op_sales_status[3].show],
+        pays:[op_sales_paid[1].show],
+        orderField:"ID_STATUS",
       });
 
     }
