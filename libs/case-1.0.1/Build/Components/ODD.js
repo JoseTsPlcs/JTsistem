@@ -1,10 +1,12 @@
 
 class ODD {
 
+    _className = "";
+    _instanceName = "";
     #title="";
     _name = '';
     _setName({name=''}){this._name=name};
-    _log  = true;
+    _log  = false;
     _logControl = [
         {
             name:'general',
@@ -28,8 +30,10 @@ class ODD {
 
         if(i){
 
+            //if(i.class) this._className = i.class;
+            if(i.instance) this._instanceName = i.instance;
             if(i.name!=null) this._name = i.name;this.#title=i.title;
-        
+            if(i.log !=null) this._log = i.log;
             //update log control
             if(i.logControl!=null){
 
@@ -52,6 +56,11 @@ class ODD {
     }
 
     //------------
+
+    Log(print,result=null){
+
+        if(this._log) console.log("instance:["+ this._instanceName+"]", print,result);
+    }
 
     LogAction({type='log',msg='',logName='general'}){
 

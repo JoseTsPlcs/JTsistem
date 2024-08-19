@@ -60,18 +60,18 @@ $(document).ready(function() {
     
         configShow:false,
         filters:[
-          {name:"proveedor",box:{tipe:1},select:{table:"provideers",field:"NAME"}},
-          {col:6,name:"fecha min",box:bx_date_start,select:{table:"buys",field:"DATE_EMMIT",tipe:"min"}},
-          {col:6,name:"fecha max",box:bx_date_end,select:{table:"buys",field:"DATE_EMMIT",tipe:"max"}},
-          {name:"estado",box:{tipe:4,options:op_buys_status},select:{table:"buys",field:"ID_BUY_STATUS"}},
+          {name:"proveedor",box:{tipe:1},select:{table:"provideers",field:"NAME"},descripcion:"buscar por nombre del proveedor"},
+          {col:6,name:"fecha min",box:bx_date_start,select:{table:"buys",field:"DATE_EMMIT",tipe:"min"},descripcion:"buscar por una fecha igual o mayor"},
+          {col:6,name:"fecha max",box:bx_date_end,select:{table:"buys",field:"DATE_EMMIT",tipe:"max"},descripcion:"buscar por una fecha igual o menor"},
+          {name:"estado",box:{tipe:4,options:op_buys_status},select:{table:"buys",field:"ID_BUY_STATUS"},descripcion:"buscar por estado de compra"},
         ],
         fields:[
           {panel:"main",...fld_edit},
           //{panel:"main",name:"id",box:{tipe:0},select:"ID_BUY"},
-          {panel:"main",name:"fecha de emision",attributes:[{name:"style",value:"min-width: 150px;"}],box:{tipe:0},select:"DATE_EMMIT"},
-          {panel:"main",name:"proveedor",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"NAME"},
-          {panel:"main",name:"estado",box:{tipe:0,options:op_buys_status},select:"ID_BUY_STATUS"},
-          {panel:"main",name:"total",box:bx_money,select:"TOTAL"},
+          {panel:"main",name:"fecha de emision",attributes:[{name:"style",value:"min-width: 150px;"}],box:{tipe:0},select:"DATE_EMMIT",descripcion:"fecha de emision de la compra"},
+          {panel:"main",name:"proveedor",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"NAME",descripcion:"nombre del proveedor"},
+          {panel:"main",name:"estado",box:{tipe:0,options:op_buys_status},select:"ID_BUY_STATUS",descripcion:"estado de compra"},
+          {panel:"main",name:"total",box:bx_money,select:"TOTAL",descripcion:"total de costo de la compra"},
         ],
         events:[
           {

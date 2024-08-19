@@ -30,39 +30,73 @@ $(document).ready(function() {
               parent:gr.GetColData({x:0,y:0}).col,
               title:pageData.title,
               panels:[{col:12,y:0,title:"main",tipe:"table"}],
-              stateTools:stTls_tb,
+              stateTools:[
+                {
+                  name:"reload",
+                  tools:[
+                      {name:"config",show:true},
+                      {name:"load",show:true},
+                      
+                      {name:"excel",show:false},
+                      {name:"pdf",show:false},
+          
+                      {name:"sizes",show:true,value:10},
+                      {name:"reload",show:true},
+                      {name:"update",show:false},
+                      {name:"new",show:false},
+                      {name:"insert",show:false},
+                      {name:"cancel",show:false},
+                      
+                      {name:"pages",show:true},
+                  ],
+                }
+              ],
           
               tableMain:"products",
               selects:[
                 {table:'products', field:'ID_PRODUCT',primary:true},
                 {table:'products', field:'NAME'},
                 {table:'products', field:'ID_PRODUCT_TIPE'},
-                {table:'products', field:'ID_PRODUCT_TAG'},
                 {table:'products', field:'UNID_ID'},
+                {table:'products', field:'STOCK_TOTAL'},
+                {table:'products', field:'STOCK_LIMIT'},
+                {table:'products', field:'STOCK_ONLIMIT'},
                 {table:'products', field:'ACTIVE'},
+                {table:'products_tags', field:'NAME',as:"TAG_NAME"},
+          
+              ],
+              joins:[
+                {
+                  main:{table:"products",field:"ID_PRODUCT_TAG"},
+                  join:{table:"products_tags",field:"ID_PRODUCT_TAG"},
+                  tipe:"LEFT",
+                }
               ],
               loads:[
                 ld_unids,
                 ld_products_tags,
               ],
-              conditions:cnds_products,
-              inserts:ins_general,
 
-              configShow:false,
+              configShow:false,    
               filters:[
-                {name:"producto",box:bx_input,select:{table:"products",field:"NAME"}},
-                {name:"tipo",box:{tipe:4,options:op_products_tipe},select:{table:"products",field:"ID_PRODUCT_TIPE"}},
-                {name:"etiqueta",box:{tipe:4,options:[]},select:{table:"products",field:"ID_PRODUCT_TAG"},load:{name:"ld-products_tags",show:"show"}},
-                {name:"activo",box:{tipe:4,options:op_active},select:{table:"products",field:"ACTIVE"}},
-                {name:"unidad",box:{tipe:4},select:{table:"products",field:"UNID_ID"},load:{name:"ld-unids",show:"show"}},
+                {name:"producto",box:bx_input,select:{table:"products",field:"NAME"},descripcion:"buscar por nombre de producto/servicio/insumo"},
+                {name:"tipo",box:{tipe:4,options:op_products_tipe,value:["producto","insumo"]},select:{table:"products",field:"ID_PRODUCT_TIPE"},descripcion:"buscar por producto/servicio/insumo"},
+                {name:"etiqueta",box:{tipe:4,options:[]},select:{table:"products",field:"ID_PRODUCT_TAG"},load:{name:"ld-products_tags",show:"show"},descripcion:"buscar por etiqueta"},
+                {name:"activo",box:{tipe:4,options:op_active,value:["activo"]},select:{table:"products",field:"ACTIVE"},descripcion:"buscar si el producto/servicio/insumo esta activo"},
+                {name:"unidad",box:{tipe:4},select:{table:"products",field:"UNID_ID"},load:{name:"ld-unids",show:"show"},descripcion:"buscar por unidad"},
               ],
               fields:[
-                {panel:"main",...fld_edit},
-                {panel:"main",attributes:[{name:"style",value:"min-width: 250px;"}],name:"producto",box:bx_input,select:"NAME"},
-                {panel:"main",name:"tipo",box:bx_op({ops:op_products_tipe}),select:"ID_PRODUCT_TIPE"},
-                {panel:"main",name:"etiqueta",box:bx_op({ops:op_products_tipe}),select:"ID_PRODUCT_TAG",load:{name:"ld-products_tags",show:"show"}},
-                {panel:"main",name:"unidad",box:bx_op({ops:[]}),select:"UNID_ID",load:{name:"ld-unids",show:"show"}},
-                {panel:"main",name:"activo",box:bx_active_input,select:"ACTIVE"},
+                {panel:"main",...fld_edit,descripcion:"editar informacion del producto/servicio/insumo"},
+                {panel:"main",attributes:[{name:"style",value:"min-width: 250px;"}],name:"producto",box:bx_shw,select:"NAME",descripcion:"nombre del producto/servicio/insumo"},
+                {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"tipo",box:{...bx_shw,options:op_products_tipe},select:"ID_PRODUCT_TIPE",descripcion:"puede ser producto/servicio/insumo"},
+                {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"etiqueta",box:bx_shw,select:"TAG_NAME",descripcion:"etiqueta del producto/servicio/insumo"},
+          
+                {panel:"main",name:"unidad",box:bx_shw,select:"UNID_ID",load:{name:"ld-unids",show:"show"},descripcion:"unidad del producto/servicio/insumo"},
+                //{panel:"main",attributes:[{name:"style",value:"min-width: 100px;"}],name:"stock total",box:(acc_stock_update?bx_input:{tipe:0,class:"text-center"}),select:"STOCK_TOTAL"},
+                //{panel:"main",attributes:[{name:"style",value:"min-width: 100px;"}],name:"stock minimo",box:{tipe:0,class:"text-center"},select:"STOCK_LIMIT"},
+                //{panel:"main",name:"limite",box:{tipe:0,options:[{value:0,show:"-",class:"rounded text-center bg-success text-white"},{value:1,show:"limit!",class:"rounded text-center bg-danger text-white"}]},select:"STOCK_ONLIMIT"},
+                
+                {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"activa",box:bx_active_show,select:"ACTIVE",descripcion:"si el producto/servicio/insumo esta activo, se puede vender o usar"},
               ],
             },
           },
@@ -127,24 +161,24 @@ $(document).ready(function() {
               inserts:ins_general,
               
               fields:[
-                {panel:"main",col:9,tipe:1,name:"producto",box:{...bx_input,value:"nombre del producto"},select:"NAME"},
-                {panel:"main",col:3,tipe:0,name:"activo",box:{...bx_active_input,value:1},select:"ACTIVE"},
+                {panel:"main",col:9,tipe:1,name:"producto",box:{...bx_input,value:"nombre del producto"},select:"NAME",descripcion:"nombre del producto/servicio/insumo"},
+                {panel:"main",col:3,tipe:0,name:"activo",box:{...bx_active_input,value:1},select:"ACTIVE",descripcion:"activo del producto/servicio/insumo, si esta activo se puede vender o usar"},
                 
-                {panel:"main",col:12,tipe:1,name:"tipo",box:{...bx_op({ops:op_products_tipe})},select:"ID_PRODUCT_TIPE"},
+                {panel:"main",col:12,tipe:1,name:"tipo",box:{...bx_op({ops:op_products_tipe})},select:"ID_PRODUCT_TIPE",descripcion:"seleccionar si es producto/servicio/insumo"},
 
-                {panel:"main",col:8,tipe:1,colAllLevel:true,name:"etiqueta",box:{tipe:3,value:1},select:"ID_PRODUCT_TAG",load:{name:"ld-products_tags",show:"show"}},
-                {panel:"main",col:2,tipe:0,colAllLevel:true,name:"edit-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-pencil-square"></i>'},action:"edit-tag"},
-                {panel:"main",col:2,tipe:0,colAllLevel:true,name:"add-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-plus-circle"></i>'},action:"add-tag"},
+                {panel:"main",col:8,tipe:1,colAllLevel:true,name:"etiqueta",box:{tipe:3,value:1},select:"ID_PRODUCT_TAG",load:{name:"ld-products_tags",show:"show"},descripcion:"seleccionar etiqueta"},
+                {panel:"main",col:2,tipe:0,colAllLevel:true,name:"edit-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-pencil-square"></i>'},action:"edit-tag",descripcion:"editar etiqueta"},
+                {panel:"main",col:2,tipe:0,colAllLevel:true,name:"add-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-plus-circle"></i>'},action:"add-tag",descripcion:"añadir etiqueta"},
 
-                {panel:"main",col:8,tipe:1,colAllLevel:true,name:"unidad",box:{...bx_op({ops:[]})},select:"UNID_ID",load:{name:"ld-unids",show:"show"}},
-                {panel:"main",col:2,tipe:0,colAllLevel:true,name:"edit-und",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-pencil-square"></i>'},action:"edit-und"},
-                {panel:"main",col:2,tipe:0,colAllLevel:true,name:"add-und",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-plus-circle"></i>'},action:"add-und"},
+                {panel:"main",col:8,tipe:1,colAllLevel:true,name:"unidad",box:{...bx_op({ops:[]})},select:"UNID_ID",load:{name:"ld-unids",show:"show"},descripcion:"seleccionar unidad"},
+                {panel:"main",col:2,tipe:0,colAllLevel:true,name:"edit-und",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-pencil-square"></i>'},action:"edit-und",descripcion:"editar unidad"},
+                {panel:"main",col:2,tipe:0,colAllLevel:true,name:"add-und",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-plus-circle"></i>'},action:"add-und",descripcion:"añadir unidad"},
 
-                {panel:"main",col:6,tipe:1,name:"costo unitario",box:{tipe:1,value:0},select:"COST_UNIT"},
-                {panel:"main",col:6,tipe:1,name:"precio unitario",box:{tipe:1,value:0},select:"PRICE_UNIT"},
+                {panel:"main",col:6,tipe:1,name:"costo unitario",box:{tipe:1,value:0},select:"COST_UNIT",descripcion:"costo unitario, este campo se actualiza de acuerdo a las compras"},
+                {panel:"main",col:6,tipe:1,name:"precio unitario",box:{tipe:1,value:0},select:"PRICE_UNIT",descripcion:"precio unitario de venta"},
 
-                {panel:"main",col:6,tipe:1,name:"stock total",box:{tipe:1,value:999},select:"STOCK_TOTAL"},
-                {panel:"main",col:6,tipe:1,name:"stock minimo",box:{tipe:1,value:1},select:"STOCK_LIMIT"},
+                {panel:"main",col:6,tipe:1,name:"stock total",box:{tipe:1,value:999},select:"STOCK_TOTAL",descripcion:"stock actual del producto/insumo/servicio"},
+                {panel:"main",col:6,tipe:1,name:"stock minimo",box:{tipe:1,value:1},select:"STOCK_LIMIT",descripcion:"stock minimo del producto/insumo/servicio, en caso el stock sea menor o igual, se lanza una alerta"},
               ],
 
               events:[
@@ -212,7 +246,7 @@ $(document).ready(function() {
     
               fields:[
                 //{panel:"main",...fld_delete},
-                {panel:"main",col:12,name:"etiqueta",box:bx_input,select:"NAME"},
+                {panel:"main",col:12,name:"etiqueta",box:bx_input,select:"NAME",descripcion:"nombre de la etiqueta del producto/servicio/insumo"},
               ],
               events:[
                 {
@@ -281,8 +315,8 @@ $(document).ready(function() {
     
               fields:[
                 //{panel:"main",...fld_delete},
-                {panel:"main",name:"unidad",box:bx_input,select:"NAME"},
-                {panel:"main",name:"simbolo",box:bx_input,select:"SIMBOL"},
+                {panel:"main",name:"unidad",box:bx_input,select:"NAME",descripcion:"nombre de la unidad"},
+                {panel:"main",name:"simbolo",box:bx_input,select:"SIMBOL",descripcion:"simbolo de la unidad"},
               ],
               events:[
                 {

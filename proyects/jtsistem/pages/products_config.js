@@ -46,8 +46,8 @@ $(document).ready(function() {
     
               fields:[
                 //{panel:"main",...fld_delete},
-                {panel:"main",name:"unidad",box:bx_input,select:"NAME"},
-                {panel:"main",name:"simbolo",box:bx_input,select:"SIMBOL"},
+                {panel:"main",name:"unidad",box:bx_input,select:"NAME",descripcion:"nombre de la unidad"},
+                {panel:"main",name:"simbolo",box:bx_input,select:"SIMBOL",descripcion:"simbolo de la unidad"},
               ],
             }
           },
@@ -79,7 +79,7 @@ $(document).ready(function() {
     
               fields:[
                 //{panel:"main",...fld_delete},
-                {panel:"main",name:"etiqueta",box:bx_input,select:"NAME"},
+                {panel:"main",name:"etiqueta",box:bx_input,select:"NAME",descripcion:"nombre de la etiqueta del producto/servicio/insumo"},
               ],
             }
           },

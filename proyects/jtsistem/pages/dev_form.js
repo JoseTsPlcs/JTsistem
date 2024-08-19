@@ -17,6 +17,7 @@ $(document).ready(function() {
     tools:[
       {position:"head-left",name:"load-tables",box:{tipe:5,value:"cargar tablas",class:"btn btn-outline-primary btn-sm"}},
       {position:"head-left",name:"copy-selects",box:{tipe:5,value:"copiar selects",class:"btn btn-outline-primary btn-sm",update:()=>{CopySelects()}}},
+      {position:"head-left",name:"copy-schema",box:{tipe:5,value:"copiar schema", class:"btn btn-primary btn-sm",update:()=>{CopySchema()}}}
     ],
 
     events:[
@@ -94,7 +95,31 @@ $(document).ready(function() {
     alert("se copiaron los selects de la tabla " + tableName);
   }
 
+  function CopySchema() {
+    
+    var tableName = fm.Field_GetBox({fieldName:"tabla"}).GetValue();
+    var tableData = tablesData.find(tb=>tb.table == tableName);
+    console.log(tableName,tableData);
 
+
+    var copi = '{' + '\n';
+    copi += "name: " + "'" + tableName + "'," + '\n';
+    copi += "fields:["  + '\n';
+
+    tableData.result.forEach(field => {
+      
+      copi += '{\n  name:"'+field.Field+'"'+(field.Key=="PRI"?', primary:true':'')+ ', active:true, \n';
+      copi += ' title:"fieldName", tipe:"none"'+ '\n' +'},' + '\n';
+    });
+
+    copi += '],';
+    copi += '\n';
+    copi += "}"
+
+    navigator.clipboard.writeText(copi);
+
+    alert("se copiaron el schema de la tabla " + tableName);
+  }
 
   //scr_admin({});
   

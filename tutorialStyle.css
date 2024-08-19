@@ -1,0 +1,52 @@
+/* Overlay que está por encima del modal */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1055; /* Mayor que el modal */
+}
+
+
+/* Estilo para el contenedor que resalta el elemento */
+.highlight {
+    position: absolute;
+    z-index: 1060;
+    border: 2px solid yellow;
+    border-radius: 5px;
+    background-color: transparent;
+}
+
+/* Estilo para el campo y etiqueta resaltado */
+.highlighted-element {
+    z-index: 1060 !important;
+    position: relative !important;
+    background-color: white !important;
+    color: black !important; /* Cambia el color del texto a negro */
+    /*border: 2px solid yellow !important; /* Añade un borde amarillo */
+    padding: 5px !important;
+}
+
+/* Ventana emergente para descripciones */
+.popup {
+    display: none; /* Oculta el popup por defecto */
+    position: fixed;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1061;
+    padding: 20px;
+    /* Asegúrate de que el popup esté en el centro de la pantalla si se necesita */
+    transform: none; /* Desactiva la transformación de centrado */
+}
+
+.popup-content {
+    text-align: center;
+}
+
+.no-scroll {
+    overflow: hidden;
+}
+

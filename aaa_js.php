@@ -26,6 +26,8 @@
   echo '<script src="../source/ListOfConections.js"></script>';
   echo '<script src="../source/ListOfForms.js"></script>';
   echo '<script src="../source/LoadPage.js"></script>';
+
+  echo '<script src="../../../TutorialClass.js"></script>';
   
   //return;
   $url = $_SERVER["REQUEST_URI"];

@@ -10,21 +10,10 @@ class Crud_set extends ODD {
 
         let k = this;
 
-        if(i.stateTools){
-
-            i.stateTools.forEach(st => {
-                
-                //console.log(st);
-                this.#State_SetTools({
-                    stateName:st.name,
-                    toolsSet:st.tools,
-                });
-            });
-        }
-
         this.#Load({
             success:()=>{
 
+                k.#questionsSetTutorials();
                 k.SetState({stateName:this.#stateData.stateStart});
                 k.#Event_StateSetFirst({});
             }
@@ -41,7 +30,9 @@ class Crud_set extends ODD {
         delete:false,
     }
 
-    #SetVariables({title,stateStart="reload",afterCancel="reload",afterDelete="reload",afterInsert="reload",afterUpdate="reload",newLinesStart=1,newActive=true,tableMain,selects,joins,inserts=[],orders=[],conditions=[],fields=[],loads=[]}){
+    #SetVariables({title,stateTools=[],questions=[],stateStart="reload",afterCancel="reload",afterDelete="reload",afterInsert="reload",afterUpdate="reload",newLinesStart=1,newActive=true,tableMain,selects,joins,inserts=[],orders=[],conditions=[],fields=[],filters=[],loads=[]}){
+
+        
 
         this.#title = title;
         this.#conection = db_lip;
@@ -56,8 +47,12 @@ class Crud_set extends ODD {
         });
         this.#selectPrimary = selects.find(slc=>slc.primary==true);
         this.#fields = fields.filter(f=>f!=null);
-        
 
+        loads=loads.filter(ld=>ld!=null);
+        this.#loadData.max = loads.length;
+        this.#loadData.data = loads;
+
+        
         this.#newActive = newActive;
         this.#stateData.stateStart=stateStart;
         this.#stateData.afterCancel = afterCancel;
@@ -65,10 +60,139 @@ class Crud_set extends ODD {
         this.#stateData.afterInsert = afterInsert;
         this.#stateData.afterUpdate = afterUpdate;
         this.#stateData.newLinesStart = newLinesStart;
+        this.#stateData.stateTools.forEach(st=>{
+            
+            var toolLoad = st.tools.find(t=>t.name == "load");
+            if(toolLoad) toolLoad.show = loads.length > 0; 
+            var toolConfig = st.tools.find(t=>t.name == "config");
+            if(toolConfig) toolConfig.show = filters.length > 0; 
+            var toolQuest = st.tools.find(t=>t.name == "question");
+            if(toolQuest) toolQuest.show = true;
+        }); 
+        stateTools.forEach(st => {
+                
+            this.#State_SetTools({
+                stateName:st.name,
+                toolsSet:st.tools,
+            });
+        });
+              
+        
+        //question
+        this.#questionSet({questions});
+        var questions = [...this.#questions];
 
-        loads=loads.filter(ld=>ld!=null);
-        this.#loadData.max = loads.length;
-        this.#loadData.data = loads;
+        var questions_op = questions.map(q=>{return {value:q.value,show:q.show}});
+        var questionTool = this.#body_tools.find(t=>t.name=="question");
+        questionTool.box.options = questions_op;
+    }
+
+    #questions = [
+        {value:"v1",show:"¿como lo utilizo?",tutorial:null,elementsInfo:[]},
+        {value:"v2",show:"¿que significan los campos?",tutorial:null,elementsInfo:[]},
+        //{value:"v3",show:"¿como lo utilizo?",tutorial:null},
+    ];
+
+    #questionSet({questions=[]}){
+
+        questions.forEach(q => {
+            
+            var qfound = this.#questions.find(qf=>qf.value==q.value);
+            if(qfound){
+
+                console.log("set question!!--------");
+                
+                console.log("set q " + q.value, q.elementsInfo,qfound);
+                
+                qfound.elementsInfo = q.elementsInfo;
+            }
+        });
+    }
+
+    #questionsSetTutorials(){
+
+        //console.log("-----------settutorial-------");
+
+        this.#questionSetTutorialQ1();
+
+        var questionQ2 = this.#questions.find(q=>q.value=="v2");
+        var v2ElementsInfo = [...questionQ2.elementsInfo];
+        
+        this.#fields.filter(fld=>fld.descripcion != null).forEach(fld=>{
+
+            var panel = this.#PanelGet({panelTitle:fld.panel});
+            var divConteiner = null;
+                 
+
+            switch (panel.tipe) {
+                case "table":
+                    
+                    var tbField = panel.build.fieldGet({fieldName:fld.name});    
+                    divConteiner = tbField.th;
+                    
+                break;
+
+                case "form":
+
+                    divConteiner = panel.build.fieldGetLabel({fieldName:fld.name}).parentGet();
+
+                break;
+            }
+
+            if(divConteiner){
+
+                v2ElementsInfo.push({
+                    id:divConteiner.id,
+                    descripcion:fld.descripcion,
+                });
+            }
+            
+        });
+
+        var questOpDom = $('#'+this.#body_tools.find(t=>t.name=="question").dom.Blocks_Get()[2].id);
+        if(v2ElementsInfo.length == 0) questOpDom.hide();
+        else questOpDom.show();
+        
+        questionQ2.tutorial = new Tutorial({elementsInfo:v2ElementsInfo});
+        
+    }
+
+    #questionSetTutorialQ1(){
+
+        var question = this.#questions.find(q=>q.value=="v1");
+        var v1ElementsInfo = [...question.elementsInfo];
+
+        this.#body_tools.forEach(tool => {
+            
+            if(tool.show == true && tool.descripcion!=null){
+
+                v1ElementsInfo.push({
+                    id: this.Tools_GetBox({toolName:tool.name}).Blocks_Get()[0].id,
+                    descripcion: tool.descripcion,
+                });
+            }   
+        });
+        
+        var questOpDom = $('#'+this.#body_tools.find(t=>t.name=="question").dom.Blocks_Get()[1].id);
+        if(v1ElementsInfo.length == 0) questOpDom.hide();
+        else questOpDom.show();
+        
+        //console.log(this.#fields[0].name + " question 1", v1ElementsInfo);
+        question.tutorial = new Tutorial({elementsInfo:v1ElementsInfo});
+    }
+
+    #questionEvent({value}){
+
+        console.log("event question " + value);
+        
+        if(value){
+
+            var question = this.#questions.find(q=>q.value == value);
+            if(question.tutorial){
+
+                question.tutorial.startTutorial();
+            }
+        }
     }
 
     #title="crud";
@@ -109,13 +233,13 @@ class Crud_set extends ODD {
 
     //-------build----------
 
-    #Build({parent,title,head=true,attributes,panels,filters,configShow,configHead,configTitle,configToolsPositions}){
+    #Build({parent,title,head=true,attributes,panels,filters,configShow,configHead,configTitle,configToolsPositions,config}){
 
         
 
         this.#Build_Body({parent,title,head,attributes});
         this.#Build_Panels({panels});
-        this.#Config_Build({filters,configShow,configHead,configTitle,configToolsPositions});
+        this.#Config_Build({filters,configShow,configHead,configTitle,configToolsPositions,config});
 
         this.#Loading_Build({parent:this.#body_w.Conteiner_Dom()});
         this.Loading_SetActive({active:false});
@@ -125,29 +249,31 @@ class Crud_set extends ODD {
 
     #body_w;
     #body_tools = [
-        {x:0,y:1,index:0,name:"config",box:{tipe:5,value:'<i class="bi bi-gear"></i>',class:"btn btn-primary btn-sm",update:()=>{this.Config_ShowChange()}},dom:null},
-        {x:0,y:1,index:1,name:"load",box:{tipe:5,value:'<i class="bi bi-database"></i>',class:"btn btn-primary btn-sm",update:()=>{this.#Load({})}},dom:null},
+        {x:0,y:1,index:0,name:"config",descripcion:"selecciona para realizar una busqueda",box:{tipe:5,value:'<i class="bi bi-gear"></i>',class:"btn btn-primary btn-sm",update:()=>{this.Config_ShowChange()}},dom:null},
+        {x:0,y:1,index:1,name:"load",descripcion:"selecciona para cargar datos externos",box:{tipe:5,value:'<i class="bi bi-database"></i>',class:"btn btn-primary btn-sm",update:()=>{this.#Load({})}},dom:null},
 
-        {x:2,y:1,index:0,name:"excel",box:{id:"btn1",tipe:5,value:"excel",class:"btn btn-success btn-sm",update:()=>{this.#Event_UpdateToolExcel({})}},dom:null},
+        {x:2,y:1,index:0,name:"excel",descripcion:"descargar datos en archivo excel",box:{id:"btn1",tipe:5,value:"excel",class:"btn btn-success btn-sm",update:()=>{this.#Event_UpdateToolExcel({})}},dom:null},
+        {x:2,y:1,index:1,name:"question",box:{id:"btn2",tipe:5,value:'<i class="bi bi-question-circle"></i>',class:"btn btn-secondary btn-sm",update:(info)=>{this.#questionEvent({value:info});}},dom:null},
 
-        {x:0,y:3,index:0,name:"sizes",box:{tipe:3,value:1,options:[{show:1,value:1},{show:10,value:10},{show:25,value:25},{show:50,value:50},{show:999,value:999}],update:()=>{this.#Event_UpdateToolPages({})}},dom:null},
+        {x:0,y:3,index:0,name:"sizes",descripcion:"seleccion la cantidad de registros ver",box:{tipe:3,value:1,options:[{show:1,value:1},{show:10,value:10},{show:25,value:25},{show:50,value:50},{show:999,value:999}],update:()=>{this.#Event_UpdateToolPages({})}},dom:null},
 
-        {x:1,y:3,index:0,name:"reload",box:{id:"btn1",tipe:5,value:"recargar",class:"btn btn-primary btn-sm",update:()=>{this.#Event_UpdateToolReload({})}},dom:null},
-        {x:1,y:3,index:1,name:"update",box:{id:"btn2",tipe:5,value:"actualizar",class:"btn btn-primary btn-sm",update:()=>{this.#Event_UpdateToolUpdate({})}},dom:null},
-        {x:1,y:3,index:2,name:"new",box:{id:"btn3",tipe:5,value:"nuevo",class:"btn btn-primary btn-sm",update:()=>{this.#Event_UpdateToolNew({})}},dom:null},
-        {x:1,y:3,index:3,name:"insert",box:{id:"btn4",tipe:5,value:"insertar",class:"btn btn-primary btn-sm",update:()=>{this.#Event_UpdateToolInsert({})}},dom:null},
-        {x:1,y:3,index:4,name:"delete",box:{id:"btn5",tipe:5,value:"borrar",class:"btn btn-danger btn-sm",update:()=>{this.#Event_UpdateToolDelete({})}},dom:null},
-        {x:1,y:3,index:5,name:"cancel",box:{id:"btn6",tipe:5,value:"cancelar",class:"btn btn-danger btn-sm",update:()=>{this.#Event_UpdateToolCancel({})}},dom:null},
-        {x:1,y:3,index:6,name:"addLine",box:{id:"btn7",tipe:5,value:"añadir linea",class:"btn btn-primary btn-sm",update:()=>{this.#New_AddLine({})}},dom:null},
-        {x:1,y:3,index:7,name:"pdf",box:{id:"btn8",tipe:5,value:"pdf",class:"btn btn-danger btn-sm",update:()=>{this.#Event_UpdateToolPDF({})}},dom:null},
+        {x:1,y:3,index:0,name:"reload",descripcion:"selecciona para recargar",box:{id:"btn1",tipe:5,value:"recargar",class:"btn btn-primary btn-sm",update:()=>{this.#Event_UpdateToolReload({})}},dom:null},
+        {x:1,y:3,index:1,name:"update",descripcion:"selecciona para actualizar",box:{id:"btn2",tipe:5,value:"actualizar",class:"btn btn-primary btn-sm",update:()=>{this.#Event_UpdateToolUpdate({})}},dom:null},
+        {x:1,y:3,index:2,name:"new",descripcion:"selecciona para crear nuevo registro",box:{id:"btn3",tipe:5,value:"nuevo",class:"btn btn-primary btn-sm",update:()=>{this.#Event_UpdateToolNew({})}},dom:null},
+        {x:1,y:3,index:3,name:"insert",descripcion:"selecciona para insertar nuevo registro",box:{id:"btn4",tipe:5,value:"insertar",class:"btn btn-primary btn-sm",update:()=>{this.#Event_UpdateToolInsert({})}},dom:null},
+        {x:1,y:3,index:4,name:"delete",descripcion:"selecciona para borrar registro",box:{id:"btn5",tipe:5,value:"borrar",class:"btn btn-danger btn-sm",update:()=>{this.#Event_UpdateToolDelete({})}},dom:null},
+        {x:1,y:3,index:5,name:"cancel",descripcion:"selecciona para cancelar",box:{id:"btn6",tipe:5,value:"cancelar",class:"btn btn-danger btn-sm",update:()=>{this.#Event_UpdateToolCancel({})}},dom:null},
+        {x:1,y:3,index:6,name:"addLine",descripcion:"selecciona para añadir nueva linea para insertar registro",box:{id:"btn7",tipe:5,value:"añadir linea",class:"btn btn-primary btn-sm",update:()=>{this.#New_AddLine({})}},dom:null},
+        {x:1,y:3,index:7,name:"pdf",descripcion:"descargar datos en pdf",box:{id:"btn8",tipe:5,value:"pdf",class:"btn btn-danger btn-sm",update:()=>{this.#Event_UpdateToolPDF({})}},dom:null},
 
-        {x:2,y:3,index:0,name:"pages",box:{tipe:3,value:1,options:[{show:"pag1",value:1}],update:()=>{this.#Event_UpdateToolPages({})}},dom:null},
+        {x:2,y:3,index:0,name:"pages",descripcion:"selecciona pagina que ver",box:{tipe:3,value:1,options:[{show:"pag1",value:1}],update:()=>{this.#Event_UpdateToolPages({})}},dom:null},
     ];
     #Build_Body({parent,title,head,attributes=[]}){
         
-        console.log("set",attributes);
+        //console.log("set",attributes);
 
         this.#body_w = new Window({
+            instance:"window main",log:true,
             parent,title,attributes,head,
             grid:{
                 cols:[
@@ -172,7 +298,7 @@ class Crud_set extends ODD {
                     {y:3,x:1,attributes:[{name:"class",value:"d-flex justify-content-center "}]},
                     {y:3,x:2,attributes:[{name:"class",value:"d-flex justify-content-end "}]},
                 ],
-            }
+            },
         });
 
         this.#config.parentDom = this.#body_w.Conteiner_GetColData({x:0,y:0}).col;
@@ -266,6 +392,7 @@ class Crud_set extends ODD {
 
                 case "form":
                     panel.build = new Window({
+                        instance:"panel " + panel.title,
                         parent: panel.parent,
                         title: panel.tag,
                         blocked:panel.blocked,
@@ -295,6 +422,12 @@ class Crud_set extends ODD {
         this.#conteiner_panels = panels;
 
         //console.log("build conteiners panels",this.#conteiner_panels);
+    }
+
+    #PanelGet({panelTitle}){
+
+        var panelInfo = this.#conteiner_panels.find(p=>p.title==panelTitle);
+        return panelInfo;
     }
 
     Panels_GetBuild({panelTitle}){
@@ -357,14 +490,17 @@ class Crud_set extends ODD {
         this.Config_ShowSet({show:!this.#config.show,slow:true});
     }
 
-    #Config_Build({filters,configShow=false,configHead=true,configTitle="fitros",configToolsPositions=[]}){
+    #Config_Build({filters,configShow=false,configHead=true,configTitle="fitros",configToolsPositions=[],config}){
 
+        //if(config!=null) console.log("-------------buildconfig",config);
+        
         
         this.#Filters_Build({
             filters,
             title:configTitle,
             head:configHead,
             toolsPositions:configToolsPositions,
+            questions:(config?config.questions:[]),
         });
 
         this.Config_ShowSet({show:configShow,slow:false});
@@ -375,13 +511,14 @@ class Crud_set extends ODD {
     #filters = null;
     Filters_Get(){return this.#filters};
 
-    #Filters_Build({filters=[],title,head,show,blocked,toolsPositions=[]}){
+    #Filters_Build({filters=[],title,head,show,blocked,toolsPositions=[],questions=[]}){
 
         let k = this;
         this.#filters = new windowFilters({
+            log:false,
             parent: this.#body_w.Conteiner_GetColData({x:0,y:0}).col,
             title,head,show,blocked,toolsPositions,
-            filters,
+            filters,questions,
             events:[
                 {
                     name:"reload",
@@ -705,7 +842,7 @@ class Crud_set extends ODD {
             orders:k.#orders,
         });
 
-        //console.log("reload data sql:",reloadDataSql);
+        console.log("reload data sql:",reloadDataSql);
 
         this.#conection.Request({
             php:"row",log:k.#ctr_log.reload,
@@ -1073,13 +1210,15 @@ class Crud_set extends ODD {
             updateChangeFist.fields.forEach(fch => {
                 
                 var field = this.#fields.find(fd=>fd.name==fch.fieldName);
-                var select = this.#selects.find(slc=>slc.field==field.select);
-                if(select){
+                if(field){
+                    var select = this.#selects.find(slc=>slc.field==field.select);
+                    if(select){
 
-                    updateSets.push({
-                        field:select.field,
-                        value:fch.value,
-                    });
+                        updateSets.push({
+                            field:select.field,
+                            value:fch.value,
+                        });
+                    }
                 }
             });
          }
@@ -1248,6 +1387,8 @@ class Crud_set extends ODD {
 
     //state
 
+    
+
     #stateData = {
         state:"reload",
         states:["reload","find","nofound","block","new"],
@@ -1258,17 +1399,18 @@ class Crud_set extends ODD {
                 name:"new",
                 tools:[
                     {name:"config",show:false},
-                    {name:"load",show:true},
+                    {name:"load",show:false},
 
                     {name:"excel",show:false},
                     {name:"pdf",show:false},
+                    {name:"question",show:false},
 
                     {name:"sizes",show:false},
                     {name:"reload",show:false},
                     {name:"update",show:false},
                     {name:"new",show:false},
-                    {name:"insert",show:true},
-                    {name:"cancel",show:true},
+                    {name:"insert",show:false},
+                    {name:"cancel",show:false},
                     {name:"addLine",show:false},
                     
                     {name:"pages",show:false},
@@ -1277,21 +1419,22 @@ class Crud_set extends ODD {
             {
                 name:"reload",
                 tools:[
-                    {name:"config",show:true},
-                    {name:"load",show:true},
+                    {name:"config",show:false},
+                    {name:"load",show:false},
                     
-                    {name:"excel",show:true},
-                    {name:"pdf",show:true},
+                    {name:"excel",show:false},
+                    {name:"pdf",show:false},
+                    {name:"question",show:false},
 
-                    {name:"sizes",show:true},
-                    {name:"reload",show:true},
-                    {name:"update",show:true},
-                    {name:"new",show:true},
+                    {name:"sizes",show:false},
+                    {name:"reload",show:false},
+                    {name:"update",show:false},
+                    {name:"new",show:false},
                     {name:"insert",show:false},
                     {name:"cancel",show:false},
                     {name:"addLine",show:false},
                     
-                    {name:"pages",show:true},
+                    {name:"pages",show:false},
                 ],
             },
             {
@@ -1302,6 +1445,7 @@ class Crud_set extends ODD {
 
                     {name:"excel",show:false},
                     {name:"pdf",show:false},
+                    {name:"question",show:false},
 
                     {name:"sizes",show:false},
                     {name:"reload",show:false},
@@ -1380,6 +1524,7 @@ class Crud_set extends ODD {
         }
 
         this.CallEvent({name:"setStateAfter",params:{stateName}});
+        this.#questionSetTutorialQ1();
 
     }
 
@@ -1387,18 +1532,23 @@ class Crud_set extends ODD {
 
         var stateToolsData = this.#stateData.stateTools.find(st=>st.name==stateName);
 
-        toolsSet.forEach(toolSet => {
-            
-            var toolData = stateToolsData.tools.find(toolData=>toolData.name==toolSet.name);
-            //if(toolData == null) toolData = {};
+        stateToolsData.tools.forEach(toolData => {
+
+            var toolSet = toolsSet.find(fset=>fset.name == toolData.name);
+            //if(toolSet) console.log("state: " + stateName, toolSet);
+            if(toolSet == null) toolSet = {...toolData};
 
             toolData.show = toolSet.show;
-            toolData.value = toolSet.value;
+            if(toolSet.value != null) toolData.value = toolSet.value;
+            if(toolSet.descripcion != null) toolData.descripcion = toolSet.descripcion;
 
-            //if(toolData.name=="pages")console.log(stateName,toolData,toolSet);
         });
 
+    }
 
+    #State_GetTools({stateName}){
+
+        return this.#stateData.stateTools.find(st=>st.name==stateName);
     }
 
     //crudJoin
@@ -1656,9 +1806,13 @@ class Crud_set extends ODD {
         if(this.#stateData.state=="reload"){
 
             var field = this.#fields.find(f=>f.name==fieldName);
-            var panel = this.#conteiner_panels.find(p=>p.title==field.panel);
-            var panelIsTable = panel.tipe=="table";
-            if(panelIsTable) this.#Update({});
+            if(field != null){
+
+                var panel = this.#conteiner_panels.find(p=>p.title==field.panel);
+                var panelIsTable = panel.tipe=="table";
+                if(panelIsTable) this.#Update({});
+            }
+           
         }
 
     }
@@ -1688,6 +1842,7 @@ class Crud_set extends ODD {
 
         if(value!=null) tool.dom.SetValue(value);
 
+        tool.show = show;
         if(show==false) tool.dom.Hide();
         else tool.dom.Show();
         //.Block({active});
@@ -1702,6 +1857,8 @@ class Crud_set extends ODD {
     GetBoxs({fieldName}){
 
         var field = this.#fields.find(f=>f.name == fieldName);
+        if(field == null) return null;
+
         var panel = this.#conteiner_panels.find(p=>p.title == field.panel);
         var boxs = [];
 
@@ -1725,7 +1882,10 @@ class Crud_set extends ODD {
 
     GetValues({fieldName}){
 
-        var values = this.GetBoxs({fieldName}).map(bx=>{
+        var boxes =  this.GetBoxs({fieldName});
+        if(boxes == null) return null;
+
+        var values = boxes.map(bx=>{
 
             return bx.GetValue();
         });
@@ -1736,7 +1896,10 @@ class Crud_set extends ODD {
     GetValue({fieldName,y}){
 
         var values = this.GetValues({fieldName});
-        if(values==null) console.log("values is null, fieldName: " + fieldName);
+        if(values == null){
+            console.log("values is null, fieldName: " + fieldName);
+            return null;
+        }
 
         return values[y];
     }
@@ -1744,6 +1907,8 @@ class Crud_set extends ODD {
     SetValuesToBox({values=[],fieldName,box}){
 
         var field = this.#fields.find(f=>f.name == fieldName);
+        if(field == null) return;
+
         var panel = this.#conteiner_panels.find(p=>p.title==field.panel);
 
         switch (panel.tipe) {
@@ -1767,8 +1932,9 @@ class Crud_set extends ODD {
 
     SetValue({fieldName,y,value}){
 
-        var box = this.GetBoxs({fieldName})[y];
-        box.SetValue(value);
+        var boxes = this.GetBoxs({fieldName});
+        var box = boxes && y < boxes.length  ? boxes[y] : null;
+        if(box) box.SetValue(value);
     }
 
     

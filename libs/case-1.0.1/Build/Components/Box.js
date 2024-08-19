@@ -13,6 +13,7 @@ class Box {
   //9 -> text area (need to build)
   //10 -> img
 
+
   #parent = undefined;
   #blocks = [];
   Blocks_Get(){return this.#blocks};
@@ -190,10 +191,60 @@ class Box {
       //buttons
       case 5:
 
-      this.#blocks[0] = document.createElement("button");
-      this.#parent.appendChild(this.#blocks[0]);
+      if(this.#options == null || this.#options.length == 0){
 
-      this.#blocks[0].setAttribute("class","w-100 m-0 p-0 btn btn-primary btn-sm");
+        this.#blocks[0] = document.createElement("button");
+        this.#parent.appendChild(this.#blocks[0]);
+      }
+      else
+      {
+        var dropdown = document.createElement("div");
+        dropdown.setAttribute("class","dropdown");
+
+        this.#blocks[0] = document.createElement("button");
+        this.#blocks[0].setAttribute("class","btn btn-secondary dropdown-toggle");
+        this.#blocks[0].setAttribute("type","button");
+        this.#blocks[0].setAttribute("class","dropdownMenuButton"+this.#id);
+        this.#blocks[0].setAttribute("data-toggle","dropdown");
+        this.#blocks[0].setAttribute("aria-haspopup","true");
+        this.#blocks[0].setAttribute("aria-expanded","false");
+        this.#blocks[0].innerHTML = this.#name;
+        dropdown.appendChild(this.#blocks[0]);
+
+        var dropdownMenu = document.createElement("div");
+        dropdownMenu.setAttribute("class","dropdown-menu");
+        dropdownMenu.setAttribute("aria-labelledby","dropdownMenuButton"+this.#id);
+        dropdown.appendChild(dropdownMenu);
+
+        for(var op=0; op < this.#options.length; op++){
+
+          var opi = this.#options[op];
+          var op_nw = document.createElement("a");
+          op_nw.setAttribute("class","dropdown-item");
+          //op_nw.setAttribute("href","#");
+          op_nw.setAttribute("id",this.#parent.id + "dropdownMenuButton" + this.#id + "_op_" + op);
+          op_nw.setAttribute("value",opi.value);
+          op_nw.innerHTML = opi.show;
+
+          dropdownMenu.appendChild(op_nw);
+          this.#blocks.push(op_nw);
+        }
+
+        this.#parent.appendChild(dropdown);
+
+        /*
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Dropdown button
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="#">Action</a>
+            <a class="dropdown-item" href="#">Another action</a>
+            <a class="dropdown-item" href="#">Something else here</a>
+          </div>
+        </div>
+        */
+      }
 
       break;
 
@@ -241,6 +292,7 @@ class Box {
 
           var op_i = this.#options[op];
           var op_dom = document.createElement("option");
+          op_dom.setAttribute("id",this.#parent.id + "item-op"+op);
           this.#blocks[op+1] = op_dom;
           op_dom.setAttribute("data-tokens",op_i.show);
           op_dom.setAttribute("value",op_i.value);
@@ -306,10 +358,24 @@ class Box {
 
       case 5:
 
-      $('#' + this.#blocks[0]['id']).click(function() {
+      if(this.#options.length >= 1){
 
-        u.#CallUpdate();
-      });
+        for (let op = 1; op < this.#blocks.length; op++) {
+
+          const option  =  this.#blocks[op];
+          $('#' + option.id).click(function() {
+  
+            u.#CallUpdate(u.#options[op-1].value);
+          });
+        }
+      }
+      else
+      {
+        $('#' + this.#blocks[0]['id']).click(function() {
+
+          u.#CallUpdate();
+        });
+      }
 
       break;
 
@@ -709,7 +775,8 @@ class Box {
     
     this.#show=show;
     var b = this.#blocks[0];
-    //console.log("show_setactive->","show:",show,"b:",b);
+    
+    //console.log("show_setactive->","show:",show,"box:",b,"find by id",$('#'+b.id));
 
     if(this.#show) $('#'+b.id).show(slow ? "slow" : null);
     else $('#'+b.id).hide(slow ? "slow" : null);
@@ -719,11 +786,15 @@ class Box {
   Hide(slow){
     
     this.#Show_SetActive({show:false,slow});
+    //console.log("!!!!!!!!!!!!hideeee");
+    
+    //this.Log("hide box!!");
   }
 
   Show(slow){
 
     this.#Show_SetActive({show:true,slow});
+    //this.Log("show box!!");
   }
 
   SetUpdate(u){

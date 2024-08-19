@@ -40,23 +40,25 @@ $(document).ready(function() {
         ],
     
         configShow:false,
-        filters:[
-          {name:"producto",box:bx_input,select:{table:"products",field:"NAME"}},
-          {name:"tipo",box:{tipe:4,options:op_products_tipe},select:{table:"products",field:"ID_PRODUCT_TIPE"}},
-          {name:"etiqueta",box:{tipe:4,options:[]},select:{table:"products",field:"ID_PRODUCT_TAG"},load:{name:"ld-products_tags",show:"show"}},
-          {name:"activo",box:{tipe:4,options:op_active,value:["activo"]},select:{table:"products",field:"ACTIVE"}},
-          //{name:"unidad",box:{tipe:4},select:{table:"products",field:"UNID_ID"},load:{name:"unids",show:"show"}},
+        filters:[          
+          {name:"producto",box:bx_input,select:{table:"products",field:"NAME"},descripcion:"buscar por nombre de producto/servicio/insumo"},
+          {name:"tipo",box:{tipe:4,options:op_products_tipe,value:["producto","insumo"]},select:{table:"products",field:"ID_PRODUCT_TIPE"},descripcion:"buscar por producto/servicio/insumo"},
+          {name:"etiqueta",box:{tipe:4,options:[]},select:{table:"products",field:"ID_PRODUCT_TAG"},load:{name:"ld-products_tags",show:"show"},descripcion:"buscar por etiqueta"},
+          {name:"unidad",box:{tipe:4},select:{table:"products",field:"UNID_ID"},load:{name:"ld-unids",show:"show"},descripcion:"buscar por unidad"},
         ],
         fields:[
-          {panel:"main",attributes:[{name:"class",value:"text-left"},{name:"style",value:"min-width: 250px;"}],name:"producto",box:bx_shw,select:"NAME"},
-          {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"tipo",box:{...bx_shw,options:op_products_tipe},select:"ID_PRODUCT_TIPE"},
-          {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"etiqueta",box:bx_shw,select:"TAG_NAME"},
-          //{panel:"main",name:"unidad",box:bx_shw,select:"UNID_ID",load:{name:"unids",show:"show"}},
+          
+          {panel:"main",...fld_edit,descripcion:"editar informacion del producto/servicio/insumo"},
+          {panel:"main",attributes:[{name:"style",value:"min-width: 250px;"}],name:"producto",box:bx_shw,select:"NAME",descripcion:"nombre del producto/servicio/insumo"},
+          {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"tipo",box:{...bx_shw,options:op_products_tipe},select:"ID_PRODUCT_TIPE",descripcion:"puede ser producto/servicio/insumo"},
+          {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"etiqueta",box:bx_shw,select:"TAG_NAME",descripcion:"etiqueta del producto/servicio/insumo"},
     
-          {panel:"main",name:"precio unitario",box:bx_input,select:"PRICE_UNIT"},
-          {panel:"main",name:"costo unitario",box:bx_input,select:"COST_UNIT"},
-    
-          {panel:"main",attributes:[{name:"style",value:"min-width: 100px;"}],name:"activa",box:bx_active_show,select:"ACTIVE"},
+          {panel:"main",name:"unidad",box:bx_shw,select:"UNID_ID",load:{name:"ld-unids",show:"show"},descripcion:"unidad del producto/servicio/insumo"},
+          
+          {panel:"main",name:"precio unitario",box:bx_input,select:"PRICE_UNIT",descripcion:"precio unitario de venta"},
+          {panel:"main",name:"costo unitario",box:bx_input,select:"COST_UNIT",descripcion:"costo unitario, este campo se actualiza de acuerdo a las compras"},
+          
+          {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"activa",box:bx_active_show,select:"ACTIVE",descripcion:"si el producto/servicio/insumo esta activo, se puede vender o usar"},
         ],
     
     

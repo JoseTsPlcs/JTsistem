@@ -66,27 +66,32 @@ class windowFilters extends ODD {
         return this.#filters;
     }
 
+    
+
     //--------build
 
     #window = null;
     #form = null;
-    #Build({parent,title,head,show,blocked,toolsPositions}){
+    #Build({parent,title,head,show,blocked,toolsPositions,questions}){
 
         let k = this;
         this.#form = new Form({
             parent,//:content.GetColData({x:0,y:0}).col,
             title,head,show,blocked,
-            fields:this.#filters,
+            fields:this.#filters,questions,
             tools:[
-                {position:"botton-center",name:"reload",action:"reload",box:{value:"recargar",tipe:5,class:"btn btn-outline-primary btn-sm"}},
-                {position:"botton-center",name:"clear",action:"clear",box:{value:"limpiar",tipe:5,class:"btn btn-outline-primary btn-sm"}},
+                {show:true,position:"botton-center",name:"reload",action:"reload",box:{value:"recargar",tipe:5,class:"btn btn-primary btn-sm"},descripcion:"presiona para recargar la data"},
+                {show:true,position:"botton-center",name:"clear",action:"clear",box:{value:"limpiar",tipe:5,class:"btn btn-primary btn-sm"},descripcion:"presiona para colocar los filtros por defecto"},
+                {show:true,position:"head-right",name:"quest"},
             ],
             events:[
                 {
                     name:"toolUpdate",
                     actions:[{
-                        action:({tool})=>{
+                        action:({tool,value})=>{
 
+                            //console.log("tool update", tool,value);
+                            
                             switch (tool.action) {
                                 case "reload":
                                     k.#Reload();
@@ -102,17 +107,6 @@ class windowFilters extends ODD {
             ],
             toolsPositions,
         });
-
-        /*this.#window = new Window({
-            parent:content.GetColData({x:0,y:0}).col,
-            h:0,
-            title,
-            grid:{
-                cols:windowConfig.cols,
-            },
-            fields:windowConfig.panels,
-            
-        });*/
     }
 
     //-------

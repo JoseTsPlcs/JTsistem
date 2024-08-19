@@ -151,6 +151,7 @@ function bx_op({ops}) {
 
 const att_btn = [{name:"class",value:"my-0 py-0"},{name:"style",value:"width: 50px"}];
 const att_shw = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"width: 130px"}];
+const att_date = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"width: 110px"}];
 const att_ln = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"min-width:300px;"}];
 const att_ln50 = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"min-width: 70px;"}];
 const att_cnt = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"width: 50px"}];
@@ -158,10 +159,10 @@ const att_cnt2 = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"widt
 
 //---------fields---------
 
-const fld_delete = {name:"delete",box:{tipe:5,value:'<i class="bi bi-x-circle"></i>',class:"btn btn-danger btn-sm"},action:"delete"};
-const fld_edit = {name:"edit",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit"};
-const fld_add = {name:"add",box:{tipe:5,value:'<i class="bi bi-plus-circle"></i>',class:"btn btn-primary btn-sm"},action:"add"};
-const fld_show = {name:"add",box:{tipe:5,value:'<i class="bi bi-eye-fill"></i>',class:"btn btn-primary btn-sm"},action:"show"};
+const fld_delete = {name:"delete",box:{tipe:5,value:'<i class="bi bi-x-circle"></i>',class:"btn btn-danger btn-sm"},action:"delete",descripcion:"seleccionar para borrar registro"};
+const fld_edit = {name:"edit",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit",descripcion:"seleccionar para editar registro"};
+const fld_add = {name:"add",box:{tipe:5,value:'<i class="bi bi-plus-circle"></i>',class:"btn btn-primary btn-sm"},action:"add",descriptcon:"seleccionar para añadir registro"};
+const fld_show = {name:"add",box:{tipe:5,value:'<i class="bi bi-eye-fill"></i>',class:"btn btn-primary btn-sm"},action:"show",descripcion:"seleccionar para mostrar detalle del registro"};
 
 function fld_ld_worker({panel="main",edit=true}){
 

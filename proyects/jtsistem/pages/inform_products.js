@@ -28,9 +28,9 @@ $(document).ready(function() {
           },
         ],
         filters:[
-          {tipe:1,name:"periodo",box:{tipe:3,options:op_date_ranges,value:"month"}},
-          {col:6,name:"fecha min",box:{tipe:2,value:Date_StartQuarter()},select:{table:"sales",field:"DATE_EMMIT",tipe:"min"}},
-          {col:6,name:"fecha max",box:{tipe:2,value:Date_EndQuarter()},select:{table:"sales",field:"DATE_EMMIT",tipe:"max"}},
+          {tipe:1,name:"periodo",box:{tipe:3,options:op_date_ranges,value:"month"},descripcion:"mostrar los datos por el perido seleccionado (dias, semanas, meses)"},
+          {col:6,name:"fecha min",box:{tipe:2,value:Date_StartQuarter()},select:{table:"sales",field:"DATE_EMMIT",tipe:"min"},descripcion:"buscar por fecha mayor o igual a las seleccionada"},
+          {col:6,name:"fecha max",box:{tipe:2,value:Date_EndQuarter()},select:{table:"sales",field:"DATE_EMMIT",tipe:"max"},descripcion:"buscar por fecha menor o igual a las seleccionada"},
           //{name:"estados",box:{tipe:4,options:op_sales_status,value:['confirmado','en proceso','terminado']},select:{table:"sales",field:"ID_STATUS"}},
           //{name:"etiquetas",box:{tipe:4},load:{name:"ld-tags",show:"show",value:"value"}},
           //{name:"producto",box:{tipe:8}},

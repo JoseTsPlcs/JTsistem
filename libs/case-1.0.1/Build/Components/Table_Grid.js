@@ -12,6 +12,10 @@ class Table_Grid extends ODD {
   }
 
   #fields = [];
+  fieldGet({fieldName}){
+
+    return this.#fields.find(fld=>fld.name==fieldName);
+  }
   #linesDoom = [];
 
   #SetParams({fields,parent}){
@@ -21,7 +25,8 @@ class Table_Grid extends ODD {
     this.#fields=fields;
     this.#fields.forEach(f=>{
 
-      f.boxs=[];
+      f.th = null,
+      f.boxs = [];
     });
 
     //console.log({...fields});
@@ -65,7 +70,7 @@ class Table_Grid extends ODD {
     //create table responsive
     const tb_r = document.createElement("div");
 
-    console.log("create tablle",attributes,tb_r);
+    //console.log("create tablle",attributes,tb_r);
 
     setDomAttributes({
       dom:tb_r,
@@ -107,8 +112,8 @@ class Table_Grid extends ODD {
       f.dom = th;
       th.setAttribute("scope","col");
       this.#header_line.appendChild(th);
-
       th.innerHTML = f.name;
+      f.th = th;
 
       if(f.attributes){
         

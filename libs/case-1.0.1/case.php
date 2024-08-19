@@ -7,6 +7,7 @@ echo '<script src="'.$src.'Build/Components/Events_Machine.js"></script>';
 echo '<script src="'.$src.'Build/Components/ODD.js"></script>';
 echo '<script src="'.$src.'Build/Components/Params.js"></script>';
 echo '<script src="'.$src.'Build/Components/Box.js"></script>';
+echo '<script src="'.$src.'Build/Components/Tools.js"></script>';
 echo '<script src="'.$src.'Build/Components/Grid.js"></script>';
 echo '<script src="'.$src.'Build/Components/Modal.js"></script>';
 echo '<script src="'.$src.'Build/Components/Label.js"></script>';

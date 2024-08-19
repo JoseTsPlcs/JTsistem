@@ -1,36 +1,61 @@
 
 var accessData = [
 
-    ["acc-1","borrar data de importante","data"],
-    ["acc-2","actualizar lista de productos","productos"],
-    ["acc-3","asignar precio a producto en venta","productos"],
-    ["acc-4","modificar apertura de los controles de cuentas","caja"],
-    ["acc-5","modifica el cierre de los controles de cuentas","caja"],
-    ["acc-6","modificar el total de cuentas","cuentas"],
-    ["acc-7","modificar el estado de cuentas","cuentas"],
-    ["acc-8","asignar trabajador de venta","ventas"],
-    ["acc-9","modificar stock","productos"],
-    ["acc-10","asignar a un item a un trabajador","ventas"],
-    ["acc-11","asignar ruc a factura","contador"],
+    ["mod-buy","compras - general","modulo de compras"],
+
+    ["mod-items-supplies","items - insumos","modulo de items"],
+    ["mod-items-config","items - config","modulo de items"],
+
+    ["mod-bill","facturacion - general","modulo de facturacion"],
+    ["mod-bill-rucs","facturacion - multiples rucs","modulo de facturacion"],
+
+    ["mod-workers","trabajadores - general","modulo de trabajadores"],
+    ["mod-workers-item","trabajadores - asignar trabajador a item","modulo de trabajadores"],
+
+    ["mod-sale-control","ventas - control","modulo de ventas"],
+    ["mod-sale-dscto","ventas - descuento","modulo de ventas"],
+    ["mod-sale-item","ventas - agregar item desde venta nueva","modulo de ventas"],
+    ["mod-sale-price","ventas - asignar precio a item desde venta nueva","modulo de ventas"],
+    ["mod-sale-dscto","ventas - descuento general","modulo de ventas"],
+
+    ["mod-box","caja - general","modulo de caja"],
+
+    ["mod-customer-nro","clientes - nro de documento","modulo de cliente"],
+    ["mod-customer-cel","clientes - celular","modulo de cliente"],
+    ["mod-customer-dir","clientes - direccion","modulo de cliente"],
+    ["mod-customer-email","clientes - correo","modulo de cliente"],
+    ["mod-customer-coment","clientes - comentario","modulo de cliente"]
+
+    /*["acc-1","borrar data de importante","data"],
+    ["acc-2","venta nueva - se puede agregar items","pos"],
+    ["acc-3","venta nueva - puede asignar precio","pos"],
+    ["acc-4","caja - modificar apertura","pos"],
+    ["acc-5","caja - modifica el cierre","pos"],
+    ["acc-6","cuentas - modificar el total de cuentas","cash"],
+    ["acc-7","cuentas - modificar el control de cuentas","cash"],
+    ["acc-8","ventas - asignar trabajador","pos"],
+    ["acc-9","items - modificar stock","items"],
+    ["acc-10","venta - asignar a un item a un trabajador","pos"],
+    ["acc-11","cuentas - asignar ruc a factura","cash"],*/
     //["pag-seccName-pageName","Seccion: Pagina: ","seccionName"]
 ];
 
 
-PagesData.forEach(seccion => {
+/*PagesData.forEach(seccion => {
     
     seccion.paginas.forEach(pagina => {
        
         accessData.push([
             "pag-" + seccion.seccion + "-" + pagina.name,
-            "Seccion: " + seccion.seccion + " Pagina: " + pagina.name,
+            "Pagina: " + seccion.title+ "-" + pagina.title,
             seccion.seccion
         ]);
     });
 
-});
+});*/
 
 accessData.forEach(acc => {
-    
+
     op_access.push({
         value:acc[0],
         show:acc[1],
