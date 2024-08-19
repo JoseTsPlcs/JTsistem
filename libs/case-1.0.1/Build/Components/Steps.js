@@ -40,6 +40,7 @@ class Steps extends ODD {
 
     #SetSteps({steps=[],stepIndex=0}){
 
+        steps = steps.filter(stp=>stp!=null);
         var v_steps = steps.map((step)=>{
 
             return {

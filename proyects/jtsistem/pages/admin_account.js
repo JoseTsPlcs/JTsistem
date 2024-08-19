@@ -5,7 +5,8 @@ $(document).ready(function() {
     success:({userData,pageData})=>{
 
       var acc_company_update = Access_Get(userData.access,"acc-4");
-      var acc_rucs = Access_Get(userData.access,"acc-11");
+      var acc_rucs = Access_Get(userData.access,"mod-bill-rucs");
+      var acc_workers = Access_Get(userData.access,"mod-workers");
 
       var gr = new Grid({
         parent:pageData.body,
@@ -78,19 +79,19 @@ $(document).ready(function() {
               ],
       
               fields:[
-                {panel:"main",name:"nombre",box:{tipe:1,value:""},select:"NAME"},
-                {panel:"main",name:"ruc",box:{tipe:1,value:""},select:"RUC"},
-                {panel:"main",name:"razon social",box:{tipe:1,value:""},select:"NAME_REAL"},
-                {panel:"main",name:"direccion",box:{tipe:1,value:""},select:"DIRECCION"},
-                {panel:"main",name:"telefono",box:{tipe:1,value:""},select:"TELF"},
-                {panel:"main",name:"correo",box:{tipe:1,value:""},select:"EMAIL"},
+                {panel:"main",name:"nombre",box:{tipe:1,value:""},select:"NAME",descripcion:"nombre de la empresa"},
+                {panel:"main",name:"ruc",box:{tipe:1,value:""},select:"RUC",descripcion:"ruc de la empresa"},
+                {panel:"main",name:"razon social",box:{tipe:1,value:""},select:"NAME_REAL",descripcion:"razon social de la empresa"},
+                {panel:"main",name:"direccion",box:{tipe:1,value:""},select:"DIRECCION",descripcion:"direccion de la empresa"},
+                {panel:"main",name:"telefono",box:{tipe:1,value:""},select:"TELF",descripcion:"numero de contacto de la empresa"},
+                {panel:"main",name:"correo",box:{tipe:1,value:""},select:"EMAIL",descripcion:"correo de contacto de la empresa"},
               ],
       
             }
           },
           {
             name:"areas",
-            active:true,
+            active:acc_workers,
             script:{
               parent:prnt_areas,
               title:"Areas de Trabajo",
@@ -133,7 +134,7 @@ $(document).ready(function() {
               inserts:[...ins_general],
 
               fields:[
-                {panel:"main",name:"nombre",select:"NAME",box:{tipe:1,class:"w-100"}},
+                {panel:"main",name:"nombre",select:"NAME",box:{tipe:1,class:"w-100"},descripcion:"nombre del area de trabajo"},
               ],
             }
           },
@@ -166,14 +167,14 @@ $(document).ready(function() {
               ],
 
               fields:[
-                {panel:"main",name:"ruc",box:bx_input,select:"RUC"},
-                {panel:"main",name:"razon social",box:bx_input,select:"RAZON_SOCIAL"},
+                {panel:"main",name:"ruc",box:bx_input,select:"RUC",descripcion:"ruc para emitir a sunat"},
+                {panel:"main",name:"razon social",box:bx_input,select:"RAZON_SOCIAL",descripcion:"razon social del ruc"},
               ],
             }
           },
           {
             name:"workes",
-            active:true,
+            active:acc_workers,
             script:{
               parent:prnt_workes,
               title:"Trabajadores",
@@ -238,9 +239,9 @@ $(document).ready(function() {
 
               fields:[
                 //{panel:"main",...fld_edit},
-                {panel:"main",name:"nombre",select:"NAME",box:{tipe:1,class:"w-100"}},
-                {panel:"main",name:"celular",select:"CEL_NUMBER",box:{tipe:1,class:"w-100"}},
-                {panel:"main",name:"area",select:"ID_WORK_AREA",box:{tipe:8,class:"w-100"},load:{name:"ld-areas",value:"value",show:"show"}},
+                {panel:"main",name:"nombre",select:"NAME",box:{tipe:1,class:"w-100"},descripcion:"nombre del trabajador"},
+                {panel:"main",name:"celular",select:"CEL_NUMBER",box:{tipe:1,class:"w-100"},descripcion:"numero de contacto del trabajador"},
+                {panel:"main",name:"area",select:"ID_WORK_AREA",box:{tipe:8,class:"w-100"},load:{name:"ld-areas",value:"value",show:"show"},descripcion:"area asignada al trabajador"},
               ],
 
               events:[

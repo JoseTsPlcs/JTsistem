@@ -1,3 +1,4 @@
+/* Estilos generales */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
 ::after,
@@ -140,5 +141,39 @@ a.sidebar-link:hover {
     transform: rotate(45deg);
     transition: all .2s ease-out;
 }
+
+
+/* Estilos para la barra horizontal */
+.horizontal-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%; /* Llena el ancho del contenedor */
+    background-color: #0e2238; /* Mismo color que la barra vertical */
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 999; /* Asegúrate de que esté debajo de la barra vertical */
+    display: flex;
+    justify-content: flex-end; /* Alinea el ícono a la derecha */
+}
+
+.horizontal-bar .btn {
+    color: #ffffff;
+    background-color: transparent;
+    border: none;
+    font-size: 24px; /* Tamaño del ícono */
+    padding: 0px;
+    transition: background-color 0.3s;
+}
+
+.horizontal-bar .btn:hover {
+    background-color: #1a2c40; /* Color de hover para coincidir con el color de la barra vertical */
+}
+
+
+
+
+
+
 
 

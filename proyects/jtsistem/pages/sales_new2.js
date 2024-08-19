@@ -3,21 +3,15 @@ $(document).ready(function() {
 
   new Pag_Base({
 
-    success:({userData,pageData,k})=>{
+    success:({userData,pageData})=>{
 
-      var acc_products_update = Access_Get(userData.access,"mod-sale-item");
-      var acc_price_update = Access_Get(userData.access,"mod-sale-price");
-      var acc_item_worker = Access_Get(userData.access,"mod-workers-item");
-      var acc_dscto = Access_Get(userData.access,"mod-sale-dscto");
-      var acc_bill = Access_Get(userData.access,"mod-bill");
-      var acc_supplies = false;//Access_Get(userData.access,"mod-items-supplies");
-      var acc_pays = Access_Get(userData.access,"mod-box");
-
-      var acc_customer_nro = Access_Get(userData.access,"mod-customer-nro");
-      var acc_customer_cel = Access_Get(userData.access,"mod-customer-cel");
-      var acc_customer_dir = Access_Get(userData.access,"mod-customer-dir");
-      var acc_customer_email = Access_Get(userData.access,"mod-customer-email");
-      var acc_customer_coment = Access_Get(userData.access,"mod-customer-coment");
+      var acc_products_update = true;//Access_Get(userData.access,"mod-sale-item");
+      var acc_price_update = true;//Access_Get(userData.access,"mod-sale-price");
+      var acc_item_worker = true;//Access_Get(userData.access,"mod-workers");
+      var acc_dscto = true;
+      var acc_bill = true;
+      var acc_supplies = true;
+      var acc_pays = true;
 
       ld_workers.conditions[0].value = company_id;
 
@@ -36,7 +30,7 @@ $(document).ready(function() {
         ],
         attributes:[
           {y:1,x:0,attributes:[{name:"class",value:"col-12 col-md-4"}/*,{name:"style",value:"background-color: lightcoral;"}*/]},
-          {y:1,x:1,attributes:[{name:"class",value:"col-12 col-md-8 px-"+paddinForms + " pt-" + paddinForms + " pt-md-0"}/*,{name:"style",value:"background-color: lightblue; min-height: 600px; flex: 1;"}*/]},
+          {y:1,x:1,attributes:[{name:"class",value:"col-12 col-md-8 px-"+paddinForms}/*,{name:"style",value:"background-color: lightblue; min-height: 600px; flex: 1;"}*/]},
         ],
       });
 
@@ -80,30 +74,26 @@ $(document).ready(function() {
               }
             }:null
           ),
-          (
-            acc_pays?
-            {
-              name:'<i class="bi bi-currency-dollar"></i> pagos',
-              window:{
-                //head:false,
-                grid:{cols:[[12],[12]]},
-              }
+          {
+            name:'<i class="bi bi-currency-dollar"></i> pagos',
+            window:{
+              //head:false,
+              grid:{cols:[[12],[12]]},
             }
-            :null
-          ),
+          },
         ],
       });
 
       var stp_items = stps.GetStep({stepIndex:0});
       var stp_supplies = acc_supplies ? stps.GetStep({stepIndex:1}) : null;
-      var stp_pays = acc_pays ? stps.GetStep({stepIndex:(acc_supplies?2:1)}) : null;
+      var stp_pays = stps.GetStep({stepIndex:(acc_supplies?2:1)});
 
       var bx_product_update = stps.GetStep({stepIndex:0}).window.Conteiner_GetColData({x:0,y:0}).boxs[0];
       if(!acc_products_update) bx_product_update.Hide();
 
       
 
-      var md = acc_pays ? new Modal({parent:stp_pays.window.Conteiner_GetColData({x:0,y:1}).col}) : null;
+      var md = new Modal({parent:stp_pays.window.Conteiner_GetColData({x:0,y:1}).col});
       var md2 = new Modal({parent:prnt_customer});
       var md3 = new Modal({parent:stp_items.window.Conteiner_GetColData({x:0,y:2}).col});
       var md4 = new Modal({parent:stp_items.window.Conteiner_GetColData({x:0,y:3}).col});
@@ -111,8 +101,7 @@ $(document).ready(function() {
       var md_item = new Modal({parent:prnt_modal_item});
 
       var prnt_items_fm = md3.GetContent();
-      var prnt_pays = acc_pays ? stp_pays.window.Conteiner_GetColData({x:0,y:1}).col : null;
-      var prnt_paymd = acc_pays ? md.GetContent() : null;
+      //var prnt_checkin = stp_vehi.window.Conteiner_GetColData({x:0,y:0}).col;
       var prnt_item = md_item.GetContent();
       var prnt_supplies = stp_supplies ? stp_supplies.window.Conteiner_GetColData({x:0,y:0}).col : null;
 
@@ -130,12 +119,11 @@ $(document).ready(function() {
             script:{
               parent:prnt_sale,
               title:"Venta",
-              //h:"100%",
               panels:[
-                {col:12,tipe:"form",title:"principal",tag:"Informacion",h:0,show:true,blocked:true},
-                {col:12,tipe:"form",title:"total",tag:"Total",h:0,show:true,blocked:true},
-                {col:12,tipe:"form",title:"cliente",tag:"Datos del Cliente",h:0,show:true,blocked:true},
-                (userData.company.tipe=="3"?{col:12,tipe:"form",title:"inmueble",tag:"Inmueble",h:0,blocked:true,show:true}:null)
+                {col:12,tipe:"form",title:"principal",tag:"Informacion",h:0,show:false,blocked:false},
+                {col:12,tipe:"form",title:"total",tag:"Total",h:0,show:false,blocked:false},
+                {col:12,tipe:"form",title:"cliente",tag:"Datos del Cliente",h:0,show:false,blocked:false},
+                (userData.company.tipe=="3"?{col:12,tipe:"form",title:"inmueble",tag:"Inmueble",h:0,blocked:false,show:false}:null)
               ],
               //breaklevel:"sm",
               stateStart:"block",
@@ -144,11 +132,20 @@ $(document).ready(function() {
                 {
                     name:"reload",
                     tools:[
-                        {name:"load",show:true, descripcion:"selecciona para cargar lista de cliente"},
-                        {name:"question",show:true},
+                        {name:"config",show:false},
+                        {name:"load",show:true},
+                        
+                        {name:"excel",show:false},
+                        {name:"pdf",show:false},
+            
                         {name:"sizes",show:false,value:1},
                         {name:"reload",show:true},
                         {name:"update",show:true},
+                        {name:"new",show:false},
+                        {name:"insert",show:false},
+                        {name:"cancel",show:false},
+                        
+                        {name:"pages",show:false},
                     ],
                 },
                 {
@@ -159,7 +156,6 @@ $(document).ready(function() {
                         
                         {name:"excel",show:false},
                         {name:"pdf",show:false},
-                        {name:"question",show:true},
             
                         {name:"sizes",show:false,value:1},
                         {name:"reload",show:false},
@@ -179,7 +175,6 @@ $(document).ready(function() {
                       
                       {name:"excel",show:false},
                       {name:"pdf",show:false},
-                      {name:"question",show:true},
           
                       {name:"sizes",show:false,value:1},
                       {name:"reload",show:false},
@@ -189,21 +184,6 @@ $(document).ready(function() {
                       {name:"cancel",show:false},
                       
                       {name:"pages",show:false},
-                  ],
-                }
-              ],
-              questions:[
-                {
-                  value:"v1",
-                  elementsInfo:[
-                    {
-                      id:"bodyMain_conteiner_undefined_row_1_div_1_1_conteiner_undefined_row_0_div_0_0_block5_button0",
-                      descripcion:"selecciona para mostrar lista de productos/servicos",
-                    },
-                    {
-                      id:"bodyMain_conteiner_undefined_row_1_div_1_1_conteiner_undefined_row_0_div_0_0_block5_button1",
-                      descripcion:"selecciona para mostrar lista de pagos",
-                    },
                   ],
                 }
               ],
@@ -247,6 +227,7 @@ $(document).ready(function() {
                   selects:[
                     {table:'customers', field:'ID_CUSTOMER',as:"value"},
                     {table:'customers', field:'NAME',as:"show"},
+                    //{table:'customers', field:'ID_CUSTOMER_TIPE'},
                     {table:'customers', field:'COMPANY'},
                     {table:'customers', field:'NRO_DOCUMENT'},
                     {table:'customers', field:'PHONE'},
@@ -324,33 +305,34 @@ $(document).ready(function() {
 
               fields:[
                 
-                {panel:"principal",col:12,y:1,name:"fecha de emision",box:bx_date,select:"DATE_EMMIT",descripcion:"se puede seleccionar fecha de emision de la venta, tambien funciona para programar ventas futuras"},
-                {panel:"principal",col:12,y:2,tipe:1,name:"estado",box:bx_op({ops:op_sales_status}),select:"ID_STATUS",descripcion:"el estado de la venta son 5 (cotizacion, confirmado, en proceso, terminado y anulado)"},
-                {panel:"principal",col:12,y:2,tipe:1,name:"cancelado",box:(!acc_pays?{...bx_op({ops:op_sales_paid}),value:0}:{...bx_shw,options:op_sales_paid}),select:"PAID",descripcion: ((acc_pays?"muestra":"selecciona") + " si la venta ya fue pagada")},
-                (acc_bill?{panel:"principal",col:12,y:3,tipe:1,name:"documento de venta",box:bx_op({ops:op_sales_document}),select:"ID_DOCUMENT",descripcion:"selecciona si desea emitir nota de pago, boleta o factura"}:null),
-                {panel:"principal",col:12,y:8,name:"comentario*",box:{tipe:9,value:""},select:"COMMENT",descripcion:"coloca algun comentario para que el equipo lo pueda visualizar"},
+                {panel:"principal",col:12,y:1,name:"fecha de emision",box:bx_date,select:"DATE_EMMIT"},
+                {panel:"principal",col:12,y:2,tipe:1,name:"estado",box:bx_op({ops:op_sales_status}),select:"ID_STATUS"},
+                {panel:"principal",col:12,y:2,tipe:1,name:"cancelado",box:{...bx_op({ops:op_sales_paid}),value:0},select:"PAID"},
+                (acc_bill?{panel:"principal",col:12,y:3,tipe:1,name:"documento de venta",box:bx_op({ops:op_sales_document}),select:"ID_DOCUMENT"}:null),
+                {panel:"principal",col:12,y:8,name:"comentario*",box:{tipe:9,value:""},select:"COMMENT"},
                 (acc_item_worker?fld_worker({panel:"principal",select:"ID_WORK_PROCESS",edit:true}):null),
                 //{panel:"principal",col:12,colAllLevel:true,y:0,name:"trabajador asignado",box:{tipe:8},select:"ID_WORK_PROCESS",load:{name:"ld-workers",show:"show"}},
 
                 
-                //{panel:"total",col:12,y:6,name:"productos",box:bx_money},
-                //{panel:"total",col:12,y:6,name:"servicios",box:bx_money},
-                (acc_dscto?{panel:"total",col:12,y:6,name:"total sin descuento",box:bx_money,select:"TOTAL_WITHOUT_DSCTO",descripcion:"total de la venta sin contar el descuento"}:null),
-                (acc_dscto?{panel:"total",col:12,y:6,name:"descuento%",box:{tipe:1,value:0},select:"DSCTO",descripcion:"ingresar descuento, se descontara al total de la venta"}:null),
-                //(acc_dscto?{panel:"total",col:12,y:6,name:"total del descuento",box:bx_money}:null),
-                {panel:"total",col:12,y:4,name:"total",box:bx_moneyh1,select:"TOTAL",descripcion:"se muestra el total de la venta"},
-                (acc_pays?{panel:"total",col:12,y:7,name:"pagado",box:bx_money,descripcion:"se muestra el total que se ha pagado"}:null),
+                {panel:"total",col:12,y:6,name:"productos",box:bx_money},
+                {panel:"total",col:12,y:6,name:"servicios",box:bx_money},
+                (acc_dscto?{panel:"total",col:12,y:6,name:"total sin descuento",box:bx_money,select:"TOTAL_WITHOUT_DSCTO"}:null),
+                (acc_dscto?{panel:"total",col:12,y:6,name:"descuento%",box:{tipe:1,value:0},select:"DSCTO"}:null),
+                (acc_dscto?{panel:"total",col:12,y:6,name:"total del descuento",box:bx_money}:null),
+                {panel:"total",col:12,y:4,name:"total",box:bx_moneyh1,select:"TOTAL"},
+                {panel:"total",col:12,y:7,name:"pagado",box:bx_money},
 
-                {panel:"cliente",col:8,colAllLevel:true,y:0,name:"cliente",box:{tipe:8,options:[{value:"null",show:"Seleccionar Cliente"}]},select:"ID_CUSTOMER",load:{name:"customers",show:"show"},descripcion:"seleccionar cliente"},
-                {panel:"cliente",col:2,colAllLevel:true,...fld_edit,descripcion:"seleccionar para editar el cliente seleccionado"},
-                {panel:"cliente",col:2,colAllLevel:true,...fld_add,descripcion:"seleccionar para añadir un nuevo cliente"},
+                {panel:"cliente",col:8,colAllLevel:true,y:0,name:"cliente",box:{tipe:8,options:[{value:"null",show:"Seleccionar Cliente"}]},select:"ID_CUSTOMER",load:{name:"customers",show:"show"}},
+                {panel:"cliente",col:2,colAllLevel:true,...fld_edit},
+                {panel:"cliente",col:2,colAllLevel:true,...fld_add},
                 //{panel:"cliente",col:12,y:1,name:"tipo",box:{tipe:0}},
-                (acc_customer_nro?{panel:"cliente",col:12,y:3,name:"cliente documento",box:{tipe:0,options:op_identity_document_tipe},descripcion:"documento del cliente"}:null),
-                (acc_customer_nro?{panel:"cliente",col:12,y:4,name:"nro de documento",box:{tipe:0},descripcion:"numero del documento del cliente"}:null),
-                (acc_customer_cel?{panel:"cliente",col:12,y:4,name:"telefono",box:{tipe:0},descripcion:"telefono del cliente"}:null),
-                (acc_customer_dir?{panel:"cliente",col:12,y:4,name:"direccion",box:{tipe:0},descripcion:"direccion del cliente"}:null),
-                (acc_customer_email?{panel:"cliente",col:12,y:4,name:"correo",box:{tipe:0},descripcion:"correo del cliente"}:null),
-                (acc_customer_coment?{panel:"cliente",col:12,y:4,name:"comentario",box:{tipe:0},descripcion:"comentaro sobre el cliente"}:null),
+                {panel:"cliente",col:12,y:2,name:"empresa",box:{tipe:0,options:[{value:0,show:"natural"},{value:1,show:"empresa"}]}},
+                {panel:"cliente",col:12,y:3,name:"cliente documento",box:{tipe:0,options:op_identity_document_tipe}},
+                {panel:"cliente",col:12,y:4,name:"nro de documento",box:{tipe:0}},
+                {panel:"cliente",col:12,y:4,name:"telefono",box:{tipe:0}},
+                {panel:"cliente",col:12,y:4,name:"direccion",box:{tipe:0}},
+                {panel:"cliente",col:12,y:4,name:"correo",box:{tipe:0}},
+                {panel:"cliente",col:12,y:4,name:"comentario",box:{tipe:0}},
 
                 (userData.company.tipe=="2"?{panel:"principal",col:8,colAllLevel:true,y:0,name:"vehiculo",box:{tipe:8,value:"null",options:[{value:"null",show:"seleccionar vehiculo"}],class:"w-100"},select:"ID_ITEM",load:{name:"ld-items",value:"value",show:"show"}}:null),
                 (userData.company.tipe=="2"?{panel:"principal",col:2,colAllLevel:true,name:"edit",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit-item"}:null),
@@ -374,7 +356,7 @@ $(document).ready(function() {
 
                       var products_total = cr_items.GetValues({fieldName:"precio total"});
                       var products_tipe = cr_items.GetValues({fieldName:"tipo"});
-                      var pays = cr_pays ? cr_pays.GetValues({fieldName:"total"}) : null;
+                      var pays = cr_pays.GetValues({fieldName:"total"});
                       var dscto = acc_dscto ? parseFloat(cr_sale.GetValue({fieldName:"descuento%",y:0})) : 0;
 
                       var total_without_dscto = 0;
@@ -398,15 +380,15 @@ $(document).ready(function() {
                       }
                       total_dscto = (dscto/100) * total_without_dscto;
                       total_with_dscto = total_without_dscto - total_dscto;
-                      total_payed = pays ? pays.reduce((acc,v)=>{return acc + parseFloat(v)},0) : 0;
+                      total_payed = pays.reduce((acc,v)=>{return acc + parseFloat(v)},0);
 
 
-                      if(acc_dscto) cr_sale.SetValuesToBox({fieldName:"total sin descuento",values:[total_without_dscto]});
+                      cr_sale.SetValuesToBox({fieldName:"total sin descuento",values:[total_without_dscto]});
                       cr_sale.SetValuesToBox({fieldName:"productos",values:[total_product]});
                       cr_sale.SetValuesToBox({fieldName:"servicios",values:[total_service]});
                       if(acc_dscto) cr_sale.SetValuesToBox({fieldName:"total del descuento",values:[total_dscto]});
                       cr_sale.SetValuesToBox({fieldName:"total",values:[total_with_dscto]});
-                      if(acc_pays) cr_sale.SetValuesToBox({fieldName:"pagado",values:[total_payed]});
+                      cr_sale.SetValuesToBox({fieldName:"pagado",values:[total_payed]});
 
 
                       var primary = cr_sale.Reload_GetData({})[0]["ID_SALE"];
@@ -423,7 +405,7 @@ $(document).ready(function() {
                     action:({k})=>{
 
                       var total = k.GetValue({fieldName:"total",y:0});
-                      var pagado = acc_pays ? k.GetValue({fieldName:"pagado",y:0}) : 0;
+                      var pagado = k.GetValue({fieldName:"pagado",y:0});
 
                       var cancelado_lasValue = k.GetValue({fieldName:"cancelado",y:0});
                       var cancelado_value = total > 0 && total == pagado ? 1 : 0;
@@ -459,12 +441,12 @@ $(document).ready(function() {
 
                         //k.SetValuesToBox({fieldName:"tipo",values:[0]});
                         //k.SetValuesToBox({fieldName:"empresa",values:[customer_line["COMPANY"]]});
-                        if(acc_customer_nro) k.SetValuesToBox({fieldName:"cliente documento",values:[customer_line["COMPANY"]]});
-                        if(acc_customer_nro) k.SetValuesToBox({fieldName:"nro de documento",values:[customer_line["NRO_DOCUMENT"]]});
-                        if(acc_customer_cel) k.SetValuesToBox({fieldName:"telefono",values:[customer_line["PHONE"]]});
-                        if(acc_customer_dir) k.SetValuesToBox({fieldName:"direccion",values:[customer_line["DIRECCION"]]});
-                        if(acc_customer_email) k.SetValuesToBox({fieldName:"correo",values:[customer_line["EMAIL"]]});
-                        if(acc_customer_coment) k.SetValuesToBox({fieldName:"comentario",values:[customer_line["DESCRIPCION"]]});
+                        k.SetValuesToBox({fieldName:"cliente documento",values:[customer_line["COMPANY"]]});
+                        k.SetValuesToBox({fieldName:"nro de documento",values:[customer_line["NRO_DOCUMENT"]]});
+                        k.SetValuesToBox({fieldName:"telefono",values:[customer_line["PHONE"]]});
+                        k.SetValuesToBox({fieldName:"direccion",values:[customer_line["DIRECCION"]]});
+                        k.SetValuesToBox({fieldName:"correo",values:[customer_line["EMAIL"]]});
+                        k.SetValuesToBox({fieldName:"comentario",values:[customer_line["DESCRIPCION"]]});
                       }
 
                     }
@@ -550,11 +532,109 @@ $(document).ready(function() {
             name:"customer",
             active:true,
             script:{
-              ...scr_customer_md({
-                userData,
-                parent:md2.GetContent(),
-                modal:md2,
-              })
+              parent:md2.GetContent(),
+              title:"cliente",
+              panels:[{col:12,y:0,title:"main",tipe:"form"}],
+              stateStart:"block",
+              afterInsert:"block",
+              afterUpdate:"block",
+              afterCancel:"block",
+              stateTools:[
+                {
+                    name:"reload",
+                    tools:[
+                        {name:"config",show:false},
+                        {name:"load",show:true},
+                        
+                        {name:"excel",show:false},
+                        {name:"pdf",show:false},
+            
+                        {name:"sizes",show:false,value:1},
+                        {name:"reload",show:true},
+                        {name:"update",show:true},
+                        {name:"new",show:false},
+                        {name:"insert",show:false},
+                        {name:"cancel",show:true},
+                        
+                        {name:"pages",show:false},
+                    ],
+                },
+                {
+                    name:"new",
+                    tools:[
+                        {name:"config",show:false},
+                        {name:"load",show:true},
+                        
+                        {name:"excel",show:false},
+                        {name:"pdf",show:false},
+            
+                        {name:"sizes",show:false,value:1},
+                        {name:"reload",show:false},
+                        {name:"update",show:false},
+                        {name:"new",show:false},
+                        {name:"insert",show:true},
+                        {name:"cancel",show:true},
+                        
+                        {name:"pages",show:false},
+                    ],
+                }
+              ],
+
+              tableMain:"customers",
+              selects:[
+                {table:'customers', field:'ID_CUSTOMER',primary:true},
+                {table:'customers', field:'ID_COMPANY'},
+                {table:'customers', field:'NAME'},
+                //{table:'customers', field:'ID_CUSTOMER_TIPE'},
+                {table:'customers', field:'COMPANY'},
+                {table:'customers', field:'NRO_DOCUMENT'},
+                {table:'customers', field:'PHONE'},
+                {table:'customers', field:'EMAIL'},
+                {table:'customers', field:'DESCRIPCION'},
+                {table:'customers', field:'DIRECCION'},
+              ],
+              conditions:[{
+                table:"customers",
+                field:"ID_COMPANY",
+                inter:"=",
+                value:company_id,
+              }],
+              inserts:ins_general,
+
+              fields:[
+                {panel:"main",col:8,name:"cliente",box:bx_input,select:"NAME"},
+                {panel:"main",col:4,tipe:0,name:"empresa",box:{tipe:6,name:"empresa",value:0},select:"COMPANY"},
+                {panel:"main",col:6,name:"documento",box:{tipe:0,options:op_identity_document_tipe},select:"COMPANY"},
+                {panel:"main",col:6,name:"nro documento",box:bx_input,select:"NRO_DOCUMENT"},
+                
+                {panel:"main",col:12,name:"telefono",box:{tipe:1,value:""},select:"PHONE"},
+                {panel:"main",col:12,name:"correo",box:{tipe:1,value:""},select:"EMAIL"},
+                {panel:"main",col:12,name:"direccion",box:{tipe:1,value:""},select:"DIRECCION"},
+                {panel:"main",col:12,tipe:2,name:"descripcion",box:{tipe:9,value:""},select:"DESCRIPCION"},
+              ],
+
+              events:[
+                {
+                  name:"modalSetActive",
+                  actions:[{
+                      action:({k,active})=>{
+
+                        md2.SetActive({active});
+                        //if(!active) conections.Crud_GetBuild({name:"sale"}).CallEvent({name:"customerUpdate"});
+                      }
+                  }]
+                },
+                {
+                  name:"insertAfter",
+                  actions:[{
+                    action:({k})=>{
+
+                      //var fm_sale = conections.Crud_GetBuild({name:"sale"});
+
+                    }
+                  }]
+                }
+              ],
             }
           },
           {
@@ -570,7 +650,6 @@ $(document).ready(function() {
                   tools:[
                       {name:"config",show:false},
                       {name:"load",show:true},
-                      {name:"question",show:true},
                       
                       {name:"excel",show:false},
                       {name:"pdf",show:false},
@@ -591,7 +670,6 @@ $(document).ready(function() {
                   tools:[
                       {name:"config",show:false},
                       {name:"load",show:false},
-                      {name:"question",show:true},
                       
                       {name:"excel",show:false},
                       {name:"pdf",show:false},
@@ -607,43 +685,11 @@ $(document).ready(function() {
                       {name:"pages",show:false},
                   ],
                 },
-                {
-                  name:"block",
-                  tools:[
-                      {name:"config",show:false},
-                      {name:"load",show:true},
-                      {name:"question",show:true},
-                      
-                      {name:"excel",show:false},
-                      {name:"pdf",show:false},
-          
-                      {name:"sizes",show:false,value:999},
-                      {name:"reload",show:false},
-                      {name:"update",show:false},
-                      {name:"new",show:false},
-                      {name:"insert",show:false},
-                      {name:"cancel",show:false},
-                      {name:"addLine",show:false},
-                      
-                      {name:"pages",show:false},
-                  ],
-                },
               ],
               stateStart:"block",
               afterInsert:"reload",
               //afterUpdate:"block",
               newLinesStart:1,
-              questions:[
-                {
-                  value:"v1",
-                  elementsInfo:[
-                    {
-                      id:"bodyMain_conteiner_undefined_row_1_div_1_1_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_0_div_0_0_block5_",
-                      descripcion:"selecciona para añadir un nuevo producto",
-                    },
-                  ],
-                }
-              ],
 
               tableMain:"sales_products",
               selects:[
@@ -715,15 +761,15 @@ $(document).ready(function() {
               ],
 
               fields:[
-                {panel:"main",...fld_delete,attributes:att_btn,descripcion:"selecciona para borrar (producto/servicio) de la venta"},
-                (acc_products_update?{panel:"main",...fld_edit,attributes:att_btn,descripcion:"selecciona para editar informacion del (producto/servicio)"}:null),
-                {panel:"main",name:"producto-servicio",box:{tipe:8,class:"w-100"},attributes:att_ln,select:"ID_PRODUCT",load:{name:"products-services",show:"show"},descripcion:"selecciona (producto/servicio) a vender"},
-                {panel:"main",name:"tipo",box:{tipe:0,options:op_products_tipe},attributes:att_shw,select:"ID_PRODUCT_TIPE",descripcion:"muestra el tipo de (producto/servicio)"},
-                {panel:"main",name:"unidad",box:bx_shw,attributes:att_shw,select:"SIMBOL",descripcion:"muestra la unidad del (producto/servicio)"},
-                {panel:"main",name:"cantidad",box:bx_cant,attributes:att_cnt,select:"CANT",descripcion:"muestra la cantidad de (producto/servicio) que se esta vendiendo"},
-                {panel:"main",name:"precio unitario",box:(acc_price_update?{tipe:1,value:0}:bx_money),attributes:att_shw,select:"PRICE_UNIT",descripcion:((acc_price_update?"seleccion":"muestra")+" precio unitario del (producto/servicio)")},
-                {panel:"main",name:"precio total",box:(acc_price_update?{tipe:1,value:0}:bx_money),attributes:att_shw,select:"PRICE_TOTAL",descripcion:((acc_price_update?"seleccion":"muestra")+" precio total del (producto/servicio)")},
-                (acc_item_worker?{panel:"main",name:"trabajador asignado",attributes:att_ln50,box:{tipe:8,value:"null",class:"w-100"},select:"ID_WORKER",load:{name:"ld-workers",show:"show",value:"value"},descripcion:"selecciona al trabajador asignado al (producto/servicio)"}:null)
+                {panel:"main",...fld_delete,attributes:att_btn},
+                (acc_products_update?{panel:"main",...fld_edit,attributes:att_btn}:null),
+                {panel:"main",name:"producto-servicio",box:{tipe:8,class:"w-100"},attributes:att_ln,select:"ID_PRODUCT",load:{name:"products-services",show:"show"}},
+                {panel:"main",name:"tipo",box:{tipe:0,options:op_products_tipe},attributes:att_shw,select:"ID_PRODUCT_TIPE"},
+                {panel:"main",name:"unidad",box:bx_shw,attributes:att_shw,select:"SIMBOL"},
+                {panel:"main",name:"cantidad",box:bx_cant,attributes:att_cnt,select:"CANT"},
+                {panel:"main",name:"precio unitario",box:(acc_price_update?{tipe:1,value:0}:bx_money),attributes:att_shw,select:"PRICE_UNIT"},
+                {panel:"main",name:"precio total",box:(acc_price_update?{tipe:1,value:0}:bx_money),attributes:att_shw,select:"PRICE_TOTAL"},
+                (acc_item_worker?{panel:"main",name:"trabajador asignado",attributes:att_ln50,box:{tipe:8,value:"null",class:"w-100"},select:"ID_WORKER",load:{name:"ld-workers",show:"show",value:"value"}}:null)
               ],
               events:[
                 {
@@ -961,11 +1007,11 @@ $(document).ready(function() {
           },
           {
             name:"pays",
-            active:acc_pays,
+            active:true,
             script:{
               ...scr_fm_pays({
                 head:false,
-                parent:prnt_pays,
+                parent:stp_pays.window.Conteiner_GetColData({x:0,y:0}).col,
                 stateTools:stTls_tb_maid,
 
                 tableName:"sales_payments",
@@ -1010,9 +1056,9 @@ $(document).ready(function() {
           },
           {
             name:"pay",
-            active:acc_pays,
+            active:true,
             script:{
-              parent:prnt_paymd,
+              parent:md.GetContent(),
               //parent:stps.GetStep({stepIndex:3}).window.Conteiner_GetColData({x:0,y:1}).col,
               ...scr_pay({
                 tagValue:1,
@@ -1696,34 +1742,6 @@ $(document).ready(function() {
         ],
 
       });
-      
-      //tutorial
-
-
-      k.AddTutorialtoPage({
-        name:"¿como insertar nueva venta?",
-        tutorialClass: new Tutorial({
-          elementsInfo:[
-            {
-              id:"bodyMain_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_3_div_1_3_block5_btn4",
-              descripcion:'presiona el boton "insertar" para agregar nueva venta',
-            },
-          ],
-        })
-      });
-
-      k.AddTutorialtoPage({
-        name:"¿como usar los campos?",
-        tutorialClass: new Tutorial({
-          elementsInfo:[
-            {
-              id:"bodyMain_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_3_div_1_3_block5_btn4",
-              descripcion:'presiona el boton "insertar" para agregar nueva venta',
-            },
-          ],
-        })
-      });
-
 
     }
   });

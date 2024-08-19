@@ -162,19 +162,19 @@ class Window extends ODD {
     return info;
   }
 
-  Fields_GetBox({fieldName,fieldIndex}){
+  fieldGetLabel({fieldName,fieldIndex}){
 
-    //console.log("window->fieldName:",fieldName);
-    //console.log("window->field: estado", this._fields.find(f=>f.name="estado"));
-    
     var field = this.Fields_GetInfo({fieldIndex,fieldName});
-    //console.log(field);
     var grid = this.Conteiner_Grid();
     var coldata = grid.GetColData({x:field.x,y:field.y});
     
     if(coldata==null)console.log("window - fields_getbox, params:",this._fields,fieldName,fieldIndex,"results:",coldata);
-    var label = coldata.labels[0];
-    return label.GetBox();
+    return coldata.labels[0];
+  }
+
+  Fields_GetBox({fieldName,fieldIndex}){
+
+    return this.fieldGetLabel({fieldName,fieldIndex}).GetBox();
   }
 
   Fields_GetValue({fieldName,fieldIndex}){

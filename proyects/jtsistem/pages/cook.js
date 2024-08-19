@@ -5,8 +5,7 @@ $(document).ready(function() {
 
     success:({userData,pageData})=>{
 
-      var acc_work_update = Access_Get(userData.access,"acc-8");
-      var acc_item_worker = Access_Get(userData.access,"acc-10");
+      var acc_work_update = Access_Get(userData.access,"mod-workers");
 
       var gr = new Grid({
         parent:pageData.body,
@@ -51,7 +50,7 @@ $(document).ready(function() {
             script:{
               parent:prnt_sales_tb,
               parent:gr.GetColData({x:0,y:1}).col,
-              title:"control de ventas",head:false,
+              title:pageData.title,head:true,
               panels:[{col:12,y:0,title:"main",tipe:"table",h:600}],
               stateTools:stTls_tb_all,
           
@@ -93,9 +92,8 @@ $(document).ready(function() {
           
               configShow:false,
               filters:[
-                {col:12,y:0,name:"cliente",box:bx_input,select:{table:"customer_client",field:"NAME"}},
-                
-                {col:12,y:2,name:"estado",box:{tipe:4,options:op_sales_status,value:[op_sales_status[1].show,op_sales_status[2].show]},select:{table:"sales",field:"ID_STATUS"}},
+                {col:12,y:0,name:"cliente",box:bx_input,select:{table:"customer_client",field:"NAME"},descripcion:"buscar por nombre del cliente"},   
+                {col:12,y:2,name:"estado",box:{tipe:4,options:op_sales_status,value:[op_sales_status[1].show,op_sales_status[2].show]},select:{table:"sales",field:"ID_STATUS"},descripcion:"buscar por estado de venta"},
                 //{col:12,y:2,name:"cancelado",box:{tipe:4,options:op_sales_paid},select:{table:"sales",field:"PAID"}},
                 //{col:12,y:2,name:"documento",box:{tipe:4,options:op_sales_document},select:{table:"sales",field:"ID_DOCUMENT"}},
                 //{col:12,name:"emitido",box:{tipe:4,options:op_document_emmit},select:{table:"sales",field:"DOCUMENT_EMMIT"}},
@@ -105,14 +103,14 @@ $(document).ready(function() {
           
                 {panel:"main",...fld_edit},
                 
-                {panel:"main",name:"fecha de emision",attributes:[{name:"style",value:"min-width:160px"}],box:{tipe:0},select:"DATE_EMMIT"},
-                {panel:"main",name:"cliente",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"NAME"},
-                {panel:"main",name:"trabajador",attributes:[{name:"style",value:"min-width: 400px;"}],box:(acc_work_update?{tipe:8,class:"w-100"}:{tipe:0}),select:"ID_WORK_PROCESS",load:{name:"ld-workers",show:"show",value:"value"}},
+                {panel:"main",name:"fecha de emision",attributes:[{name:"style",value:"min-width:160px"}],box:{tipe:0},select:"DATE_EMMIT",descripcion:"muestra la fecha de emision"},
+                {panel:"main",name:"cliente",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"NAME",descripcion:"muestra el nombre del cliente"},
+                (acc_work_update?{panel:"main",name:"trabajador",attributes:[{name:"style",value:"min-width: 400px;"}],box:({tipe:8,class:"w-100"}),select:"ID_WORK_PROCESS",load:{name:"ld-workers",show:"show",value:"value"},descripcion:"asigna un trabajador a la venta"}:null),
                 (userData.company.tipe=="2"?{panel:"main",name:"vehiculo",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"ITEM_NAME"}:null),
-                {panel:"main",name:"estado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_status},select:"ID_STATUS"},
+                {panel:"main",name:"estado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_status},select:"ID_STATUS",descripcion:"muestra el estado de venta"},
                 //{panel:"main",name:"cancelado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_paid},select:"PAID"},
 
-                {panel:"main",name:"comentario",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0,value:""},select:"COMMENT"},
+                {panel:"main",name:"comentario",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0,value:""},select:"COMMENT",descripcion:"muestra el comentario de la venta"},
 
               ],
               events:[
@@ -215,13 +213,13 @@ $(document).ready(function() {
 
               fields:[
                 
-                {panel:"main",name:"fecha de emision",box:{tipe:0},select:"DATE_EMMIT"},
-                {panel:"main",name:"cliente",box:{tipe:0},select:"NAME"},
-                {panel:"main",name:"estado",box:{tipe:3,options:[op_sales_status[1],op_sales_status[2],op_sales_status[3]]},select:"ID_STATUS"},
-                {panel:"main",name:"trabajador",box:(acc_work_update?{tipe:8,class:"w-100"}:{tipe:0}),load:{name:"ld-workers",show:"show"},select:"ID_WORK_PROCESS"},
+                {panel:"main",name:"fecha de emision",box:{tipe:0},select:"DATE_EMMIT",descripcion:"muestra la fecha de emision"},
+                {panel:"main",name:"cliente",box:{tipe:0},select:"NAME",descripcion:"muestra el nombre del cliente"},
+                {panel:"main",name:"estado",box:{tipe:3,options:[op_sales_status[1],op_sales_status[2],op_sales_status[3]]},select:"ID_STATUS",descripcion:"selecciona el estado de la venta"},
+                (acc_work_update?{panel:"main",name:"trabajador",box:(acc_work_update?{tipe:8,class:"w-100"}:{tipe:0}),load:{name:"ld-workers",show:"show"},select:"ID_WORK_PROCESS",descripcion:"selecciona trabajador a la venta"}:null),
                 //{panel:"main",name:"cancelado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_paid},select:"PAID"},
 
-                {panel:"main",name:"comentario",box:{tipe:9,value:""},select:"COMMENT"},
+                {panel:"main",name:"comentario",box:{tipe:9,value:""},select:"COMMENT",descripcion:"edita comentario de la venta"},
 
               ],
 
@@ -251,7 +249,7 @@ $(document).ready(function() {
                   {name:"edit",active:false},
                   {name:"precio unitario",active:false},
                   {name:"precio total",active:false},
-                  {name:"trabajador asignado",state:"edit"},
+                  {name:"trabajador asignado",state:"edit",active:acc_work_update},
                   {name:"check",state:"edit",active:true},
                 ],
               }),
@@ -346,8 +344,8 @@ $(document).ready(function() {
 
               fields:[
                 {panel:"main",...fld_delete,attributes:att_btn},
-                {panel:"main",name:"insumo",attributes:att_ln,box:{tipe:8,class:"w-100"},select:"ID_SUPPLIE",load:{name:"supplies",show:"show"}},
-                {panel:"main",name:"cantidad",attributes:att_cnt,box:bx_cant,select:"CANT"},
+                {panel:"main",name:"insumo",attributes:att_ln,box:{tipe:8,class:"w-100"},select:"ID_SUPPLIE",load:{name:"supplies",show:"show"},descripcion:"asigna insumo utilizado"},
+                {panel:"main",name:"cantidad",attributes:att_cnt,box:bx_cant,select:"CANT",descripcion:"asigna cantidad de insumos"},
               ],
             }
           },

@@ -123,6 +123,21 @@ $(document).ready(function() {
                     ],
                   }
                 ],
+                questions:[
+                  {
+                    value:"v1",
+                    elementsInfo:[
+                      {
+                        id:"bodyMain_conteiner_undefined_row_1_div_1_1_conteiner_undefined_row_0_div_0_0_block5_button0",
+                        descripcion:"selecciona para mostrar lista de productos/insumos",
+                      },
+                      {
+                        id:"bodyMain_conteiner_undefined_row_1_div_1_1_conteiner_undefined_row_0_div_0_0_block5_button1",
+                        descripcion:"selecciona para mostrar lista de pagos",
+                      },
+                    ],
+                  }
+                ],
 
                 tableMain:"buys",
                 selects:[
@@ -156,15 +171,15 @@ $(document).ready(function() {
                 ],
 
                 fields:[
-                  {panel:"principal",col:12,y:0,name:"id",box:{tipe:0},select:"ID_BUY"},
-                  {panel:"principal",col:12,y:1,name:"fecha de emision",box:bx_date,select:"DATE_EMMIT"},
-                  {panel:"principal",col:12,y:2,name:"estado",box:{tipe:3,options:op_buys_status,value:1},select:"ID_BUY_STATUS"},
-                  {panel:"principal",col:12,y:3,name:"total",box:bx_moneyh3,select:"TOTAL"},
-                  {panel:"principal",col:12,y:4,name:"pagado",box:bx_money},
+                  {panel:"principal",col:12,y:0,name:"id",box:{tipe:0},select:"ID_BUY",descripcion:"nro de compra"},
+                  {panel:"principal",col:12,y:1,name:"fecha de emision",box:bx_date,select:"DATE_EMMIT",descripcion:"fecha de la compra"},
+                  {panel:"principal",col:12,y:2,name:"estado",box:{tipe:3,options:op_buys_status,value:1},select:"ID_BUY_STATUS",descripcion:"estado de la compra"},
+                  {panel:"principal",col:12,y:3,name:"total",box:bx_moneyh3,select:"TOTAL",descripcion:"total del costo de la compra"},
+                  {panel:"principal",col:12,y:4,name:"pagado",box:bx_money,descripcion:"total pagado"},
 
-                  {panel:"proveedor",col:12,y:0,name:"proveedor",box:{tipe:8,value:1,class:"w-100"},select:"ID_PROVIDEER",load:{name:"ld-provideers",show:"show"}},
-                  {panel:"proveedor",col:6,...fld_edit},
-                  {panel:"proveedor",col:6,...fld_add},
+                  {panel:"proveedor",col:12,y:0,name:"proveedor",box:{tipe:8,value:1,class:"w-100"},select:"ID_PROVIDEER",load:{name:"ld-provideers",show:"show"},descripcion:"selecciona el proveedor de la compra"},
+                  {panel:"proveedor",col:6,...fld_edit,descripcion:"edita informacion del proveedor"},
+                  {panel:"proveedor",col:6,...fld_add,descripcion:"añade nuevo proveedor"},
                   
                 ],
               }
@@ -193,8 +208,8 @@ $(document).ready(function() {
                 inserts:ins_general,
 
                 fields:[
-                  {panel:"main",name:"nombre",box:bx_input,select:"NAME"},
-                  {panel:"main",name:"ruc",box:bx_input,select:"RUC"},
+                  {panel:"main",name:"nombre",box:bx_input,select:"NAME",descripcion:"nombre del proveedor"},
+                  {panel:"main",name:"ruc",box:bx_input,select:"RUC",descripcion:"ruc del proveedor"},
                 ],
                 events:[
                   {
@@ -290,12 +305,12 @@ $(document).ready(function() {
                   {panel:"main",...fld_delete,attributes:att_btn},
                   //{panel:"main",name:"id",box:{tipe:0},select:"ID_BUY_PRODUCT"},
                   //{panel:"main",name:"id compra",box:{tipe:0},select:"ID_BUY"},
-                  {panel:"main",name:"producto/insumo",box:{tipe:8,class:"w-100"},attributes:att_ln,select:"ID_PRODUCT",load:{name:"ld-supplies-products",show:"show"}},
-                  {panel:"main",name:"unidad",box:bx_shw,select:"SIMBOL"},
-                  {panel:"main",name:"cantidad",box:bx_cant,attributes:att_cnt,select:"CANT"},
+                  {panel:"main",name:"producto/insumo",box:{tipe:8,class:"w-100"},attributes:att_ln,select:"ID_PRODUCT",load:{name:"ld-supplies-products",show:"show"},descripcion:"selecciona producto/insumo"},
+                  {panel:"main",name:"unidad",box:bx_shw,select:"SIMBOL",descripcion:"unidad del producto/insumo"},
+                  {panel:"main",name:"cantidad",box:bx_cant,attributes:att_cnt,select:"CANT",descripcion:"cantidad del producto/insumo"},
                   //{panel:"main",name:"unidad",box:{tipe:1}},
-                  {panel:"main",name:"costo unitario",box:{tipe:1,value:0},attributes:att_cnt,select:"COST_UNIT"},
-                  {panel:"main",name:"costo total",box:{tipe:1,value:0},attributes:att_cnt,select:"COST_TOTAL"},
+                  {panel:"main",name:"costo unitario",box:{tipe:1,value:0},attributes:att_cnt,select:"COST_UNIT",descripcion:"costo unitario del producto/insumo, calcula automaticamente"},
+                  {panel:"main",name:"costo total",box:{tipe:1,value:0},attributes:att_cnt,select:"COST_TOTAL",descripcion:"costo total del producto/insumo, calcula automaticamente"},
                 ],
 
                 events:[

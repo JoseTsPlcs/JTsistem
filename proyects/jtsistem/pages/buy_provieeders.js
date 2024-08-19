@@ -23,7 +23,16 @@ $(document).ready(function() {
               parent:gr.GetColData({x:0,y:0}).col,
               title:"lista de proveedores",
               panels:[{col:12,y:0,tipe:"table",title:"main"}],
-              stateTools:stTls_tb,
+              stateTools:[
+                {
+                  name:"reload",
+                  tools:[
+                    {name:"reload",show:true},
+                    {name:"sizes",value:10,show:true},
+                    {name:"pages",value:1,show:true},
+                  ],
+                }
+              ],
     
               tableMain:"provideers",
               selects:[
@@ -45,14 +54,14 @@ $(document).ready(function() {
               ],
               
               filters:[
-                {name:"nombre",box:{tipe:1},select:{table:"provideers",field:"NAME"}},
-                {name:"ruc",box:{tipe:1},select:{table:"provideers",field:"RUC"}},
+                {name:"nombre",box:{tipe:1},select:{table:"provideers",field:"NAME"},descripcion:"buscar por nombre"},
+                {name:"ruc",box:{tipe:1},select:{table:"provideers",field:"RUC"},descripcion:"buscar por ruc"},
               ],
               fields:[
-                {panel:"main",...fld_delete},
+                //{panel:"main",...fld_delete},
                 //{panel:"main",...fld_edit},
-                {panel:"main",name:"nombre",attributes:[{name:"style",value:"min-width: 200px;"}],box:bx_input,select:"NAME"},
-                {panel:"main",name:"ruc",attributes:[{name:"style",value:"min-width: 150px;"}],box:bx_input,select:"RUC"},
+                {panel:"main",name:"nombre",attributes:[{name:"style",value:"min-width: 200px;"}],box:bx_input,select:"NAME",descripcion:"nombre del proveedor"},
+                {panel:"main",name:"ruc",attributes:[{name:"style",value:"min-width: 150px;"}],box:bx_input,select:"RUC",descripcion:"ruc del proveedor"},
               ],
             }
           },

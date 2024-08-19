@@ -5,7 +5,7 @@ $(document).ready(function() {
 
     success:({userData,pageData})=>{
 
-      var acc_rucs = Access_Get(userData.access,"acc-11");
+      var acc_rucs = Access_Get(userData.access,"mod-bill-rucs");
 
       var gr = new Grid({
         parent:pageData.body,

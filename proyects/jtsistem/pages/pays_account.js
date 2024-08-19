@@ -43,13 +43,13 @@ $(document).ready(function() {
         attributes:[
           {y:2,x:0,attributes:[{name:"class",value:"d-flex justify-content-center"}]},
         ],
-        boxs:[
-          {x:0,y:2,box:{tipe:5,value:"add",class:"btn btn-outline-primary btn-sm",update:()=>{
+        /*boxs:[
+          {x:0,y:2,box:{tipe:5,value:"add",class:"btn btn-primary btn-sm",update:()=>{
             var cr_pay = control.Crud_GetBuild({name:"pay"});
             cr_pay.SetState({stateName:"new"});
             console.log(cr_pay);
           }}}
-        ],
+        ],*/
       });
 
       var md2 = new Modal({
@@ -85,23 +85,42 @@ $(document).ready(function() {
               stateTools:[
                 {
                     name:"reload",
-                    tools:[
-                        {name:"config",show:false},
-                        {name:"load",show:false},
-                        
-                        {name:"excel",show:false},
-                        {name:"pdf",show:false},
-            
+                    tools:[            
                         {name:"sizes",show:false,value:1},
                         {name:"reload",show:true},
-                        {name:"update",show:false},
-                        {name:"new",show:false},
-                        {name:"insert",show:false},
-                        {name:"cancel",show:false},
-                        
-                        {name:"pages",show:false},
+                        {name:"config",show:false},
+                        {name:"load",show:false},
+                        {name:"question",show:true},
                     ],
                 }
+              ],
+              questions:[
+                {
+                  value:"v1",
+                  elementsInfo:[
+                    {
+                      id:"bodyMain_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_0",
+                      descripcion:"selecciona que caja usar",
+                    },
+                    {
+                      id:"bodyMain_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_2_div_0_2_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_2_div_0_2_conteiner_undefined_row_0_div_1_0_block5_",
+                      descripcion:"selecciona para abrir o cerrar la caja, si la caja esta abierta se registran las transferencias que se hicieron",
+                    },
+                  ],
+                },
+                {
+                  value:"v2",
+                  elementsInfo:[
+                    {
+                      id:"bodyMain_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_2_div_0_2_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_0",
+                      descripcion:"se muestra el total de efectivo en la caja seleccionado",
+                    },
+                    {
+                      id:"bodyMain_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_2_div_0_2_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_0",
+                      descripcion:"se muestra el estado de la caja, solo se pueden hacer transacciones si la caja esta abierta",
+                    },
+                  ],
+                },
               ],
 
               tableMain:"accounts",
@@ -158,7 +177,48 @@ $(document).ready(function() {
               configToolsPositions:[
                 {name:"reload",position:"head-center",show:false},
                 {name:"clear",position:"head-center",show:false},
+                {name:"quest",position:"head-center",show:false},
               ],
+              config:{
+                show:true,
+                positions:[
+                  {name:"reload",position:"head-center",show:false},
+                  {name:"clear",position:"head-center",show:false},
+                  {name:"quest",position:"head-center",show:false},
+                ],
+                questions:[
+                  {
+                    value:"q1",
+                    elementsInfo:[
+                      {
+                        id:"bodyMain_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_0",
+                        descripcion:"selecciona que caja usar",
+                      },
+                      {
+                        id:"bodyMain_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_2_div_0_2_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_2_div_0_2_conteiner_undefined_row_0_div_1_0_block5_",
+                        descripcion:"selecciona para abrir o cerrar la caja, si la caja esta abierta se registran las transferencias que se hicieron",
+                      },
+                      {
+                        id:"bodyMain_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_3_div_1_3_block5_btn1",
+                        descripcion:"selecciona para recargar informacion de la caja",
+                      },
+                    ],
+                  },
+                  {
+                    value:"q2",
+                    elementsInfo:[
+                      {
+                        id:"bodyMain_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_2_div_0_2_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_0",
+                        descripcion:"se muestra el total de efectivo en la caja seleccionado",
+                      },
+                      {
+                        id:"bodyMain_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_2_div_0_2_conteiner_undefined_row_0_div_0_0_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_0",
+                        descripcion:"se muestra el estado de la caja, solo se pueden hacer transacciones si la caja esta abierta",
+                      },
+                    ],
+                  },
+                ],
+              },
               filters:[
                 {name:"cuenta",box:{tipe:3},load:{name:"ld-accounts",value:"value",show:"show"},select:{table:"accounts",field:"ID_ACCOUNT",inter:"="}},
               ],
@@ -221,20 +281,9 @@ $(document).ready(function() {
                 {
                     name:"reload",
                     tools:[
-                        {name:"config",show:false},
-                        {name:"load",show:false},
-                        
-                        {name:"excel",show:false},
-                        {name:"pdf",show:false},
-            
-                        {name:"sizes",show:false,value:10},
-                        {name:"reload",show:true},
-                        {name:"update",show:false},
-                        {name:"new",show:false},
-                        {name:"insert",show:false},
-                        {name:"cancel",show:false},
-                        
-                        {name:"pages",show:false},
+                      {name:"config",show:false},
+                      {name:"reload",show:true},
+                      {name:"size",show:false,value:10},
                     ],
                 }
               ],
@@ -267,13 +316,13 @@ $(document).ready(function() {
                 //(acc_control_update?{panel:"main",...fld_delete}:null),
                 {panel:"main",...fld_edit},
                 //{panel:"main",name:"cuenta",box:{tipe:0},select:"ACCOUNT_NAME"},
-                {panel:"main",name:"abre/cierre",box:{tipe:0,options:op_account_state},select:"OPEN"},
-                {panel:"main",name:"abre - fecha",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"DATE_EMMIT_OPEN"},
+                {panel:"main",name:"abre/cierre",box:{tipe:0,options:op_account_state},select:"OPEN",descripcion:"se muestra el estado del registro, si esta abierto o cerrado"},
+                {panel:"main",name:"abre - fecha",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"DATE_EMMIT_OPEN",descripcion:"fecha en la que fue abierta la caja"},
                 //{panel:"main",name:"abre - hora",attributes:[{name:"style",value:"min-width: 100px;"}],box:{tipe:0},select:"HORA_OPEN"},
-                {panel:"main",name:"abre - total",attributes:[{name:"style",value:"min-width: 200px;"}],box:bx_money,select:"TOTAL_OPEN"},
-                {panel:"main",name:"cierre - fecha",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"DATE_EMMIT_CLOSE"},
+                {panel:"main",name:"abre - total",attributes:[{name:"style",value:"min-width: 200px;"}],box:bx_money,select:"TOTAL_OPEN",descripcion:"total cuando la caja fue abierta"},
+                {panel:"main",name:"cierre - fecha",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"DATE_EMMIT_CLOSE",descripcion:"fecha en la que fue cerrada la caja"},
                 //{panel:"main",name:"cierre - hora",attributes:[{name:"style",value:"min-width: 100px;"}],box:{tipe:0},select:"HORA_CLOSE"},
-                {panel:"main",name:"cierre - total",attributes:[{name:"style",value:"min-width: 200px;"}],box:bx_money,select:"TOTAL_CLOSE"},
+                {panel:"main",name:"cierre - total",attributes:[{name:"style",value:"min-width: 200px;"}],box:bx_money,select:"TOTAL_CLOSE",descripcion:"total cuando la caja fue cerrada"},
               ],
               orders:[
                 {field:"OPEN",asc:false},
@@ -313,20 +362,8 @@ $(document).ready(function() {
                 {
                     name:"reload",
                     tools:[
-                        {name:"config",show:false},
-                        {name:"load",show:false},
-                        
-                        {name:"excel",show:false},
-                        {name:"pdf",show:false},
-            
-                        {name:"sizes",show:false,value:1},
                         {name:"reload",show:true},
                         {name:"update",show:(acc_control_update_close || acc_control_update_open)},
-                        {name:"new",show:false},
-                        {name:"insert",show:false},
-                        {name:"cancel",show:false},
-                        
-                        {name:"pages",show:false},
                     ],
                 }
               ],
@@ -356,16 +393,16 @@ $(document).ready(function() {
               inserts:ins_general,   
 
               fields:[
-                {panel:"cuenta",name:"cuenta",box:{tipe:0},select:"ACCOUNT_NAME"},
-                {panel:"cuenta",name:"estado",box:((acc_control_update_close || acc_control_update_open) ?{tipe:6,name:"abierto"}:{tipe:0,options:op_account_state}),select:"OPEN"},
-                {panel:"cuenta",name:"total actual",box:bx_money,select:"ACCOUNT_TOTAL"},
+                {panel:"cuenta",name:"cuenta",box:{tipe:0},select:"ACCOUNT_NAME",descripcion:"muestra la caja seleccionada"},
+                {panel:"cuenta",name:"estado",box:((acc_control_update_close || acc_control_update_open) ?{tipe:6,name:"abierto"}:{tipe:0,options:op_account_state}),select:"OPEN",descripcion:"muestra el estado de la caja, abierto o cerrado"},
+                {panel:"cuenta",name:"total actual",box:bx_money,select:"ACCOUNT_TOTAL",descripcion:"muestra el total de la caja"},
 
-                {panel:"control",name:"fecha de apertura",box:(acc_control_update_open?{tipe:2}:{tipe:0}),select:"DATE_EMMIT_OPEN"},
-                {panel:"control",name:"total de apertura",box:(acc_control_update_open?{tipe:1,value:0}:bx_money),select:"TOTAL_OPEN"},
+                {panel:"control",name:"fecha de apertura",box:(acc_control_update_open?{tipe:2}:{tipe:0}),select:"DATE_EMMIT_OPEN",descripcion:"fecha en la que fue abierta la caja"},
+                {panel:"control",name:"total de apertura",box:(acc_control_update_open?{tipe:1,value:0}:bx_money),select:"TOTAL_OPEN",descripcion:"total cuando la caja fue abierta"},
 
-                {panel:"control",name:"fecha de cierre",box:(acc_control_update_close?{tipe:2}:{tipe:0}),select:"DATE_EMMIT_CLOSE"},
-                {panel:"control",name:"total de cierre",box:(acc_control_update_close?{tipe:1,value:0}:bx_money),select:"TOTAL_CLOSE"},
-                {panel:"control",name:"close",tipe:0,box:{tipe:5,value:"cerrar",class:"btn btn-danger btn-sm"},action:"close"},
+                {panel:"control",name:"fecha de cierre",box:(acc_control_update_close?{tipe:2}:{tipe:0}),select:"DATE_EMMIT_CLOSE",descripcion:"fecha en la que fue cerrada la caja"},
+                {panel:"control",name:"total de cierre",box:(acc_control_update_close?{tipe:1,value:0}:bx_money),select:"TOTAL_CLOSE",descripcion:"total cuando la caja fue cerrada"},
+                {panel:"control",name:"close",tipe:0,box:{tipe:5,value:"cerrar",class:"btn btn-danger btn-sm"},action:"close",descripcion:"selecciona para cerra caja, con esto ya no se registraran cambios en la caja"},
               ],
 
               events:[
@@ -511,11 +548,11 @@ $(document).ready(function() {
                 //{panel:"main",...fld_delete},
                 //{panel:"main",...fld_edit},
                 //{panel:"main",name:"id",box:bx_shw,select:"ID_PAY"},
-                {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"fecha de emision",box:bx_shw,select:"DATE_EMMIT"},
-                {panel:"main",name:"ingreso",box:{tipe:0},select:"INCOME_CAL"},
-                {panel:"main",name:"egreso",box:{tipe:0},select:"NOCOME_CAL"},
-                {panel:"main",name:"total",box:bx_money,select:"TOTAL_CAL"},
-                {panel:"main",name:"etiqueta",box:{tipe:0},select:"TAG_NAME"},
+                {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"fecha de emision",box:bx_shw,select:"DATE_EMMIT",descripcion:"fecha de la realizacion del pago"},
+                {panel:"main",name:"ingreso",box:{tipe:0},select:"INCOME_CAL",descripcion:"total de ingreso"},
+                {panel:"main",name:"egreso",box:{tipe:0},select:"NOCOME_CAL",descripcion:"total de egreso"},
+                {panel:"main",name:"total",box:bx_money,select:"TOTAL_CAL",descripcion:"resultado del total anterior más el ingreso/egreso"},
+                {panel:"main",name:"etiqueta",box:{tipe:0},select:"TAG_NAME",descripcion:"tipo de pago que se hizo"},
                 //{panel:"main",name:"cuenta",box:bx_shw,select:"ACCOUNT_NAME"},
                 //{panel:"main",name:"ingreso",box:{...bx_shw,options:[{value:0,show:"egreso"},{value:1,show:"ingreso"}]},select:"INCOME"},
               ],

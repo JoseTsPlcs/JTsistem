@@ -1,6 +1,7 @@
 class Label {
 
     #parent = null;
+    parentGet(){return this.#parent};
     #name = "field";
     GetName(){return this.#name;}
     #box = null;

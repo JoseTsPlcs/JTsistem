@@ -8,8 +8,6 @@ $(document).ready(function() {
         parent:pageData.body,
         userData,
         title:pageData.title,
-        fechaMin:null,
-        fechaMax:null,
         status:["cotizacion"],
       });
 

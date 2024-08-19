@@ -21,11 +21,11 @@ var PagesData = [
     title:'Punto de Venta',
     seccion:'pos',
     paginas:[
-      {state:"active",name:"orders",title:"ordenes de trabajos",href:"check-in.php"},
+      {state:"hide",name:"orders",title:"ordenes de trabajos",href:"check-in.php"},
       {state:"active",name:"sale new",title:"venta nueva",href:"sales_new.php"},
-      {state:"active",name:"cash",title:"caja",href:"pays_account.php"},
-      {state:"active",name:"vehicles",title:"vehiculos",href:"vehicles.php"},
-      {state:"active",name:"inmuebles",title:"inmuebles",href:"inmuebles.php"},
+      {state:"active",name:"box",title:"caja",href:"pays_account.php"},
+      {state:"hide",name:"vehicles",title:"vehiculos",href:"vehicles.php"},
+      {state:"hide",name:"inmuebles",title:"inmuebles",href:"inmuebles.php"},
     ],
 },
   {
@@ -33,10 +33,10 @@ var PagesData = [
       title:'tienda',
       seccion:'shop',
       paginas:[
-        {state:"active",name:"sales control",title:"control de ventas",href:"sales_control.php"},
         {state:"active",name:"sales in cotizacion",title:"ventas por confirmar",href:"sales_toConfirm.php"},
         {state:"active",name:"sales in process",title:"ventas confirmadas",href:"cook.php"},
         {state:"active",name:"sales to pay",title:"ventas terminadas",href:"inform_nopaid.php"},
+        {state:"hide",name:"sales control",title:"control de ventas",href:"sales_control.php"},
       ],
   },
   {
@@ -44,8 +44,8 @@ var PagesData = [
       title:'compras',
       seccion:'buys',
       paginas:[  
-        {state:"active",name:"buy control",title:"control de compras",href:"buys_control.php"},
-        {state:"active",name:"buy new",title:"compra nueva",href:"buy_new.php"},
+        {state:"hide",name:"buy control",title:"control de compras",href:"buys_control.php"},
+        {state:"hide",name:"buy new",title:"compra nueva",href:"buy_new.php"},
       ],
   },
   {
@@ -54,31 +54,38 @@ var PagesData = [
       seccion:'contacts',
       paginas:[
           {state:"active",name:"contacts-customers",title:"lista de clientes",href:"customers_control.php"},
-          {state:"active",name:"contacts-provieeders",title:"lista de proveedores",href:"buy_provieeders.php"},
+          {state:"hide",name:"contacts-provieeders",title:"lista de proveedores",href:"buy_provieeders.php"},
       ],
   },
   {
       icon:'<i class="bi bi-box"></i>',
       title:"inventario",
-      seccion:'stock',
+      seccion:'items',
       paginas:[
           {state:"active",name:"items",title:"lista de items",href:"products.php"},
           {state:"active",name:"prices",title:"precios de items",href:"products_prices.php"},
           {state:"active",name:"stock",title:"stock de items",href:"products_stock.php"},
-          {state:"active",name:"recipe",title:"recetas",href:"products_recipe.php"},
-          {state:"active",name:"produccion",title:"orden de produccion",href:"produccions.php"},
           {state:"active",name:"items config",title:"configuracion",href:"products_config.php"},
       ],
   },
+  {
+    icon:'<i class="bi bi-box"></i>',
+    title:"produccion",
+    seccion:'production',
+    paginas:[
+        {state:"hide",name:"recipe",title:"recetas",href:"products_recipe.php"},
+        {state:"hide",name:"produccion",title:"orden de produccion",href:"produccions.php"},
+    ],
+},
   {
       icon:'<i class="bi bi-clipboard-data"></i>',
       title:'informes',
       seccion:'informs',
       paginas:[
-          {state:"active",name:'infom-sales',title:"ventas - completada",href:"inform_products.php"},
-          {state:"active",name:'inform-pay',title:"ventas - por cobrar",href:"inform_nopaid.php"},
-          {state:"active",name:'inform-transacctions',title:"transacciones",href:"inform_pays.php"},
-          {state:"active",name:'inform-accounts',title:"contador",href:"inform_accounts.php"},
+          {state:"active",name:'inform-sales',title:"ventas - completada",href:"inform_products.php"},
+          {state:"hide",name:'inform-pay',title:"ventas - por cobrar",href:"inform_nopaid.php"},
+          {state:"hide",name:'inform-transacctions',title:"transacciones",href:"inform_pays.php"},
+          {state:"hide",name:'inform-accounts',title:"contador",href:"inform_accounts.php"},
       ],
   },
   {
@@ -86,10 +93,10 @@ var PagesData = [
       title:'cuentas',
       seccion:'cash',
       paginas:[
-          {state:"active",name:'pays',title:"lista de pagos",href:"pays_control.php"},
-          {state:"active",name:'cash control',title:"control",href:"pays_account.php"},
-          {state:"active",name:'list of bills',title:"lista de facturas",href:"pays_bills.php"},
-          {state:"active",name:'cash-config',title:"configuracion",href:"pays_config.php"},
+          {state:"hide",name:'pays',title:"lista de pagos",href:"pays_control.php"},
+          {state:"hide",name:'cash control',title:"control",href:"pays_account.php"},
+          {state:"hide",name:'bills',title:"lista de facturas",href:"pays_bills.php"},
+          {state:"hide",name:'cash-config',title:"configuracion",href:"pays_config.php"},
       ],
   },
   {
@@ -97,18 +104,21 @@ var PagesData = [
       title:'usuario',
       seccion:'user',
       paginas:[
-          {state:"active",name:'compani',title:"empresa",href:"admin_account.php"},
-          {state:"active",name:'user-config',title:"config",href:"admin_config.php"},
-          {state:"active",name:'out',title:"salir",href:"login.php"},
+          {state:"active",name:'company',title:"empresa",href:"admin_account.php"},
+          {state:"hide",name:'user-config',title:"config",href:"admin_config.php"},
       ],
   },
 ];
 
-class Pag_Base {
 
-  constructor({success}) {
+class Pag_Base extends ODD {
 
+  constructor({success,events}) {
+
+    
+    super({success,events});
     let k = this;
+
     this.#IsLog({success:(i)=>{
  
       k.#SetPages({
@@ -138,6 +148,7 @@ class Pag_Base {
       pageData.body = this.#body;
       i.pageData = pageData;
       document.title = i.pageData.title;
+      i.k = k;
 
       if(success!=null)success(i);
     }});
@@ -166,15 +177,50 @@ class Pag_Base {
     
     }
     
+
     PagesData.forEach(secc => {
       
       secc.paginas.forEach(pagina => {
         
-        var acc = Access_Get(accessList,"pag-"+secc.seccion+"-"+pagina.name);
-        pagina.state = pagina.state == "active" ? (acc ? "active":"disactive") : pagina.state;
+
+        //pos
+        if(pagina.name=="box") pagina.state = Access_Get(accessList,"mod-box") ? "active": "hide";
+
+        //ventas
+        if(pagina.name=="sales control") pagina.state = "hide";//Access_Get(accessList,"mod-sale-control") ? "active": "hide";
+        
+        //buy
+        if(pagina.name=="buy control") pagina.state = Access_Get(accessList,"mod-buy") ? "active": "hide";
+        if(pagina.name=="buy new") pagina.state = Access_Get(accessList,"mod-buy") ? "active": "hide";
+
+        //informs
+        if(pagina.name=="inform-accounts") pagina.state = Access_Get(accessList,"mod-bill") ? "active": "hide";
+
+        //clientes
+        if(pagina.name=="contacts-provieeders") pagina.state = Access_Get(accessList,"mod-buy") ? "active": "hide";
+
+        //facturacion
+        if(pagina.name=="bills") pagina.state = pagina.state = Access_Get(accessList,"mod-bill") ? "active": "hide";
+
+        //usuario
+        if(pagina.name=="company") pagina.state = "active";
 
       });
+
     });
+
+    
+
+    /*PagesData.forEach(secc => {
+      
+      secc.paginas.forEach(pagina => {
+        
+        var acc = Access_Get(accessList,"pag-"+secc.seccion+"-"+pagina.name);
+        pagina.state = pagina.state == "active" ? (acc ? "active":"hide") : pagina.state;
+        pagina.state = "active";
+
+      });
+    });*/
         
   }
 
@@ -186,7 +232,19 @@ class Pag_Base {
     console.log("buildNav:",PagesData);
 
     var nav = "";
-    nav = `    
+
+    nav +=`
+
+      <div class="horizontal-bar">
+            <button id="helpIcon" class="btn btn-light" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="lni lni-home"></i> <!-- Ícono de home de Lineicons -->
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="helpIcon" id="itemsTutorials">
+            </ul>
+      </div>
+    `;
+
+    nav += `    
     <div class="wrapper">
         <aside id="sidebar">
             <div class="d-flex">
@@ -201,7 +259,10 @@ class Pag_Base {
     `;
       
     PagesData.forEach(secc => {
-        
+
+      var countPages = secc.paginas.reduce((acc,v)=>{return acc + (v.state=="active"?1:0)},0);
+      if(countPages>0){
+
         nav+= `
                 <li class="sidebar-item">
                     <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
@@ -209,8 +270,8 @@ class Pag_Base {
                         `+secc.icon+`
                         <span>`+secc.seccion+`</span>
                     </a>`;
-        
-        
+
+
 
         nav+= `
             <ul id="`+secc.seccion+`" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">`;
@@ -233,20 +294,32 @@ class Pag_Base {
 
         nav+= `</li>
         `;
+      }
 
     });   
 
     nav += `
             </ul>
             <div class="sidebar-footer">
-                <a href="#" class="sidebar-link">
+                <a href="login.php" class="sidebar-link">
                     <i class="lni lni-exit"></i>
                     <span>Logout</span>
                 </a>
             </div>
         </aside>
-        <div class="main p-3 custom-bg-gray" id="bodyMain">
-            
+        <div class="main p-3 mt-5 custom-bg-gray" id="bodyMain">
+
+          <!-- Ventana emergente para descripciones -->
+          <div id="popup" class="popup">
+              <div class="popup-content">
+                  <p id="popup-description"></p>
+                  <div class="d-flex justify-content-between">
+                      <button id="prevBtn" class="btn btn-secondary">Anterior</button>
+                      <button id="nextBtn" class="btn btn-primary">Siguiente</button>
+                  </div>
+              </div>
+          </div>
+
         </div>
     </div>
     `;
@@ -301,6 +374,31 @@ class Pag_Base {
     else window.location.href = "login.php";
   }
 
+  #page = {
+    title:"",
+    tutorials: [],
+  }
+
+  AddTutorialtoPage({tutorialClass,name}){
+
+    //<li><a class="dropdown-item" href="#">¿prueba?</a></li>
+    var item = document.createElement("li");
+    var a = document.createElement("a");
+    a.setAttribute("class","dropdown-item");
+    a.href = "#";
+    item.appendChild(a);
+    a.innerHTML = name;
+    a.addEventListener('click', () => tutorialClass.startTutorial());
+
+
+    document.getElementById("itemsTutorials").appendChild(item);
+    this.#page.tutorials.push({
+      name,
+      item,
+      tutorial:tutorialClass,
+    });
+
+  }
 }
 
 //pass to other page with data
