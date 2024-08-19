@@ -35,8 +35,8 @@ var PagesData = [
       paginas:[
         {state:"active",name:"sales in cotizacion",title:"ventas por confirmar",href:"sales_toConfirm.php"},
         {state:"active",name:"sales in process",title:"ventas confirmadas",href:"cook.php"},
-        {state:"active",name:"sales to pay",title:"ventas terminadas",href:"inform_nopaid.php"},
-        {state:"hide",name:"sales control",title:"control de ventas",href:"sales_control.php"},
+        {state:"active",name:"sales to pay",title:"ventas por cobrar",href:"salesToPay.php"},
+        {state:"active",name:"sales control",title:"historial de ventas",href:"sales_control.php"},
       ],
   },
   {
@@ -187,7 +187,7 @@ class Pag_Base extends ODD {
         if(pagina.name=="box") pagina.state = Access_Get(accessList,"mod-box") ? "active": "hide";
 
         //ventas
-        if(pagina.name=="sales control") pagina.state = "hide";//Access_Get(accessList,"mod-sale-control") ? "active": "hide";
+        //if(pagina.name=="sales control") pagina.state = "hide";//Access_Get(accessList,"mod-sale-control") ? "active": "hide";
         
         //buy
         if(pagina.name=="buy control") pagina.state = Access_Get(accessList,"mod-buy") ? "active": "hide";

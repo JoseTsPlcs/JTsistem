@@ -113,20 +113,7 @@ const stTls_tb_all = [
     {
         name:"reload",
         tools:[
-            {name:"config",show:true},
-            {name:"load",show:true},
-            
-            {name:"excel",show:false},
-            {name:"pdf",show:false},
-
             {name:"sizes",show:false,value:999},
-            {name:"reload",show:false},
-            {name:"update",show:false},
-            {name:"new",show:false},
-            {name:"insert",show:false},
-            {name:"cancel",show:false},
-            
-            {name:"pages",show:false},
         ],
     },
 ];
@@ -594,7 +581,23 @@ function scr_pay({tags=[],tagValue=1,events=[]}) {
         afterUpdate:"block",
         afterInsert:"block",
         afterCancel:"block",
-        stateTools:stTls_fm_maid,
+        stateTools:[
+            {
+                name:"new",
+                tools:[
+                    {name:"insert",show:true},
+                    {name:"cancel",show:true},
+                ],
+            },
+            {
+                name:"reload",
+                tools:[
+                    {name:"update",show:true},
+                    {name:"reload",show:true},
+                    {name:"cancel",show:true},
+                ],
+            },
+        ],
 
         tableMain:"payments",
         selects:[
@@ -1639,12 +1642,87 @@ function src_items_tb({parent,userData}) {
     }
 }
 
+function src_item_fm({}){
+
+    return {
+        title:"producto",
+        panels:[{col:12,y:0,title:"main",tipe:"form",head:false}],
+        stateTools:[
+        {
+            name:"reload",
+            tools:[
+                {name:"config",show:false},
+                {name:"load",show:false},
+                
+                {name:"excel",show:false},
+                {name:"pdf",show:false},
+    
+                {name:"sizes",show:false,value:999},
+                {name:"reload",show:true},
+                {name:"update",show:true},
+                {name:"new",show:false},
+                {name:"insert",show:false},
+                {name:"cancel",show:true},
+                
+                {name:"pages",show:false},
+            ],
+        }
+        ],
+        stateStart:"block",
+        afterUpdate:"block",
+        afterInsert:"block",
+        afterCancel:"block",
+    
+        tableMain:"products",
+        selects:[
+        {table:'products', field:'ID_PRODUCT',primary:true},
+        {table:'products', field:'NAME'},
+        {table:'products', field:'ID_PRODUCT_TIPE'},
+        {table:'products', field:'ID_PRODUCT_TAG'},
+        {table:'products', field:'UNID_ID'},
+        {table:'products', field:'ACTIVE'},
+        {table:'products', field:'COST_UNIT'},
+        {table:'products', field:'PRICE_UNIT'},
+        {table:'products', field:'STOCK_TOTAL'},
+        {table:'products', field:'STOCK_LIMIT'},
+        ],
+        loads:[
+        ld_unids,
+        ld_products_tags,
+        ],
+        inserts:ins_general,
+        
+        fields:[
+        {panel:"main",col:9,tipe:1,name:"producto",box:{...bx_input,value:"nombre del producto"},select:"NAME",descripcion:"nombre del producto/servicio/insumo"},
+        {panel:"main",col:3,tipe:0,name:"activo",box:{...bx_active_input,value:1},select:"ACTIVE",descripcion:"activo del producto/servicio/insumo, si esta activo se puede vender o usar"},
+        
+        {panel:"main",col:12,tipe:1,name:"tipo",box:{...bx_op({ops:op_products_tipe})},select:"ID_PRODUCT_TIPE",descripcion:"seleccionar si es producto/servicio/insumo"},
+
+        {panel:"main",col:8,tipe:1,colAllLevel:true,name:"etiqueta",box:{tipe:3,value:1},select:"ID_PRODUCT_TAG",load:{name:"ld-products_tags",show:"show"},descripcion:"seleccionar etiqueta"},
+        {panel:"main",col:2,tipe:0,colAllLevel:true,name:"edit-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-pencil-square"></i>'},action:"edit-tag",descripcion:"editar etiqueta"},
+        {panel:"main",col:2,tipe:0,colAllLevel:true,name:"add-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-plus-circle"></i>'},action:"add-tag",descripcion:"añadir etiqueta"},
+
+        {panel:"main",col:8,tipe:1,colAllLevel:true,name:"unidad",box:{...bx_op({ops:[]})},select:"UNID_ID",load:{name:"ld-unids",show:"show"},descripcion:"seleccionar unidad"},
+        {panel:"main",col:2,tipe:0,colAllLevel:true,name:"edit-und",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-pencil-square"></i>'},action:"edit-und",descripcion:"editar unidad"},
+        {panel:"main",col:2,tipe:0,colAllLevel:true,name:"add-und",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-plus-circle"></i>'},action:"add-und",descripcion:"añadir unidad"},
+
+        {panel:"main",col:6,tipe:1,name:"costo unitario",box:{tipe:1,value:0},select:"COST_UNIT",descripcion:"costo unitario, este campo se actualiza de acuerdo a las compras"},
+        {panel:"main",col:6,tipe:1,name:"precio unitario",box:{tipe:1,value:0},select:"PRICE_UNIT",descripcion:"precio unitario de venta"},
+
+        {panel:"main",col:6,tipe:1,name:"stock total",box:{tipe:1,value:999},select:"STOCK_TOTAL",descripcion:"stock actual del producto/insumo/servicio"},
+        {panel:"main",col:6,tipe:1,name:"stock minimo",box:{tipe:1,value:1},select:"STOCK_LIMIT",descripcion:"stock minimo del producto/insumo/servicio, en caso el stock sea menor o igual, se lanza una alerta"},
+        ],
+    }
+}
+
 
 //------------
 
-function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax=Date_Today(),status=[]}) {
+function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax=Date_Today(),status=[],pays=[],orderField=null,stateStart="reload"}) {
     
     if(status==null || status.length==0) status = op_sales_status.map((op)=>{return op.show});
+    if(pays==null || pays.length==0) pays = op_sales_paid.map((op)=>{return op.show});
+    var orders = orderField ? [{table:"sales",field:"ID_STATUS",asc:false,}]:[];
 
     var gr = new Grid({
         parent,
@@ -1677,119 +1755,134 @@ function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax
 
     cruds:[
         {
-        name:"control",
-        active:true,
-        script:{
-            parent:gr.GetColData({x:0,y:1}).col,
-            title:title,
-            panels:[{col:12,y:0,title:"main",tipe:"table"}],
-            stateTools:stTls_tb_all,
-        
-            tableMain:"sales",
-            selects:[
-                {table:'sales', field:'ID_SALE',primary:true},
-                {table:'sales', field:'DATE_EMMIT'},
-                {table:'sales', field:'ID_STATUS'},
-                {table:'sales', field:'PAID'},
-                {table:'sales', field:'ID_DOCUMENT'},
-                {table:'sales', field:'ID_CUSTOMER'},
-                {table:'sales', field:'TOTAL'},
-                {table:'sales', field:'DOCUMENT_EMMIT'},
-                {table:'sales', field:'COMMENT'},
-                {table:'customers',field:'NAME'},
-                (userData.company.tipe == "2"?{sql:"CONCAT(items_vehicles.PLACA,'-',items_vehicles.MARCA) AS 'VEHICLE'"}:null),
-            ],
-            joins:[
-            {main:{table:"sales",field:"ID_CUSTOMER"},join:{table:"customers",field:"ID_CUSTOMER"},tipe:"LEFT"},
-            (
-                userData.company.tipe == "2"?
-                {
-                main:{table:"sales",field:"ID_ITEM"},
-                join:{table:"items_vehicles",field:"ID_VEHICLE"},
-                tipe:"LEFT",
-                }:null
-            )
-            ],
-            conditions:[
-            {
-                before:" AND ",
-                table:"sales",
-                field:"ID_COMPANY",
-                inter:"=",
-                value:userData.company.id,
-            }
-            ],
-        
-            configShow:false,
-            filters:[
-                {name:"cliente",box:bx_input,select:{table:"customers",field:"NAME"},descripcion:"buscar por nombre del cliente"},
-                (userData.company.tipe == "2"?{name:"placa",box:bx_input,select:{table:"items_vehicles",field:"PLACA"},descripcion:"buscar por placa del vehiculo"}:null),
-                (userData.company.tipe == "2"?{name:"marca",box:bx_input,select:{table:"items_vehicles",field:"MARCA"},descripcion:"buscar por marca del vehiculo"}:null),
-                (fechaMin==null?null:{col:6,name:"fecha min",box:{...bx_date,value:fechaMin},select:{table:"sales",field:"DATE_EMMIT",tipe:"min"},descripcion:"buscar venta con una fecha mayor o igual a la seleccionada"}),
-                (fechaMax==null?null:{col:6,name:"fechamax",box:{...bx_date,value:fechaMax},select:{table:"sales",field:"DATE_EMMIT",tipe:"max"},descripcion:"buscar venta con una fecha menor o igual a la seleccionada"}),
-                {name:"estado",box:{tipe:4,options:op_sales_status,value:status},select:{table:"sales",field:"ID_STATUS"},descripcion:"buscar por estado de venta"},
-                {name:"cancelado",box:{tipe:4,options:op_sales_paid},select:{table:"sales",field:"PAID"},descripcion:"buscar por pagado"},
-                //{name:"documento",box:{tipe:4,options:op_sales_document},select:{table:"sales",field:"ID_DOCUMENT"}},
-                //{name:"emitido",box:{tipe:4,options:op_document_emmit},select:{table:"sales",field:"DOCUMENT_EMMIT"}},
-            ],
-            fields:[
-            //{panel:"main",name:"id",box:{tipe:0},select:"ID_SALE"},
-        
-            {panel:"main",name:"edit",attributes:[{name:"class",value:"px-1"}],box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit-page",descripcion:"seleccionar para editar venta"},
-            {panel:"main",name:"show",attributes:[{name:"class",value:"px-1"}],box:{tipe:5,value:'<i class="bi bi-eye-fill"></i>',class:"btn btn-primary btn-sm"},action:"edit",descripcion:"seleccionar para ver el detalle de venta"},
+            name:"control",
+            active:true,
+            script:{
+                parent:gr.GetColData({x:0,y:1}).col,
+                title:title,
+                panels:[{col:12,y:0,title:"main",tipe:"table"}],
+                stateTools:[
+                    {
+                        name:"reload",
+                        tools:[
+                            {name:"sizes",show:false,value:999},
+                        ],
+                    },
+                    {
+                        name:"block",
+                        tools:[
+                            {name:"reload",show:true},
+                        ],
+                    },
+                ],
+                stateStart,
             
-            {panel:"main",name:"cliente",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"NAME",descripcion:"muestra el nombre del cliente"},
-            (userData.company.tipe == "2"?{panel:"main",name:"vehiculo",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"VEHICLE",descripcion:"muestra el vehiculo (marca-placa)"}:null),
-            {panel:"main",name:"estado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_status},select:"ID_STATUS",descripcion:"muestra el estado de la venta"},
-            {panel:"main",name:"cancelado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_paid},select:"PAID",descripcion:"muestra si la venta ya ha pagado"},
-            {panel:"main",name:"total",box:bx_money,select:"TOTAL",descripcion:"muestra el total de la venta"},
-            {panel:"main",name:"comentario",box:{tipe:9,value:""},select:"COMMENT",descripcion:"seleccionar comentario de venta"},
-            {panel:"main",name:"fecha de emision",attributes:[{name:"style",value:"min-width:160px"}],box:{tipe:0},select:"DATE_EMMIT",descripcion:"muestra la fecha de emision de venta"},
-            
-            //{panel:"main",name:"documento",attributes:[{name:"style",value:"min-width:100px"}],box:{tipe:0,options:op_sales_document},select:"ID_DOCUMENT"},
-            //{panel:"main",name:"emitido",attributes:[{name:"style",value:"min-width:100px"}],box:{tipe:0,options:op_document_emmit},select:"DOCUMENT_EMMIT"},
-            ],
-            events:[
-            {
-                name:"boxUpdate",
-                actions:[
+                tableMain:"sales",
+                selects:[
+                    {table:'sales', field:'ID_SALE',primary:true},
+                    {table:'sales', field:'DATE_EMMIT'},
+                    {table:'sales', field:'ID_STATUS'},
+                    {table:'sales', field:'PAID'},
+                    {table:'sales', field:'ID_DOCUMENT'},
+                    {table:'sales', field:'ID_CUSTOMER'},
+                    {table:'sales', field:'TOTAL'},
+                    {table:'sales', field:'DOCUMENT_EMMIT'},
+                    {table:'sales', field:'COMMENT'},
+                    {table:'customers',field:'NAME'},
+                    (userData.company.tipe == "2"?{sql:"CONCAT(items_vehicles.PLACA,'-',items_vehicles.MARCA) AS 'VEHICLE'"}:null),
+                ],
+                joins:[
+                {main:{table:"sales",field:"ID_CUSTOMER"},join:{table:"customers",field:"ID_CUSTOMER"},tipe:"LEFT"},
+                (
+                    userData.company.tipe == "2"?
+                    {
+                    main:{table:"sales",field:"ID_ITEM"},
+                    join:{table:"items_vehicles",field:"ID_VEHICLE"},
+                    tipe:"LEFT",
+                    }:null
+                )
+                ],
+                conditions:[
                 {
-                    action:({field,y,k})=>{
-        
-                    if(field.action=="edit-page"){
-        
-                        var id_sale = k.Reload_GetData()[y]["ID_SALE"];
-                        PageSend({
-                        url:"sales_new.php",
-                        send:{id_sale},
-                        })
-                        //console.log("edit sale!!", sale_id);
-                    }
-                    }
+                    before:" AND ",
+                    table:"sales",
+                    field:"ID_COMPANY",
+                    inter:"=",
+                    value:userData.company.id,
                 }
                 ],
-            },
-            {
-                name:"calculateTotal",
-                actions:[{
-                action:({k})=>{
-        
-                    var total = k.Reload_GetData().reduce((acum,v)=>{return acum + parseFloat(v["TOTAL"])},0);
-                    gr.GetColData({x:1,y:0}).boxs[0].SetValue(total);
+                orders,
+            
+                configShow:stateStart=="block",
+                filters:[
+                    {name:"cliente",box:bx_input,select:{table:"customers",field:"NAME"},descripcion:"buscar por nombre del cliente"},
+                    (userData.company.tipe == "2"?{name:"placa",box:bx_input,select:{table:"items_vehicles",field:"PLACA"},descripcion:"buscar por placa del vehiculo"}:null),
+                    (userData.company.tipe == "2"?{name:"marca",box:bx_input,select:{table:"items_vehicles",field:"MARCA"},descripcion:"buscar por marca del vehiculo"}:null),
+                    (fechaMin==null?null:{col:6,name:"fecha min",box:{...bx_date,value:fechaMin},select:{table:"sales",field:"DATE_EMMIT",tipe:"min"},descripcion:"buscar venta con una fecha mayor o igual a la seleccionada"}),
+                    (fechaMax==null?null:{col:6,name:"fechamax",box:{...bx_date,value:fechaMax},select:{table:"sales",field:"DATE_EMMIT",tipe:"max"},descripcion:"buscar venta con una fecha menor o igual a la seleccionada"}),
+                    {name:"estado",box:{tipe:4,options:op_sales_status,value:status},select:{table:"sales",field:"ID_STATUS"},descripcion:"buscar por estado de venta"},
+                    {name:"cancelado",box:{tipe:4,options:op_sales_paid,value:pays},select:{table:"sales",field:"PAID"},descripcion:"buscar por pagado"},
+                    //{name:"documento",box:{tipe:4,options:op_sales_document},select:{table:"sales",field:"ID_DOCUMENT"}},
+                    //{name:"emitido",box:{tipe:4,options:op_document_emmit},select:{table:"sales",field:"DOCUMENT_EMMIT"}},
+                ],
+                fields:[
+                //{panel:"main",name:"id",box:{tipe:0},select:"ID_SALE"},
+            
+                {panel:"main",name:"edit",attributes:[{name:"class",value:"px-1"}],box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit-page",descripcion:"seleccionar para editar venta"},
+                {panel:"main",name:"show",attributes:[{name:"class",value:"px-1"}],box:{tipe:5,value:'<i class="bi bi-eye-fill"></i>',class:"btn btn-primary btn-sm"},action:"edit",descripcion:"seleccionar para ver el detalle de venta"},
+                
+                {panel:"main",name:"cliente",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"NAME",descripcion:"muestra el nombre del cliente"},
+                (userData.company.tipe == "2"?{panel:"main",name:"vehiculo",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"VEHICLE",descripcion:"muestra el vehiculo (marca-placa)"}:null),
+                {panel:"main",name:"estado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_status},select:"ID_STATUS",descripcion:"muestra el estado de la venta"},
+                {panel:"main",name:"cancelado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_paid},select:"PAID",descripcion:"muestra si la venta ya ha pagado"},
+                {panel:"main",name:"total",box:bx_money,select:"TOTAL",descripcion:"muestra el total de la venta"},
+                {panel:"main",name:"comentario",box:{tipe:9,value:""},select:"COMMENT",descripcion:"seleccionar comentario de venta"},
+                {panel:"main",name:"fecha de emision",attributes:[{name:"style",value:"min-width:160px"}],box:{tipe:0},select:"DATE_EMMIT",descripcion:"muestra la fecha de emision de venta"},
+                
+                //{panel:"main",name:"documento",attributes:[{name:"style",value:"min-width:100px"}],box:{tipe:0,options:op_sales_document},select:"ID_DOCUMENT"},
+                //{panel:"main",name:"emitido",attributes:[{name:"style",value:"min-width:100px"}],box:{tipe:0,options:op_document_emmit},select:"DOCUMENT_EMMIT"},
+                ],
+                events:[
+                {
+                    name:"boxUpdate",
+                    actions:[
+                    {
+                        action:({field,y,k})=>{
+            
+                        if(field.action=="edit-page"){
+            
+                            var id_sale = k.Reload_GetData()[y]["ID_SALE"];
+                            PageSend({
+                            url:"sales_new.php",
+                            send:{id_sale},
+                            })
+                            //console.log("edit sale!!", sale_id);
+                        }
+                        }
+                    }
+                    ],
+                },
+                {
+                    name:"calculateTotal",
+                    actions:[{
+                    action:({k})=>{
+            
+                        var total = k.Reload_GetData().reduce((acum,v)=>{return acum + parseFloat(v["TOTAL"])},0);
+                        gr.GetColData({x:1,y:0}).boxs[0].SetValue(total);
+                    }
+                    }]
+                },
+                {
+                    name:"reloadAfter",
+                    actions:[{
+                    action:({k})=>{
+            
+                        k.CallEvent({name:"calculateTotal"});
+                    }
+                    }]
                 }
-                }]
-            },
-            {
-                name:"reloadAfter",
-                actions:[{
-                action:({k})=>{
-        
-                    k.CallEvent({name:"calculateTotal"});
-                }
-                }]
-            }
-            ],
-        },   
+                ],
+            },   
         },
         {
             name:"show-form",
@@ -1806,21 +1899,9 @@ function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax
                 stateTools:[
                 {
                     name:"reload",
-                    tools:[
-                        {name:"config",show:false},
-                        {name:"load",show:false},
-                        
-                        {name:"excel",show:false},
-                        {name:"pdf",show:false},
-            
+                    tools:[            
                         {name:"sizes",show:false,value:50},
-                        {name:"reload",show:false},
-                        {name:"update",show:false},
-                        {name:"new",show:false},
-                        {name:"insert",show:false},
-                        {name:"cancel",show:false},
-                        
-                        {name:"pages",show:false},
+                        {name:"question",show:false},
                     ],
                 },
                 ],
@@ -1911,20 +1992,8 @@ function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax
                 {
                     name:"reload",
                     tools:[
-                        {name:"config",show:false},
-                        {name:"load",show:false},
-                        
-                        {name:"excel",show:false},
-                        {name:"pdf",show:false},
-            
                         {name:"sizes",show:false,value:999},
-                        {name:"reload",show:false},
-                        {name:"update",show:false},
-                        {name:"new",show:false},
-                        {name:"insert",show:false},
-                        {name:"cancel",show:false},
-                        
-                        {name:"pages",show:false},
+                        {name:"question",show:false},
                     ],
                 },
                 ],
@@ -2241,17 +2310,6 @@ function scr_sales_products({parent,title="items-products",head=true,h=600,field
             (field_worker.active?{...ld_workers}:null),
         ],
 
-        /*fields:[
-            {panel:"main",...fld_delete,attributes:att_btn},
-            (acc_products_update?{panel:"main",...fld_edit,attributes:att_btn}:null),
-            {panel:"main",name:"producto-servicio",box:{tipe:8,class:"w-100"},attributes:att_ln,select:"ID_PRODUCT",load:{name:"products-services",show:"show"}},
-            {panel:"main",name:"tipo",box:{tipe:0,options:op_products_tipe},attributes:att_shw,select:"ID_PRODUCT_TIPE"},
-            {panel:"main",name:"unidad",box:bx_shw,attributes:att_shw,select:"SIMBOL"},
-            {panel:"main",name:"cantidad",box:bx_cant,attributes:att_cnt,select:"CANT"},
-            {panel:"main",name:"precio unitario",box:(acc_price_update?{tipe:1,value:0}:bx_money),attributes:att_shw,select:"PRICE_UNIT"},
-            {panel:"main",name:"precio total",box:(acc_price_update?{tipe:1,value:0}:bx_money),attributes:att_shw,select:"PRICE_TOTAL"},
-            (acc_item_worker?{panel:"main",name:"trabajador asignado",attributes:att_ln50,box:{tipe:8,value:"null",class:"w-100"},select:"ID_WORKER",load:{name:"ld-workers",show:"show",value:"value"}}:null)
-        ],*/
         fields,
     }
 

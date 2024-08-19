@@ -104,83 +104,8 @@ $(document).ready(function() {
             name:"fm-product",
             active:true,
             script:{
+              ...src_item_fm({}),
               parent:prnt_prod,
-              title:"producto",
-              panels:[{col:12,y:0,title:"main",tipe:"form"}],
-              stateTools:[
-                {
-                    name:"reload",
-                    tools:[
-                        {name:"config",show:false},
-                        {name:"load",show:false},
-                        
-                        {name:"excel",show:false},
-                        {name:"pdf",show:false},
-            
-                        {name:"sizes",show:false,value:999},
-                        {name:"reload",show:true},
-                        {name:"update",show:true},
-                        {name:"new",show:false},
-                        {name:"insert",show:false},
-                        {name:"cancel",show:true},
-                        
-                        {name:"pages",show:false},
-                    ],
-                }
-              ],
-              stateStart:"block",
-              afterUpdate:"block",
-              afterInsert:"block",
-              afterCancel:"block",
-          
-              tableMain:"products",
-              selects:[
-                {table:'products', field:'ID_PRODUCT',primary:true},
-                {table:'products', field:'NAME'},
-                {table:'products', field:'ID_PRODUCT_TIPE'},
-                {table:'products', field:'ID_PRODUCT_TAG'},
-                {table:'products', field:'UNID_ID'},
-                {table:'products', field:'ACTIVE'},
-                {table:'products', field:'COST_UNIT'},
-                {table:'products', field:'PRICE_UNIT'},
-                {table:'products', field:'STOCK_TOTAL'},
-                {table:'products', field:'STOCK_LIMIT'},
-              ],
-              loads:[
-                ld_unids,
-                ld_products_tags,
-              ],
-              /*conditions:[
-                {
-                  table:"products",
-                  field:"ID_COMPANY",
-                  inter:"=",
-                  value:company_id,
-                }
-              ],*/
-              inserts:ins_general,
-              
-              fields:[
-                {panel:"main",col:9,tipe:1,name:"producto",box:{...bx_input,value:"nombre del producto"},select:"NAME",descripcion:"nombre del producto/servicio/insumo"},
-                {panel:"main",col:3,tipe:0,name:"activo",box:{...bx_active_input,value:1},select:"ACTIVE",descripcion:"activo del producto/servicio/insumo, si esta activo se puede vender o usar"},
-                
-                {panel:"main",col:12,tipe:1,name:"tipo",box:{...bx_op({ops:op_products_tipe})},select:"ID_PRODUCT_TIPE",descripcion:"seleccionar si es producto/servicio/insumo"},
-
-                {panel:"main",col:8,tipe:1,colAllLevel:true,name:"etiqueta",box:{tipe:3,value:1},select:"ID_PRODUCT_TAG",load:{name:"ld-products_tags",show:"show"},descripcion:"seleccionar etiqueta"},
-                {panel:"main",col:2,tipe:0,colAllLevel:true,name:"edit-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-pencil-square"></i>'},action:"edit-tag",descripcion:"editar etiqueta"},
-                {panel:"main",col:2,tipe:0,colAllLevel:true,name:"add-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-plus-circle"></i>'},action:"add-tag",descripcion:"añadir etiqueta"},
-
-                {panel:"main",col:8,tipe:1,colAllLevel:true,name:"unidad",box:{...bx_op({ops:[]})},select:"UNID_ID",load:{name:"ld-unids",show:"show"},descripcion:"seleccionar unidad"},
-                {panel:"main",col:2,tipe:0,colAllLevel:true,name:"edit-und",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-pencil-square"></i>'},action:"edit-und",descripcion:"editar unidad"},
-                {panel:"main",col:2,tipe:0,colAllLevel:true,name:"add-und",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-plus-circle"></i>'},action:"add-und",descripcion:"añadir unidad"},
-
-                {panel:"main",col:6,tipe:1,name:"costo unitario",box:{tipe:1,value:0},select:"COST_UNIT",descripcion:"costo unitario, este campo se actualiza de acuerdo a las compras"},
-                {panel:"main",col:6,tipe:1,name:"precio unitario",box:{tipe:1,value:0},select:"PRICE_UNIT",descripcion:"precio unitario de venta"},
-
-                {panel:"main",col:6,tipe:1,name:"stock total",box:{tipe:1,value:999},select:"STOCK_TOTAL",descripcion:"stock actual del producto/insumo/servicio"},
-                {panel:"main",col:6,tipe:1,name:"stock minimo",box:{tipe:1,value:1},select:"STOCK_LIMIT",descripcion:"stock minimo del producto/insumo/servicio, en caso el stock sea menor o igual, se lanza una alerta"},
-              ],
-
               events:[
                 {
                   name:"modalSetActive",
