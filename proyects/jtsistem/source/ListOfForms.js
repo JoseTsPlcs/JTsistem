@@ -1085,24 +1085,27 @@ function scr_admin({id_company,parent,editUsuarios=false,editClase=false,editAcc
 
                                                 var inserts = [];
 
-                                                accessData.forEach(acc=>{
+                                                modulos.forEach(md=>{
 
-                                                    inserts.push(
-                                                        {
-                                                            field:"ID_ACCESS",
-                                                            value:acc[0],
-                                                            tipe:"values",
-                                                        }
-                                                    );
-
-                                                    inserts.push(
-                                                        {
-                                                            field:"CLASS_ACCESS_TYPE",
-                                                            value:acc[2],
-                                                            tipe:"values",
-                                                        }
-                                                    );
-                                                });                                                
+                                                    md.access.forEach(acc => {
+                                                        
+                                                        inserts.push(
+                                                            {
+                                                                field:"ID_ACCESS",
+                                                                value:acc.value,
+                                                                tipe:"values",
+                                                            }
+                                                        );
+    
+                                                        inserts.push(
+                                                            {
+                                                                field:"CLASS_ACCESS_TYPE",
+                                                                value:md.value,
+                                                                tipe:"values",
+                                                            }
+                                                        );
+                                                    });
+                                                });                                               
 
                                                 inserts.push({
                                                     field:"ID_CLASS",
@@ -1142,20 +1145,8 @@ function scr_admin({id_company,parent,editUsuarios=false,editClase=false,editAcc
                     {
                         name:"reload",
                         tools:[
-                            {name:"config",show:true},
-                            {name:"load",show:true},
-                            
-                            {name:"excel",show:false},
-                            {name:"pdf",show:false},
-                
-                            {name:"sizes",show:true,value:999},
+                            {name:"sizes",show:false,value:999},
                             {name:"reload",show:true},
-                            {name:"update",show:false},
-                            {name:"new",show:false},
-                            {name:"insert",show:false},
-                            {name:"cancel",show:false},
-                            
-                            {name:"pages",show:true},
                         ],
                     }
                     ],
@@ -1195,12 +1186,12 @@ function scr_admin({id_company,parent,editUsuarios=false,editClase=false,editAcc
                     configShow:true,
                     filters:[
                         {name:"clase",box:{tipe:3},select:{table:"class_access",field:"ID_CLASS"},load:{name:"ld-class",show:"show",value:"value"}},
-                        {name:"tipo",box:{tipe:4,options:op_access_type},select:{table:"class_access",field:"CLASS_ACCESS_TYPE"}}
+                        {name:"tipo",box:{tipe:3,options:op_modulos},select:{table:"class_access",field:"CLASS_ACCESS_TYPE"}}
                     ],
                     fields:[
                         //{panel:"main",name:"clase",box:{tipe:3,class:"w-100"},select:"ID_CLASS",load:{name:"ld-class",show:"show",value:"value"}},
                         {panel:"main",name:"acceso",box:{tipe:0,options:op_access},select:"ID_ACCESS"},
-                        {panel:"main",name:"tipo",box:{tipe:0,options:op_access_type},select:"CLASS_ACCESS_TYPE"},
+                        {panel:"main",name:"tipo",box:{tipe:0,options:op_modulos},select:"CLASS_ACCESS_TYPE"},
                         {panel:"main",name:"activo",box:(editAccess?bx_active_input:bx_shw_activo),select:"ACTIVE"},
                     ],
 
@@ -1230,314 +1221,6 @@ function scr_admin({id_company,parent,editUsuarios=false,editClase=false,editAcc
 
 //--------------------------
 
-function scr_base({actives=[],table,fieldPrimary,userData,tipe,useFilters=false,fieldsSet=[]}) {
-
-    var panels = [{col:12,y:0,title:"main",head:false,tipe}];
-
-    if(fieldsSet.length>0){
-
-        actives.filter(act=>{
-
-            var fset = fieldsSet.find(f=>f.name==act.name);
-            if(fset){
-    
-                act.state = fset.state;
-                if(act.state == null) act.state = "show";
-                return true;
-    
-            }else return false;
-        });
-    }
-
-    var filters = !useFilters? [] : actives.map(act=>{
-
-        return {
-            name:act.name,
-            select:act.select,
-            box:act.filter.box,
-            select:{table,field:act.select},
-            descripcion:"buscar por " + act.descripcion,
-        }
-    });
-
-    var fields = actives.map(act=>{
-
-        return {
-            panel:"main",
-            name:act.name,
-            select:act.select,
-            box:{...act.edit.box},
-            descripcion:act.descripcion,
-        }
-    });
-
-    var selects = actives.map(act=>{
-
-        return {
-            table,
-            field:act.select,
-        }
-    });
-    selects.push({
-        table,
-        field:fieldPrimary,
-        primary:true,
-    });
-    
-    return {
-        panels,
-
-        tableMain:table,
-        selects,
-        inserts:[...ins_general],
-        conditions:[
-            {
-                //before:" AND ",
-                table,
-                field:"ID_COMPANY",
-                inter:"=",
-                value:userData.company.id,
-              }
-        ],
-
-        filters,
-        fields,
-
-    }
-}
-
-//-------------------
-
-function customer_actives({userData}) {
-
-    var actives = [
-        {
-            name:"nombre",select:'NAME',active:true,
-            edit:{box:{...bx_input}},
-            show:{box:{...bx_shw}},
-            filter:{box:{...bx_input}},
-            descripcion:"nombre del cliente"
-        },
-        {
-            name:"empresa",select:'COMPANY',active:Access_Get(userData.access,"mod-customer-nro"),
-            edit:{box:{tipe:6,name:"empresa"},filter:{box:{...bx_input}}},
-            show:{box:{...bx_shw}},
-            filter:{box:{tipe:4,options:[{value:1,show:"empresa"},{value:0,show:"persona natural"}]}},
-            descripcion:"si el cliente es empresa o persona natural",
-        },
-        {
-            name:"nro documento",select:'NRO_DOCUMENT',active:Access_Get(userData.access,"mod-customer-nro"),
-            edit:{box:{...bx_input}},
-            show:{box:{...bx_shw}},
-            filter:{box:{...bx_input}},
-            descripcion:"nro del documento del dni/ruc"
-        },
-        {
-            name:"celular",select:'PHONE',active:Access_Get(userData.access,"mod-customer-cel"),
-            edit:{box:{...bx_input}},
-            show:{box:{...bx_shw}},
-            filter:{box:{...bx_input}},
-            descripcion:"numero de celular del cliente",
-        },
-        {
-            name:"correo",select:'EMAIL',active:Access_Get(userData.access,"mod-customer-email"),
-            edit:{box:{...bx_input}},
-            show:{box:{...bx_shw}},
-            filter:{box:{...bx_input}},
-            descripcion:"correo del contacto del cliente"
-        },
-        {
-            name:"descripcion",select:'DESCRIPCION',active:Access_Get(userData.access,"mod-customer-coment"),
-            edit:{box:{...bx_input}},
-            show:{box:{...bx_shw}},
-            filter:{box:{...bx_input}},
-            descripcion:"descripcion del cliente",
-        },
-        {
-            name:"direccion",select:'DIRECCION',active:Access_Get(userData.access,"mod-customer-dir"),
-            edit:{box:{...bx_input}},
-            show:{box:{...bx_shw}},
-            filter:{box:{...bx_input}},
-            descripcion:"direccion del cliente",
-        },
-    ];
-    actives = actives.filter(act=>act.active==true);
-    return actives;
-}
-
-function sch_customer_SetAccess({userData}) {
-    
-    var tableName = "customers";
-    var fieldPrimary = "ID_CUSTOMER";
-    var fieldShow = "NAME";
-    var sqlField = [
-        {name:"nombre",select:'NAME',active:true},
-        {name:"empresa",select:'COMPANY',active:Access_Get(userData.access,"mod-customer-nro")},
-        {name:"nro documento",select:'NRO_DOCUMENT',active:Access_Get(userData.access,"mod-customer-nro")},
-        {name:"celular",select:'PHONE',active:Access_Get(userData.access,"mod-customer-cel")},
-        {name:"correo",select:'EMAIL',active:Access_Get(userData.access,"mod-customer-email")},
-        {name:"descripcion",select:'DESCRIPCION',active:Access_Get(userData.access,"mod-customer-coment")},
-        {name:"direccion",select:'DIRECCION',active:Access_Get(userData.access,"mod-customer-dir")},
-    ];
-    sqlField = sqlField.filter(sql=>sql.active==true);
-
-    var company = {
-        insert:{...ins_general},
-        condition:{
-            table:tableName,
-            field:"ID_COMPANY",
-            inter:"=",
-            value:company_id,
-        }
-    };
-
-    var fields = sqlField.map(sql=>{
-        return {
-            panel:"main",
-            name:sql.name,
-            box:{...bx_input},
-            select:sql.select
-        }
-    });
-
-    var selectPrimary = {table:tableName,field:fieldPrimary,primary:true};
-    var selects = sqlField.map(sql=>{
-        return {
-            table:tableName,
-            field:sql.select
-        }
-    });
-    selects.push(selectPrimary);
-
-    var loadOp = {
-        name:"ld-customers",
-        tableMain:tableName,
-        selects:[
-            {...selectPrimary,as:"value"},
-            {table:tableName,field:fieldShow,as:"show"},
-        ],
-        conditions:[
-            ...company.condition
-        ],
-    };
-    var loadModulo = {
-        name:"ld-mod-customers",
-        tableMain:tableName,
-        selects:[
-            {...selectPrimary,as:"value"},
-            {table:tableName,field:fieldShow,as:"show"},
-        ],
-        conditions:[
-            ...company.condition
-        ],
-    }
-
-    return {
-        table:tableName,
-        fields,
-        selects,
-        loadOp,
-        loadModulo,
-    }
-}
-
-function scr_customer_base({userData,tipe}) {
-
-    return scr_base({
-        userData,
-        actives:customer_actives({userData}),
-        table:"customers",
-        fieldPrimary:"ID_CUSTOMER",
-        tipe,
-        useFilters:tipe=="table",
-    })
-}
-
-function scr_customer_md({parent,modal,userData}) {
-
-    return {
-        parent,
-        title:"cliente",
-        stateStart:"block",
-        afterInsert:"block",
-        afterUpdate:"block",
-        afterCancel:"block",
-        stateTools:[
-        {
-            name:"reload",
-            tools:[
-                {name:"config",show:false},
-                {name:"load",show:true},
-                
-                {name:"excel",show:false},
-                {name:"pdf",show:false},
-    
-                {name:"sizes",show:false,value:1},
-                {name:"reload",show:true},
-                {name:"update",show:true},
-                {name:"new",show:false},
-                {name:"insert",show:false},
-                {name:"cancel",show:true},
-                
-                {name:"pages",show:false},
-            ],
-        },
-        {
-            name:"new",
-            tools:[
-                {name:"config",show:false},
-                {name:"load",show:true},
-                
-                {name:"excel",show:false},
-                {name:"pdf",show:false},
-    
-                {name:"sizes",show:false,value:1},
-                {name:"reload",show:false},
-                {name:"update",show:false},
-                {name:"new",show:false},
-                {name:"insert",show:true},
-                {name:"cancel",show:true},
-                
-                {name:"pages",show:false},
-            ],
-        }
-        ],
-
-        ...scr_customer_base({userData,tipe:"form"}),
-
-        events:[
-        {
-            name:"modalSetActive",
-            actions:[{
-                action:({k,active})=>{
-
-                    if(modal) modal.SetActive({active});
-                }
-            }]
-        },
-        {
-            name:"insertAfter",
-            actions:[{
-            action:({k})=>{
-
-                //var fm_sale = conections.Crud_GetBuild({name:"sale"});
-
-            }
-            }]
-        }
-        ],
-    }
-}
-
-function scr_customer_tb({parent,userData}) {
-    
-    return {
-        parent,
-        stateTools:stTls_tb,
-        title:"lista de clientes",
-        ...scr_customer_base({userData,tipe:"table"}),
-    }
-}
 
 //-----------
 

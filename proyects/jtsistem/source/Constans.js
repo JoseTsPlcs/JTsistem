@@ -21,15 +21,11 @@ const op_company_type = [
     {value:5,show:"consultorio"},
 ];
 
-var op_access = [
-    //...acess
-    //...options,
-];
 
-var op_access_type = [
-    //access type
+var op_products_onlimit = [
+    {value:0,show:"aún con stock",class:"rounded text-center bg-success text-white"},
+    {value:1,show:"!se acaba!",class:"rounded text-center bg-danger text-white"}
 ];
-
 
 
 const op_taller_check = [
@@ -92,9 +88,14 @@ const op_control_type = [
 ];
 
 const op_account_state = [
-    {value:1,show:"abierto",class:"rounded text-center bg-success text-white"},
     {value:0,show:"cerrado",class:"rounded text-center bg-danger text-white"},
+    {value:1,show:"abierto",class:"rounded text-center bg-success text-white"},
 ];
+
+const op_access_state = [
+    {value:0,show:"inabilitado",class:"rounded text-center bg-danger text-white"},
+    {value:1,show:"activo",class:"rounded text-center bg-success text-white"},
+]
 
 const op_inmuble_state = [
     {value:1,show:"en venta"},
@@ -146,6 +147,7 @@ function bx_op({ops}) {
         value:1,
     }
 }
+
 
 //------attributes-----
 

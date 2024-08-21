@@ -46,6 +46,7 @@ echo '<script src="'.$src.'Constructor/ConsInform.js"></script>';
 
 echo '<script src="'.$src.'Land/PageBase.js"></script>';
 echo '<script src="'.$src.'Land/Pag_Base.js"></script>';
+echo '<script src="'.$src.'Land/TutorialCompleto.js"></script>';
 
 echo '<script src="'.$src.'Source/Usefull.js"></script>';
 

@@ -115,7 +115,7 @@ class Form extends ODD {
         for (let t = 0; t < this.#tools.length; t++) {
 
             let tool = this.#tools[t];
-            console.log(tool,t);            
+            //console.log(tool,t);            
             tool.box.id = "btn" + (t+1);
             var update = tool.box.update;
             var pst = this.#Tool_GetPosition({positionName:tool.position});
@@ -204,6 +204,8 @@ class Form extends ODD {
     #gr_content=null;
     #Build({parent,title,head,blocked,show,toolsPositions=[]}){
 
+        let k = this;
+
         this.#wn_parent = new Window({
             parent,h:0,
             title,head,blocked,show,
@@ -242,12 +244,18 @@ class Form extends ODD {
         });
 
         var config = GetGridConfig({panels:this.#fields});
-        //console.log("form config",config,this.#dom_conteiner);
+        //console.log("gridConfigConteiner", config);
+        
         this.#gr_content = new Grid({
             parent:this.#dom_conteiner,
-            ...config
+            ...config,
+            events:[
+                {
+                    name:"labelUpdate",
+                    actions:[{action:(value)=>{k.#Event_FieldUpdate(value);}}],
+                }
+            ],
         });
-        //console.log(this.#gr_content);
 
         toolsPositions.forEach(t => {
             
@@ -270,5 +278,11 @@ class Form extends ODD {
     #Event_ToolUpdate(params){
 
         this.CallEvent({name:"toolUpdate",params});
+    }
+
+    #Event_FieldUpdate(params){
+
+        //console.log("from label update",params);
+        this.CallEvent({name:"fieldUpdate",params:{...params}});
     }
 }

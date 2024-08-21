@@ -10,7 +10,7 @@ $(document).ready(function() {
         title:pageData.title,
         fechaMax:null,
         fechaMin:null,
-        status:[op_sales_status[0].show],
+        status:[op_sales_status[0].show,op_sales_status[1].show,op_sales_status[2].show],
       });
 
     }

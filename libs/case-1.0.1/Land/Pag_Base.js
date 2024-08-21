@@ -22,7 +22,7 @@ var PagesData = [
     seccion:'pos',
     paginas:[
       {state:"hide",name:"orders",title:"ordenes de trabajos",href:"check-in.php"},
-      {state:"active",name:"sale new",title:"venta nueva",href:"sales_new.php"},
+      {state:"active",name:"saleNew",title:"venta nueva",href:"sales_new.php"},
       {state:"active",name:"box",title:"caja",href:"pays_account.php"},
       {state:"hide",name:"vehicles",title:"vehiculos",href:"vehicles.php"},
       {state:"hide",name:"inmuebles",title:"inmuebles",href:"inmuebles.php"},
@@ -33,10 +33,10 @@ var PagesData = [
       title:'tienda',
       seccion:'shop',
       paginas:[
-        {state:"active",name:"sales in cotizacion",title:"ventas por confirmar",href:"sales_toConfirm.php"},
-        {state:"active",name:"sales in process",title:"ventas confirmadas",href:"cook.php"},
-        {state:"active",name:"sales to pay",title:"ventas por cobrar",href:"salesToPay.php"},
-        {state:"active",name:"sales control",title:"historial de ventas",href:"sales_control.php"},
+        {state:"active",name:"salesCotizacion",title:"ventas en proceso",href:"sales_toConfirm.php"},
+        {state:"hide",name:"salesProcess",title:"ventas confirmadas",href:"cook.php"},
+        {state:"active",name:"salesPay",title:"ventas por cobrar",href:"salesToPay.php"},
+        {state:"active",name:"salesControl",title:"historial de ventas",href:"sales_control.php"},
       ],
   },
   {
@@ -44,8 +44,8 @@ var PagesData = [
       title:'compras',
       seccion:'buys',
       paginas:[  
-        {state:"hide",name:"buy control",title:"control de compras",href:"buys_control.php"},
-        {state:"hide",name:"buy new",title:"compra nueva",href:"buy_new.php"},
+        {state:"hide",name:"buyControl",title:"control de compras",href:"buys_control.php"},
+        {state:"hide",name:"buyNew",title:"compra nueva",href:"buy_new.php"},
       ],
   },
   {
@@ -53,8 +53,8 @@ var PagesData = [
       title:'contactos',
       seccion:'contacts',
       paginas:[
-          {state:"active",name:"contacts-customers",title:"lista de clientes",href:"customers_control.php"},
-          {state:"hide",name:"contacts-provieeders",title:"lista de proveedores",href:"buy_provieeders.php"},
+          {state:"active",name:"customers",title:"lista de clientes",href:"customers_control.php"},
+          {state:"hide",name:"provieeders",title:"lista de proveedores",href:"buy_provieeders.php"},
       ],
   },
   {
@@ -65,7 +65,7 @@ var PagesData = [
           {state:"active",name:"items",title:"lista de items",href:"products.php"},
           {state:"active",name:"prices",title:"precios de items",href:"products_prices.php"},
           {state:"active",name:"stock",title:"stock de items",href:"products_stock.php"},
-          {state:"active",name:"items config",title:"configuracion",href:"products_config.php"},
+          {state:"active",name:"itemsConfig",title:"configuracion",href:"products_config.php"},
       ],
   },
   {
@@ -82,10 +82,10 @@ var PagesData = [
       title:'informes',
       seccion:'informs',
       paginas:[
-          {state:"active",name:'inform-sales',title:"ventas - completada",href:"inform_products.php"},
-          {state:"hide",name:'inform-pay',title:"ventas - por cobrar",href:"inform_nopaid.php"},
-          {state:"hide",name:'inform-transacctions',title:"transacciones",href:"inform_pays.php"},
-          {state:"hide",name:'inform-accounts',title:"contador",href:"inform_accounts.php"},
+          {state:"active",name:'informSales',title:"ventas",href:"inform_products.php"},
+          {state:"hide",name:'informPay',title:"ventas - por cobrar",href:"inform_nopaid.php"},
+          {state:"hide",name:'informTransacctions',title:"transacciones",href:"inform_pays.php"},
+          {state:"hide",name:'informAccounts',title:"contador",href:"inform_accounts.php"},
       ],
   },
   {
@@ -94,9 +94,9 @@ var PagesData = [
       seccion:'cash',
       paginas:[
           {state:"hide",name:'pays',title:"lista de pagos",href:"pays_control.php"},
-          {state:"hide",name:'cash control',title:"control",href:"pays_account.php"},
+          {state:"hide",name:'cashControl',title:"control",href:"pays_account.php"},
           {state:"hide",name:'bills',title:"lista de facturas",href:"pays_bills.php"},
-          {state:"hide",name:'cash-config',title:"configuracion",href:"pays_config.php"},
+          {state:"hide",name:'cashConfig',title:"configuracion",href:"pays_config.php"},
       ],
   },
   {
@@ -105,10 +105,27 @@ var PagesData = [
       seccion:'user',
       paginas:[
           {state:"active",name:'company',title:"empresa",href:"admin_account.php"},
-          {state:"hide",name:'user-config',title:"config",href:"admin_config.php"},
+          {state:"hide",name:'userConfig',title:"config",href:"admin_config.php"},
+          {state:"active",name:'tutorial',title:"tutorial",href:"tutorial.php"},
       ],
   },
 ];
+
+function PageDataFind({pageName}) {
+  
+  var pageInfo = null;
+  PagesData.forEach(secc => {
+    
+    secc.paginas.forEach(pag => {
+      
+      console.log(pag,pageName);
+      
+      if(pag.name==pageName) pageInfo = pag;
+    });
+  });
+
+  return pageInfo;
+}
 
 
 class Pag_Base extends ODD {
@@ -182,45 +199,17 @@ class Pag_Base extends ODD {
       
       secc.paginas.forEach(pagina => {
         
+        if(pagina.state=="hide") {
 
-        //pos
-        if(pagina.name=="box") pagina.state = Access_Get(accessList,"mod-box") ? "active": "hide";
-
-        //ventas
-        //if(pagina.name=="sales control") pagina.state = "hide";//Access_Get(accessList,"mod-sale-control") ? "active": "hide";
-        
-        //buy
-        if(pagina.name=="buy control") pagina.state = Access_Get(accessList,"mod-buy") ? "active": "hide";
-        if(pagina.name=="buy new") pagina.state = Access_Get(accessList,"mod-buy") ? "active": "hide";
-
-        //informs
-        if(pagina.name=="inform-accounts") pagina.state = Access_Get(accessList,"mod-bill") ? "active": "hide";
-
-        //clientes
-        if(pagina.name=="contacts-provieeders") pagina.state = Access_Get(accessList,"mod-buy") ? "active": "hide";
-
-        //facturacion
-        if(pagina.name=="bills") pagina.state = pagina.state = Access_Get(accessList,"mod-bill") ? "active": "hide";
-
-        //usuario
-        if(pagina.name=="company") pagina.state = "active";
+          var pageActive = PageActiveByAccess({accessList, pageName:pagina.name});
+          //console.log("setpage " + pagina.name + " set:",pageActive);
+          
+          pagina.state = pageActive ? "active" : "hide";
+        }
 
       });
 
     });
-
-    
-
-    /*PagesData.forEach(secc => {
-      
-      secc.paginas.forEach(pagina => {
-        
-        var acc = Access_Get(accessList,"pag-"+secc.seccion+"-"+pagina.name);
-        pagina.state = pagina.state == "active" ? (acc ? "active":"hide") : pagina.state;
-        pagina.state = "active";
-
-      });
-    });*/
         
   }
 
@@ -266,7 +255,7 @@ class Pag_Base extends ODD {
         nav+= `
                 <li class="sidebar-item">
                     <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
-                        data-bs-target="#`+secc.seccion+`" aria-expanded="false" aria-controls="`+secc.seccion+`">
+                        data-bs-target="#`+secc.seccion+`" id="seccion-`+secc.seccion+`" aria-expanded="false" aria-controls="`+secc.seccion+`">
                         `+secc.icon+`
                         <span>`+secc.seccion+`</span>
                     </a>`;
@@ -281,7 +270,7 @@ class Pag_Base extends ODD {
             if(pag.state != "hide"){
                 nav+= `
                 <li class="sidebar-item">
-                    <a href="`+(pag.state=="active"?pag.href:"")+`" `+(pag.state=="disactive"?"disabled":"")+` class="sidebar-link`+(pag.state=="disactive"?" bg-danger":"")+`">`+pag.title+`</a>
+                    <a id="`+secc.seccion+"-"+pag.name+`" href="`+(pag.state=="active"?pag.href:"")+`" `+(pag.state=="disactive"?"disabled":"")+` class="sidebar-link`+(pag.state=="disactive"?" bg-danger":"")+`">`+pag.title+`</a>
                 </li>
                 `;
             }
@@ -329,7 +318,7 @@ class Pag_Base extends ODD {
     this.#body = document.getElementById("bodyMain");
     const hamBurger = document.querySelector(".toggle-btn");
     hamBurger.addEventListener("click", function () {
-    document.querySelector("#sidebar").classList.toggle("expand");
+      document.querySelector("#sidebar").classList.toggle("expand");
     });
   }
 
@@ -402,20 +391,31 @@ class Pag_Base extends ODD {
   }
 }
 
+function InfoBetweenPagesSet(send) {
+  
+  sessionStorage.setItem("data", JSON.stringify({...send}));
+}
+
+function InfoBetweenPageGet() {
+
+  var data = JSON.parse(sessionStorage.getItem('data'));
+  sessionStorage.setItem("data", null);
+  return data;
+}
+
 //pass to other page with data
 function PageSend({url=null, send={}}){
 
   window.location.href = url;
   var from = window.location.href;
   send.from = from;
-  sessionStorage.setItem("data", JSON.stringify(send));
+  InfoBetweenPagesSet(send);
 }
 
 //recive data from other page
 function PageRecive(){
 
-  var data = JSON.parse(sessionStorage.getItem('data'));
-  sessionStorage.setItem("data", null);
+  var data = InfoBetweenPageGet();
   return data;
 }
 

@@ -89,9 +89,10 @@ class Crud_set extends ODD {
 
     #questions = [
         {value:"v1",show:"¿como lo utilizo?",tutorial:null,elementsInfo:[]},
-        {value:"v2",show:"¿que significan los campos?",tutorial:null,elementsInfo:[]},
+        //{value:"v2",show:"¿que significan los campos?",tutorial:null,elementsInfo:[]},
         //{value:"v3",show:"¿como lo utilizo?",tutorial:null},
     ];
+    questionsGet(){return this.#questions};
 
     #questionSet({questions=[]}){
 
@@ -115,7 +116,7 @@ class Crud_set extends ODD {
 
         this.#questionSetTutorialQ1();
 
-        var questionQ2 = this.#questions.find(q=>q.value=="v2");
+        /*var questionQ2 = this.#questions.find(q=>q.value=="v2");
         var v2ElementsInfo = [...questionQ2.elementsInfo];
         
         this.#fields.filter(fld=>fld.descripcion != null).forEach(fld=>{
@@ -153,7 +154,9 @@ class Crud_set extends ODD {
         if(v2ElementsInfo.length == 0) questOpDom.hide();
         else questOpDom.show();
         
-        questionQ2.tutorial = new Tutorial({elementsInfo:v2ElementsInfo});
+        questionQ2.tutorial = new Tutorial({elementsInfo:v2ElementsInfo});*/
+
+        this.CallEvent({name:"setTutorials"});
         
     }
 
@@ -171,6 +174,37 @@ class Crud_set extends ODD {
                     descripcion: tool.descripcion,
                 });
             }   
+        });
+
+        this.#fields.filter(fld=>fld.descripcion != null).forEach(fld=>{
+
+            var panel = this.#PanelGet({panelTitle:fld.panel});
+            var divConteiner = null;
+                 
+
+            switch (panel.tipe) {
+                case "table":
+                    
+                    var tbField = panel.build.fieldGet({fieldName:fld.name});    
+                    divConteiner = tbField.th;
+                    
+                break;
+
+                case "form":
+
+                    divConteiner = panel.build.fieldGetLabel({fieldName:fld.name}).parentGet();
+
+                break;
+            }
+
+            if(divConteiner){
+
+                v1ElementsInfo.push({
+                    id:divConteiner.id,
+                    descripcion:fld.descripcion,
+                });
+            }
+            
         });
         
         var questOpDom = $('#'+this.#body_tools.find(t=>t.name=="question").dom.Blocks_Get()[1].id);
@@ -210,6 +244,24 @@ class Crud_set extends ODD {
     //------fields-------
 
     #fields;
+    fieldsGet(){return this.#fields}
+    fieldGetTutorialElement({fieldName}){
+
+        var fld = this.#fields.find(f=>f.name==fieldName);
+        var panel = this.#PanelGet({panelTitle:fld.panel});
+
+        switch (panel.tipe) {
+            case "table":
+                
+                var tbField = panel.build.fieldGet({fieldName:fld.name});    
+            return tbField.th;
+
+            case "form":
+
+            return panel.build.fieldGetLabel({fieldName:fld.name}).parentGet();
+        }
+    }
+
     Field_Get({fieldName}){
 
         return this.#fields.find(f=>f.name==fieldName);
