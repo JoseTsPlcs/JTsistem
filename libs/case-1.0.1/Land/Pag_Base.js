@@ -290,7 +290,7 @@ class Pag_Base extends ODD {
     nav += `
             </ul>
             <div class="sidebar-footer">
-                <a href="login.php" class="sidebar-link">
+                <a href="../../../" class="sidebar-link">
                     <i class="lni lni-exit"></i>
                     <span>Logout</span>
                 </a>
@@ -489,7 +489,7 @@ function Login({uss,pss,fail}){
                 return;
               }
 
-              console.log(result);
+              //console.log(result);
 
               var userData = {
                 id:result[0]["IS_USER"],
@@ -545,12 +545,12 @@ function Login({uss,pss,fail}){
                   });
 
 
-                  $.post("../../../libs/case-1.0.1/Land/setLogin.php",{userData},function(resp) {
+                  $.post(window.location.pathname.split('/').pop()+"libs/case-1.0.1/Land/setLogin.php",{userData},function(resp) {
                   
                     if(controlTest.login) return;
                     
                     PageSend({
-                        url:"sales_control.php",
+                        url:"proyects/jtsistem/pages/sales_control.php",
                         send:{},
                     });
                   }); 

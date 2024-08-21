@@ -35,18 +35,27 @@ class Conection extends ODD {
 
   Request({php, sql=null,success=null,fail=null,name,log=false}){ 
 
+    var arr = window.location.pathname.split('/');
+    var path = "";
+    for (let i = 0; i < arr.length-3; i++) {
+      
+      path += "../";
+    }
+    
+    console.log("----------request:",path,arr); // Retorna el nombre del archivo actual
+
     switch (php) {
       case "row":
-        php = '../../../libs/case-1.0.1/BaseData/Mysql_Row.php';
+        php = path+'libs/case-1.0.1/BaseData/Mysql_Row.php';
         break;
 
       case "success":
-        php = '../../../libs/case-1.0.1/BaseData/Mysql_Success.php';
+        php = path+'libs/case-1.0.1/BaseData/Mysql_Success.php';
         break;
     
     }
 
-    //console.log("request -> sql:",sql);
+    console.log("php",php);
 
     let k = this;
     $.post(php, {...this.config,sql}, function(resp){

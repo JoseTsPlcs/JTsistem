@@ -1,6 +1,9 @@
 <?php
 
-  $srcPathReturn = $srcPathReturn ? $srcPathReturn : "../../../";
+  if (!isset($srcPathReturn)) {
+    $srcPathReturn = '../../../';
+  }
+
   /*jquery*/echo '<script src="'.$srcPathReturn.'libs/jquery-3.7.1/jquery-3.7.1.min.js"></script>';
 
   /*popper-necesario para select*/echo '<script src="'.$srcPathReturn.'libs/popper/popper.min.js"></script>';
@@ -16,20 +19,21 @@
   echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>';
   echo '<script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.0/dist/xlsx.full.min.js"></script>';
 
+  echo '<script>console.log("pathreturn: '.$srcPathReturn.'proyects/jtsistem/source/ConfigProyect.js")</script>';
 
   $src= $srcPathReturn."libs/case-1.0.1/"; 
   include $srcPathReturn.'libs/case-1.0.1/case.php';
 
-  echo '<script src="../source/ConfigProyect.js"></script>';
-  echo '<script src="../source/Constans.js"></script>';
-  echo '<script src="../source/ListOfPaginas.js"></script>';
-  echo '<script src="../source/ListOfConections.js"></script>';
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ConfigProyect.js"></script>';
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/Constans.js"></script>';
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ListOfPaginas.js"></script>';
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ListOfConections.js"></script>';
 
-  echo '<script src="../source/cruds/crudsBase.js"></script>';
-  echo '<script src="../source/cruds/schList.js"></script>';
-  echo '<script src="../source/ListOfForms.js"></script>';
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/cruds/crudsBase.js"></script>';
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/cruds/schList.js"></script>';
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ListOfForms.js"></script>';
 
-  echo '<script src="../source/LoadPage.js"></script>';
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/LoadPage.js"></script>';
 
   echo '<script src="'.$srcPathReturn.'TutorialClass.js"></script>';
   
@@ -37,6 +41,7 @@
   $url = $_SERVER["REQUEST_URI"];
   $parts = explode("/", $url);
   $page = str_replace(".php", "", end($parts));  
+  if($page=="")$page="Index";
 
 
   echo '<script src="'.$page.'.js"></script>';

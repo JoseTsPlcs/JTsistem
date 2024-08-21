@@ -2,7 +2,7 @@
 <html lang="es" dir="ltr">
   <head>
     
-    <?php include 'aaa_css.php'?>
+    <?php $srcPathReturn = ""; include 'aaa_css.php'?>
 
     <title></title>
   </head>
