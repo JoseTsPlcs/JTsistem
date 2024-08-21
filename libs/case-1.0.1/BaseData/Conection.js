@@ -37,7 +37,7 @@ class Conection extends ODD {
 
     var arr = window.location.pathname.split('/');
     var path = "";
-    for (let i = 0; i < arr.length-3; i++) {
+    for (let i = 0; i < arr.length-(2 + (arr.find(a=>a == "JTsistem")?1:0)); i++) {
       
       path += "../";
     }
