@@ -13,10 +13,10 @@
 /* Estilo para el contenedor que resalta el elemento */
 .highlight {
     position: absolute;
-    z-index: 1060;
-    border: 2px solid yellow;
-    border-radius: 5px;
-    background-color: transparent;
+    background-color: rgba(255, 0, 0, 0.2); /* Fondo rojo translúcido */
+    border: 2px solid red;                  /* Borde rojo más visible */
+    pointer-events: none;                   /* Permite la interacción con el elemento */
+    z-index: 1061;                          /* Asegúrate de que esté por encima de otros elementos */
 }
 
 /* Estilo para el campo y etiqueta resaltado */
@@ -36,7 +36,7 @@
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 1061;
+    z-index: 1062;
     padding: 20px;
     /* Asegúrate de que el popup esté en el centro de la pantalla si se necesita */
     transform: none; /* Desactiva la transformación de centrado */

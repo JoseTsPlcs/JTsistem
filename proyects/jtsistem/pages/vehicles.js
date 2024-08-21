@@ -113,48 +113,10 @@ $(document).ready(function() {
             name:"vehicle-fm",
             active:true,
             script:{
-              parent:prnt_vehicle_fm,
-              title:"vehiculo",
-              panels:[{col:12,y:0,title:"main",head:false,tipe:"form"}],
-              stateStart:"block",
-              afterCancel:"block",
-
-              tableMain:"items_vehicles",
-              selects:[
-                {table:"items_vehicles",field:"ID_VEHICLE",primary:true},
-                {table:"items_vehicles",field:"PLACA"},
-                {table:"items_vehicles",field:"MARCA"},
-                {table:"items_vehicles",field:"MODELO"},
-                {table:"items_vehicles",field:"NRO_MOTO"},
-                {table:"items_vehicles",field:"NRO_VIN"},                
-                {table:"items_vehicles",field:"ANIO"},
-                {table:"items_vehicles",field:"COLOR"},
-              ],
-              inserts:[
-                ...ins_general,
-              ],
-
-              fields:[
-                {panel:"main",name:"placa",box:{tipe:1,value:""},select:"PLACA"},
-                {panel:"main",name:"marca",box:{tipe:1,value:""},select:"MARCA"},
-                {panel:"main",name:"modelo",box:{tipe:1,value:""},select:"MODELO"},
-                {panel:"main",name:"nro de motor",box:{tipe:1,value:""},select:"NRO_MOTO"},
-                {panel:"main",name:"nro de vin",box:{tipe:1,value:""},select:"NRO_VIN"},
-                {panel:"main",name:"año",box:{tipe:1,value:""},select:"ANIO"},
-                {panel:"main",name:"color",box:{tipe:1,value:""},select:"COLOR"},
-              ],
-
-              events:[
-                {
-                  name:"modalSetActive",
-                  actions:[{
-                    action:({active})=>{
-
-                      md_vehicle_fm.SetActive({active});
-                    }
-                  }]
-                }
-              ],
+              ...scr_vehicle_fm({
+                parent:md_vehicle_fm,
+                userData,
+              }),
             }
           },
         ],

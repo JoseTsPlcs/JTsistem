@@ -59,7 +59,7 @@ $(document).ready(function() {
           {name:"content",tipe:0,box:{tipe:0,class:"w-100 px-0 mx-0"}},
         ],
         tools:[
-          {position:"botton-center",name:"pdf",box:{tipe:5,value:'pdf <i class="bi bi-filetype-pdf"></i>',class:"btn btn-danger btn-sm",update:()=>{SavePdf()}}},
+          //{position:"botton-center",name:"pdf",box:{tipe:5,value:'pdf <i class="bi bi-filetype-pdf"></i>',class:"btn btn-danger btn-sm",update:()=>{SavePdf()}}},
         ],
       });
 
@@ -85,20 +85,12 @@ $(document).ready(function() {
                   tools:[
                       {name:"config",show:true},
                       {name:"load",show:true},
-                      
-                      {name:"excel",show:false},
-                      {name:"pdf",show:false},
-          
                       {name:"sizes",show:true,value:10},
                       {name:"reload",show:true},
-                      {name:"update",show:false},
                       {name:"new",show:true},
-                      {name:"insert",show:false},
-                      {name:"cancel",show:false},
-                      
                       {name:"pages",show:true},
                   ],
-              }
+                },
               ],
               
               tableMain:"checkin_vehicles",
@@ -134,21 +126,22 @@ $(document).ready(function() {
               ],
               inserts:ins_general,
 
+              configShow:true,
               filters:[
-                {name:"cliente",box:bx_input,select:{table:"customers",field:"NAME"}},
-                {name:"placa",box:bx_input,select:{table:"items_vehicles",field:"PLACA"}},
-                {name:"marca",box:bx_input,select:{table:"items_vehicles",field:"MARCA"}},
-                {col:6,name:"fecha min",box:bx_date,select:{table:"checkin_vehicles",field:"DATE_ENTER",tipe:"min"}},
-                {col:6,name:"fechamax",box:bx_date,select:{table:"checkin_vehicles",field:"DATE_ENTER",tipe:"max"}},
+                {name:"cliente",box:bx_input,select:{table:"customers",field:"NAME"},descripcion:"buscar por nombre del cliente"},
+                {name:"placa",box:bx_input,select:{table:"items_vehicles",field:"PLACA"},descripcion:"buscar por placa del vehiculo"},
+                {name:"marca",box:bx_input,select:{table:"items_vehicles",field:"MARCA"},descripcion:"buscar po marca del vehiculo"},
+                {col:6,name:"fecha min",box:bx_date,select:{table:"checkin_vehicles",field:"DATE_ENTER",tipe:"min"},descripcion:"buscar por fecha mayor o igual a la seleccionada"},
+                {col:6,name:"fechamax",box:bx_date,select:{table:"checkin_vehicles",field:"DATE_ENTER",tipe:"max"},descripcion:"buscar por fecha menor o igual a la seleccionada"},
               ],
               fields:[
                 //{panel:"main",...fld_delete},
                 {panel:"main",...fld_edit},
                 //{panel:"main",name:"pdf",box:{tipe:5,value:'<i class="bi bi-filetype-pdf"></i>',class:"btn btn-danger btn-sm"},action:"pdf"},
-                {panel:"main",name:"fecha de entrada",box:{tipe:0},select:"DATE_ENTER"},
-                {panel:"main",name:"cliente",box:{tipe:0},select:"NAME"},
-                {panel:"main",name:"marca",box:{tipe:0},select:"MARCA"},
-                {panel:"main",name:"placa",box:{tipe:0},select:"PLACA"},
+                {panel:"main",name:"fecha de entrada",box:{tipe:0},select:"DATE_ENTER",descripcion:"fecha de entrada del vehiculo"},
+                {panel:"main",name:"cliente",box:{tipe:0},select:"NAME",descripcion:"nombre del cliente"},
+                {panel:"main",name:"marca",box:{tipe:0},select:"MARCA",descripcion:"marca del vehiculo"},
+                {panel:"main",name:"placa",box:{tipe:0},select:"PLACA",descripcion:"placa del vehiculo"},
               ],
 
               events:[
@@ -178,27 +171,26 @@ $(document).ready(function() {
                 {col:8,y:1,title:"Chasis",tipe:"form",blocked:false},
               ],
               stateStart:"block",
-              //afterUpdate:"block",
+              afterUpdate:"block",
               afterCancel:"block",
               afterInsert:"block",
               stateTools:[
                 {
                   name:"reload",
                   tools:[
-                      {name:"config",show:false},
                       {name:"load",show:true},
-                      
-                      {name:"excel",show:false},
-                      {name:"pdf",show:false},
-          
                       {name:"sizes",show:false,value:1},
                       {name:"reload",show:true},
                       {name:"update",show:true},
-                      {name:"new",show:false},
-                      {name:"insert",show:false},
                       {name:"cancel",show:true},
-                      
-                      {name:"pages",show:false},
+                      {name:"pdf",show:true},
+                  ],
+                },
+                {
+                  name:"new",
+                  tools:[
+                    {name:"insert",show:true},
+                    {name:"cancel",show:true},
                   ],
                 }
               ],
@@ -365,26 +357,26 @@ $(document).ready(function() {
 
               fields:[
 
-                {panel:"Datos del Cliente",col:8,colAllLevel:true,name:"cliente",box:{tipe:8,class:"w-100"},load:{name:"ld-customers",value:"value",show:"show"},select:"ID_CUSTOMER"},
-                {panel:"Datos del Cliente",col:2,colAllLevel:true,name:"cus-edit",...fld_edit,action:"cus-edit"},
-                {panel:"Datos del Cliente",col:2,colAllLevel:true,name:"cus-add",...fld_add,action:"cus-add"},
+                {panel:"Datos del Cliente",col:8,colAllLevel:true,name:"cliente",box:{tipe:8,class:"w-100"},load:{name:"ld-customers",value:"value",show:"show"},select:"ID_CUSTOMER",descripcion:"cliente que requiere el trabajo"},
+                {panel:"Datos del Cliente",col:2,colAllLevel:true,name:"cus-edit",...fld_edit,action:"cus-edit",descripcion:"editar informacion del cliente"},
+                {panel:"Datos del Cliente",col:2,colAllLevel:true,name:"cus-add",...fld_add,action:"cus-add",descripcion:"añadir nuevo cliente"},
 
-                {panel:"Datos del Cliente",col:8,colAllLevel:true,name:"solicitante",box:{tipe:8,class:"w-100"},load:{name:"ld-customers",value:"value",show:"show"},select:"ID_CUSTOMER_RECEPTOR"},
-                {panel:"Datos del Cliente",col:2,colAllLevel:true,name:"sol-edit",...fld_edit,action:"cus-edit"},
-                {panel:"Datos del Cliente",col:2,colAllLevel:true,name:"sol-add",...fld_add,action:"cus-add"},
+                {panel:"Datos del Cliente",col:8,colAllLevel:true,name:"solicitante",box:{tipe:8,class:"w-100"},load:{name:"ld-customers",value:"value",show:"show"},select:"ID_CUSTOMER_RECEPTOR",descripcion:"persona que viene a dejar el vehiculo"},
+                {panel:"Datos del Cliente",col:2,colAllLevel:true,name:"sol-edit",...fld_edit,action:"cus-edit",descripcion:"editar informacion del solicitante"},
+                {panel:"Datos del Cliente",col:2,colAllLevel:true,name:"sol-add",...fld_add,action:"cus-add",descripcion:"añadir solicitante"},
 
-                {panel:"Datos del Cliente",col:12,colAllLevel:true,name:"recepcionista",box:{tipe:8,class:"w-100"},load:{name:"ld-workers",value:"value",show:"show"},select:"ID_USER_RECEPTOR"},
+                {panel:"Datos del Cliente",col:12,colAllLevel:true,name:"recepcionista",box:{tipe:8,class:"w-100"},load:{name:"ld-workers",value:"value",show:"show"},select:"ID_USER_RECEPTOR",descripcion:"trabajador que recepciono la orden de trabajo"},
 
-                {panel:"Datos del Vehiculo",col:8,colAllLevel:true,name:"vehiculo",box:{tipe:8,class:"w-100"},select:"ID_ITEM_VEHICLE",load:{name:"ld-items",value:"value",show:"show"}},
-                {panel:"Datos del Vehiculo",col:2,colAllLevel:true,name:"veh-edit",...fld_edit,action:"veh-edit"},
-                {panel:"Datos del Vehiculo",col:2,colAllLevel:true,name:"veh-add",...fld_add,action:"veh-add"},
+                {panel:"Datos del Vehiculo",col:8,colAllLevel:true,name:"vehiculo",box:{tipe:8,class:"w-100"},select:"ID_ITEM_VEHICLE",load:{name:"ld-items",value:"value",show:"show"},descripcion:"vehiculo al que se le realizara la orden de trabajo"},
+                {panel:"Datos del Vehiculo",col:2,colAllLevel:true,name:"veh-edit",...fld_edit,action:"veh-edit",descripcion:"editar informacion del vehiculo"},
+                {panel:"Datos del Vehiculo",col:2,colAllLevel:true,name:"veh-add",...fld_add,action:"veh-add",descripcion:"añadir nuevo vehiculo"},
                 //{panel:"Datos del Vehiculo",col:2,colAllLevel:true,...fld_edit},{panel:"Datos del Vehiculo",col:2,colAllLevel:true,...fld_add},
-                {panel:"Datos del Vehiculo",col:6,name:"fecha de ingreso",box:bx_date,select:"DATE_ENTER"},
-                {panel:"Datos del Vehiculo",col:6,name:"fecha de entrega",box:bx_date,select:"DATE_OUT"},
-                {panel:"Datos del Vehiculo",col:12,name:"combustible",box:{tipe:1,value:0,attributes:[{name:"type",value:"range"},{name:"min",value:0},{name:"max",value:100}]},select:"FUEL"},
-                {panel:"Datos del Vehiculo",col:4,name:"kilometraje",box:{tipe:1,value:0},select:"MILEAGE"},
-                {panel:"Datos del Vehiculo",col:8,name:"kilometraje del proximo servicio",box:{tipe:1,value:0},select:"MILEAGE_PROX"},
-                {panel:"Datos del Vehiculo",col:12,name:"requerimiento",box:{tipe:9,value:""},select:"COMENT"},
+                {panel:"Datos del Vehiculo",col:6,name:"fecha de ingreso",box:bx_date,select:"DATE_ENTER",descripcion:"fecha de ingreso del vehiculo"},
+                {panel:"Datos del Vehiculo",col:6,name:"fecha de entrega",box:bx_date,select:"DATE_OUT",descripcion:"fechad de entrega del vehiculo"},
+                {panel:"Datos del Vehiculo",col:12,name:"combustible",box:{tipe:1,value:0,attributes:[{name:"type",value:"range"},{name:"min",value:0},{name:"max",value:100}]},select:"FUEL",descripcion:"nivel de combustible con el cual el vehiculo llego"},
+                {panel:"Datos del Vehiculo",col:4,name:"kilometraje",box:{tipe:1,value:0},select:"MILEAGE",descripcion:"kilometraje del vehiculo"},
+                {panel:"Datos del Vehiculo",col:8,name:"kilometraje del proximo servicio",box:{tipe:1,value:0},select:"MILEAGE_PROX",descripcion:"kilometraje para el proximo servicio"},
+                {panel:"Datos del Vehiculo",col:12,name:"requerimiento",box:{tipe:9,value:""},select:"COMENT",select:"descripcion del requerimiento del vehiculo"},
 
                 
                 {panel:"Inventario de Recepcion",name:"check in 1",tipe:0,box:{tipe:6,value:0,name:"radio"},select:"CHECK_1"},
@@ -414,8 +406,8 @@ $(document).ready(function() {
                 {panel:"Inventario de Recepcion",name:"check in 25",tipe:0,box:{tipe:6,value:0,name:"pisos de jebe"},select:"CHECK_25"},
                 {panel:"Inventario de Recepcion",name:"check in 26",tipe:0,box:{tipe:6,value:0,name:"plimillas/otros"},select:"CHECK_26"},
 
-                {panel:"Chasis",name:"front",tipe:2,box:{tipe:0,class:"w-100 px-0 mx-0"},action:"img"},
-                {panel:"Chasis",name:"observacion",box:{tipe:9,class:"w-100 px-0 mx-0",value:""},select:"OBSERVATIONS"},
+                {panel:"Chasis",name:"front",tipe:2,box:{tipe:0,class:"w-100 px-0 mx-0"},action:"img",descripcion:"descripcion grafica del vehiculo"},
+                {panel:"Chasis",name:"observacion",box:{tipe:9,class:"w-100 px-0 mx-0",value:""},select:"OBSERVATIONS",descripcion:"observaciones de las condiciones del vehiculo"},
                 //{panel:"chasis",name:"comentario",tipe:2,box:{tipe:9,value:""},select:"COMENT"},
                 //type="file" class="form-control-file" id="imageInput" value="../images/mi_imagen.jpg"
                 
@@ -530,168 +522,20 @@ $(document).ready(function() {
             name:"vehicle-fm",
             active:true,
             script:{
-              parent:prnt_vehicle_fm,
-              title:"vehiculo",
-              panels:[{col:12,y:0,title:"main",head:false,tipe:"form"}],
-              stateStart:"block",
-              afterCancel:"block",
-              afterInsert:"block",
-              stateTools:[
-                {
-                  name:"reload",
-                  tools:[
-                      {name:"config",show:false},
-                      {name:"load",show:false},
-                      
-                      {name:"excel",show:false},
-                      {name:"pdf",show:false},
-          
-                      {name:"sizes",show:false,value:1},
-                      {name:"reload",show:true},
-                      {name:"update",show:true},
-                      {name:"new",show:false},
-                      {name:"insert",show:false},
-                      {name:"cancel",show:true},
-                      
-                      {name:"pages",show:false},
-                  ],
-                }
-              ],
-
-              tableMain:"items_vehicles",
-              selects:[
-                {table:"items_vehicles",field:"ID_VEHICLE",primary:true},
-                {table:"items_vehicles",field:"PLACA"},
-                {table:"items_vehicles",field:"MARCA"},
-                {table:"items_vehicles",field:"MODELO"},
-                {table:"items_vehicles",field:"NRO_MOTO"},
-                {table:"items_vehicles",field:"NRO_VIN"},                
-                {table:"items_vehicles",field:"ANIO"},
-                {table:"items_vehicles",field:"COLOR"},
-              ],
-              inserts:[
-                ...ins_general,
-              ],
-
-              fields:[
-                {panel:"main",name:"placa",box:{tipe:1,value:""},select:"PLACA"},
-                {panel:"main",name:"marca",box:{tipe:1,value:""},select:"MARCA"},
-                {panel:"main",name:"modelo",box:{tipe:1,value:""},select:"MODELO"},
-                {panel:"main",name:"nro de motor",box:{tipe:1,value:""},select:"NRO_MOTO"},
-                {panel:"main",name:"nro de vin",box:{tipe:1,value:""},select:"NRO_VIN"},
-                {panel:"main",name:"año",box:{tipe:1,value:""},select:"ANIO"},
-                {panel:"main",name:"color",box:{tipe:1,value:""},select:"COLOR"},
-              ],
-
-              events:[
-                {
-                  name:"modalSetActive",
-                  actions:[{
-                    action:({active})=>{
-
-                      md_vehicle_fm.SetActive({active});
-                    }
-                  }]
-                }
-              ],
+              ...scr_vehicle_fm({
+                parent:md_vehicle_fm,
+                userData,
+              }),
             }
           },
           {
             name:"customer",
             active:true,
             script:{
-              parent:prnt_customer_fm,
-              title:"cliente",
-              panels:[{col:12,y:0,title:"main",tipe:"form"}],
-              stateStart:"block",
-              afterInsert:"block",
-              afterUpdate:"block",
-              afterCancel:"block",
-              stateTools:[
-                {
-                    name:"reload",
-                    tools:[
-                        {name:"config",show:false},
-                        {name:"load",show:true},
-                        
-                        {name:"excel",show:false},
-                        {name:"pdf",show:false},
-            
-                        {name:"sizes",show:false,value:1},
-                        {name:"reload",show:true},
-                        {name:"update",show:true},
-                        {name:"new",show:false},
-                        {name:"insert",show:false},
-                        {name:"cancel",show:true},
-                        
-                        {name:"pages",show:false},
-                    ],
-                },
-                {
-                    name:"new",
-                    tools:[
-                        {name:"config",show:false},
-                        {name:"load",show:true},
-                        
-                        {name:"excel",show:false},
-                        {name:"pdf",show:false},
-            
-                        {name:"sizes",show:false,value:1},
-                        {name:"reload",show:false},
-                        {name:"update",show:false},
-                        {name:"new",show:false},
-                        {name:"insert",show:true},
-                        {name:"cancel",show:true},
-                        
-                        {name:"pages",show:false},
-                    ],
-                }
-              ],
-
-              tableMain:"customers",
-              selects:[
-                {table:'customers', field:'ID_CUSTOMER',primary:true},
-                {table:'customers', field:'ID_COMPANY'},
-                {table:'customers', field:'NAME'},
-                //{table:'customers', field:'ID_CUSTOMER_TIPE'},
-                {table:'customers', field:'COMPANY'},
-                {table:'customers', field:'NRO_DOCUMENT'},
-                {table:'customers', field:'PHONE'},
-                {table:'customers', field:'EMAIL'},
-                {table:'customers', field:'DESCRIPCION'},
-                {table:'customers', field:'DIRECCION'},
-              ],
-              conditions:[{
-                table:"customers",
-                field:"ID_COMPANY",
-                inter:"=",
-                value:company_id,
-              }],
-              inserts:ins_general,
-
-              fields:[
-                {panel:"main",col:8,name:"cliente",box:bx_input,select:"NAME"},
-                {panel:"main",col:4,tipe:0,name:"empresa",box:{tipe:6,name:"empresa",value:0},select:"COMPANY"},
-                {panel:"main",col:6,name:"documento",box:{tipe:0,options:op_identity_document_tipe},select:"COMPANY"},
-                {panel:"main",col:6,name:"nro documento",box:bx_input,select:"NRO_DOCUMENT"},
-                
-                {panel:"main",col:12,name:"telefono",box:{tipe:1,value:""},select:"PHONE"},
-                {panel:"main",col:12,name:"correo",box:{tipe:1,value:""},select:"EMAIL"},
-                {panel:"main",col:12,name:"direccion",box:{tipe:1,value:""},select:"DIRECCION"},
-                {panel:"main",col:12,tipe:2,name:"descripcion",box:{tipe:9,value:""},select:"DESCRIPCION"},
-              ],
-
-              events:[
-                {
-                  name:"modalSetActive",
-                  actions:[{
-                      action:({k,active})=>{
-
-                        md_customer_fm.SetActive({active});
-                      }
-                  }]
-                },
-              ],
+              ...scr_customer_fm({
+                parent:md_customer_fm,
+                userData,
+              }),
             }
           }
         ],

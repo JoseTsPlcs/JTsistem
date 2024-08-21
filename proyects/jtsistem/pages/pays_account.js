@@ -283,7 +283,7 @@ $(document).ready(function() {
                     tools:[
                       {name:"config",show:false},
                       {name:"reload",show:true},
-                      {name:"size",show:false,value:10},
+                      {name:"sizes",show:false,value:10},
                     ],
                 }
               ],

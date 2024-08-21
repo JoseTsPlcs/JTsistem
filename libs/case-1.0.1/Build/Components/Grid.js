@@ -186,7 +186,10 @@ class Grid extends ODD {
           ...label.box,
           update:(v)=>{
             
-            k.CallEvent({name:'boxUpdate',params:{x:label.x,y:label.y,valueUpdate:v}});
+            var paramsUpdate = {x:label.x,y:label.y,valueUpdate:v};
+            k.CallEvent({name:'boxUpdate',params:paramsUpdate});
+            k.CallEvent({name:'labelUpdate',params:{...paramsUpdate,label}});
+            //if(label.box.update!=null) label.box.update(paramsUpdate); 
           }
         }
 

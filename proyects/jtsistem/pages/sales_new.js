@@ -5,6 +5,10 @@ $(document).ready(function() {
 
     success:({userData,pageData,k})=>{
 
+      var infoBetweenPage = JSON.parse(sessionStorage.getItem('data'));
+      console.log("--------------infoBetweenPage",infoBetweenPage);
+      
+
       var acc_products_update = Access_Get(userData.access,"mod-sale-item");
       var acc_price_update = Access_Get(userData.access,"mod-sale-price");
       var acc_item_worker = Access_Get(userData.access,"mod-workers-item");
@@ -542,6 +546,18 @@ $(document).ready(function() {
                       } 
                     }
                   }],
+                },
+                {
+                  name:"setTutorials",
+                  actions:[{
+                    action:({k})=>{
+
+                      if(infoBetweenPage && infoBetweenPage.question){
+
+                        if(infoBetweenPage.question.value == "md-sale-saleNew") k.questionsGet()[0].tutorial.startTutorial();
+                      }
+                    }
+                  }]
                 }
               ],
             }
@@ -550,10 +566,9 @@ $(document).ready(function() {
             name:"customer",
             active:true,
             script:{
-              ...scr_customer_md({
+              ...scr_customer_fm({
                 userData,
-                parent:md2.GetContent(),
-                modal:md2,
+                parent:md2,
               })
             }
           },
@@ -1622,32 +1637,82 @@ $(document).ready(function() {
 
       });
       
-      //tutorial
+      //------tutorial------
+      var elementsInfo = [
+        {
+          id:"bodyMain_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_3_div_1_3",
+          descripcion:"presiona insertar para añadir venta, una vez insertada se puede modificar",
+        },
+      ];
 
+      //sale
+      var cr_sale = conections.Crud_GetBuild({name:"sale"});
+      cr_sale.fieldsGet().forEach(fld => {
+        
+        if(fld.descripcion!=null){
 
-      k.AddTutorialtoPage({
-        name:"¿como insertar nueva venta?",
-        tutorialClass: new Tutorial({
-          elementsInfo:[
-            {
-              id:"bodyMain_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_3_div_1_3_block5_btn4",
-              descripcion:'presiona el boton "insertar" para agregar nueva venta',
-            },
-          ],
-        })
+          elementsInfo.push({
+            id:cr_sale.fieldGetTutorialElement({fieldName:fld.name}).id,
+            descripcion:fld.descripcion,
+          });
+        }
       });
 
-      k.AddTutorialtoPage({
-        name:"¿como usar los campos?",
-        tutorialClass: new Tutorial({
-          elementsInfo:[
-            {
-              id:"bodyMain_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_3_div_1_3_block5_btn4",
-              descripcion:'presiona el boton "insertar" para agregar nueva venta',
-            },
-          ],
-        })
+      //items
+      elementsInfo.push({
+        id:"bodyMain_conteiner_undefined_row_1_div_1_1_conteiner_undefined_row_0_div_0_0_block5_button0",
+        descripcion:"selecciona para ver los items de la venta",
       });
+      if(acc_products_update){
+
+        elementsInfo.push({
+          id:"bodyMain_conteiner_undefined_row_1_div_1_1_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_0_div_0_0_block5_",
+          descripcion:"selecciona para añadir un nuevo item",
+        });
+      }
+
+      var cr_item = conections.Crud_GetBuild({name:"products"});
+      cr_item.fieldsGet().forEach(fld => {
+        
+        if(fld.descripcion!=null){
+
+          elementsInfo.push({
+            id:cr_item.fieldGetTutorialElement({fieldName:fld.name}).id,
+            descripcion:fld.descripcion,
+          });
+        }
+      });
+
+      //pays
+      if(acc_pays){
+
+        elementsInfo.push({
+          id:"bodyMain_conteiner_undefined_row_1_div_1_1_conteiner_undefined_row_0_div_0_0_block5_button1",
+          descripcion:"selecciona para ver los pagos realizados",
+        });
+
+        var cr_pays = conections.Crud_GetBuild({name:"pays"});
+        cr_pays.fieldsGet().forEach(fld => {
+          
+          if(fld.descripcion!=null){
+
+            elementsInfo.push({
+              id:cr_pays.fieldGetTutorialElement({fieldName:fld.name}).id,
+              descripcion:fld.descripcion,
+            });
+          }
+        });
+      }
+      
+      var tutorial = new Tutorial({
+        elementsInfo,
+      });
+
+      console.log("start tutorial----------",infoBetweenPage);
+      
+      
+
+      //setTimeout(()=>{tutorial.startTutorial()},1000);
 
 
     }

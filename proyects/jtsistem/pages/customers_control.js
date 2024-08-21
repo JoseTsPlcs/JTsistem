@@ -11,7 +11,6 @@ $(document).ready(function() {
         
         ...scr_customer_tb({
           parent:gr.GetColData({x:0,y:0}).col,
-          title:"lista de cliente",
           userData,
         })
 
