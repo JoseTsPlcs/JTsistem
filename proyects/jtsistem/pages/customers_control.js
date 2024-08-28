@@ -5,17 +5,7 @@ $(document).ready(function() {
 
     success:({userData,pageData})=>{
 
-      var gr = new Grid({parent:pageData.body,cols:[[12]]});
-
-      new Crud_set({
-        
-        ...scr_customer_tb({
-          parent:gr.GetColData({x:0,y:0}).col,
-          userData,
-        })
-
-      });
-
+      pageBuildCruds({userData,pageData});
     }
   });
 

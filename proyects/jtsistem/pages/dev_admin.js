@@ -29,18 +29,16 @@ $(document).ready(function() {
           tools:[
               {name:"config",show:true},
               {name:"load",show:true},
-              
-              {name:"excel",show:false},
-              {name:"pdf",show:false},
-
               {name:"sizes",show:true,value:999},
               {name:"reload",show:true},
-              {name:"update",show:false},
               {name:"new",show:true},
-              {name:"insert",show:false},
-              {name:"cancel",show:false},
-              
-              {name:"pages",show:false},
+          ],
+        },
+        {
+          name:"new",
+          tools:[
+            {name:"insert",show:true},
+            {name:"cancel",show:true},
           ],
         }
       ],
@@ -62,9 +60,9 @@ $(document).ready(function() {
       fields:[
         //{panel:"main",...fld_delete},
         {panel:"main",...fld_edit},
-        {panel:"main",name:"id",box:{tipe:0},select:"ID_COMPANY"},
-        {panel:"main",name:"tipo",attributes:[{name:"style",value:"min-width:100px"}],box:{tipe:3,options:op_company_type},select:"ID_COMPANY_TYPE"},
-        {panel:"main",name:"nombre",attributes:[{name:"style",value:"min-width:300px"}],box:{tipe:1,class:"w-100"},select:"NAME"},
+        //{panel:"main",name:"id",box:{tipe:0},select:"ID_COMPANY"},
+        {panel:"main",name:"tipo",attributes:[{name:"style",value:"min-width:100px"}],box:{tipe:3,options:op_company_type,value:1},select:"ID_COMPANY_TYPE"},
+        {panel:"main",name:"nombre",attributes:[{name:"style",value:"min-width:300px"}],box:{tipe:1,class:"w-100",value:""},select:"NAME"},
         {panel:"main",name:"logo show",box:{tipe:10,style:"max-width: 100px;"},select:"LOGO"},
         {panel:"main",name:"logo update",box:{tipe:1,attributes:[{name:"type",value:"file"}]},select:"LOGO"},
         {panel:"main",name:"active",box:{tipe:6,name:"active"},select:"ACTIVE"},

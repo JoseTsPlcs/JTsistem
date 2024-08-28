@@ -865,7 +865,6 @@ function scr_fm_pays({parent,head=true,tableName,priFieldName,joinFieldName,even
 
 }
 
-
 function scr_admin({id_company,parent,editUsuarios=false,editClase=false,editAccess=false}){
 
     var gr = new Grid({
@@ -895,25 +894,26 @@ function scr_admin({id_company,parent,editUsuarios=false,editClase=false,editAcc
                     title:"lista de usuarios",
                     panels:[{col:12,y:0,title:"main",tipe:"table"}],
                     stateTools:[
-                    {
-                        name:"reload",
-                        tools:[
-                            {name:"config",show:true},
-                            {name:"load",show:true},
-                            
-                            {name:"excel",show:false},
-                            {name:"pdf",show:false},
-                
-                            {name:"sizes",show:true,value:10},
-                            {name:"reload",show:true},
-                            {name:"update",show:false},
-                            {name:"new",show:editUsuarios},
-                            {name:"insert",show:false},
-                            {name:"cancel",show:false},
-                            
-                            {name:"pages",show:true},
-                        ],
-                    }
+                        {
+                            name:"reload",
+                            tools:[
+                                {name:"config",show:true},
+                                {name:"load",show:true},
+                    
+                                {name:"sizes",show:true,value:10},
+                                {name:"reload",show:true},
+                                {name:"new",show:editUsuarios},
+                                
+                                {name:"pages",show:true},
+                            ],
+                        },
+                        {
+                            name:"new",
+                            tools:[
+                                {name:"insert",show:true},
+                                {name:"cancel",show:true},
+                            ],
+                        }
                     ],
 
                     tableMain:"users",
@@ -990,6 +990,13 @@ function scr_admin({id_company,parent,editUsuarios=false,editClase=false,editAcc
                                 
                                 {name:"pages",show:true},
                             ],
+                        },
+                        {
+                            name:"new",
+                            tools:[
+                                {name:"insert",show:true},
+                                {name:"cancel",show:true},
+                            ],
                         }
                     ],
 
@@ -1021,7 +1028,7 @@ function scr_admin({id_company,parent,editUsuarios=false,editClase=false,editAcc
                             actions:[{
                                 action:({k,field,value})=>{
 
-                                    k.Loading_SetActive({active:true});
+                                    //k.Loading_SetActive({active:true});
 
                                     var count = 0;
                                     var total = op_access.length;
@@ -1052,7 +1059,7 @@ function scr_admin({id_company,parent,editUsuarios=false,editClase=false,editAcc
                                     count++;
                                     if(count>=total){
 
-                                        k.Loading_SetActive({active:false});
+                                        //k.Loading_SetActive({active:false});
                                     }
                                     }
                                     
@@ -1066,7 +1073,7 @@ function scr_admin({id_company,parent,editUsuarios=false,editClase=false,editAcc
 
                                     if(field.action=="update_access"){
 
-                                        k.Loading_SetActive({active:true});
+                                        //k.Loading_SetActive({active:true});
                                         var class_id = k.Reload_GetData({})[y]["ID_CLASS"];
                                         var conection = k.Conection_Get({});
 
@@ -1086,6 +1093,22 @@ function scr_admin({id_company,parent,editUsuarios=false,editClase=false,editAcc
                                                 var inserts = [];
 
                                                 modulos.forEach(md=>{
+
+                                                    inserts.push(
+                                                        {
+                                                            field:"ID_ACCESS",
+                                                            value:md.value+"-general",
+                                                            tipe:"values",
+                                                        }
+                                                    );
+
+                                                    inserts.push(
+                                                        {
+                                                            field:"CLASS_ACCESS_TYPE",
+                                                            value:md.value,
+                                                            tipe:"values",
+                                                        }
+                                                    );
 
                                                     md.access.forEach(acc => {
                                                         
@@ -1121,7 +1144,7 @@ function scr_admin({id_company,parent,editUsuarios=false,editClase=false,editAcc
                                                     }),
                                                     success:()=>{
 
-                                                        k.Loading_SetActive({active:false});
+                                                        //k.Loading_SetActive({active:false});
                                                     }
                                                 });
                                             }
@@ -1263,28 +1286,28 @@ function items_actives({userData}) {
             descripcion:"precio unitario del producto/servicio/insumo"
         },
         {
-            name:"costo unitario",select:'COST_UNIT',active:true,
+            name:"costo unitario",select:'COST_UNIT',active:"md-buy",
             edit:{box:{...bx_input}},
             show:{box:{...bx_shw}},
             filter:{box:{...bx_input}},
             descripcion:"costo unitario del producto/servicio/insumo"
         },
         {
-            name:"stock total",select:'STOCK_TOTAL',active:true,
+            name:"stock total",select:'STOCK_TOTAL',active:"md-items-stock",
             edit:{box:{...bx_input}},
             show:{box:{...bx_shw}},
             filter:{box:{...bx_input}},
             descripcion:"stock total del producto/servicio/insumo"
         },
         {
-            name:"stock minimo",select:'STOCK_LIMIT',active:true,
+            name:"stock minimo",select:'STOCK_LIMIT',active:"md-items-stock",
             edit:{box:{...bx_input}},
             show:{box:{...bx_shw}},
             filter:{box:{...bx_input}},
             descripcion:"stock minimo del producto/servicio/insumo, en caso el stock sea menor al minimo, este estara en el limite"
         },
         {
-            name:"stock en el minimo",select:'STOCK_LIMIT',active:true,
+            name:"stock en el minimo",select:'STOCK_LIMIT',active:"md-items-stock",
             edit:{box:{...bx_input}},
             show:{box:{...bx_shw}},
             filter:{box:{...bx_input}},
@@ -1325,31 +1348,42 @@ function src_items_tb({parent,userData}) {
     }
 }
 
-function src_item_fm({}){
+function src_item_fm({userData}){
+
+    var item_buy = Access_Get(userData.access,"md-buy");
+    var item_stock = Access_Get(userData.access,"md-items-stock");
+    var item_config = Access_Get(userData.access,"md-items-config");
 
     return {
         title:"producto",
         panels:[{col:12,y:0,title:"main",tipe:"form",head:false}],
         stateTools:[
-        {
-            name:"reload",
-            tools:[
-                {name:"config",show:false},
-                {name:"load",show:false},
-                
-                {name:"excel",show:false},
-                {name:"pdf",show:false},
-    
-                {name:"sizes",show:false,value:999},
-                {name:"reload",show:true},
-                {name:"update",show:true},
-                {name:"new",show:false},
-                {name:"insert",show:false},
-                {name:"cancel",show:true},
-                
-                {name:"pages",show:false},
-            ],
-        }
+            {
+                name:"reload",
+                tools:[
+                    {name:"config",show:false},
+                    {name:"load",show:false},
+                    
+                    {name:"excel",show:false},
+                    {name:"pdf",show:false},
+        
+                    {name:"sizes",show:false,value:999},
+                    {name:"reload",show:true},
+                    {name:"update",show:true},
+                    {name:"new",show:false},
+                    {name:"insert",show:false},
+                    {name:"cancel",show:true},
+                    
+                    {name:"pages",show:false},
+                ],
+            },
+            {
+                name:"new",
+                tools:[
+                    {name:"cancel",show:true},
+                    {name:"insert",show:true},
+                ],
+            }
         ],
         stateStart:"block",
         afterUpdate:"block",
@@ -1358,16 +1392,16 @@ function src_item_fm({}){
     
         tableMain:"products",
         selects:[
-        {table:'products', field:'ID_PRODUCT',primary:true},
-        {table:'products', field:'NAME'},
-        {table:'products', field:'ID_PRODUCT_TIPE'},
-        {table:'products', field:'ID_PRODUCT_TAG'},
-        {table:'products', field:'UNID_ID'},
-        {table:'products', field:'ACTIVE'},
-        {table:'products', field:'COST_UNIT'},
-        {table:'products', field:'PRICE_UNIT'},
-        {table:'products', field:'STOCK_TOTAL'},
-        {table:'products', field:'STOCK_LIMIT'},
+            {table:'products', field:'ID_PRODUCT',primary:true},
+            {table:'products', field:'NAME'},
+            {table:'products', field:'ID_PRODUCT_TIPE'},
+            {table:'products', field:'ID_PRODUCT_TAG'},
+            {table:'products', field:'UNID_ID'},
+            {table:'products', field:'ACTIVE'},
+            {table:'products', field:'COST_UNIT'},
+            {table:'products', field:'PRICE_UNIT'},
+            {table:'products', field:'STOCK_TOTAL'},
+            {table:'products', field:'STOCK_LIMIT'},
         ],
         loads:[
         ld_unids,
@@ -1376,24 +1410,24 @@ function src_item_fm({}){
         inserts:ins_general,
         
         fields:[
-        {panel:"main",col:9,tipe:1,name:"producto",box:{...bx_input,value:"nombre del producto"},select:"NAME",descripcion:"nombre del producto/servicio/insumo"},
-        {panel:"main",col:3,tipe:0,name:"activo",box:{...bx_active_input,value:1},select:"ACTIVE",descripcion:"activo del producto/servicio/insumo, si esta activo se puede vender o usar"},
-        
-        {panel:"main",col:12,tipe:1,name:"tipo",box:{...bx_op({ops:op_products_tipe})},select:"ID_PRODUCT_TIPE",descripcion:"seleccionar si es producto/servicio/insumo"},
+            {panel:"main",col:9,tipe:1,name:"producto",box:{...bx_input,value:"nombre del producto"},select:"NAME",descripcion:"nombre del producto/servicio/insumo"},
+            {panel:"main",col:3,tipe:0,name:"activo",box:{...bx_active_input,value:1},select:"ACTIVE",descripcion:"activo del producto/servicio/insumo, si esta activo se puede vender o usar"},
+            
+            {panel:"main",col:12,tipe:1,name:"tipo",box:{...bx_op({ops:op_products_tipe})},select:"ID_PRODUCT_TIPE",descripcion:"seleccionar si es producto/servicio/insumo"},
 
-        {panel:"main",col:8,tipe:1,colAllLevel:true,name:"etiqueta",box:{tipe:3,value:1},select:"ID_PRODUCT_TAG",load:{name:"ld-products_tags",show:"show"},descripcion:"seleccionar etiqueta"},
-        {panel:"main",col:2,tipe:0,colAllLevel:true,name:"edit-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-pencil-square"></i>'},action:"edit-tag",descripcion:"editar etiqueta"},
-        {panel:"main",col:2,tipe:0,colAllLevel:true,name:"add-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-plus-circle"></i>'},action:"add-tag",descripcion:"añadir etiqueta"},
+            (item_config?{panel:"main",col:8,tipe:1,colAllLevel:true,name:"etiqueta",box:{tipe:3,value:1},select:"ID_PRODUCT_TAG",load:{name:"ld-products_tags",show:"show"},descripcion:"seleccionar etiqueta"}:null),
+            (item_config?{panel:"main",col:2,tipe:0,colAllLevel:true,name:"edit-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-pencil-square"></i>'},action:"edit-tag",descripcion:"editar etiqueta"}:null),
+            (item_config?{panel:"main",col:2,tipe:0,colAllLevel:true,name:"add-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-plus-circle"></i>'},action:"add-tag",descripcion:"añadir etiqueta"}:null),
 
-        {panel:"main",col:8,tipe:1,colAllLevel:true,name:"unidad",box:{...bx_op({ops:[]})},select:"UNID_ID",load:{name:"ld-unids",show:"show"},descripcion:"seleccionar unidad"},
-        {panel:"main",col:2,tipe:0,colAllLevel:true,name:"edit-und",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-pencil-square"></i>'},action:"edit-und",descripcion:"editar unidad"},
-        {panel:"main",col:2,tipe:0,colAllLevel:true,name:"add-und",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-plus-circle"></i>'},action:"add-und",descripcion:"añadir unidad"},
+            (item_config?{panel:"main",col:8,tipe:1,colAllLevel:true,name:"unidad",box:{...bx_op({ops:[]})},select:"UNID_ID",load:{name:"ld-unids",show:"show"},descripcion:"seleccionar unidad"}:null),
+            (item_config?{panel:"main",col:2,tipe:0,colAllLevel:true,name:"edit-und",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-pencil-square"></i>'},action:"edit-und",descripcion:"editar unidad"}:null),
+            (item_config?{panel:"main",col:2,tipe:0,colAllLevel:true,name:"add-und",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-plus-circle"></i>'},action:"add-und",descripcion:"añadir unidad"}:null),
 
-        {panel:"main",col:6,tipe:1,name:"costo unitario",box:{tipe:1,value:0},select:"COST_UNIT",descripcion:"costo unitario, este campo se actualiza de acuerdo a las compras"},
-        {panel:"main",col:6,tipe:1,name:"precio unitario",box:{tipe:1,value:0},select:"PRICE_UNIT",descripcion:"precio unitario de venta"},
+            (item_buy?{panel:"main",col:6,tipe:1,name:"costo unitario",box:{tipe:1,value:0},select:"COST_UNIT",descripcion:"costo unitario, este campo se actualiza de acuerdo a las compras"}:null),
+            {panel:"main",col:(item_buy?6:12),tipe:1,name:"precio unitario",box:{tipe:1,value:0},select:"PRICE_UNIT",descripcion:"precio unitario de venta"},
 
-        {panel:"main",col:6,tipe:1,name:"stock total",box:{tipe:1,value:999},select:"STOCK_TOTAL",descripcion:"stock actual del producto/insumo/servicio"},
-        {panel:"main",col:6,tipe:1,name:"stock minimo",box:{tipe:1,value:1},select:"STOCK_LIMIT",descripcion:"stock minimo del producto/insumo/servicio, en caso el stock sea menor o igual, se lanza una alerta"},
+            (item_stock?{panel:"main",col:6,tipe:1,name:"stock total",box:{tipe:1,value:999},select:"STOCK_TOTAL",descripcion:"stock actual del producto/insumo/servicio"}:null),
+            (item_stock?{panel:"main",col:6,tipe:1,name:"stock minimo",box:{tipe:1,value:1},select:"STOCK_LIMIT",descripcion:"stock minimo del producto/insumo/servicio, en caso el stock sea menor o igual, se lanza una alerta"}:null),
         ],
     }
 }

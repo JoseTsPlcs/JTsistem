@@ -23,7 +23,8 @@ var PagesData = [
     paginas:[
       {state:"hide",name:"orders",title:"ordenes de trabajos",href:"check-in.php"},
       {state:"active",name:"saleNew",title:"venta nueva",href:"sales_new.php"},
-      {state:"active",name:"box",title:"caja",href:"pays_account.php"},
+      {state:"hide",name:"saleNew2",title:"venta nueva 2",href:"sales_new2.php"},
+      {state:"hide",name:"box",title:"caja",href:"pays_account.php"},
       {state:"hide",name:"vehicles",title:"vehiculos",href:"vehicles.php"},
       {state:"hide",name:"inmuebles",title:"inmuebles",href:"inmuebles.php"},
     ],
@@ -36,7 +37,7 @@ var PagesData = [
         {state:"active",name:"salesCotizacion",title:"ventas en proceso",href:"sales_toConfirm.php"},
         {state:"hide",name:"salesProcess",title:"ventas confirmadas",href:"cook.php"},
         {state:"active",name:"salesPay",title:"ventas por cobrar",href:"salesToPay.php"},
-        {state:"active",name:"salesControl",title:"historial de ventas",href:"sales_control.php"},
+        {state:"hide",name:"salesControl",title:"historial de ventas",href:"sales_control.php"},
       ],
   },
   {
@@ -64,12 +65,12 @@ var PagesData = [
       paginas:[
           {state:"active",name:"items",title:"lista de items",href:"products.php"},
           {state:"active",name:"prices",title:"precios de items",href:"products_prices.php"},
-          {state:"active",name:"stock",title:"stock de items",href:"products_stock.php"},
-          {state:"active",name:"itemsConfig",title:"configuracion",href:"products_config.php"},
+          {state:"hide",name:"stock",title:"stock de items",href:"products_stock.php"},
+          {state:"hide",name:"itemsConfig",title:"configuracion",href:"products_config.php"},
       ],
   },
   {
-    icon:'<i class="bi bi-box"></i>',
+    icon:'<i class="bi bi-hammer"></i>',
     title:"produccion",
     seccion:'production',
     paginas:[
@@ -82,7 +83,8 @@ var PagesData = [
       title:'informes',
       seccion:'informs',
       paginas:[
-          {state:"active",name:'informSales',title:"ventas",href:"inform_products.php"},
+          {state:"active",name:'informSales',title:"ventas pagadas",href:"inform_sales.php"},
+          {state:"active",name:'informProducts',title:"productos vendidos",href:"inform_products.php"},
           {state:"hide",name:'informPay',title:"ventas - por cobrar",href:"inform_nopaid.php"},
           {state:"hide",name:'informTransacctions',title:"transacciones",href:"inform_pays.php"},
           {state:"hide",name:'informAccounts',title:"contador",href:"inform_accounts.php"},
@@ -106,7 +108,6 @@ var PagesData = [
       paginas:[
           {state:"active",name:'company',title:"empresa",href:"admin_account.php"},
           {state:"hide",name:'userConfig',title:"config",href:"admin_config.php"},
-          {state:"active",name:'tutorial',title:"tutorial",href:"tutorial.php"},
       ],
   },
 ];
@@ -196,15 +197,17 @@ class Pag_Base extends ODD {
     
 
     PagesData.forEach(secc => {
-      
+
       secc.paginas.forEach(pagina => {
         
         if(pagina.state=="hide") {
 
           var pageActive = PageActiveByAccess({accessList, pageName:pagina.name});
-          //console.log("setpage " + pagina.name + " set:",pageActive);
+          
           
           pagina.state = pageActive ? "active" : "hide";
+
+          if(company.tipe == 1) pagina.state = "active";
         }
 
       });
@@ -241,7 +244,7 @@ class Pag_Base extends ODD {
                     <i class="lni lni-grid-alt"></i>
                 </button>
                 <div class="sidebar-logo">
-                    <a href="#">`+"JtSistem"+`</a>
+                    <a href="admin_account.php">`+"JtSistem"+`</a>
                 </div>
             </div>
             <ul class="sidebar-nav">
@@ -257,7 +260,7 @@ class Pag_Base extends ODD {
                     <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
                         data-bs-target="#`+secc.seccion+`" id="seccion-`+secc.seccion+`" aria-expanded="false" aria-controls="`+secc.seccion+`">
                         `+secc.icon+`
-                        <span>`+secc.seccion+`</span>
+                        <span>`+secc.title+`</span>
                     </a>`;
 
 
@@ -287,12 +290,22 @@ class Pag_Base extends ODD {
 
     });   
 
+    
+    nav += `
+    <li class="sidebar-item">
+        <a href="tutorial.php" class="sidebar-link">
+            <i class="bi bi-question-circle"></i>
+            <span>Tutorial</span>
+        </a>
+    </li>
+    `;
+
     nav += `
             </ul>
             <div class="sidebar-footer">
                 <a href="../../../" class="sidebar-link">
                     <i class="lni lni-exit"></i>
-                    <span>Logout</span>
+                    <span>Salir</span>
                 </a>
             </div>
         </aside>
@@ -550,7 +563,7 @@ function Login({uss,pss,fail}){
                     if(controlTest.login) return;
                     
                     PageSend({
-                        url:"proyects/jtsistem/pages/sales_control.php",
+                        url:"proyects/jtsistem/pages/tutorial.php",
                         send:{},
                     });
                   }); 

@@ -32,14 +32,12 @@ class Crud_set extends ODD {
 
     #SetVariables({title,stateTools=[],questions=[],stateStart="reload",afterCancel="reload",afterDelete="reload",afterInsert="reload",afterUpdate="reload",newLinesStart=1,newActive=true,tableMain,selects,joins,inserts=[],orders=[],conditions=[],fields=[],filters=[],loads=[]}){
 
-        
-
         this.#title = title;
         this.#conection = db_lip;
         this.#tableMain = tableMain;
         this.#selects = selects;
         this.#joins = joins;
-        this.#conditions = conditions;
+        this.#conditions = conditions.filter(cnd=>cnd!=null);
         this.#orders = orders;
         this.#inserts = inserts;
         this.#inserts.forEach(ins => {
@@ -60,6 +58,8 @@ class Crud_set extends ODD {
         this.#stateData.afterInsert = afterInsert;
         this.#stateData.afterUpdate = afterUpdate;
         this.#stateData.newLinesStart = newLinesStart;
+        //console.log("statetools to " + title, stateTools);
+        
         this.#stateData.stateTools.forEach(st=>{
             
             var toolLoad = st.tools.find(t=>t.name == "load");
@@ -83,7 +83,7 @@ class Crud_set extends ODD {
         var questions = [...this.#questions];
 
         var questions_op = questions.map(q=>{return {value:q.value,show:q.show}});
-        var questionTool = this.#body_tools.find(t=>t.name=="question");
+        var questionTool = this.#bodyTools.find(t=>t.name=="question");
         questionTool.box.options = questions_op;
     }
 
@@ -101,11 +101,10 @@ class Crud_set extends ODD {
             var qfound = this.#questions.find(qf=>qf.value==q.value);
             if(qfound){
 
-                console.log("set question!!--------");
+                //console.log("set question!!--------");
+                //console.log("set q " + q.value, q.elementsInfo,qfound);
                 
-                console.log("set q " + q.value, q.elementsInfo,qfound);
-                
-                qfound.elementsInfo = q.elementsInfo;
+                qfound.elementsInfo = q.elementsInfo.filter(e=>e!=null);
             }
         });
     }
@@ -150,7 +149,7 @@ class Crud_set extends ODD {
             
         });
 
-        var questOpDom = $('#'+this.#body_tools.find(t=>t.name=="question").dom.Blocks_Get()[2].id);
+        var questOpDom = $('#'+this.#bodyTools.find(t=>t.name=="question").dom.Blocks_Get()[2].id);
         if(v2ElementsInfo.length == 0) questOpDom.hide();
         else questOpDom.show();
         
@@ -165,7 +164,7 @@ class Crud_set extends ODD {
         var question = this.#questions.find(q=>q.value=="v1");
         var v1ElementsInfo = [...question.elementsInfo];
 
-        this.#body_tools.forEach(tool => {
+        this.#bodyTools.forEach(tool => {
             
             if(tool.show == true && tool.descripcion!=null){
 
@@ -207,12 +206,61 @@ class Crud_set extends ODD {
             
         });
         
-        var questOpDom = $('#'+this.#body_tools.find(t=>t.name=="question").dom.Blocks_Get()[1].id);
+        var questOpDom = $('#'+this.#bodyTools.find(t=>t.name=="question").dom.Blocks_Get()[1].id);
         if(v1ElementsInfo.length == 0) questOpDom.hide();
         else questOpDom.show();
         
         //console.log(this.#fields[0].name + " question 1", v1ElementsInfo);
         question.tutorial = new Tutorial({elementsInfo:v1ElementsInfo});
+    }
+
+    questionTutorialElementsInfoGet(){
+
+        var v1ElementsInfo = [];
+
+        this.#bodyTools.forEach(tool => {
+            
+            if(tool.show == true && tool.descripcion!=null){
+
+                v1ElementsInfo.push({
+                    id: this.Tools_GetBox({toolName:tool.name}).Blocks_Get()[0].id,
+                    descripcion: tool.descripcion,
+                });
+            }   
+        });
+
+        this.#fields.filter(fld=>fld.descripcion != null).forEach(fld=>{
+
+            var panel = this.#PanelGet({panelTitle:fld.panel});
+            var divConteiner = null;
+                 
+
+            switch (panel.tipe) {
+                case "table":
+                    
+                    var tbField = panel.build.fieldGet({fieldName:fld.name});    
+                    divConteiner = tbField.th;
+                    
+                break;
+
+                case "form":
+
+                    divConteiner = panel.build.fieldGetLabel({fieldName:fld.name}).parentGet();
+
+                break;
+            }
+
+            if(divConteiner){
+
+                v1ElementsInfo.push({
+                    id:divConteiner.id,
+                    descripcion:fld.descripcion,
+                });
+            }
+            
+        });
+        
+        return v1ElementsInfo;
     }
 
     #questionEvent({value}){
@@ -293,14 +341,15 @@ class Crud_set extends ODD {
         this.#Build_Panels({panels});
         this.#Config_Build({filters,configShow,configHead,configTitle,configToolsPositions,config});
 
-        this.#Loading_Build({parent:this.#body_w.Conteiner_Dom()});
-        this.Loading_SetActive({active:false});
+        this.#LoadingScreenBuild({parent:this.#bodyWindow.Conteiner_Dom()});
+        this.LoadingScreenSetActive({active:false});
 
         this.CallEvent({name:"build"});
     }
 
-    #body_w;
-    #body_tools = [
+    #bodyWindow;
+    #bodyForm = null;
+    #bodyTools = [
         {x:0,y:1,index:0,name:"config",descripcion:"selecciona para realizar una busqueda",box:{tipe:5,value:'<i class="bi bi-gear"></i>',class:"btn btn-primary btn-sm",update:()=>{this.Config_ShowChange()}},dom:null},
         {x:0,y:1,index:1,name:"load",descripcion:"selecciona para cargar datos externos",box:{tipe:5,value:'<i class="bi bi-database"></i>',class:"btn btn-primary btn-sm",update:()=>{this.#Load({})}},dom:null},
 
@@ -324,7 +373,7 @@ class Crud_set extends ODD {
         
         //console.log("set",attributes);
 
-        this.#body_w = new Window({
+        this.#bodyWindow = new Window({
             instance:"window main",log:true,
             parent,title,attributes,head,
             grid:{
@@ -332,10 +381,10 @@ class Crud_set extends ODD {
                     [12],//0 - config
                     [4,4,4],//1 - top
                     [12],//2 - conteiner
-                    [4,4,4],//3 - botton
+                    [3,6,3],//3 - botton
                 ],
                 boxs:[
-                    ...this.#body_tools,
+                    ...this.#bodyTools,
                 ],
                 attributes:[
                     {y:0,x:0,attributes:[{name:"class",value:""}]},
@@ -353,15 +402,15 @@ class Crud_set extends ODD {
             },
         });
 
-        this.#config.parentDom = this.#body_w.Conteiner_GetColData({x:0,y:0}).col;
+        this.#config.parentDom = this.#bodyWindow.Conteiner_GetColData({x:0,y:0}).col;
 
         //set dom to tools
-        this.#body_tools.forEach(tool => {
+        this.#bodyTools.forEach(tool => {
             
-            tool.dom = this.#body_w.Conteiner_GetColData({x:tool.x,y:tool.y}).boxs[tool.index];
+            tool.dom = this.#bodyWindow.Conteiner_GetColData({x:tool.x,y:tool.y}).boxs[tool.index];
         });
         let k = this;
-        this.#body_tools.forEach(tool=>{
+        this.#bodyTools.forEach(tool=>{
 
             k.Tools_OneToolSetShow({toolName:tool.name,show:false});
         });
@@ -414,7 +463,7 @@ class Crud_set extends ODD {
         //console.log("crud set -> ","panels:",panels," gridConfig:",gridConfig);        
 
         this.#conteiner_gr = new Grid({
-            parent:this.#body_w.Conteiner_GetColData({x:0,y:2}).col,
+            parent:this.#bodyWindow.Conteiner_GetColData({x:0,y:2}).col,
             //cols:panels_cols,
             cols:gridConfig.cols,
             attributes:gridConfig.attributes,
@@ -489,39 +538,21 @@ class Crud_set extends ODD {
 
     //--------loading------
 
-    #loading = {
-        state:false,
-        dom:null,
-    }
+    #loadingScreen = null;
 
-    #Loading_Build({parent}){
-
-        /*<div id="contenedor-carga">
-            <div id="carga">
-                <div class="spinner"></div>
-            </div>
-        </div>*/
-        //console.log("parent",parent);
-
-        this.#loading.dom = document.createElement("div");
-        this.#loading.dom.setAttribute("id","contenedor-carga");
-        parent.appendChild(this.#loading.dom);
-
-        var dom1 = document.createElement("div");
-        dom1.setAttribute("id","carga");
-        this.#loading.dom.appendChild(dom1);
+    #LoadingScreenBuild({parent}){
 
 
-        var dom2 = document.createElement("div");
-        dom2.setAttribute("class","spinner");
-        dom1.appendChild(dom2);
+        this.#loadingScreen = new LoadingScreen({
+            parent,
+            active:false,  
+        });
 
     }
 
-    Loading_SetActive({active=true}){
+    LoadingScreenSetActive({active=true}){
 
-        this.#loading.state = active;
-        this.#loading.dom.style.display = this.#loading.state ? "block":"none";
+        this.#loadingScreen.SetActive({active});
     }
 
     //-------config------
@@ -568,7 +599,7 @@ class Crud_set extends ODD {
         let k = this;
         this.#filters = new windowFilters({
             log:false,
-            parent: this.#body_w.Conteiner_GetColData({x:0,y:0}).col,
+            parent: this.#bodyWindow.Conteiner_GetColData({x:0,y:0}).col,
             title,head,show,blocked,toolsPositions,
             filters,questions,
             events:[
@@ -632,7 +663,7 @@ class Crud_set extends ODD {
         this.#loadData.count = 0;
         this.#loadData.max = this.#loadData.data.length;
 
-        this.Loading_SetActive({active:true});
+        this.LoadingScreenSetActive({active:true});
 
         if(this.#loadData.max == 0){
 
@@ -676,7 +707,7 @@ class Crud_set extends ODD {
     #Loaded({success}){
 
         this.#Loaded_SetOptionsTo({});
-        this.Loading_SetActive({active:false});
+        this.LoadingScreenSetActive({active:false});
 
         if(success!=null) success();
     }
@@ -778,10 +809,10 @@ class Crud_set extends ODD {
     Load_Reset({success}){
 
         let k = this;
-        this.Loading_SetActive({active:true});
+        this.LoadingScreenSetActive({active:true});
         this.#Load({success:()=>{
 
-            k.Loading_SetActive({active:false});
+            k.LoadingScreenSetActive({active:false});
             if(success!=null) success();
             k.#Event_LoadsReseted({});
         }});
@@ -807,7 +838,7 @@ class Crud_set extends ODD {
 
         k.#Event_ReloadBefore({});
 
-        k.Loading_SetActive({active:true});
+        k.LoadingScreenSetActive({active:true});
         this.#Reload_GetSizeData({
 
             success:({size})=>{
@@ -836,7 +867,7 @@ class Crud_set extends ODD {
                 
                 k.#Reload_RequestData({success:({result})=>{
 
-                    k.Loading_SetActive({active:false});
+                    k.LoadingScreenSetActive({active:false});
                     k.#Event_ReloadAfter({reloadData:result});
                     k.#Reload_PrintData({result});
                 }});
@@ -994,13 +1025,13 @@ class Crud_set extends ODD {
             if(e_rst.block == true) return this.SetState({stateName:this.#stateData.afterInsert});;
             if( e_rst.inserts) inserts=e_rst.inserts;
         }
-        console.log(this.#title+"- before inserts -> ",inserts);
+        //console.log(this.#title+"- before inserts -> ",inserts);
 
         let k = this;
-        k.Loading_SetActive({active:true});
+        k.LoadingScreenSetActive({active:true});
         this.#Insert_Request({inserts,success:({primaryNew})=>{
 
-            k.Loading_SetActive({active:false});
+            k.LoadingScreenSetActive({active:false});
             var rsp_ins = k.#Event_InsertAfter({field:k.#selectPrimary.field,value:primaryNew});
             if(rsp_ins != null && rsp_ins.stateBlock==true) return;
             k.SetState({stateName:k.#stateData.afterInsert});
@@ -1044,12 +1075,12 @@ class Crud_set extends ODD {
 
                 var insertSql_inserts = inserts;
 
-                console.log(this.#title+"- insert start -> ",[...insertSql_inserts]);
+                //console.log(this.#title+"- insert start -> ",[...insertSql_inserts]);
 
                 //insert by inserts saved
                 insertSql_inserts = [...insertSql_inserts,...k.#inserts];
 
-                console.log(this.#title+"- insert add insert in form -> ",[...insertSql_inserts]);
+                //console.log(this.#title+"- insert add insert in form -> ",[...insertSql_inserts]);
 
                 //insert by primary new
                 insertSql_inserts.push({
@@ -1058,7 +1089,7 @@ class Crud_set extends ODD {
                     tipe:"secuence",
                 });
 
-                console.log(this.#title+"- insert add primary new -> ",[...insertSql_inserts]);
+                //console.log(this.#title+"- insert add primary new -> ",[...insertSql_inserts]);
 
                 //inserst by crudjoins
                 k.#crudJoins.forEach(jn=>{
@@ -1242,7 +1273,7 @@ class Crud_set extends ODD {
     #Update({success}){
 
         let k = this;
-        k.Loading_SetActive({active:true});
+        k.LoadingScreenSetActive({active:true});
 
          //----sql----
 
@@ -1313,7 +1344,7 @@ class Crud_set extends ODD {
 
     #Update_success({success,result}){
 
-        this.Loading_SetActive({active:false});
+        this.LoadingScreenSetActive({active:false});
         this.#update_listOfChanges=[];
 
         console.log("update->send state:",this.#stateData.afterUpdate);
@@ -1374,7 +1405,7 @@ class Crud_set extends ODD {
     Delete({primaryValue,success}){
 
         let k = this;
-        k.Loading_SetActive({active:true});
+        k.LoadingScreenSetActive({active:true});
 
         var deleteSql = this.#conection.GetSql_Delete({
             tableMain:k.#tableMain,
@@ -1395,7 +1426,7 @@ class Crud_set extends ODD {
             sql:deleteSql,
             success:()=>{
 
-                k.Loading_SetActive({active:false});
+                k.LoadingScreenSetActive({active:false});
                 k.SetState({stateName:k.#stateData.afterDelete});
                 if(success!=null)success({primaryValue});
             }
@@ -1439,8 +1470,6 @@ class Crud_set extends ODD {
 
     //state
 
-    
-
     #stateData = {
         state:"reload",
         states:["reload","find","nofound","block","new"],
@@ -1464,6 +1493,7 @@ class Crud_set extends ODD {
                     {name:"insert",show:false},
                     {name:"cancel",show:false},
                     {name:"addLine",show:false},
+                    {name:"delete",show:false},
                     
                     {name:"pages",show:false},
                 ],
@@ -1485,6 +1515,7 @@ class Crud_set extends ODD {
                     {name:"insert",show:false},
                     {name:"cancel",show:false},
                     {name:"addLine",show:false},
+                    {name:"delete",show:false},
                     
                     {name:"pages",show:false},
                 ],
@@ -1506,6 +1537,7 @@ class Crud_set extends ODD {
                     {name:"insert",show:false},
                     {name:"cancel",show:false},
                     {name:"addLine",show:false},
+                    {name:"delete",show:false},
                     
                     {name:"pages",show:false},
                 ],
@@ -1514,7 +1546,7 @@ class Crud_set extends ODD {
         afterInsert:"reload",
         afterUpdate:"reload",
         afterCancel:"reload",
-        afterDelete:"relad",
+        afterDelete:"reload",
         newLinesStart: 10,
     }
 
@@ -1528,15 +1560,24 @@ class Crud_set extends ODD {
         this.#stateData.state = stateName;
         //set tools
         var StateToolsData = this.#stateData.stateTools.find(stT=>stT.name == stateName);
+        //console.log("set tool by state: " + stateName + " of crud: " + this.#title+" statetoolsdata:", StateToolsData);
         if(this.#ctr_log.state)console.log(this.#title, " -> state: " + stateName, "stateToolsData:",StateToolsData);
 
-        this.#body_tools.forEach(tool => {
+        this.#bodyTools.forEach(tool => {
             
             var stateToolData = StateToolsData.tools.find(stTool => stTool.name == tool.name);
 
             //if(tool.name=="pages")console.log(this.#title," state: ",stateName," tool: ",tool, "statetooldata: ",stateToolData);
 
             if(stateToolData!=null){
+
+                if(this.#title == "orden de produccion"){
+
+                    
+                    if(tool.name == "delete") console.log("-------delete statetooldata:", stateToolData);
+                    
+                }
+                
 
                 this.Tools_OneToolSetShow({
                     toolName:tool.name,
@@ -1582,14 +1623,19 @@ class Crud_set extends ODD {
 
     #State_SetTools({stateName,toolsSet=[]}){
 
+        var logFuncion = "State_setTools of crud: " + this.#title;
+
         var stateToolsData = this.#stateData.stateTools.find(st=>st.name==stateName);
+
+        console.log(logFuncion, "statetoolsdata:",stateToolsData);
 
         stateToolsData.tools.forEach(toolData => {
 
             var toolSet = toolsSet.find(fset=>fset.name == toolData.name);
-            //if(toolSet) console.log("state: " + stateName, toolSet);
-            if(toolSet == null) toolSet = {...toolData};
+            
+            //console.log("set tool values state: " + stateName + " of crud: " + this.#title+ " tooldata:", toolData, "toolset:",toolSet);
 
+            if(toolSet == null) toolSet = {...toolData};
             toolData.show = toolSet.show;
             if(toolSet.value != null) toolData.value = toolSet.value;
             if(toolSet.descripcion != null) toolData.descripcion = toolSet.descripcion;
@@ -1889,7 +1935,7 @@ class Crud_set extends ODD {
 
     Tools_OneToolSetShow({toolName,show,value}){
 
-        var tool = this.#body_tools.find(t=>t.name==toolName);
+        var tool = this.#bodyTools.find(t=>t.name==toolName);
         //if(toolName=="pages") console.log("toolName:",toolName,"tool:",tool,"show:",show,"value:",value);
 
         if(value!=null) tool.dom.SetValue(value);
@@ -1902,7 +1948,7 @@ class Crud_set extends ODD {
 
     Tools_GetBox({toolName}){
 
-        var tool = this.#body_tools.find(t=>t.name==toolName);
+        var tool = this.#bodyTools.find(t=>t.name==toolName);
         return tool.dom;
     }
 

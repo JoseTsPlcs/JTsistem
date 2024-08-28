@@ -6,22 +6,24 @@ $(document).ready(function() {
     success:({userData,pageData,k})=>{
 
       var infoBetweenPage = JSON.parse(sessionStorage.getItem('data'));
-      console.log("--------------infoBetweenPage",infoBetweenPage);
+
+      var acc_products_update = Access_Get(userData.access,"md-items-sale-add");
+      var acc_price_update = Access_Get(userData.access,"md-item-sale-price");
+      var acc_sale_worker = Access_Get(userData.access,"md-workers-sale");
+      var acc_item_worker = Access_Get(userData.access,"md-workers-item");
+      var acc_dscto = Access_Get(userData.access,"md-sale-dscto");
+      var acc_bill = Access_Get(userData.access,"md-bill-general");
+      var acc_supplies = false;//Access_Get(userData.access,"md-items-supplies");
+      var acc_pays = Access_Get(userData.access,"md-box-general");
+
+      var acc_customer_nro = Access_Get(userData.access,"md-bills-general");
+      var acc_customer_cel = Access_Get(userData.access,"md-customer-cel");
+      var acc_customer_dir = Access_Get(userData.access,"md-customer-dir");
+      var acc_customer_email = Access_Get(userData.access,"md-customer-email");
+      var acc_customer_coment = Access_Get(userData.access,"md-customer-coment");
+
+      console.log("acc_custoemr_cel",acc_customer_cel);
       
-
-      var acc_products_update = Access_Get(userData.access,"mod-sale-item");
-      var acc_price_update = Access_Get(userData.access,"mod-sale-price");
-      var acc_item_worker = Access_Get(userData.access,"mod-workers-item");
-      var acc_dscto = Access_Get(userData.access,"mod-sale-dscto");
-      var acc_bill = Access_Get(userData.access,"mod-bill");
-      var acc_supplies = false;//Access_Get(userData.access,"mod-items-supplies");
-      var acc_pays = Access_Get(userData.access,"mod-box");
-
-      var acc_customer_nro = Access_Get(userData.access,"mod-customer-nro");
-      var acc_customer_cel = Access_Get(userData.access,"mod-customer-cel");
-      var acc_customer_dir = Access_Get(userData.access,"mod-customer-dir");
-      var acc_customer_email = Access_Get(userData.access,"mod-customer-email");
-      var acc_customer_coment = Access_Get(userData.access,"mod-customer-coment");
 
       ld_workers.conditions[0].value = company_id;
 
@@ -204,10 +206,10 @@ $(document).ready(function() {
                       id:"bodyMain_conteiner_undefined_row_1_div_1_1_conteiner_undefined_row_0_div_0_0_block5_button0",
                       descripcion:"selecciona para mostrar lista de productos/servicos",
                     },
-                    {
+                    (acc_pays?{
                       id:"bodyMain_conteiner_undefined_row_1_div_1_1_conteiner_undefined_row_0_div_0_0_block5_button1",
                       descripcion:"selecciona para mostrar lista de pagos",
-                    },
+                    }:null),
                   ],
                 }
               ],
@@ -333,7 +335,7 @@ $(document).ready(function() {
                 {panel:"principal",col:12,y:2,tipe:1,name:"cancelado",box:(!acc_pays?{...bx_op({ops:op_sales_paid}),value:0}:{...bx_shw,options:op_sales_paid}),select:"PAID",descripcion: ((acc_pays?"muestra":"selecciona") + " si la venta ya fue pagada")},
                 (acc_bill?{panel:"principal",col:12,y:3,tipe:1,name:"documento de venta",box:bx_op({ops:op_sales_document}),select:"ID_DOCUMENT",descripcion:"selecciona si desea emitir nota de pago, boleta o factura"}:null),
                 {panel:"principal",col:12,y:8,name:"comentario*",box:{tipe:9,value:""},select:"COMMENT",descripcion:"coloca algun comentario para que el equipo lo pueda visualizar"},
-                (acc_item_worker?fld_worker({panel:"principal",select:"ID_WORK_PROCESS",edit:true}):null),
+                (acc_sale_worker?fld_worker({panel:"principal",select:"ID_WORK_PROCESS",edit:true}):null),
                 //{panel:"principal",col:12,colAllLevel:true,y:0,name:"trabajador asignado",box:{tipe:8},select:"ID_WORK_PROCESS",load:{name:"ld-workers",show:"show"}},
 
                 
@@ -1050,7 +1052,7 @@ $(document).ready(function() {
             name:"fm-product",
             active:true,
             script:{
-              ...src_item_fm({}),
+              ...src_item_fm({userData}),
               parent:prnt_items_fm,
               events:[
                 {
@@ -1112,22 +1114,19 @@ $(document).ready(function() {
               stateTools:[
                 {
                     name:"reload",
-                    tools:[
-                        {name:"config",show:false},
-                        {name:"load",show:false},
-                        
-                        {name:"excel",show:false},
-                        {name:"pdf",show:false},
-            
+                    tools:[            
                         {name:"sizes",show:false,value:999},
                         {name:"reload",show:true},
                         {name:"update",show:true},
-                        {name:"new",show:false},
-                        {name:"insert",show:false},
                         {name:"cancel",show:true},
-                        
-                        {name:"pages",show:false},
                     ],
+                },
+                {
+                  name:"new",
+                  tools:[
+                    {name:"insert",show:true},
+                    {name:"cancel",show:true},
+                  ],
                 }
               ],
               stateStart:"block",
@@ -1140,20 +1139,12 @@ $(document).ready(function() {
                 {table:'products_tags', field:'ID_PRODUCT_TAG',primary:true},
                 {table:'products_tags', field:'NAME'},
               ],
-              /*conditions:[{
-                //before:" AND ",
-                table:"products_tags",
-                field:"ID_COMPANY",
-                inter:"=",
-                value:userData.company.id,
-              }],*/
               inserts:[{
                 field:"ID_COMPANY",
                 value:userData.company.id,
               }],
     
               fields:[
-                //{panel:"main",...fld_delete},
                 {panel:"main",col:12,name:"etiqueta",box:bx_input,select:"NAME"},
               ],
               events:[
@@ -1196,6 +1187,13 @@ $(document).ready(function() {
                         
                         {name:"pages",show:false},
                     ],
+                },
+                {
+                  name:"new",
+                  tools:[
+                    {name:"insert",show:true},
+                    {name:"cancel",show:true},
+                  ],
                 }
               ],
               stateStart:"block",
@@ -1635,83 +1633,16 @@ $(document).ready(function() {
           }
         ],
 
-      });
+      });     
       
-      //------tutorial------
-      var elementsInfo = [
-        {
-          id:"bodyMain_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_3_div_1_3",
-          descripcion:"presiona insertar para añadir venta, una vez insertada se puede modificar",
-        },
-      ];
-
-      //sale
-      var cr_sale = conections.Crud_GetBuild({name:"sale"});
-      cr_sale.fieldsGet().forEach(fld => {
-        
-        if(fld.descripcion!=null){
-
-          elementsInfo.push({
-            id:cr_sale.fieldGetTutorialElement({fieldName:fld.name}).id,
-            descripcion:fld.descripcion,
-          });
-        }
-      });
-
-      //items
-      elementsInfo.push({
-        id:"bodyMain_conteiner_undefined_row_1_div_1_1_conteiner_undefined_row_0_div_0_0_block5_button0",
-        descripcion:"selecciona para ver los items de la venta",
-      });
-      if(acc_products_update){
-
-        elementsInfo.push({
-          id:"bodyMain_conteiner_undefined_row_1_div_1_1_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_1_div_0_1_conteiner_undefined_row_0_div_0_0_block5_",
-          descripcion:"selecciona para añadir un nuevo item",
-        });
-      }
-
-      var cr_item = conections.Crud_GetBuild({name:"products"});
-      cr_item.fieldsGet().forEach(fld => {
-        
-        if(fld.descripcion!=null){
-
-          elementsInfo.push({
-            id:cr_item.fieldGetTutorialElement({fieldName:fld.name}).id,
-            descripcion:fld.descripcion,
-          });
-        }
-      });
-
-      //pays
-      if(acc_pays){
-
-        elementsInfo.push({
-          id:"bodyMain_conteiner_undefined_row_1_div_1_1_conteiner_undefined_row_0_div_0_0_block5_button1",
-          descripcion:"selecciona para ver los pagos realizados",
-        });
-
-        var cr_pays = conections.Crud_GetBuild({name:"pays"});
-        cr_pays.fieldsGet().forEach(fld => {
-          
-          if(fld.descripcion!=null){
-
-            elementsInfo.push({
-              id:cr_pays.fieldGetTutorialElement({fieldName:fld.name}).id,
-              descripcion:fld.descripcion,
-            });
-          }
-        });
-      }
-      
-      var tutorial = new Tutorial({
-        elementsInfo,
-      });
-
-      console.log("start tutorial----------",infoBetweenPage);
-      
-      
-
+      /*TutorialPagePlay({
+        pageData,
+        elementsTutorial:[
+          {crud:conections.Crud_GetBuild({name:"sale"})},
+          //{id:"",descripcion:""},
+          {crud:conections.Crud_GetBuild({name:"products"})},
+        ],
+      });*/
       //setTimeout(()=>{tutorial.startTutorial()},1000);
 
 

@@ -24,18 +24,24 @@
   $src= $srcPathReturn."libs/case-1.0.1/"; 
   include $srcPathReturn.'libs/case-1.0.1/case.php';
 
-  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ConfigProyect.js"></script>';
+  
+  
+
+  
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/Constans.js"></script>';
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/cruds/schList.js"></script>';
+  
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ConfigProyect.js"></script>';
+
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ListOfPaginas.js"></script>';
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ListOfConections.js"></script>';
 
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/cruds/crudsBase.js"></script>';
-  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/cruds/schList.js"></script>';
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ListOfForms.js"></script>';
-
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/LoadPage.js"></script>';
 
   echo '<script src="'.$srcPathReturn.'TutorialClass.js"></script>';
+  echo '<script src="'.$srcPathReturn.'TutorialsData.js"></script>';
   
   //return;
   $url = $_SERVER["REQUEST_URI"];

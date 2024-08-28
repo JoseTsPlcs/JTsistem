@@ -21,10 +21,11 @@ class windowFilters extends ODD {
     //-------filters
 
     #filters = [];
+    filtersGet(){return this.#filters;}
+
     Filter_Get({filterName}){
 
         var filter = this.#form.Field_Get({fieldName:filterName});
-        console.log(filter,filterName);
 
         return this.#filters.find(f=>f.name==filterName);
     }

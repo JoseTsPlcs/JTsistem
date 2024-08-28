@@ -18,7 +18,7 @@ class Form extends ODD {
     #SetVariables({tools=[],toolsPositions=[],fields=[],questions=[]}){
 
         let k = this;
-        this._Tools_Set({tools,toolsPositions});
+        this.ToolsSet({tools,toolsPositions});
         this._Fields_Set({fields});
         this.#questionSet({questions});
     }
@@ -98,38 +98,58 @@ class Form extends ODD {
     //tools
 
     #tools=[];
-    _Tools_Set({tools=[]}){
+    ToolsSet({tools=[]}){
 
-        for (let t = 0; t < tools.length; t++) {
+        if(this.#builded){
 
-            const tool = tools[t];
-            if(tool.name==this.#questions.tool.name){
+            this.#tools.forEach(tdata=>{
 
-                this.#questions.tool.box.options = this.#questions.data.map((q)=>{return {value:q.value,show:q.description}});
-                tools[t] = {...tool,...this.#questions.tool};                
-            }
+                var tset = tools.find(tset=>tset.name==tdata.name);
+
+                if(tset && tset.show == true) tdata.dom.Show();
+                else tdata.dom.Hide();
+                
+                if(tset && tset.value !=null) tdata.dom.SetValue(tset.value);
+            })
+
+            tools.forEach(tset => {
+                
+                
+            });
         }
+        else
+        {
+            for (let t = 0; t < tools.length; t++) {
 
-        this.#tools=tools;
-        let k = this;
-        for (let t = 0; t < this.#tools.length; t++) {
-
-            let tool = this.#tools[t];
-            //console.log(tool,t);            
-            tool.box.id = "btn" + (t+1);
-            var update = tool.box.update;
-            var pst = this.#Tool_GetPosition({positionName:tool.position});
-            tool.index = pst.count;
-            pst.count++;
-            tool.x = pst.x;
-            tool.y = pst.y;
-
-            tool.box.update = (value)=>{
-
-                if(update!=null) update({tool,value});
-                k.#Event_ToolUpdate({tool,value});
-
-                if(tool.name == k.#questions.tool.name) k.#questionEvent(value);
+                const tool = tools[t];
+                if(tool.name==this.#questions.tool.name){
+    
+                    this.#questions.tool.box.options = this.#questions.data.map((q)=>{return {value:q.value,show:q.description}});
+                    tools[t] = {...tool,...this.#questions.tool};                
+                }
+            }
+    
+            this.#tools=tools;
+            let k = this;
+            for (let t = 0; t < this.#tools.length; t++) {
+    
+                let tool = this.#tools[t];
+                //console.log(tool,t);            
+                tool.box.id = "btn" + (t+1);
+                var update = tool.box.update;
+                var pst = this.#Tool_GetPosition({positionName:tool.position});
+                tool.index = pst.count;
+                pst.count++;
+                tool.x = pst.x;
+                tool.y = pst.y;
+    
+                tool.box.update = (value)=>{
+    
+                    if(update!=null) update({tool,value});
+                    k.#Event_ToolUpdate({tool,value});
+    
+                    if(tool.name == k.#questions.tool.name) k.#questionEvent(value);
+                }
             }
         }
 
@@ -194,14 +214,15 @@ class Form extends ODD {
     #positions = [
         {name:"head-left",count:0,x:0,y:0},
         {name:"head-center",count:0,x:1,y:0},
-        {name:"head-right",count:0,x:2,y:0},
+        {name:"head-rigth",count:0,x:2,y:0},
         {name:"botton-left",count:0,x:0,y:2},
         {name:"botton-center",count:0,x:1,y:2},
-        {name:"botton-right",count:0,x:2,y:2},
+        {name:"botton-rigth",count:0,x:2,y:2},
     ];
     #wn_parent=null;
     #dom_conteiner = null;
     #gr_content=null;
+    #builded = false;
     #Build({parent,title,head,blocked,show,toolsPositions=[]}){
 
         let k = this;
@@ -211,9 +232,9 @@ class Form extends ODD {
             title,head,blocked,show,
             grid:{
                 cols:[
-                    [4,4,4],//top
+                    [3,6,3],//top
                     [12],//conteiner
-                    [4,4,4],//botton
+                    [3,6,3],//botton
                 ],
                 boxs:this.#tools,
                 attributes:[
@@ -263,6 +284,7 @@ class Form extends ODD {
         });
 
         this.#questionsSetTutorials();
+        this.#builded = true;
     }
 
     ContentGridGet(){
