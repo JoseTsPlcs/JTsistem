@@ -12,6 +12,8 @@ $(document).ready(function() {
 
       var test = false;
 
+      var acc_item_config = Access_Get(userData.access,"md-items-config");
+
       var md_prod = new Modal({parent:gr.GetColData({x:0,y:1}).col});
       var md_tags = new Modal({parent:gr.GetColData({x:1,y:1}).col});
       var md_unds = new Modal({parent:gr.GetColData({x:2,y:1}).col});
@@ -36,17 +38,9 @@ $(document).ready(function() {
                   tools:[
                       {name:"config",show:true},
                       {name:"load",show:true},
-                      
-                      {name:"excel",show:false},
-                      {name:"pdf",show:false},
-          
                       {name:"sizes",show:true,value:10},
                       {name:"reload",show:true},
-                      {name:"update",show:false},
-                      {name:"new",show:false},
-                      {name:"insert",show:false},
-                      {name:"cancel",show:false},
-                      
+                      {name:"new",show:true},
                       {name:"pages",show:true},
                   ],
                 }
@@ -65,6 +59,14 @@ $(document).ready(function() {
                 {table:'products_tags', field:'NAME',as:"TAG_NAME"},
           
               ],
+              conditions:[
+                {
+                  table:"products",
+                  field:"ID_COMPANY",
+                  inter:"=",
+                  value:userData.company.id,
+                }
+              ],
               joins:[
                 {
                   main:{table:"products",field:"ID_PRODUCT_TAG"},
@@ -80,18 +82,18 @@ $(document).ready(function() {
               configShow:false,    
               filters:[
                 {name:"producto",box:bx_input,select:{table:"products",field:"NAME"},descripcion:"buscar por nombre de producto/servicio/insumo"},
-                {name:"tipo",box:{tipe:4,options:op_products_tipe,value:["producto","insumo"]},select:{table:"products",field:"ID_PRODUCT_TIPE"},descripcion:"buscar por producto/servicio/insumo"},
-                {name:"etiqueta",box:{tipe:4,options:[]},select:{table:"products",field:"ID_PRODUCT_TAG"},load:{name:"ld-products_tags",show:"show"},descripcion:"buscar por etiqueta"},
+                {name:"tipo",box:{tipe:4,options:op_products_tipe},select:{table:"products",field:"ID_PRODUCT_TIPE"},descripcion:"buscar por producto/servicio/insumo"},
+                (acc_item_config?{name:"etiqueta",box:{tipe:4,options:[]},select:{table:"products",field:"ID_PRODUCT_TAG"},load:{name:"ld-products_tags",show:"show"},descripcion:"buscar por etiqueta"}:null),
                 {name:"activo",box:{tipe:4,options:op_active,value:["activo"]},select:{table:"products",field:"ACTIVE"},descripcion:"buscar si el producto/servicio/insumo esta activo"},
-                {name:"unidad",box:{tipe:4},select:{table:"products",field:"UNID_ID"},load:{name:"ld-unids",show:"show"},descripcion:"buscar por unidad"},
+                (acc_item_config?{name:"unidad",box:{tipe:4},select:{table:"products",field:"UNID_ID"},load:{name:"ld-unids",show:"show"},descripcion:"buscar por unidad"}:null),
               ],
               fields:[
                 {panel:"main",...fld_edit,descripcion:"editar informacion del producto/servicio/insumo"},
                 {panel:"main",attributes:[{name:"style",value:"min-width: 250px;"}],name:"producto",box:bx_shw,select:"NAME",descripcion:"nombre del producto/servicio/insumo"},
                 {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"tipo",box:{...bx_shw,options:op_products_tipe},select:"ID_PRODUCT_TIPE",descripcion:"puede ser producto/servicio/insumo"},
-                {panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"etiqueta",box:bx_shw,select:"TAG_NAME",descripcion:"etiqueta del producto/servicio/insumo"},
+                (acc_item_config?{panel:"main",attributes:[{name:"style",value:"min-width: 150px;"}],name:"etiqueta",box:bx_shw,select:"TAG_NAME",descripcion:"etiqueta del producto/servicio/insumo"}:null),
           
-                {panel:"main",name:"unidad",box:bx_shw,select:"UNID_ID",load:{name:"ld-unids",show:"show"},descripcion:"unidad del producto/servicio/insumo"},
+                (acc_item_config?{panel:"main",name:"unidad",box:bx_shw,select:"UNID_ID",load:{name:"ld-unids",show:"show"},descripcion:"unidad del producto/servicio/insumo"}:null),
                 //{panel:"main",attributes:[{name:"style",value:"min-width: 100px;"}],name:"stock total",box:(acc_stock_update?bx_input:{tipe:0,class:"text-center"}),select:"STOCK_TOTAL"},
                 //{panel:"main",attributes:[{name:"style",value:"min-width: 100px;"}],name:"stock minimo",box:{tipe:0,class:"text-center"},select:"STOCK_LIMIT"},
                 //{panel:"main",name:"limite",box:{tipe:0,options:[{value:0,show:"-",class:"rounded text-center bg-success text-white"},{value:1,show:"limit!",class:"rounded text-center bg-danger text-white"}]},select:"STOCK_ONLIMIT"},
@@ -104,7 +106,7 @@ $(document).ready(function() {
             name:"fm-product",
             active:true,
             script:{
-              ...src_item_fm({}),
+              ...src_item_fm({userData}),
               parent:prnt_prod,
               events:[
                 {
@@ -129,22 +131,19 @@ $(document).ready(function() {
               stateTools:[
                 {
                     name:"reload",
-                    tools:[
-                        {name:"config",show:false},
-                        {name:"load",show:false},
-                        
-                        {name:"excel",show:false},
-                        {name:"pdf",show:false},
-            
+                    tools:[            
                         {name:"sizes",show:false,value:999},
                         {name:"reload",show:true},
                         {name:"update",show:true},
-                        {name:"new",show:false},
-                        {name:"insert",show:false},
                         {name:"cancel",show:true},
-                        
-                        {name:"pages",show:false},
                     ],
+                },
+                {
+                  name:"new",
+                  tools:[
+                    {name:"insert",show:true},
+                    {name:"cancel",show:true},
+                  ],
                 }
               ],
               stateStart:"block",
@@ -198,21 +197,18 @@ $(document).ready(function() {
                 {
                     name:"reload",
                     tools:[
-                        {name:"config",show:false},
-                        {name:"load",show:false},
-                        
-                        {name:"excel",show:false},
-                        {name:"pdf",show:false},
-            
                         {name:"sizes",show:false,value:999},
                         {name:"reload",show:true},
                         {name:"update",show:true},
-                        {name:"new",show:false},
-                        {name:"insert",show:false},
                         {name:"cancel",show:true},
-                        
-                        {name:"pages",show:false},
                     ],
+                },
+                {
+                  name:"block",
+                  tools:[
+                    {name:"insert",show:true},
+                    {name:"cancel",show:true},
+                  ],
                 }
               ],
               stateStart:"block",

@@ -5,7 +5,7 @@ $(document).ready(function() {
 
     success:({userData,pageData})=>{
 
-      var acc_control_update_total = userData.access.find(acc=>acc.value=="acc-6") &&  userData.access.find(acc=>acc.value=="acc-6").active == "true";
+      var acc_control_update_total = true;//userData.access.find(acc=>acc.value=="acc-6") &&  userData.access.find(acc=>acc.value=="acc-6").active == "true";
       var acc_control_update_state = userData.access.find(acc=>acc.value=="acc-7") &&  userData.access.find(acc=>acc.value=="acc-7").active == "true";
 
       var gr = new Grid({

@@ -158,17 +158,18 @@ class Window extends ODD {
 
     if(fieldName!=null) fieldIndex=this._fields.findIndex(f=>f.name==fieldName);
     var info = fieldIndex < 0 ? null : this._fields[fieldIndex];    
-    if(info==null) console.error("window->fields_getinfo(fieldName:"+fieldName+",fieldIndex:"+fieldIndex+")",this._fields);
+    //if(info==null) console.error("window->fields_getinfo(fieldName:"+fieldName+",fieldIndex:"+fieldIndex+")",this._fields);
     return info;
   }
 
   fieldGetLabel({fieldName,fieldIndex}){
 
     var field = this.Fields_GetInfo({fieldIndex,fieldName});
+    
     var grid = this.Conteiner_Grid();
     var coldata = grid.GetColData({x:field.x,y:field.y});
     
-    if(coldata==null)console.log("window - fields_getbox, params:",this._fields,fieldName,fieldIndex,"results:",coldata);
+    //if(coldata==null)console.log("window - fields_getbox, params:",this._fields,fieldName,fieldIndex,"results:",coldata);
     return coldata.labels[0];
   }
 
