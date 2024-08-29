@@ -8,7 +8,7 @@ $(document).ready(function() {
       var infoBetweenPage = JSON.parse(sessionStorage.getItem('data'));
 
       var acc_products_update = Access_Get(userData.access,"md-items-sale-add");
-      var acc_price_update = Access_Get(userData.access,"md-item-sale-price");
+      var acc_price_update = Access_Get(userData.access,"md-items-sale-price");
       var acc_sale_worker = Access_Get(userData.access,"md-workers-sale");
       var acc_item_worker = Access_Get(userData.access,"md-workers-item");
       var acc_dscto = Access_Get(userData.access,"md-sale-dscto");
