@@ -192,6 +192,9 @@ var salenew2_page = {
         {
             ...cr_items_tb,
         },
+        {
+            ...cr_pays_tb,
+        }
     ],
     conections:[
         {

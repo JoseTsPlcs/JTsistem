@@ -30,6 +30,8 @@
   
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/Constans.js"></script>';
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/cruds/schList.js"></script>';
+
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/md-sales.js"></script>';
   
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ConfigProyect.js"></script>';
 

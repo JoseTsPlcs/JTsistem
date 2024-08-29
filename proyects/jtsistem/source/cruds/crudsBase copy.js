@@ -80,12 +80,7 @@ function scr_base({schema=null,userData,fieldsSet=[],stateGeneral="hide",parent,
 
     schema.fields.forEach(field => {
 
-        if(field.access != true){
-            
-            //console.log("FIELD NEED GET ACSSESS",field,"access:",field.access);
-            
-            field.access = Access_Get(userData.access,field.access); 
-        }
+        if(field.access != true) field.access = Access_Get(userData.access,field.access); 
         if(field.width == null) field.width = 100;
     });
 
@@ -107,7 +102,7 @@ function scr_base({schema=null,userData,fieldsSet=[],stateGeneral="hide",parent,
     //set state default, filter active
     schema.fields.forEach(act=>{
 
-        act.state = stateGeneral;
+        act.state=stateGeneral;
         if(act.filter) act.filter.active = true;
     });
 
@@ -203,8 +198,6 @@ function scr_base({schema=null,userData,fieldsSet=[],stateGeneral="hide",parent,
         });
     }
     //------fields-----
-    console.log("SCR BASE ACTIVES:",actives);
-    
     var fields = actives.map(act=>{
 
         
@@ -273,7 +266,6 @@ function scr_base({schema=null,userData,fieldsSet=[],stateGeneral="hide",parent,
         title,
         parent:(parentModalIs?parent.GetContent():parent),
         panels,
-        fields,
         stateStart:(parentModalIs && panelTipe=="form"?"block":"reload"),
         afterInsert:(parentModalIs && panelTipe=="form"?"block":"reload"),
         afterUpdate:(parentModalIs && panelTipe=="form"?"block":"reload"),
@@ -624,8 +616,8 @@ function pageBuildCruds({userData,pageData}) {
 
 }
 
-class CrudsBuild extends ODD {
-
+class CrudsGroup extends ODD {
+    
     constructor(i) {
         
         super(i);
@@ -893,6 +885,7 @@ class CrudsBuild extends ODD {
 
     #layers = [];
     #parent = null;
+
     #layersBuild({parent,layers=[]}){
 
         this.#parent = parent;
@@ -991,8 +984,9 @@ class CrudsBuild extends ODD {
     }
 }
 
-class CrudsGroup extends ODD {
-    
+class CrudsPage extends ODD {
+
+    /*
     constructor(i) {
         
         super(i);
@@ -1005,10 +999,16 @@ class CrudsGroup extends ODD {
 
     }
 
-    #Build({userData,parent,layers,cruds}){
+    #Build({userData,pageData}){
+
         
-        this.#layersBuild({parent,layers});
-        this.#crudsBuild({cruds,userData});
+        var pageBuildInfo = pages.find(pg=>pg.value==pageData.name);
+        if(!pageBuildInfo) return;
+
+        pageBuildInfo.parents = [];
+        
+        this.#layersBuild({parent:pageData.body,layers:pageBuildInfo.layers});
+        this.#crudsBuild({cruds:pageBuildInfo.cruds,userData});
     };
 
     #cruds=[];
@@ -1058,8 +1058,7 @@ class CrudsGroup extends ODD {
                 panel.fieldsSet.forEach(fset => {
                     
                     var fsch = schema.fields.find(fsch=>fsch.value == fset.value);
-                    
-                    var facc = fsch.access == true ? true : Access_Get(userData.access,fsch.access);
+                    var facc = fsch.access == true ? true : Access_Get(fsch.access);
 
                     if(facc){
 
@@ -1091,8 +1090,6 @@ class CrudsGroup extends ODD {
                             select:fsch.select,
                             load:(load?{name:load.name,value:"value",show:"show"}:null),
                         });
-
-                        //add 
 
                         //selects
                         selects.push({
@@ -1257,6 +1254,7 @@ class CrudsGroup extends ODD {
 
     #layers = [];
     #parent = null;
+
     #layersBuild({parent,layers=[]}){
 
         this.#parent = parent;
@@ -1352,18 +1350,5 @@ class CrudsGroup extends ODD {
             build,
             conteiner
         });
-    }
-}
-
-class CrudsPage extends ODD {
-
-    constructor(i){
-
-        this.#Build(i);
-    }
-
-    #Build({}){
-
-
-    }
+    }*/
 }

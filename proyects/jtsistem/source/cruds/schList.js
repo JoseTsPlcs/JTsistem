@@ -19,7 +19,7 @@ const sch_customers = {
             name:"empresa",
             select:'COMPANY',
             width:100,
-            access:"md-customer-nro",
+            access:"md-bills-general",
             tipe:"active",
             descripcion:"si el cliente es empresa o persona natural",
         },
@@ -28,7 +28,7 @@ const sch_customers = {
             name:"nro documento",
             select:'NRO_DOCUMENT',
             width:150,
-            access:"md-customer-nro",
+            access:"md-bills-general",
             tipe:"input",
             descripcion:"nro del documento del dni/ruc",
         },
@@ -76,15 +76,30 @@ const sch_customers = {
 }
 
 function scr_customer_fm({parent,userData}) {
-    return {
+
+    var script = {
         ...scr_base({
             schema:sch_customers,
             panelTipe:"form",
             stateGeneral:"edit",
+            fieldsSet:[
+                {value:"name",state:"edit"},
+                {value:"company",state:"edit"},
+                {value:"nroDoc",state:"edit"},
+                {value:"cel",state:"edit"},
+                {value:"dir",state:"edit"},
+                {value:"email",state:"edit"},
+                {value:"comment",state:"edit"},
+            ],
             userData,
             parent,
           }),
     };
+
+    //console.log("GET SCRIPT OF CUSTOMER FORM",script);
+    
+
+    return script;
 }
 
 function scr_customer_tb({parent, userData}) {
@@ -207,14 +222,39 @@ const sch_items = {
             descripcion:"cantidad que se obtiene al momento de realizar la receta",
         },
     ],
-    panels:[
-        {tipe:"form",title:"item"},
-        {tipe:"table",title:"lista de items"},
-    ],
 }
 
 const sch_unids = {
+    table:"unids",
+    fieldPrimary:"ID_UNID",
+    fields:[
+        {
+            value:"name",
+            name:"unidad",tipe:"input",
+            select:"NAME",access:true,
+            descripcion:"",
+        },
+        {
+            value:"simbol",
+            name:"simbolo",tipe:"input",
+            select:"SIMBOL",access:true,
+            descripcion:"",
+        },
+    ],
+}
 
+const sch_items_tag = {
+    table:"products_tags",
+    fieldPrimary:"ID_PRODUCT_TAG",
+    company:true,
+    fields:[
+        {
+            value:"name",
+            name:"etiqueta",tipe:"input",
+            select:"NAME",access:true,
+            descripcion:"",
+        },
+    ],
 }
 
 const sch_vehicles = {
@@ -659,6 +699,57 @@ const sch_database = [
             join:{table:sch_produccion_inputs.table,field:"ID_PRODUCT"}},
     ],
 ];
+
+const sch_pays = {
+    
+    table:"payments",
+    fieldPrimary:"ID_PAY",
+    company:true,
+    fields:[
+        {
+            value:"idPay",
+            name:"id del pago",
+            select:"ID_PAY",access:true,
+            tipe:"show",
+            descripcion:"",
+        },
+        {
+            value:"date",
+            name:"fecha de emision",
+            select:"DATE_EMMIT",access:true,
+            tipe:"date",
+            descripcion:"",
+        },
+        {
+            value:"total",
+            name:"total",
+            select:"TOTAL",access:true,
+            tipe:"money",
+            descripcion:"",
+        },
+        {
+            value:"income",
+            name:"ingreso/egreso",
+            select:"INCOME",access:true,
+            tipe:"active",
+            descripcion:"",
+        },
+        {
+            value:"account",
+            name:"cuenta",
+            select:"ID_ACCOUNT",access:true,
+            tipe:"options",
+            descripcion:"",
+        },
+        {
+            value:"tag",
+            name:"etiqueta",
+            select:"ID_PAY_TAG",access:true,
+            tipe:"options",
+            descripcion:"",
+        },
+    ]
+};
 
 /*const schema = {
     tables:[
