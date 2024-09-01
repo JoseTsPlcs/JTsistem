@@ -165,6 +165,8 @@ class Window extends ODD {
   fieldGetLabel({fieldName,fieldIndex}){
 
     var field = this.Fields_GetInfo({fieldIndex,fieldName});
+
+    if(field == null) return null;
     
     var grid = this.Conteiner_Grid();
     var coldata = grid.GetColData({x:field.x,y:field.y});
@@ -175,7 +177,9 @@ class Window extends ODD {
 
   Fields_GetBox({fieldName,fieldIndex}){
 
-    return this.fieldGetLabel({fieldName,fieldIndex}).GetBox();
+    var label = this.fieldGetLabel({fieldName,fieldIndex});
+    if(label) return label.GetBox();
+    else return null;
   }
 
   Fields_GetValue({fieldName,fieldIndex}){

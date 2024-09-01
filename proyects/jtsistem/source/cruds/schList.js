@@ -4,6 +4,7 @@ const sch_customers = {
     
     table:"customers",
     fieldPrimary:"ID_CUSTOMER",
+    company:true,
     fields:[
         {
             value:"name",
@@ -362,7 +363,7 @@ const sch_sales = {
             value:"pay",
             name:"pagado",
             select:"PAID",access:true,
-            tipe:"active",options:op_sales_paid,
+            tipe:"options",options:op_sales_paid,
             descripcion:"si la venta ya ha sido pagada",
         },
         {
@@ -371,6 +372,14 @@ const sch_sales = {
             table:"customers",select:"ID_CUSTOMER",access:true,sql:"CONCAT(customers.NAME,'-',customers.NRO_DOCUMENT) AS 'NAME'",
             tipe:"optionsSearch",
             descripcion:"cliente de la venta",
+            load:{
+                name:"ld-customer",
+                tableMain:sch_customers.table,
+                selects:[
+                    {table:sch_customers.table,field:sch_customers.fieldPrimary,as:"value"},
+                    {table:sch_customers.table,field:"NAME",as:"show"},
+                ],
+            }
         },
         {
             value:"doc",
@@ -427,6 +436,9 @@ const sch_sales = {
             select:"ID_WORK_PROCESS",access:true,
             tipe:"options",
             descripcion:"trabajador asignado a la venta",
+            load:{
+                ld:"ld-worker",
+            },
         },
         {
             value:"dscto",
@@ -466,7 +478,7 @@ const sch_sales_products = {
         },
         {
             value:"item",
-            name:"producto/servicio a vender",width:500,
+            name:"producto/servicio",width:500,
             select:"ID_PRODUCT",access:true,
             tipe:"optionsSearch",
             descripcion:"",
@@ -475,7 +487,17 @@ const sch_sales_products = {
                 tableMain:sch_items.table,
                 selects:[
                     {table:sch_items.table,field:sch_items.fieldPrimary,as:"value"},
-                    {sql:("CONCAT("+sch_items.table+".NAME,' [tipo]',' [unid]') AS 'show'")},
+                    {sql:("CONCAT("+sch_items.table+".NAME,' (',unids.SIMBOL,')') AS 'show'")},
+                ],
+                joins:[
+                    {
+                        main:{table:sch_items.table,field:"UNID_ID"},
+                        join:{table:sch_unids.table,field:sch_unids.fieldPrimary},
+                        tipe:"LEFT",
+                    }
+                ],
+                startOptions:[
+                    {value:"null",show:"Nuevo Producto/Servicio"},
                 ],
             },
         },
@@ -512,6 +534,25 @@ const sch_sales_products = {
             name:"trabajador asignado",
             select:"ID_WORKER",access:true,
             tipe:"options",
+            descripcion:"",
+        },
+    ],
+}
+
+const sch_sales_pays = {
+    table:"sales_payments",
+    fieldPrimary:"ID_SALE_PAY",
+    fields:[
+        {
+            value:"idSale",access:true,
+            name:"id sale",tipe:"show",
+            select:"ID_SALE",
+            descripcion:"",
+        },
+        {
+            value:"idPay",access:true,
+            name:"id pay",tipe:"show",
+            select:"ID_PAY",
             descripcion:"",
         },
     ],
@@ -700,6 +741,75 @@ const sch_database = [
     ],
 ];
 
+const sch_accounts = {
+    table:"accounts",
+    fieldPrimary:"ID_ACCOUNT",
+    company:true,
+    fields:[
+        {
+            value:"name",access:true,
+            name:"nombre de cuenta",select:"NAME",
+            tipe:"input",
+            descripcion:"",
+        },
+        {
+            value:"total",access:true,
+            name:"total",select:"TOTAL",
+            tipe:"money",
+            descripcion:"",
+        },
+        {
+            value:"active",access:true,
+            name:"activo",select:"ACTIVE",
+            tipe:"active",
+            descripcion:"",
+        },
+        {
+            value:"open",access:true,
+            name:"estado",select:"OPEN",
+            tipe:"active",
+            descripcion:"",
+        },
+        {
+            value:"control",access:true,
+            name:"cuenta controlada",select:"CONTROL_BY_OPEN",
+            tipe:"active",
+            descripcion:"",
+        },
+    ],
+}
+
+const shc_pay_tag = {
+
+    table:"pay_tag",
+    fieldPrimary:"ID_PAY_TAG",
+    company:true,
+    fields:[
+        {
+            value:"name",access:true,
+            select:"NAME",name:"nombre de etiqueta",
+            tipe:"input",
+            descripcion:"",
+        },
+        {
+            value:"income",access:true,
+            select:"INCOME",name:"ingreso",
+            tipe:"options",
+            options:[
+                {value:0,show:"egreso"},
+                {value:1,show:"ingreso"},
+            ],
+            descripcion:"",
+        },
+        {
+            value:"active",access:true,
+            select:"ACTIVE",name:"activo",
+            tipe:"active",
+            descripcion:"",
+        },
+    ],
+};
+
 const sch_pays = {
     
     table:"payments",
@@ -731,7 +841,10 @@ const sch_pays = {
             value:"income",
             name:"ingreso/egreso",
             select:"INCOME",access:true,
-            tipe:"active",
+            tipe:"options",options:[
+                {value:0,show:"egreso"},
+                {value:1,show:"ingreso"},
+            ],
             descripcion:"",
         },
         {
@@ -740,6 +853,14 @@ const sch_pays = {
             select:"ID_ACCOUNT",access:true,
             tipe:"options",
             descripcion:"",
+            load:{
+                name:"ld-account",
+                tableMain:sch_accounts.table,
+                selects:[
+                    {table:sch_accounts.table,field:sch_accounts.fieldPrimary,as:"value"},
+                    {table:sch_accounts.table,field:"NAME",as:"show"},
+                ],
+            },
         },
         {
             value:"tag",
@@ -747,9 +868,20 @@ const sch_pays = {
             select:"ID_PAY_TAG",access:true,
             tipe:"options",
             descripcion:"",
+            load:{
+                name:"ld-tag",
+                tableMain:shc_pay_tag.table,
+                selects:[
+                    {table:shc_pay_tag.table,field:shc_pay_tag.fieldPrimary,as:"value"},
+                    {table:shc_pay_tag.table,field:"NAME",as:"show"},
+                ],
+            },
         },
     ]
 };
+
+
+
 
 /*const schema = {
     tables:[

@@ -7,14 +7,17 @@ $(document).ready(function() {
 
       var infoBetweenPage = JSON.parse(sessionStorage.getItem('data'));
 
+      var acc_deliv = Access_Get(userData.access,"md-deliv-general");
+      
       var acc_products_update = Access_Get(userData.access,"md-items-sale-add");
       var acc_price_update = Access_Get(userData.access,"md-items-sale-price");
       var acc_sale_worker = Access_Get(userData.access,"md-workers-sale");
       var acc_item_worker = Access_Get(userData.access,"md-workers-item");
       var acc_dscto = Access_Get(userData.access,"md-sale-dscto");
-      var acc_bill = Access_Get(userData.access,"md-bill-general");
+      var acc_bill = Access_Get(userData.access,"md-bills-general");
       var acc_supplies = false;//Access_Get(userData.access,"md-items-supplies");
       var acc_pays = Access_Get(userData.access,"md-box-general");
+      var acc_item_stock = Access_Get(userData.access,"md-items-stock"); 
 
       var acc_customer_nro = Access_Get(userData.access,"md-bills-general");
       var acc_customer_cel = Access_Get(userData.access,"md-customer-cel");
@@ -41,8 +44,8 @@ $(document).ready(function() {
           [12],//modal item
         ],
         attributes:[
-          {y:1,x:0,attributes:[{name:"class",value:"col-12 col-md-4"}/*,{name:"style",value:"background-color: lightcoral;"}*/]},
-          {y:1,x:1,attributes:[{name:"class",value:"col-12 col-md-8 px-"+paddinForms + " pt-" + paddinForms + " pt-md-0"}/*,{name:"style",value:"background-color: lightblue; min-height: 600px; flex: 1;"}*/]},
+          {y:1,x:0,attributes:[{name:"class",value:"col-12 col-md-4 px-md-3 px-0"}/*,{name:"style",value:"background-color: lightcoral;"}*/]},
+          {y:1,x:1,attributes:[{name:"class",value:"col-12 col-md-8 pt-0 pt-sx-3 pt-md-0"}/*,{name:"style",value:"background-color: lightblue; min-height: 600px; flex: 1;"}*/]},
         ],
       });
 
@@ -141,7 +144,8 @@ $(document).ready(function() {
                 {col:12,tipe:"form",title:"principal",tag:"Informacion",h:0,show:true,blocked:true},
                 {col:12,tipe:"form",title:"total",tag:"Total",h:0,show:true,blocked:true},
                 {col:12,tipe:"form",title:"cliente",tag:"Datos del Cliente",h:0,show:true,blocked:true},
-                (userData.company.tipe=="3"?{col:12,tipe:"form",title:"inmueble",tag:"Inmueble",h:0,blocked:true,show:true}:null)
+                (userData.company.tipe=="3"?{col:12,tipe:"form",title:"inmueble",tag:"Inmueble",h:0,blocked:true,show:true}:null),
+                //(acc_deliv?{col:12,tipe:"form",title:"delivery",tag:"deliv"}:null),
               ],
               //breaklevel:"sm",
               stateStart:"block",
@@ -150,8 +154,8 @@ $(document).ready(function() {
                 {
                     name:"reload",
                     tools:[
-                        {name:"load",show:true, descripcion:"selecciona para cargar lista de cliente"},
-                        {name:"question",show:true},
+                        {name:"load",show:false, descripcion:"selecciona para cargar lista de cliente"},
+                        {name:"question",show:false},
                         {name:"sizes",show:false,value:1},
                         {name:"reload",show:true},
                         {name:"update",show:true},
@@ -161,11 +165,11 @@ $(document).ready(function() {
                     name:"new",
                     tools:[
                         {name:"config",show:false},
-                        {name:"load",show:true},
+                        {name:"load",show:false},
                         
                         {name:"excel",show:false},
                         {name:"pdf",show:false},
-                        {name:"question",show:true},
+                        {name:"question",show:false},
             
                         {name:"sizes",show:false,value:1},
                         {name:"reload",show:false},
@@ -185,7 +189,7 @@ $(document).ready(function() {
                       
                       {name:"excel",show:false},
                       {name:"pdf",show:false},
-                      {name:"question",show:true},
+                      {name:"question",show:false},
           
                       {name:"sizes",show:false,value:1},
                       {name:"reload",show:false},
@@ -230,6 +234,8 @@ $(document).ready(function() {
                 {table:'sales', field:'ID_WORK_PROCESS'},
                 {table:'sales', field:'TOTAL_WITHOUT_DSCTO'},
                 {table:'sales', field:'DSCTO'},
+                {table:"sales",field:"DELIVERY"},
+                {table:"sales",field:"USEDELIV"},
               ],
               conditions:[
                 {
@@ -336,6 +342,7 @@ $(document).ready(function() {
                 (acc_bill?{panel:"principal",col:12,y:3,tipe:1,name:"documento de venta",box:bx_op({ops:op_sales_document}),select:"ID_DOCUMENT",descripcion:"selecciona si desea emitir nota de pago, boleta o factura"}:null),
                 {panel:"principal",col:12,y:8,name:"comentario*",box:{tipe:9,value:""},select:"COMMENT",descripcion:"coloca algun comentario para que el equipo lo pueda visualizar"},
                 (acc_sale_worker?fld_worker({panel:"principal",select:"ID_WORK_PROCESS",edit:true}):null),
+                (acc_deliv?{panel:"principal",name:"servicio de delivery",select:"USEDELIV",box:{...bx_op({ops:op_usedeliv}),value:0}}:null),
                 //{panel:"principal",col:12,colAllLevel:true,y:0,name:"trabajador asignado",box:{tipe:8},select:"ID_WORK_PROCESS",load:{name:"ld-workers",show:"show"}},
 
                 
@@ -343,13 +350,14 @@ $(document).ready(function() {
                 //{panel:"total",col:12,y:6,name:"servicios",box:bx_money},
                 (acc_dscto?{panel:"total",col:12,y:6,name:"total sin descuento",box:bx_money,select:"TOTAL_WITHOUT_DSCTO",descripcion:"total de la venta sin contar el descuento"}:null),
                 (acc_dscto?{panel:"total",col:12,y:6,name:"descuento%",box:{tipe:1,value:0},select:"DSCTO",descripcion:"ingresar descuento, se descontara al total de la venta"}:null),
+                (acc_deliv?{panel:"total",col:12,name:"costo de delivery",box:{tipe:1,class:"w-100",value:0},select:"DELIVERY",descripcion:"costo de delivery"}:null),
                 //(acc_dscto?{panel:"total",col:12,y:6,name:"total del descuento",box:bx_money}:null),
                 {panel:"total",col:12,y:4,name:"total",box:bx_moneyh1,select:"TOTAL",descripcion:"se muestra el total de la venta"},
                 (acc_pays?{panel:"total",col:12,y:7,name:"pagado",box:bx_money,descripcion:"se muestra el total que se ha pagado"}:null),
 
-                {panel:"cliente",col:8,colAllLevel:true,y:0,name:"cliente",box:{tipe:8,options:[{value:"null",show:"Seleccionar Cliente"}]},select:"ID_CUSTOMER",load:{name:"customers",show:"show"},descripcion:"seleccionar cliente"},
-                {panel:"cliente",col:2,colAllLevel:true,...fld_edit,descripcion:"seleccionar para editar el cliente seleccionado"},
-                {panel:"cliente",col:2,colAllLevel:true,...fld_add,descripcion:"seleccionar para añadir un nuevo cliente"},
+                {panel:"cliente",col:10,colAllLevel:true,y:0,name:"cliente",box:{tipe:8,options:[{value:"null",show:"Seleccionar Cliente"}]},select:"ID_CUSTOMER",load:{name:"customers",show:"show"},descripcion:"seleccionar cliente"},
+                {panel:"cliente",col:1,colAllLevel:true,...fld_edit,descripcion:"seleccionar para editar el cliente seleccionado"},
+                {panel:"cliente",col:1,colAllLevel:true,...fld_add,descripcion:"seleccionar para añadir un nuevo cliente"},
                 //{panel:"cliente",col:12,y:1,name:"tipo",box:{tipe:0}},
                 (acc_customer_nro?{panel:"cliente",col:12,y:3,name:"cliente documento",box:{tipe:0,options:op_identity_document_tipe},descripcion:"documento del cliente"}:null),
                 (acc_customer_nro?{panel:"cliente",col:12,y:4,name:"nro de documento",box:{tipe:0},descripcion:"numero del documento del cliente"}:null),
@@ -379,7 +387,7 @@ $(document).ready(function() {
                       var cr_pays = conections.Crud_GetBuild({name:"pays"});
 
                       var products_total = cr_items.GetValues({fieldName:"precio total"});
-                      var products_tipe = cr_items.GetValues({fieldName:"tipo"});
+                      //var products_tipe = cr_items.GetValues({fieldName:"tipo"});
                       var pays = cr_pays ? cr_pays.GetValues({fieldName:"total"}) : null;
                       var dscto = acc_dscto ? parseFloat(cr_sale.GetValue({fieldName:"descuento%",y:0})) : 0;
 
@@ -395,10 +403,10 @@ $(document).ready(function() {
                       for (let item = 0; item < products_total.length; item++) {
 
                         var pr_total = parseFloat(products_total[item]);
-                        var pr_tipe = products_tipe[item];
+                        //var pr_tipe = products_tipe[item];
 
-                        if(pr_tipe==3) total_product+= pr_total;
-                        if(pr_tipe==1) total_service+= pr_total;      
+                        //if(pr_tipe==3) total_product+= pr_total;
+                        //if(pr_tipe==1) total_service+= pr_total;      
                         
                         total_without_dscto += pr_total;                        
                       }
@@ -585,64 +593,26 @@ $(document).ready(function() {
                 {
                   name:"reload",
                   tools:[
-                      {name:"config",show:false},
-                      {name:"load",show:true},
-                      {name:"question",show:true},
-                      
-                      {name:"excel",show:false},
-                      {name:"pdf",show:false},
-          
+                      {name:"load",show:false},
+                      {name:"question",show:false},
                       {name:"sizes",show:false,value:999},
-                      {name:"reload",show:false},
-                      {name:"update",show:false},
                       {name:"new",show:true},
-                      {name:"insert",show:false},
-                      {name:"cancel",show:false},
-                      {name:"addLine",show:false},
-                      
-                      {name:"pages",show:false},
                   ],
                 },
                 {
                   name:"new",
                   tools:[
-                      {name:"config",show:false},
                       {name:"load",show:false},
-                      {name:"question",show:true},
-                      
-                      {name:"excel",show:false},
-                      {name:"pdf",show:false},
-          
-                      {name:"sizes",show:false,value:999},
-                      {name:"reload",show:false},
-                      {name:"update",show:false},
-                      {name:"new",show:false},
+                      {name:"question",show:false},
                       {name:"insert",show:true},
                       {name:"cancel",show:true},
-                      {name:"addLine",show:true},
-                      
-                      {name:"pages",show:false},
                   ],
                 },
                 {
                   name:"block",
                   tools:[
-                      {name:"config",show:false},
-                      {name:"load",show:true},
-                      {name:"question",show:true},
-                      
-                      {name:"excel",show:false},
-                      {name:"pdf",show:false},
-          
-                      {name:"sizes",show:false,value:999},
-                      {name:"reload",show:false},
-                      {name:"update",show:false},
-                      {name:"new",show:false},
-                      {name:"insert",show:false},
-                      {name:"cancel",show:false},
-                      {name:"addLine",show:false},
-                      
-                      {name:"pages",show:false},
+                      {name:"load",show:false},
+                      {name:"question",show:false},
                   ],
                 },
               ],
@@ -692,7 +662,7 @@ $(document).ready(function() {
                   tableMain:"products",
                   selects:[
                       {table:'products', field:'ID_PRODUCT',as:"value"},
-                      {table:'products', field:'NAME',as:"show"},
+                      {/*table:'products', field:'NAME',as:"show",*/sql:"CONCAT(products.NAME,' (',unids.SIMBOL,')') AS 'show'"},
                       {table:'products',field:"PRICE_UNIT"},
                       {table:'products',field:"STOCK_TOTAL"},
                       {table:'products',field:"ID_PRODUCT_TIPE"},
@@ -727,16 +697,23 @@ $(document).ready(function() {
                       value:company_id,
                     },
                   ],
+                  joins:[
+                    {
+                      main:{table:"products",field:"UNID_ID"},
+                      join:{table:"unids",field:"ID_UNID"},
+                      tipe:"LEFT",
+                    }
+                  ],
                 },
                 (acc_item_worker?{...ld_workers}:null),
               ],
 
               fields:[
-                {panel:"main",...fld_delete,attributes:att_btn,descripcion:"selecciona para borrar (producto/servicio) de la venta"},
+                {panel:"main",...fld_delete,name:"dlt",attributes:att_btn,descripcion:"selecciona para borrar (producto/servicio) de la venta"},
                 (acc_products_update?{panel:"main",...fld_edit,attributes:att_btn,descripcion:"selecciona para editar informacion del (producto/servicio)"}:null),
                 {panel:"main",name:"producto-servicio",box:{tipe:8,class:"w-100"},attributes:att_ln,select:"ID_PRODUCT",load:{name:"products-services",show:"show"},descripcion:"selecciona (producto/servicio) a vender"},
-                {panel:"main",name:"tipo",box:{tipe:0,options:op_products_tipe},attributes:att_shw,select:"ID_PRODUCT_TIPE",descripcion:"muestra el tipo de (producto/servicio)"},
-                {panel:"main",name:"unidad",box:bx_shw,attributes:att_shw,select:"SIMBOL",descripcion:"muestra la unidad del (producto/servicio)"},
+                //{panel:"main",name:"tipo",box:{tipe:0,options:op_products_tipe},attributes:att_shw,select:"ID_PRODUCT_TIPE",descripcion:"muestra el tipo de (producto/servicio)"},
+                //{panel:"main",name:"unidad",box:bx_shw,attributes:att_shw,select:"SIMBOL",descripcion:"muestra la unidad del (producto/servicio)"},
                 {panel:"main",name:"cantidad",box:bx_cant,attributes:att_cnt,select:"CANT",descripcion:"muestra la cantidad de (producto/servicio) que se esta vendiendo"},
                 {panel:"main",name:"precio unitario",box:(acc_price_update?{tipe:1,value:0}:bx_money),attributes:att_shw,select:"PRICE_UNIT",descripcion:((acc_price_update?"seleccion":"muestra")+" precio unitario del (producto/servicio)")},
                 {panel:"main",name:"precio total",box:(acc_price_update?{tipe:1,value:0}:bx_money),attributes:att_shw,select:"PRICE_TOTAL",descripcion:((acc_price_update?"seleccion":"muestra")+" precio total del (producto/servicio)")},
@@ -788,7 +765,7 @@ $(document).ready(function() {
 
                         var stock = parseFloat(productData["STOCK_TOTAL"]);
                         var tipe = parseInt(productData["ID_PRODUCT_TIPE"]);
-                        if(tipe != 1 && cantValue >= stock) alert("solo quedan " + stock + " unidades ");
+                        if(acc_item_stock && tipe != 1 && cantValue >= stock) alert("solo quedan " + stock + " unidades ");
                       }
                       
                       
@@ -818,7 +795,7 @@ $(document).ready(function() {
                       var priceUnit = parseFloat(productData["PRICE_UNIT"]);
                       var priceTotal =  priceUnit * cantValue;
                       
-                      console.log("line :"+y," product:",productid," cant:",cantValue," price:",priceUnit," total:",priceTotal);
+                      //console.log("line :"+y," product:",productid," cant:",cantValue," price:",priceUnit," total:",priceTotal);
 
                       return {priceUnit, priceTotal,primary};
                     }

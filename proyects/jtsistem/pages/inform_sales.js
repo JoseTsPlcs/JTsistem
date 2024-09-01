@@ -18,13 +18,15 @@ $(document).ready(function() {
               {table:'products_tags', field:'ID_PRODUCT_TAG',as:"value"},
               {table:'products_tags', field:'NAME',as:"show"},
             ],
-            conditions:[{
-              //before:" AND ",
-              table:"products_tags",
-              field:"ID_COMPANY",
-              inter:"=",
-              value:userData.company.id,
-            }],
+            conditions:[
+                {
+                //before:" AND ",
+                table:"products_tags",
+                field:"ID_COMPANY",
+                inter:"=",
+                value:userData.company.id,
+              },
+            ],
           },
         ],
         filters:[
@@ -32,7 +34,7 @@ $(document).ready(function() {
           {col:6,name:"fecha min",box:{tipe:2,value:Date_StartQuarter()},select:{table:"sales",field:"DATE_EMMIT",tipe:"min"},descripcion:"buscar por fecha mayor o igual a las seleccionada"},
           {col:6,name:"fecha max",box:{tipe:2,value:Date_EndQuarter()},select:{table:"sales",field:"DATE_EMMIT",tipe:"max"},descripcion:"buscar por fecha menor o igual a las seleccionada"},
           //{name:"estados",box:{tipe:4,options:op_sales_status,value:['confirmado','en proceso','terminado']},select:{table:"sales",field:"ID_STATUS"}},
-          {name:"etiquetas",box:{tipe:4},load:{name:"ld-tags",show:"show",value:"value"}},
+          {name:"etiquetas",box:{tipe:4},load:{name:"ld-tags",show:"show",value:"value"},select:{table:"products",field:"ID_PRODUCT_TAG"}},
           //{name:"producto",box:{tipe:8}},
         ],
         charts:[
@@ -138,6 +140,13 @@ $(document).ready(function() {
               field:"PAID",
               inter:"=",
               value:1,
+            },
+            {
+              before:" AND ",
+              table:"sales",
+              field:"ID_STATUS",
+              inter:"!=",
+              value:5,
             },
           ],
           orders:[

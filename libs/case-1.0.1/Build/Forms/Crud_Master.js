@@ -30,7 +30,7 @@ class Crud_Master extends ODD {
         delete:false,
     }
 
-    #SetVariables({stateTools=[],questions=[],stateStart="reload",afterCancel="reload",afterDelete="reload",afterInsert="reload",afterUpdate="reload",newLinesStart=1,newActive=true,tableMain,selects,joins,inserts=[],orders=[],conditions=[],fields=[],filters=[],loads=[]}){
+    #SetVariables({stateTools=[],questions=[],stateStart="reload",afterCancel="reload",afterDelete="reload",afterInsert="reload",afterUpdate="reload",newLinesStart=1,newActive=true,tableMain,selects,joins,inserts=[],orders=[],conditions=[],fields=[],filters=[],loads=[],insertNoAddFields=false,updateCurrent,panels=[]}){
 
         this.#conection = db_lip;
         this.#tableMain = tableMain;
@@ -51,6 +51,8 @@ class Crud_Master extends ODD {
 
         
         this.#newActive = newActive;
+        this.#insertNoAddFields = insertNoAddFields;
+        this.#updateCurrent = updateCurrent !=null ? updateCurrent : panels.find(p=>p.tipe == "table");
         this.#stateData.stateStart=stateStart;
         this.#stateData.afterCancel = afterCancel;
         this.#stateData.afterDelete = afterDelete;
@@ -167,7 +169,10 @@ class Crud_Master extends ODD {
                                 case "pages":
                                     this.#Event_UpdateToolPages({});
                                 break;
-                            
+
+                                case "addLine":
+                                    this.#New_AddLine({});
+                                break;                            
                                 
                             }
                         }
@@ -343,7 +348,7 @@ class Crud_Master extends ODD {
         return this.#reloadData.map((ln)=>{return ln[this.#selectPrimary.field]});
     }
 
-    Reload({success}){
+    Reload({success,noUseReloadAfter=false}){
 
         let k = this;
 
@@ -379,7 +384,7 @@ class Crud_Master extends ODD {
                 k.#Reload_RequestData({success:({result})=>{
 
                     k.#body.LoadingScreenActive({active:false});
-                    k.#Event_ReloadAfter({reloadData:result});
+                    if(!noUseReloadAfter) k.#Event_ReloadAfter({reloadData:result});
                     k.#Reload_PrintData({result});
                 }});
             }
@@ -436,7 +441,7 @@ class Crud_Master extends ODD {
             orders:k.#orders,
         });
 
-        console.log("reload data sql:",reloadDataSql);
+        //console.log("reload data sql:",reloadDataSql);
 
         this.#conection.Request({
             php:"row",log:k.#ctr_log.reload,
@@ -524,6 +529,7 @@ class Crud_Master extends ODD {
 
     //insert
 
+    #insertNoAddFields = false;
     Insert({inserts=[],success}){
 
         var e_rst = this.#Event_InsertBefore({inserts});
@@ -582,12 +588,14 @@ class Crud_Master extends ODD {
 
                 var insertSql_inserts = inserts;
 
-                //console.log(this.#title+"- insert start -> ",[...insertSql_inserts]);
+                
+                console.log("INSERT REQUEST BY INSERT IN FUNCION", [...insertSql_inserts]);
 
                 //insert by inserts saved
                 insertSql_inserts = [...insertSql_inserts,...k.#inserts];
 
-                //console.log(this.#title+"- insert add insert in form -> ",[...insertSql_inserts]);
+                console.log("INSERT REQUEST BY SAVED", [...insertSql_inserts]);
+                
 
                 //insert by primary new
                 insertSql_inserts.push({
@@ -596,7 +604,7 @@ class Crud_Master extends ODD {
                     tipe:"secuence",
                 });
 
-                //console.log(this.#title+"- insert add primary new -> ",[...insertSql_inserts]);
+                //console.log("INSERT REQUEST ADDED PRIMARY", [...insertSql_inserts]);
 
                 //inserst by crudjoins
                 k.#crudJoins.forEach(jn=>{
@@ -612,32 +620,48 @@ class Crud_Master extends ODD {
                     }                   
                 });
 
-                //insert by fields
-                k.#body.fieldsGet().forEach(field => {
-                    
-                    //no button, no div and select exist
-                    var select = k.#SelectGet({selectName:field.select});
-                    if(field.box.tipe != 0 && select){
-  
-                        //no primary in insert because primary have a value
-                        if(!select.primary){
+                //console.log("INSERT REQUEST ADDED JOINS", [...insertSql_inserts]);
 
-                            var fieldSelecField = select.field;
-                            var fieldValues = k.#body.fieldGetValues({fieldName:field.name});
+                if(!this.#insertNoAddFields){
 
-                            fieldValues.forEach(v => {
+                    //insert by fields
+                    k.#body.fieldsGet().forEach(field => {
+                        
+                        //no button, no div and select exist
+                        var select = k.#SelectGet({selectName:field.select});
+                        if(field.box.tipe != 0 && select){
+    
+                            //no primary in insert because primary have a value
+                            if(!select.primary){
+
+                                var fieldSelecField = select.field;
+                                if(this.#stateData.state == "new"){
+
+                                    var fieldValues = k.#body.fieldGetValues({fieldName:field.name});                                    
+                                    fieldValues.forEach(v => {
+                                        
+                                        insertSql_inserts.push({
+                                            field: fieldSelecField,
+                                            value: v,
+                                        });
+                                    });  
+                                }
+                                else
+                                {
+                                    insertSql_inserts.push({
+                                        field: fieldSelecField,
+                                        value: field.box.value,
+                                    });  
+                                }
+                                  
                                 
-                                insertSql_inserts.push({
-                                    field: fieldSelecField,
-                                    value: v,
-                                });
-                            });    
-                            
-                            //console.log(field.name, fieldValues);
-                        }                        
-                    }
-                });    
-                
+                                //console.log(field.name, fieldValues);
+                            }                        
+                        }
+                    }); 
+                }   
+
+                //console.log("INSERT REQUEST ADDED FIELDS", [...insertSql_inserts]);
                 
 
                 //-----request------
@@ -675,40 +699,18 @@ class Crud_Master extends ODD {
 
     #New_AddLine({}){
 
-        /*this.#conteiner_panels.forEach(panel => {
+        let k = this;
+        this.#body.fieldsGet().forEach(field=>{
 
-            var fieldsOfPanel = this.#fields.filter(f=>f.panel==panel.title);
-            
-            switch (panel.tipe) {
-                case "table":
+            var values = k.#body.fieldGetValues({fieldName:field.name});
 
-                fieldsOfPanel.forEach(f => {
-                        
-                    var value = "";
-                    var box = null;
+            values.push(field.box.value);
 
-                    value = f.box.value;
-                    //else box = {tipe:0};
-
-                    var values = this.GetValues({fieldName:f.name});
-                    values.push(value);
-
-                    this.SetValuesToBox({values,fieldName:f.name,box});
-                });                   
-
-                break;
-
-                case "form":
-
-                fieldsOfPanel.forEach(f => {
-                    
-                    if(f.action == "edit") console.log("new -> field:",f);
-                    this.SetValuesToBox({values:[f.box.value],fieldName:f.name});
-                });
-
-                break;
-            }
-        });*/
+            k.#body.fieldSetValues({
+                fieldName:field.name,
+                values,
+            });
+        });
     }
 
     #New_RemoveLine({y,from}){
@@ -741,7 +743,7 @@ class Crud_Master extends ODD {
 
     //update
 
-    #Update({success}){
+    Update({success}){
 
         let k = this;
         k.#body.LoadingScreenActive({active:true});
@@ -835,6 +837,7 @@ class Crud_Master extends ODD {
             ]
         }*/
     ];
+    #updateCurrent = false;
 
     Update_AddChange({fieldName,value,primary}){
 
@@ -998,7 +1001,7 @@ class Crud_Master extends ODD {
         return this.#stateData.state;
     }
 
-    SetState({stateName}){
+    SetState({stateName,noUseReloadAfter=false}){
 
         this.#stateData.state = stateName;
         //set tools
@@ -1039,7 +1042,7 @@ class Crud_Master extends ODD {
 
             case "reload":
                 
-                this.Reload({});
+                this.Reload({noUseReloadAfter});
             break;
 
             case "block":
@@ -1132,7 +1135,7 @@ class Crud_Master extends ODD {
 
     #Event_UpdateToolUpdate({}){
 
-        this.#Update({});
+        this.Update({});
     }
     
     #Event_UpdateToolPages({}){
@@ -1192,7 +1195,7 @@ class Crud_Master extends ODD {
             primaryValue: this.#reloadData[0][this.#selectPrimary.field],
         });
     }
-
+    //#update
     #Event_BoxUpdate(u){
 
         let k = this;
@@ -1202,8 +1205,8 @@ class Crud_Master extends ODD {
 
         if(u.field.action == "delete"){
 
-            /*var panel = this.#conteiner_panels.find(p=>p.title == u.field.panel);
-            if(panel.tipe == "table"){
+            var panel = this.#body.panelGet({panelName:u.field.panel.name});
+            if(panel.build.tipeGet() == "table"){
 
                 switch (this.#stateData.state) {
                     case "reload":
@@ -1223,7 +1226,7 @@ class Crud_Master extends ODD {
                     break;
                 }
                 
-            }*/
+            }
         }
 
         this.CallEvent({name:"boxUpdate",params:{...u}});
@@ -1301,18 +1304,8 @@ class Crud_Master extends ODD {
     #Event_AddChange({fieldName,value,primary}){
 
         this.CallEvent({name:"addChange",params:{fieldName,value,primary}});
-
-        if(this.#stateData.state=="reload"){
-
-            var field = this.#body.fieldGet({fieldName});
-            if(field != null){
-
-                var panel = this.#body.panelGet({panelName:field.panel.name});
-                var panelIsTable = panel.tipe=="table";
-                if(panelIsTable) this.#Update({});
-            }
-           
-        }
+        
+        if(this.#updateCurrent) this.Update({});
 
     }
 

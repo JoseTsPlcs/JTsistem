@@ -18,22 +18,22 @@ class Crud_Body extends ODD {
 
 
     #tools = [
-      {position:"head-left",name:"config",descripcion:"selecciona para realizar una busqueda",box:{tipe:5,value:'<i class="bi bi-gear"></i>',class:"btn btn-primary btn-sm"}},
-      {position:"head-left",name:"load",descripcion:"selecciona para cargar datos externos",box:{tipe:5,value:'<i class="bi bi-database"></i>',class:"btn btn-primary btn-sm"}},
+      {position:"head-left",name:"config",descripcion:"selecciona para realizar una busqueda",box:{tipe:5,value:'<i class="bi bi-gear"></i>',class:"btn btn-primary btn"}},
+      {position:"head-left",name:"load",descripcion:"selecciona para cargar datos externos",box:{tipe:5,value:'<i class="bi bi-database"></i>',class:"btn btn-primary btn"}},
 
-      {position:"head-rigth",name:"excel",descripcion:"descargar datos en archivo excel",box:{id:"btn1",tipe:5,value:"excel",class:"btn btn-success btn-sm"}},
-      {position:"head-rigth",name:"question",box:{id:"btn2",tipe:5,value:'<i class="bi bi-question-circle"></i>',class:"btn btn-secondary btn-sm"}},
+      {position:"head-rigth",name:"excel",descripcion:"descargar datos en archivo excel",box:{id:"btn1",tipe:5,value:"excel",class:"btn btn-success btn"}},
+      {position:"head-rigth",name:"question",box:{id:"btn2",tipe:5,value:'<i class="bi bi-question-circle"></i>',class:"btn btn-secondary btn"}},
 
       {position:"botton-left",name:"sizes",descripcion:"seleccion la cantidad de registros ver",box:{tipe:3,value:1,options:[{show:1,value:1},{show:10,value:10},{show:25,value:25},{show:50,value:50},{show:999,value:999}]}},
 
-      {position:"botton-center",name:"reload",descripcion:"selecciona para recargar",box:{id:"btn1",tipe:5,value:"recargar",class:"btn btn-primary btn-sm"}},
-      {position:"botton-center",name:"update",descripcion:"selecciona para actualizar",box:{id:"btn2",tipe:5,value:"actualizar",class:"btn btn-primary btn-sm"}},
-      {position:"botton-center",name:"new",descripcion:"selecciona para crear nuevo registro",box:{id:"btn3",tipe:5,value:"nuevo",class:"btn btn-primary btn-sm"}},
-      {position:"botton-center",name:"insert",descripcion:"selecciona para insertar nuevo registro",box:{id:"btn4",tipe:5,value:"insertar",class:"btn btn-primary btn-sm"}},
-      {position:"botton-center",name:"delete",descripcion:"selecciona para borrar registro",box:{id:"btn5",tipe:5,value:"borrar",class:"btn btn-danger btn-sm"}},
-      {position:"botton-center",name:"cancel",descripcion:"selecciona para cancelar",box:{id:"btn6",tipe:5,value:"cancelar",class:"btn btn-danger btn-sm"}},
-      {position:"botton-center",name:"addLine",descripcion:"selecciona para añadir nueva linea para insertar registro",box:{id:"btn7",tipe:5,value:"añadir linea",class:"btn btn-primary btn-sm"}},
-      {position:"botton-center",name:"pdf",descripcion:"descargar datos en pdf",box:{id:"btn8",tipe:5,value:"pdf",class:"btn btn-danger btn-sm"}},
+      {position:"botton-center",name:"reload",descripcion:"selecciona para recargar",box:{id:"btn1",tipe:5,value:"recargar",class:"btn btn-primary btn"}},
+      {position:"botton-center",name:"update",descripcion:"selecciona para actualizar",box:{id:"btn2",tipe:5,value:"actualizar",class:"btn btn-primary btn"}},
+      {position:"botton-center",name:"new",descripcion:"selecciona para crear nuevo registro",box:{id:"btn3",tipe:5,value:"nuevo",class:"btn btn-primary btn"}},
+      {position:"botton-center",name:"insert",descripcion:"selecciona para insertar nuevo registro",box:{id:"btn4",tipe:5,value:"insertar",class:"btn btn-primary btn"}},
+      {position:"botton-center",name:"delete",descripcion:"selecciona para borrar registro",box:{id:"btn5",tipe:5,value:"borrar",class:"btn btn-danger btn"}},
+      {position:"botton-center",name:"cancel",descripcion:"selecciona para cancelar",box:{id:"btn6",tipe:5,value:"cancelar",class:"btn btn-danger btn"}},
+      {position:"botton-center",name:"addLine",descripcion:"selecciona para añadir nueva linea para insertar registro",box:{id:"btn7",tipe:5,value:"añadir linea",class:"btn btn-primary btn"}},
+      {position:"botton-center",name:"pdf",descripcion:"descargar datos en pdf",box:{id:"btn8",tipe:5,value:"pdf",class:"btn btn-danger btn"}},
 
       {position:"botton-rigth",name:"pages",descripcion:"selecciona pagina que ver",box:{tipe:3,value:1,options:[{show:"pag1",value:1}]}},
     ];
@@ -110,17 +110,23 @@ class Crud_Body extends ODD {
 
       this.#panels.forEach(panel => {
         
-        panel.build.fieldGetBoxes({fieldName}).forEach(bx=>{
+        var boxesOfpanel = panel.build.fieldGetBoxes({fieldName});
+        boxesOfpanel.forEach(bx=>{
 
           boxes.push(bx);
         })
       });
+
+      //console.log("FIELD GET BOXES field:",fieldName,boxes);
+      
 
       return boxes;
     }
 
     fieldGetValues({fieldName}){
 
+      //console.log("FIELD GETVALUES ",fieldName);
+      
       return this.fieldGetBoxes({fieldName}).map(bx=>{return bx.GetValue()});
     }
 

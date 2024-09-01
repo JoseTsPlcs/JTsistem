@@ -7,7 +7,6 @@ class Panel extends ODD {
         super(i);
         this.#setVariables(i);
         this.#Build(i);
-        this.#BuildPanel(i);
     }
 
     #tipe = "";
@@ -54,8 +53,12 @@ class Panel extends ODD {
         
             case "form":
                 
-                var boxs = this.fieldGetBoxes({fieldName});
-                boxs[0].SetValue(values[0]);
+                if(this.fieldGet({fieldName}).action != "div"){
+
+                    var boxs = this.fieldGetBoxes({fieldName});
+                    boxs[0].SetValue(values[0]);
+                }
+               
             break;
         }
 
@@ -74,18 +77,16 @@ class Panel extends ODD {
             case "form":
                 
                 var box = this.#build.Fields_GetBox({fieldName});
-                boxs = [box];
+                boxs = box ? [box] : [];
             break;
         }
-
-        if(fieldName=="nombre del item") console.log("GET BOX OF FIELD",fieldName,boxs);
 
         return boxs;
     }
     fieldSetOptions({fieldName,options}){
         
         var boxes = this.fieldGetBoxes({fieldName});
-        if(fieldName=="nombre del item") console.log("SET OPTIONS TO FIELDNAME",fieldName,options,boxes);
+
         boxes.forEach(box => {           
             
             box.SetOptions(options);
@@ -100,7 +101,7 @@ class Panel extends ODD {
     #panelConteiner = null;
     #build = null;
 
-    #Build({parent}){
+    #Build({parent,head=true,h}){
 
         /*this.#panelWindow = new Window({
             parent,title:"title panel",h:0,
@@ -112,10 +113,6 @@ class Panel extends ODD {
 
         this.#panelConteiner = this.#panelWindow.Conteiner_GetColData({x:0,y:0}).col;*/
         this.#panelConteiner = parent;
-    }
-
-    #BuildPanel({h}){
-        
         let k = this;
 
         var events = [
@@ -148,7 +145,7 @@ class Panel extends ODD {
             case "form":
                 
                 this.#build = new Window({
-                    head:true,h,
+                    head,h,
                     title:this.#title,
                     parent:this.#panelConteiner,
                     fields:this._fields,
