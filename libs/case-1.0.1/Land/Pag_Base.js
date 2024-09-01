@@ -309,7 +309,7 @@ class Pag_Base extends ODD {
                 </a>
             </div>
         </aside>
-        <div class="main p-3 mt-0 custom-bg-gray" id="bodyMain">
+        <div class="main p-0 p-md-3 mt-0 custom-bg-gray" id="bodyMain">
 
           <!-- Ventana emergente para descripciones -->
           <div id="popup" class="popup">

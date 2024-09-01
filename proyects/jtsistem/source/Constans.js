@@ -21,6 +21,10 @@ const op_company_type = [
     {value:5,show:"consultorio"},
 ];
 
+const op_usedeliv = [
+    {value:0,show:"recoge en tienda",class:"rounded text-center bg-success text-white"},
+    {value:1,show:"delivery",class:"rounded text-center bg-warning text-white"}
+];
 
 var op_products_onlimit = [
     {value:0,show:"aún con stock",class:"rounded text-center bg-success text-white"},
@@ -161,10 +165,10 @@ const att_cnt2 = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"widt
 
 //---------fields---------
 
-const fld_delete = {name:"delete",box:{tipe:5,value:'<i class="bi bi-x-circle"></i>',class:"btn btn-danger btn-sm"},action:"delete",descripcion:"seleccionar para borrar registro"};
-const fld_edit = {name:"edit",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn-sm"},action:"edit",descripcion:"seleccionar para editar registro"};
-const fld_add = {name:"add",box:{tipe:5,value:'<i class="bi bi-plus-circle"></i>',class:"btn btn-primary btn-sm"},action:"add",descriptcon:"seleccionar para añadir registro"};
-const fld_show = {name:"add",box:{tipe:5,value:'<i class="bi bi-eye-fill"></i>',class:"btn btn-primary btn-sm"},action:"show",descripcion:"seleccionar para mostrar detalle del registro"};
+const fld_delete = {name:"dlt",box:{tipe:5,value:'<i class="bi bi-x-circle"></i>',class:"btn btn-danger btn"},action:"delete",descripcion:"seleccionar para borrar registro"};
+const fld_edit = {name:"edt",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn"},action:"edit",descripcion:"seleccionar para editar registro"};
+const fld_add = {name:"add",box:{tipe:5,value:'<i class="bi bi-plus-circle"></i>',class:"btn btn-primary btn"},action:"add",descriptcon:"seleccionar para añadir registro"};
+const fld_show = {name:"add",box:{tipe:5,value:'<i class="bi bi-eye-fill"></i>',class:"btn btn-primary btn"},action:"show",descripcion:"seleccionar para mostrar detalle del registro"};
 
 function fld_ld_worker({panel="main",edit=true}){
 

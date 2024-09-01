@@ -69,7 +69,7 @@ class Form extends ODD {
             var label = this.FiledGetLabel({fieldName:fld.name});
             return {id:label.parentGet().id,descripcion:fld.descripcion};
         });
-        console.log("set tutorial q2",q2Elements);
+        //console.log("set tutorial q2",q2Elements);
         
         this.#questionSetTutorial({value:"q2",elementsInfo:q2Elements});
     }
@@ -232,9 +232,9 @@ class Form extends ODD {
             title,head,blocked,show,
             grid:{
                 cols:[
-                    [3,6,3],//top
+                    [4,4,4],//top
                     [12],//conteiner
-                    [3,6,3],//botton
+                    [1,10,1],//botton
                 ],
                 boxs:this.#tools,
                 attributes:[

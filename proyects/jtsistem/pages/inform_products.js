@@ -6,7 +6,6 @@ $(document).ready(function() {
 
     success:({userData,pageData})=>{
 
-
       new Crud_Master({
         parent:pageData.body,
         title:"reporte de productos",
@@ -77,9 +76,16 @@ $(document).ready(function() {
           {
             before:" AND ",
             table:"sales",
-            field:"ID_STATUS",
+            field:"PAID",
             inter:"=",
-            value:4,
+            value:1,
+          },
+          {
+            before:" AND ",
+            table:"sales",
+            field:"ID_STATUS",
+            inter:"!=",
+            value:5,
           },
         ],
 
@@ -102,7 +108,7 @@ $(document).ready(function() {
                 {name:"cantidad total",select:"cant",box:{...bx_shw}},
                 {name:"cantidad promedio",select:"cantProm",box:{...bx_shw}},
               ],
-            }
+            },
         ],
 
         events:[
@@ -110,6 +116,9 @@ $(document).ready(function() {
             name:"printBefore",
             actions:[{
               action:({result,k})=>{
+
+                console.log("PRINT BEFORE", result);
+                
 
                 var products = [];
                 var dates = [];
@@ -133,6 +142,11 @@ $(document).ready(function() {
                       count:1,
                       money,
                       cant,
+                      dates:[{
+                        label:dateLabel,
+                        cant,
+                        money,
+                      }],
                     });
 
                   }
@@ -142,6 +156,22 @@ $(document).ready(function() {
                     productFound.count++;
                     productFound.money += money;
                     productFound.cant += cant;
+
+                    var productDate = productFound.dates.find(d=>d.label == dateLabel);
+                    if(productDate){
+
+                      productDate.cant += cant;
+                      productDate.money += money;
+                    }
+                    else
+                    {
+                      productFound.dates.push({
+                        label:dateLabel,
+                        cant,
+                        money,
+                      });
+                    }
+
                   }
 
                 });
@@ -156,9 +186,8 @@ $(document).ready(function() {
 
                 products.sort((a, b) => b.money - a.money);
 
-                //console.log("result",result);
-                //console.log("products",products);
-                //console.log("dates",dates);
+                console.log("TRANSFORM DATA",products,dates);
+                
 
                 return {data:products};
 

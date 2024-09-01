@@ -1437,6 +1437,9 @@ function src_item_fm({userData}){
 
 function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax=Date_Today(),status=[],pays=[],orderField=null,stateStart="reload"}) {
     
+    var acc_deliv = Access_Get(userData.access,"md-deliv-general");
+    var acc_pays = Access_Get(userData.access,"md-box-general");
+
     if(status==null || status.length==0) status = op_sales_status.map((op)=>{return op.show});
     if(pays==null || pays.length==0) pays = op_sales_paid.map((op)=>{return op.show});
     var orders = orderField ? [{table:"sales",field:"ID_STATUS",asc:false,}]:[];
@@ -1450,7 +1453,7 @@ function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax
         ],
     });
 
-    var md = new Modal({
+    let md = new Modal({
     parent:gr.GetColData({x:0,y:2}).col,
     size:"lg",
     });
@@ -1462,6 +1465,7 @@ function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax
     boxs:[
         {x:0,y:2,box:{tipe:5,id:"btn1",value:'PDF <i class="bi bi-filetype-pdf"></i>',class:"btn btn-danger btn-sm",update:()=>{SalePDF()}}},
         {x:0,y:2,box:{tipe:5,id:"btn2",value:'Copiar <i class="bi bi-clipboard"></i>',class:"btn btn-primary btn-sm",update:()=>{SaleCopy()}}},
+        {x:0,y:2,box:{tipe:5,id:"btn3",value:'Cancelar',class:"btn btn-danger btn-sm",update:()=>{md.SetActive({active:false})}}},
     ],
     attributes:[
         {x:0,y:2,attributes:[{name:"class",value:"col-4 m-0 p-0 d-flex justify-content-center"}]},
@@ -1505,6 +1509,7 @@ function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax
                     {table:'sales', field:'TOTAL'},
                     {table:'sales', field:'DOCUMENT_EMMIT'},
                     {table:'sales', field:'COMMENT'},
+                    {table:"sales",field:"USEDELIV"},
                     {table:'customers',field:'NAME'},
                     (userData.company.tipe == "2"?{sql:"CONCAT(items_vehicles.PLACA,'-',items_vehicles.MARCA) AS 'VEHICLE'"}:null),
                 ],
@@ -1539,6 +1544,7 @@ function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax
                     (fechaMax==null?null:{col:6,name:"fechamax",box:{...bx_date,value:fechaMax},select:{table:"sales",field:"DATE_EMMIT",tipe:"max"},descripcion:"buscar venta con una fecha menor o igual a la seleccionada"}),
                     {name:"estado",box:{tipe:4,options:op_sales_status,value:status},select:{table:"sales",field:"ID_STATUS"},descripcion:"buscar por estado de venta"},
                     {name:"cancelado",box:{tipe:4,options:op_sales_paid,value:pays},select:{table:"sales",field:"PAID"},descripcion:"buscar por pagado"},
+                    (acc_deliv?{name:"servicio de delivery",box:{tipe:4,options:op_usedeliv},select:{table:"sales",field:"USEDELIV",descripcion:"buscar si recogen en tienda o por delivery"}}:null),
                     //{name:"documento",box:{tipe:4,options:op_sales_document},select:{table:"sales",field:"ID_DOCUMENT"}},
                     //{name:"emitido",box:{tipe:4,options:op_document_emmit},select:{table:"sales",field:"DOCUMENT_EMMIT"}},
                 ],
@@ -1550,8 +1556,9 @@ function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax
                 
                 {panel:"main",name:"cliente",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"NAME",descripcion:"muestra el nombre del cliente"},
                 (userData.company.tipe == "2"?{panel:"main",name:"vehiculo",attributes:[{name:"style",value:"min-width: 200px;"}],box:{tipe:0},select:"VEHICLE",descripcion:"muestra el vehiculo (marca-placa)"}:null),
-                {panel:"main",name:"estado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_status},select:"ID_STATUS",descripcion:"muestra el estado de la venta"},
-                {panel:"main",name:"cancelado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_paid},select:"PAID",descripcion:"muestra si la venta ya ha pagado"},
+                (acc_deliv?{panel:"main",attributes:[{name:"style",value:"min-width: 120px;"}],name:"uso de delivery",box:{...bx_shw,options:op_usedeliv},select:"USEDELIV"}:null),
+                {panel:"main",name:"estado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:3,options:op_sales_status},select:"ID_STATUS",descripcion:"muestra el estado de la venta"},
+                {panel:"main",name:"cancelado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:(acc_pays?0:3),options:op_sales_paid},select:"PAID",descripcion:"muestra si la venta ya ha pagado"},
                 {panel:"main",name:"total",box:bx_money,select:"TOTAL",descripcion:"muestra el total de la venta"},
                 {panel:"main",name:"comentario",box:{tipe:9,value:""},select:"COMMENT",descripcion:"seleccionar comentario de venta"},
                 {panel:"main",name:"fecha de emision",attributes:[{name:"style",value:"min-width:160px"}],box:{tipe:0},select:"DATE_EMMIT",descripcion:"muestra la fecha de emision de venta"},
@@ -1625,74 +1632,84 @@ function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax
 
                 tableMain:"sales",
                 selects:[
-                {table:'sales', field:'ID_SALE',primary:true},
-                {table:'sales', field:'DATE_EMMIT'},
-                {table:'sales', field:'ID_STATUS'},
-                {table:'sales', field:'ID_DOCUMENT'},
-                {table:'sales', field:'ID_CUSTOMER'},
-                {table:'sales', field:'TOTAL'},
-                {table:'sales', field:'DOCUMENT_EMMIT'},
-                {table:'sales', field:'COMMENT'},
-                {table:'customers',field:'NAME'},
-                {table:'customers',field:'PHONE'},
-                {table:'customers',field:'DIRECCION'},
-                {table:'customers',field:'EMAIL'},
-                {table:'customers',field:'COMPANY'},
-                {table:'customers',field:'NRO_DOCUMENT'},
-                {table:'sales',field:'DSCTO'},
-                {table:'sales',field:'TOTAL_WITHOUT_DSCTO'},                
-                (userData.company.tipe=="2"?{table:"items_vehicles",field:"PLACA"}:null),
-                (userData.company.tipe=="2"?{table:"items_vehicles",field:"MARCA"}:null),
-                (userData.company.tipe=="2"?{table:"items_vehicles",field:"MODELO"}:null),
-                (userData.company.tipe=="2"?{table:"items_vehicles",field:"NRO_MOTO"}:null),
-                (userData.company.tipe=="2"?{table:"items_vehicles",field:"NRO_VIN"}:null),
-                (userData.company.tipe=="2"?{table:"items_vehicles",field:"ANIO"}:null),
-                (userData.company.tipe=="2"?{table:"items_vehicles",field:"COLOR"}:null),
+                    {table:'sales', field:'ID_SALE',primary:true},
+                    {table:'sales', field:'DATE_EMMIT'},
+                    {table:'sales', field:'ID_STATUS'},
+                    {table:'sales', field:'ID_DOCUMENT'},
+                    {table:'sales', field:'ID_CUSTOMER'},
+                    {table:'sales', field:'TOTAL'},
+                    {table:'sales', field:'DOCUMENT_EMMIT'},
+                    {table:'sales', field:'COMMENT'},
+                    {table:'customers',field:'NAME'},
+                    {table:'customers',field:'PHONE'},
+                    {table:'customers',field:'DIRECCION'},
+                    {table:'customers',field:'EMAIL'},
+                    {table:'customers',field:'COMPANY'},
+                    {table:'customers',field:'NRO_DOCUMENT'},
+                    {table:'sales',field:'DSCTO'},
+                    {table:'sales',field:'TOTAL_WITHOUT_DSCTO'},                
+                    (userData.company.tipe=="2"?{table:"items_vehicles",field:"PLACA"}:null),
+                    (userData.company.tipe=="2"?{table:"items_vehicles",field:"MARCA"}:null),
+                    (userData.company.tipe=="2"?{table:"items_vehicles",field:"MODELO"}:null),
+                    (userData.company.tipe=="2"?{table:"items_vehicles",field:"NRO_MOTO"}:null),
+                    (userData.company.tipe=="2"?{table:"items_vehicles",field:"NRO_VIN"}:null),
+                    (userData.company.tipe=="2"?{table:"items_vehicles",field:"ANIO"}:null),
+                    (userData.company.tipe=="2"?{table:"items_vehicles",field:"COLOR"}:null),
                 ],
                 joins:[
-                {main:{table:"sales",field:"ID_CUSTOMER"},join:{table:"customers",field:"ID_CUSTOMER"},tipe:"LEFT"},
-                (userData.company.tipe=="2"?{
-                    main:{table:"sales",field:"ID_ITEM"},
-                    join:{table:"items_vehicles",field:"ID_VEHICLE"},
-                    tipe:"LEFT",
-                }:null),
+                    {main:{table:"sales",field:"ID_CUSTOMER"},join:{table:"customers",field:"ID_CUSTOMER"},tipe:"LEFT"},
+                    (userData.company.tipe=="2"?{
+                        main:{table:"sales",field:"ID_ITEM"},
+                        join:{table:"items_vehicles",field:"ID_VEHICLE"},
+                        tipe:"LEFT",
+                    }:null),
                 ],
 
                 fields:[
-                {panel:"informacion",name:"nro",box:{tipe:0},select:"ID_SALE"},
-                {panel:"informacion",name:"fecha de emision",box:{tipe:0},select:"DATE_EMMIT"},
-                {panel:"informacion",name:"total sin descuento",box:bx_money,select:"TOTAL_WITHOUT_DSCTO"},
-                {panel:"informacion",name:"descuento",box:{tipe:0,format:{end:"%",decimals:2}},select:"DSCTO"},
-                {panel:"informacion",name:"total",box:bx_moneyh1,select:"TOTAL"},
+                    {panel:"informacion",name:"nro",box:{tipe:0},select:"ID_SALE"},
+                    {panel:"informacion",name:"fecha de emision",box:{tipe:0},select:"DATE_EMMIT"},
+                    {panel:"informacion",name:"total sin descuento",box:bx_money,select:"TOTAL_WITHOUT_DSCTO"},
+                    {panel:"informacion",name:"descuento",box:{tipe:0,format:{end:"%",decimals:2}},select:"DSCTO"},
+                    {panel:"informacion",name:"total",box:bx_moneyh1,select:"TOTAL"},
 
-                {panel:"cliente",name:"cliente",box:{tipe:0},select:"NAME"},
-                {panel:"cliente",name:"telefono",box:{tipe:0},select:"PHONE"},
-                {panel:"cliente",name:"correo",box:{tipe:0},select:"EMAIL"},
-                {panel:"cliente",name:"documento",box:{tipe:0,options:op_identity_document_tipe},select:"COMPANY"},
-                {panel:"cliente",name:"nro documento",box:{tipe:0},select:"NRO_DOCUMENT"},
-                {panel:"cliente",name:"direccion",box:{tipe:0},select:"DIRECCION"},
+                    {panel:"cliente",name:"cliente",box:{tipe:0},select:"NAME"},
+                    {panel:"cliente",name:"telefono",box:{tipe:0},select:"PHONE"},
+                    {panel:"cliente",name:"correo",box:{tipe:0},select:"EMAIL"},
+                    {panel:"cliente",name:"documento",box:{tipe:0,options:op_identity_document_tipe},select:"COMPANY"},
+                    {panel:"cliente",name:"nro documento",box:{tipe:0},select:"NRO_DOCUMENT"},
+                    {panel:"cliente",name:"direccion",box:{tipe:0},select:"DIRECCION"},
 
-                (userData.company.tipe=="2"?{panel:"vehicle",col:12,name:"placa",box:{tipe:0},select:"PLACA"}:null),
-                (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"marca",box:{tipe:0},select:"MARCA"}:null),
-                (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"modelo",box:{tipe:0},select:"MODELO"}:null),
-                (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"nro de motor",box:{tipe:0},select:"NRO_MOTO"}:null),
-                (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"nro de vin",box:{tipe:0},select:"NRO_VIN"}:null),
-                (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"año",box:{tipe:0},select:"ANIO"}:null),
-                (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"color",box:{tipe:0},select:"COLOR"}:null),
-                
-                //{panel:"informacion",name:"comentario",box:{tipe:0,value:""},select:"COMMENT"},
+                    (userData.company.tipe=="2"?{panel:"vehicle",col:12,name:"placa",box:{tipe:0},select:"PLACA"}:null),
+                    (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"marca",box:{tipe:0},select:"MARCA"}:null),
+                    (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"modelo",box:{tipe:0},select:"MODELO"}:null),
+                    (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"nro de motor",box:{tipe:0},select:"NRO_MOTO"}:null),
+                    (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"nro de vin",box:{tipe:0},select:"NRO_VIN"}:null),
+                    (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"año",box:{tipe:0},select:"ANIO"}:null),
+                    (userData.company.tipe=="2"?{panel:"vehicle",col:6,name:"color",box:{tipe:0},select:"COLOR"}:null),
+                    
+                    //{panel:"informacion",name:"comentario",box:{tipe:0,value:""},select:"COMMENT"},
 
                 ],
                 events:[
-                {
-                    name:"modalSetActive",
-                    actions:[{
-                    action:({active})=>{
+                    {
+                        name:"modalSetActive",
+                        actions:[{
+                        action:({active})=>{
 
-                        md.SetActive({active});
+                            md.SetActive({active});
+                        }
+                        }]
+                    },
+                    {
+                        name:"reloadBefore",
+                        actions:[{
+                            action:()=>{
+
+                                var crdMaid = cruds.Crud_GetBuild({name:"show-table"});
+                                crdMaid.SetState({stateName:"block"});
+                            }
+                        }],
                     }
-                    }]
-                }
                 ],
 
             }
@@ -1758,18 +1775,18 @@ function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax
 
     conections:[
         {
-        tipe:"tb-fm",
-        master:"control",
-        masterField:"ID_SALE",
-        maid:"show-form",
-        maidField:"ID_SALE",
+            tipe:"tb-fm",
+            master:"control",
+            masterField:"ID_SALE",
+            maid:"show-form",
+            maidField:"ID_SALE",
         },
         {
-        tipe:"fm-tb",
-        master:"show-form",
-        masterField:"ID_SALE",
-        maid:"show-table",
-        maidField:"ID_SALE",
+            tipe:"fm-tb",
+            master:"show-form",
+            masterField:"ID_SALE",
+            maid:"show-table",
+            maidField:"ID_SALE",
         }
     ],
 
@@ -1785,8 +1802,7 @@ function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax
     inform += 'fecha: ' + sale_fm.GetValue({fieldName:"fecha de emision",y:0});
     inform += '\ncliente: ' + sale_fm.GetValue({fieldName:"cliente",y:0});
     inform += '\ntelefono: ' + sale_fm.GetValue({fieldName:"telefono",y:0});
-    inform += '\ncorreo: ' + sale_fm.GetValue({fieldName:"correo",y:0});
-    inform += '\ntotal: S/.' + sale_fm.GetValue({fieldName:"total",y:0});
+    inform += '\ndireccion: ' + sale_fm.GetValue({fieldName:"direccion",y:0});
 
     var itemsCount = sale_tb.Reload_GetData().length;
     for (let y = 0; y < itemsCount; y++) {
@@ -1797,11 +1813,14 @@ function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax
         var priceTotal = sale_tb.GetValue({fieldName:"precio total",y});
         
         inform += '\n';
-        inform += ' item: ' + itemName;
-        inform += ' ,cantidad: ' + cant;
-        inform += ' ,precio unitario: ' + priceUnit;
-        inform += ' ,precio total: ' + priceTotal;
+        inform += '-> ' + itemName;
+        inform += ' X' + cant;
+        inform += ' Precio: S/.' + priceUnit;
+        inform += ' Total: S/.' + priceTotal;
     }
+
+    inform += '\ndescuento: ' + sale_fm.GetValue({fieldName:"descuento",y:0}) + '%';
+    inform += '\ntotal: S/.' + sale_fm.GetValue({fieldName:"total",y:0});
 
     navigator.clipboard.writeText(inform);
     console.log("sale information:");

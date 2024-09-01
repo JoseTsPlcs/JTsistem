@@ -381,7 +381,7 @@ class Crud_set extends ODD {
                     [12],//0 - config
                     [4,4,4],//1 - top
                     [12],//2 - conteiner
-                    [3,6,3],//3 - botton
+                    [1,10,1],//3 - botton
                 ],
                 boxs:[
                     ...this.#bodyTools,
@@ -389,7 +389,7 @@ class Crud_set extends ODD {
                 attributes:[
                     {y:0,x:0,attributes:[{name:"class",value:""}]},
 
-                    {y:1,x:0,attributes:[{name:"class",value:"d-flex justify-content-start "}]},
+                    {y:1,x:0,attributes:[{name:"class",value:"d-flex justify-content-start"}]},
                     {y:1,x:1,attributes:[{name:"class",value:""}]},
                     {y:1,x:2,attributes:[{name:"class",value:"d-flex justify-content-end "}]},
 

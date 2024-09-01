@@ -75,7 +75,7 @@ var modulos = [
     {
         value:"md-bills",
         show:"Módulo de Facturación",
-        pages:["bills","informAccounts"],
+        pages:["bills"/*,"informAccounts"*/],
         access:[
             {value:"rucs",show:"multiples rucs"},
         ],
@@ -87,6 +87,11 @@ var modulos = [
             {value:"sale",show:"asignar trabajador a venta"},
             {value:"item",show:"asignar trabajador a item"},
         ],
+    },
+    {
+        value:"md-deliv",
+        show:"modulo de delivery",
+        access:[],
     }
 ];
 

@@ -157,6 +157,7 @@ class Box {
 
         var opi = this.#options[op];
         var op_nw = document.createElement("option");
+        //if(opi.class) op_nw.setAttribute("class",opi.class);
         this.#blocks[0].appendChild(op_nw);
         this.#blocks[op+1] = op_nw;
         op_nw.value = opi.value;
@@ -390,6 +391,17 @@ class Box {
 
       break;
 
+      case 3:
+
+        $('#' + this.#blocks[0]['id']).change(function() {
+
+            
+          u.#CallUpdate(this.value);
+          u.#Paint();
+        });
+
+      break;
+
       default:
 
       if(this.#blocks[0].type == "file"){
@@ -413,8 +425,7 @@ class Box {
 
         $('#' + this.#blocks[0]['id']).change(function() {
 
-        
-          // console.log("----------------setvalue----");
+          
           u.#CallUpdate(this.value);
         });
       }     
@@ -486,6 +497,21 @@ class Box {
       break;
 
       case 3:
+
+        for (let op = 0; op < this.#options.length; op++) {
+              
+          var option = this.#options[op];
+          var optionDom = this.#blocks[op+1];
+          if(option.class) optionDom.className = option.class;
+        }
+
+        var optionInfo = this.#options.find(op=>op.value == this.#value);
+        
+        if(optionInfo && optionInfo.class){
+
+          this.#blocks[0].setAttribute("class",optionInfo.class);
+        }
+        else this.#blocks[0].setAttribute("class","");
 
       break;
 

@@ -42,7 +42,7 @@ class Conection extends ODD {
       path += "../";
     }
     
-    console.log("----------request:",path,arr); // Retorna el nombre del archivo actual
+    //console.log("----------request:",path,arr); // Retorna el nombre del archivo actual
 
     switch (php) {
       case "row":
@@ -55,7 +55,7 @@ class Conection extends ODD {
     
     }
 
-    console.log("php",php);
+    //console.log("php",php);
 
     let k = this;
     $.post(php, {...this.config,sql}, function(resp){
