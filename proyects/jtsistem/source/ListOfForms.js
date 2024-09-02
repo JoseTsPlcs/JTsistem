@@ -1427,7 +1427,7 @@ function src_item_fm({userData}){
             {panel:"main",col:(item_buy?6:12),tipe:1,name:"precio unitario",box:{tipe:1,value:0},select:"PRICE_UNIT",descripcion:"precio unitario de venta"},
 
             (item_stock?{panel:"main",col:6,tipe:1,name:"stock total",box:{tipe:1,value:999},select:"STOCK_TOTAL",descripcion:"stock actual del producto/insumo/servicio"}:null),
-            (item_stock?{panel:"main",col:6,tipe:1,name:"stock minimo",box:{tipe:1,value:1},select:"STOCK_LIMIT",descripcion:"stock minimo del producto/insumo/servicio, en caso el stock sea menor o igual, se lanza una alerta"}:null),
+            (item_stock?{panel:"main",col:6,tipe:1,name:"stock minimo",box:{tipe:1,value:-999},select:"STOCK_LIMIT",descripcion:"stock minimo del producto/insumo/servicio, en caso el stock sea menor o igual, se lanza una alerta"}:null),
         ],
     }
 }

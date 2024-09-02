@@ -219,7 +219,22 @@ class Pag_Base extends ODD {
   
   #body;
 
-  #BuildNav({companyName="JtSistemName"}){
+  #BuildNav({}){
+
+    if (window.innerWidth < 500) {
+      
+      this.#BuildNavHorizontal({});
+    }
+    else
+    {
+
+      this.#BuildNavVertical({});
+    }
+
+    this.#body = document.getElementById("bodyMain");
+  }
+
+  #BuildNavVertical({pagesData=[]}){
 
     console.log("buildNav:",PagesData);
 
@@ -328,11 +343,76 @@ class Pag_Base extends ODD {
 
     document.body.innerHTML = nav;
 
-    this.#body = document.getElementById("bodyMain");
+
     const hamBurger = document.querySelector(".toggle-btn");
     hamBurger.addEventListener("click", function () {
       document.querySelector("#sidebar").classList.toggle("expand");
     });
+  }
+
+  #BuildNavHorizontal({pagesData=[]}){
+
+    var nav = `
+      <nav class="navbar navbar-dark bg-dark px-2">
+        <a class="navbar-brand" href="admin_account.php">JtSistem</a>
+        <button class="navbar-toggler mr-2" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <i class="lni lni-grid-alt"></i>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            
+    `;
+
+    PagesData.forEach(secc => {
+      
+      var pagesCount = secc.paginas.find(pg=>pg.state=="active");
+
+      if(pagesCount != null){
+
+          nav += `
+      
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            `+secc.icon+" "+secc.title+`
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+        `;
+
+        secc.paginas.forEach(pg => {
+        
+          if(pg.state=="active"){
+  
+            nav += `<a class="dropdown-item" href="`+pg.href+`">`+pg.title+`</a>`;
+          }
+  
+        });
+
+        nav += `
+          </div>
+        </li>
+        
+        `;
+      }
+
+    });
+
+    nav += `
+
+          
+          </ul>
+        </div>
+      </nav>
+    `;
+
+    nav += `
+
+      <div class="main p-2 p-md-3 mt-0 custom-bg-gray" id="bodyMain">
+      </div>
+
+    `;
+
+    document.body.innerHTML = nav;
   }
 
   #IsLog({success}){

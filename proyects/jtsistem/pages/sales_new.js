@@ -355,7 +355,7 @@ $(document).ready(function() {
                 {panel:"total",col:12,y:4,name:"total",box:bx_moneyh1,select:"TOTAL",descripcion:"se muestra el total de la venta"},
                 (acc_pays?{panel:"total",col:12,y:7,name:"pagado",box:bx_money,descripcion:"se muestra el total que se ha pagado"}:null),
 
-                {panel:"cliente",col:10,colAllLevel:true,y:0,name:"cliente",box:{tipe:8,options:[{value:"null",show:"Seleccionar Cliente"}]},select:"ID_CUSTOMER",load:{name:"customers",show:"show"},descripcion:"seleccionar cliente"},
+                {panel:"cliente",col:10,colAllLevel:true,y:0,name:"cliente",tipe:0,box:{tipe:8,options:[{value:"null",show:"Seleccionar Cliente"}]},select:"ID_CUSTOMER",load:{name:"customers",show:"show"},descripcion:"seleccionar cliente"},
                 {panel:"cliente",col:1,colAllLevel:true,...fld_edit,descripcion:"seleccionar para editar el cliente seleccionado"},
                 {panel:"cliente",col:1,colAllLevel:true,...fld_add,descripcion:"seleccionar para añadir un nuevo cliente"},
                 //{panel:"cliente",col:12,y:1,name:"tipo",box:{tipe:0}},
