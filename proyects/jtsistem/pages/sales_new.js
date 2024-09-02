@@ -714,7 +714,7 @@ $(document).ready(function() {
               fields:[
                 {panel:"main",...fld_delete,name:"dlt",attributes:att_btn,descripcion:"selecciona para borrar (producto/servicio) de la venta"},
                 (acc_products_update?{panel:"main",...fld_edit,attributes:att_btn,descripcion:"selecciona para editar informacion del (producto/servicio)"}:null),
-                {panel:"main",name:"producto-servicio",box:{tipe:8,class:"w-100"},attributes:att_ln,select:"ID_PRODUCT",load:{name:"products-services",show:"show"},descripcion:"selecciona (producto/servicio) a vender"},
+                {panel:"main",name:"producto-servicio",box:{tipe:8,class:"w-100"},attributes:[{name:"style",value:"max-width: 300px;"}],select:"ID_PRODUCT",load:{name:"products-services",show:"show"},descripcion:"selecciona (producto/servicio) a vender"},
                 //{panel:"main",name:"tipo",box:{tipe:0,options:op_products_tipe},attributes:att_shw,select:"ID_PRODUCT_TIPE",descripcion:"muestra el tipo de (producto/servicio)"},
                 //{panel:"main",name:"unidad",box:bx_shw,attributes:att_shw,select:"SIMBOL",descripcion:"muestra la unidad del (producto/servicio)"},
                 {panel:"main",name:"cantidad",box:bx_cant,attributes:att_cnt,select:"CANT",descripcion:"muestra la cantidad de (producto/servicio) que se esta vendiendo"},
@@ -819,7 +819,7 @@ $(document).ready(function() {
                   actions:[{
                     action:({field,y,k})=>{
 
-                      return;
+                      return
                       if(field.action == "edit"){
 
                         var product_id = k.Reload_GetData()[y]["ID_PRODUCT"];

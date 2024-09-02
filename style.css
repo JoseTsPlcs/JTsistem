@@ -176,15 +176,22 @@ a.sidebar-link:hover {
 
 /* Limitar el tamaño máximo del dropdown en dispositivos móviles */
 @media (max-width: 576px) {
-    .dropdown-menu.show {
+    .dropdown-menu {
       max-width: 100vw; /* Limitar el ancho máximo al tamaño del viewport */
       overflow-x: hidden; /* Evitar que se desborde horizontalmente */
-      left: 0; /* Alinear al borde izquierdo de la pantalla si es necesario */
-      right: 0; /* Alinear al borde derecho de la pantalla si es necesario */
-      position: relative;
+      position: absolute; /* Asegurar que el dropdown esté posicionado */
+      left: 0; /* Alinear al borde izquierdo de la pantalla */
+      right: 0; /* Alinear al borde derecho de la pantalla */
+      z-index: 1099;
+    }
+  
+    /* Asegurarse de que el dropdown esté visible */
+    .dropdown-menu.show {
+      display: block; /* Asegurarse de que el dropdown se muestre */
     }
   }
   
+
 
 
 
