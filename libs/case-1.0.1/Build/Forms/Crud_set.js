@@ -350,22 +350,22 @@ class Crud_set extends ODD {
     #bodyWindow;
     #bodyForm = null;
     #bodyTools = [
-        {x:0,y:1,index:0,name:"config",descripcion:"selecciona para realizar una busqueda",box:{tipe:5,value:'<i class="bi bi-gear"></i>',class:"btn btn-primary btn-sm",update:()=>{this.Config_ShowChange()}},dom:null},
-        {x:0,y:1,index:1,name:"load",descripcion:"selecciona para cargar datos externos",box:{tipe:5,value:'<i class="bi bi-database"></i>',class:"btn btn-primary btn-sm",update:()=>{this.#Load({})}},dom:null},
+        {x:0,y:1,index:0,name:"config",descripcion:"selecciona para realizar una busqueda",box:{tipe:5,value:'<i class="bi bi-gear"></i>',class:"btn btn-primary btn",update:()=>{this.Config_ShowChange()}},dom:null},
+        {x:0,y:1,index:1,name:"load",descripcion:"selecciona para cargar datos externos",box:{tipe:5,value:'<i class="bi bi-database"></i>',class:"btn btn-primary btn",update:()=>{this.#Load({})}},dom:null},
 
-        {x:2,y:1,index:0,name:"excel",descripcion:"descargar datos en archivo excel",box:{id:"btn1",tipe:5,value:"excel",class:"btn btn-success btn-sm",update:()=>{this.#Event_UpdateToolExcel({})}},dom:null},
-        {x:2,y:1,index:1,name:"question",box:{id:"btn2",tipe:5,value:'<i class="bi bi-question-circle"></i>',class:"btn btn-secondary btn-sm",update:(info)=>{this.#questionEvent({value:info});}},dom:null},
+        {x:2,y:1,index:0,name:"excel",descripcion:"descargar datos en archivo excel",box:{id:"btn1",tipe:5,value:"excel",class:"btn btn-success btn",update:()=>{this.#Event_UpdateToolExcel({})}},dom:null},
+        {x:2,y:1,index:1,name:"question",box:{id:"btn2",tipe:5,value:'<i class="bi bi-question-circle"></i>',class:"btn btn-secondary btn",update:(info)=>{this.#questionEvent({value:info});}},dom:null},
 
         {x:0,y:3,index:0,name:"sizes",descripcion:"seleccion la cantidad de registros ver",box:{tipe:3,value:1,options:[{show:1,value:1},{show:10,value:10},{show:25,value:25},{show:50,value:50},{show:999,value:999}],update:()=>{this.#Event_UpdateToolPages({})}},dom:null},
 
-        {x:1,y:3,index:0,name:"reload",descripcion:"selecciona para recargar",box:{id:"btn1",tipe:5,value:"recargar",class:"btn btn-primary btn-sm",update:()=>{this.#Event_UpdateToolReload({})}},dom:null},
-        {x:1,y:3,index:1,name:"update",descripcion:"selecciona para actualizar",box:{id:"btn2",tipe:5,value:"actualizar",class:"btn btn-primary btn-sm",update:()=>{this.#Event_UpdateToolUpdate({})}},dom:null},
-        {x:1,y:3,index:2,name:"new",descripcion:"selecciona para crear nuevo registro",box:{id:"btn3",tipe:5,value:"nuevo",class:"btn btn-primary btn-sm",update:()=>{this.#Event_UpdateToolNew({})}},dom:null},
-        {x:1,y:3,index:3,name:"insert",descripcion:"selecciona para insertar nuevo registro",box:{id:"btn4",tipe:5,value:"insertar",class:"btn btn-primary btn-sm",update:()=>{this.#Event_UpdateToolInsert({})}},dom:null},
-        {x:1,y:3,index:4,name:"delete",descripcion:"selecciona para borrar registro",box:{id:"btn5",tipe:5,value:"borrar",class:"btn btn-danger btn-sm",update:()=>{this.#Event_UpdateToolDelete({})}},dom:null},
-        {x:1,y:3,index:5,name:"cancel",descripcion:"selecciona para cancelar",box:{id:"btn6",tipe:5,value:"cancelar",class:"btn btn-danger btn-sm",update:()=>{this.#Event_UpdateToolCancel({})}},dom:null},
-        {x:1,y:3,index:6,name:"addLine",descripcion:"selecciona para añadir nueva linea para insertar registro",box:{id:"btn7",tipe:5,value:"añadir linea",class:"btn btn-primary btn-sm",update:()=>{this.#New_AddLine({})}},dom:null},
-        {x:1,y:3,index:7,name:"pdf",descripcion:"descargar datos en pdf",box:{id:"btn8",tipe:5,value:"pdf",class:"btn btn-danger btn-sm",update:()=>{this.#Event_UpdateToolPDF({})}},dom:null},
+        {x:1,y:3,index:0,name:"reload",descripcion:"selecciona para recargar",box:{id:"btn1",tipe:5,value:"recargar",class:"btn btn-primary btn",update:()=>{this.#Event_UpdateToolReload({})}},dom:null},
+        {x:1,y:3,index:1,name:"update",descripcion:"selecciona para actualizar",box:{id:"btn2",tipe:5,value:"actualizar",class:"btn btn-primary btn",update:()=>{this.#Event_UpdateToolUpdate({})}},dom:null},
+        {x:1,y:3,index:2,name:"new",descripcion:"selecciona para crear nuevo registro",box:{id:"btn3",tipe:5,value:"nuevo",class:"btn btn-primary btn",update:()=>{this.#Event_UpdateToolNew({})}},dom:null},
+        {x:1,y:3,index:3,name:"insert",descripcion:"selecciona para insertar nuevo registro",box:{id:"btn4",tipe:5,value:"insertar",class:"btn btn-primary btn",update:()=>{this.#Event_UpdateToolInsert({})}},dom:null},
+        {x:1,y:3,index:4,name:"delete",descripcion:"selecciona para borrar registro",box:{id:"btn5",tipe:5,value:"borrar",class:"btn btn-danger btn",update:()=>{this.#Event_UpdateToolDelete({})}},dom:null},
+        {x:1,y:3,index:5,name:"cancel",descripcion:"selecciona para cancelar",box:{id:"btn6",tipe:5,value:"cancelar",class:"btn btn-danger btn",update:()=>{this.#Event_UpdateToolCancel({})}},dom:null},
+        {x:1,y:3,index:6,name:"addLine",descripcion:"selecciona para añadir nueva linea para insertar registro",box:{id:"btn7",tipe:5,value:"añadir linea",class:"btn btn-primary btn",update:()=>{this.#New_AddLine({})}},dom:null},
+        {x:1,y:3,index:7,name:"pdf",descripcion:"descargar datos en pdf",box:{id:"btn8",tipe:5,value:"pdf",class:"btn btn-danger btn",update:()=>{this.#Event_UpdateToolPDF({})}},dom:null},
 
         {x:2,y:3,index:0,name:"pages",descripcion:"selecciona pagina que ver",box:{tipe:3,value:1,options:[{show:"pag1",value:1}],update:()=>{this.#Event_UpdateToolPages({})}},dom:null},
     ];

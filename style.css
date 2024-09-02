@@ -170,6 +170,10 @@ a.sidebar-link:hover {
     background-color: #1a2c40; /* Color de hover para coincidir con el color de la barra vertical */
 }
 
+.navbar.bg-dark {
+    background-color: #1a2c40 !important;
+}
+
 
 
 

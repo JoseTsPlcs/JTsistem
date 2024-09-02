@@ -12,23 +12,23 @@ const sch_customers = {
             select:'NAME',
             access:true,
             tipe:"input",
-            width:350,
+            minWidth:350,
             descripcion:"nombre del cliente"
         },
         {
-            value:"company",
-            name:"empresa",
+            value:"document",
+            name:"documento",
             select:'COMPANY',
-            width:100,
+            minWidth:100,
             access:"md-bills-general",
-            tipe:"active",
+            tipe:"options",options:op_customer_document,
             descripcion:"si el cliente es empresa o persona natural",
         },
         {
             value:"nroDoc",
             name:"nro documento",
             select:'NRO_DOCUMENT',
-            width:150,
+            minWidth:150,
             access:"md-bills-general",
             tipe:"input",
             descripcion:"nro del documento del dni/ruc",
@@ -37,7 +37,7 @@ const sch_customers = {
             value:"cel",
             name:"celular",
             select:'PHONE',
-            width:150,
+            minWidth:150,
             access:"md-customer-cel",
             tipe:"input",
             descripcion:"numero de celular del cliente",
@@ -46,7 +46,7 @@ const sch_customers = {
             value:"dir",
             name:"direccion",
             select:'DIRECCION',
-            width:300,
+            minWidth:300,
             access:"md-customer-dir",
             tipe:"input",
             descripcion:"direccion del cliente",
@@ -55,7 +55,7 @@ const sch_customers = {
             value:"email",
             name:"correo",
             select:'EMAIL',
-            width:300,
+            minWidth:300,
             access:"md-customer-email",
             tipe:"input",
             descripcion:"correo del contacto del cliente"
@@ -64,7 +64,7 @@ const sch_customers = {
             value:"comment",
             name:"descripcion",
             select:'DESCRIPCION',
-            width:300,
+            minWidth:300,
             access:"md-customer-coment",
             tipe:"input",
             descripcion:"descripcion del cliente",
@@ -130,7 +130,7 @@ const sch_items = {
         },
         {
             value:"name",
-            name:"nombre del item",state:"show",width:300,
+            name:"nombre del item",state:"show",minWidth:300,
             select:"NAME",access:true,
             tipe:"input",
             descripcion:"nombre del producto/servicio/insumo",
@@ -174,35 +174,35 @@ const sch_items = {
         },
         {
             value:"price",
-            name:"precio de venta",state:"show",width:130,
+            name:"precio de venta",state:"show",minWidth:130,
             select:"PRICE_UNIT",access:true,
             tipe:"money",
             descripcion:"precio unitario de venta",
         },
         {
             value:"costUnit",
-            name:"costo unitario",state:"show",width:130,
+            name:"costo unitario",state:"show",minWidth:130,
             select:"COST_UNIT",access:"md-buy-general",
             tipe:"money",
             descripcion:"costo unitario, este campo se actualiza de acuerdo a las compras",
         },
         {
             value:"stock",
-            name:"stock total",state:"show",width:70,
+            name:"stock total",state:"show",minWidth:70,
             select:"STOCK_TOTAL",access:"md-items-stock",
             tipe:"input",
             descripcion:"stock actual del producto/insumo/servicio",
         },
         {
             value:"limit",
-            name:"stock minimo",state:"show",width:70,
+            name:"stock minimo",state:"show",minWidth:70,
             select:"STOCK_LIMIT",access:"md-items-stock",
             tipe:"input",
             descripcion:"stock minimo del producto/insumo/servicio, en caso el stock sea menor o igual, se lanza una alerta",
         },
         {
             value:"limitOn",
-            name:"limite",state:"show",width:150,
+            name:"limite",state:"show",minWidth:150,
             select:"STOCK_ONLIMIT",access:"md-items-stock",
             options:op_products_onlimit,
             tipe:"active",
@@ -264,7 +264,7 @@ const sch_vehicles = {
     fieldPrimary:"ID_VEHICLE",
     fields:[
         {
-            name:"placa",state:"show",width:100,
+            name:"placa",state:"show",minWidth:100,
             select:"PLACA",access:true,
             edit:{box:{...bx_input}},
             show:{box:{...bx_shw}},
@@ -272,7 +272,7 @@ const sch_vehicles = {
             descripcion:"placa del vehiculo",
         },
         {
-            name:"marca",state:"show",width:100,
+            name:"marca",state:"show",minWidth:100,
             select:"MARCA",access:true,
             edit:{box:{...bx_input}},
             show:{box:{...bx_shw}},
@@ -280,7 +280,7 @@ const sch_vehicles = {
             descripcion:"marca del vehiculo",
         },
         {
-            name:"modelo",state:"show",width:100,
+            name:"modelo",state:"show",minWidth:100,
             select:"MODELO",access:true,
             edit:{box:{...bx_input}},
             show:{box:{...bx_shw}},
@@ -288,7 +288,7 @@ const sch_vehicles = {
             descripcion:"modelo del vehiculo",
         },
         {
-            name:"nro de motor",state:"show",width:100,
+            name:"nro de motor",state:"show",minWidth:100,
             select:"NRO_MOTO",access:true,
             edit:{box:{...bx_input}},
             show:{box:{...bx_shw}},
@@ -296,7 +296,7 @@ const sch_vehicles = {
             descripcion:"numero de motor",
         },
         {
-            name:"nro de vin",state:"show",width:100,
+            name:"nro de vin",state:"show",minWidth:100,
             select:"NRO_VIN",access:true,
             edit:{box:{...bx_input}},
             show:{box:{...bx_shw}},
@@ -304,7 +304,7 @@ const sch_vehicles = {
             descripcion:"numero de vin",
         },
         {
-            name:"año",state:"show",width:100,
+            name:"año",state:"show",minWidth:100,
             select:"ANIO",access:true,
             edit:{box:{...bx_input}},
             show:{box:{...bx_shw}},
@@ -312,7 +312,7 @@ const sch_vehicles = {
             descripcion:"año de fabricacion del vehiculo",
         },
         {
-            name:"color",state:"show",width:100,
+            name:"color",state:"show",minWidth:100,
             select:"COLOR",access:true,
             edit:{box:{...bx_input}},
             show:{box:{...bx_shw}},
@@ -368,7 +368,7 @@ const sch_sales = {
         },
         {
             value:"customer",
-            name:"cliente",width:300,
+            name:"cliente",minWidth:300,
             table:"customers",select:"ID_CUSTOMER",access:true,sql:"CONCAT(customers.NAME,'-',customers.NRO_DOCUMENT) AS 'NAME'",
             tipe:"optionsSearch",
             descripcion:"cliente de la venta",
@@ -397,7 +397,7 @@ const sch_sales = {
         },
         {
             value:"emit",
-            name:"venta emitida a sunat",width:250,
+            name:"venta emitida a sunat",minWidth:250,
             select:"DOCUMENT_EMMIT",access:true,
             tipe:"active",options:[{value:0,show:"venta no emitida"},{value:1,show:"venta emitida a sunat"}],
             descripcion:"si ya se emitio (nota de pago/boleta/factura) a sunat",
@@ -478,7 +478,7 @@ const sch_sales_products = {
         },
         {
             value:"item",
-            name:"producto/servicio",width:500,
+            name:"producto/servicio",minWidth:500,
             select:"ID_PRODUCT",access:true,
             tipe:"optionsSearch",
             descripcion:"",
@@ -562,7 +562,7 @@ const sch_recipe_inputs = {
 
     table:"recipe_input",
     fieldPrimary:"ID_RECIPE_INPUT",
-    company:false,
+    company:false,delete:true,
     fields:[
         {
             value:"product",
@@ -581,7 +581,7 @@ const sch_recipe_inputs = {
         },
         {
             value:"supplie",
-            name:"producto/insumo",width:400,
+            name:"producto/insumo",minWidth:300,
             select:"ID_INPUT",access:true,
             tipe:"optionsSearch",
             descripcion:"producto/insumo que se utilizara en la receta",
@@ -637,18 +637,18 @@ const sch_recipe_inputs = {
 const sch_produccion = {
     table:"produccions",
     fieldPrimary:"ID_PRODUCCION",
-    company:true,
+    company:true,delete:true,
     fields:[
         {
             value:"dateEmmit",
             name:"fecha de produccion",
             select:"DATE_EMMIT",access:true,
-            tipe:"date",
+            tipe:"show",
             descripcion:"fecha en la cual se incio la produccion del item", 
         },
         {
             value:"productResult",
-            name:"producto",width:400,
+            name:"producto",minWidth:300,
             select:"ID_PRODUCT",access:true,
             tipe:"optionsSearch",
             descripcion:"item resultante de la produccion",
@@ -684,16 +684,22 @@ const sch_produccion = {
             tipe:"cant",
             descripcion:"cantidad de items resultantes de la produccion", 
         },
+        {
+            value:"comment",
+            name:"comentario",tipe:"comment",
+            select:"COMMENT",access:true,
+            descripcion:"",
+        }
     ],
 }
 
 const sch_produccion_inputs = {
     table:"produccions_input",
     fieldPrimary:"ID_PRODUCCION_INPUT",
-    company:false,
+    company:false,delete:true,
     fields:[
         {
-            value:"input",width:400,
+            value:"input",minWidth:300,
             name:"producto/insumos",
             select:"ID_INPUT",access:true,
             tipe:"optionsSearch",

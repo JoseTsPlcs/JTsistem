@@ -5,81 +5,52 @@ $(document).ready(function() {
 
     success:({userData,pageData})=>{
 
-      var gr = new Grid({
+      /*var gr = new Grid({
         parent:pageData.body,
         cols:[[6,6]],
         attributes:[
           {x:0,y:0,attributes:[{name:"class",value:"col-12 col-md-6"}]},
           {x:1,y:0,attributes:[{name:"class",value:"col-12 col-md-6 px-0 px-md-"+paddinForms+" pt-"+paddinForms +" pt-md-0"}]},
         ],
-      });
+      });*/
     
-      new ConsCruds({
-    
-        cruds:[
+      new CrudsGroup({
+        userData,parent:pageData.body,
+        layers:[
           {
-            name:"unids",
-            active:true,
-            script:{
-              parent:gr.GetColData({x:0,y:0}).col,
-              title:"lista de unidades",blocked:false,
-              panels:[{col:12,y:0,title:"main",tipe:"table"}],
-              stateTools:stTls_tb,
-    
-              tableMain:"unids",
-              selects:[
-                {table:'unids', field:'ID_UNID',primary:true},
-                {table:'unids', field:'NAME'},
-                {table:'unids', field:'SIMBOL'},
-              ],
-              conditions:[{
-                //before:" AND ",
-                table:"unids",
-                field:"ID_COMPANY",
-                inter:"=",
-                value:userData.company.id,
-              }],
-              inserts:[{
-                field:"ID_COMPANY",
-                value:userData.company.id,
-              }],
-    
-              fields:[
-                //{panel:"main",...fld_delete},
-                {panel:"main",name:"unidad",box:bx_input,select:"NAME",descripcion:"nombre de la unidad"},
-                {panel:"main",name:"simbolo",box:bx_input,select:"SIMBOL",descripcion:"simbolo de la unidad"},
+            grid:{
+              items:[
+                {name:"prnt-unids",col:6},
+                {name:"prnt-tags",col:6},
               ],
             }
           },
           {
-            name:"tags",
-            active:true,
-            script:{
-              parent:gr.GetColData({x:1,y:0}).col,
-              title:"lista de etiquetas",blocked:false,
-              panels:[{col:12,y:0,title:"main",tipe:"table"}],
-              stateTools:stTls_tb,
-    
-              tableMain:"products_tags",
-              selects:[
-                {table:'products_tags', field:'ID_PRODUCT_TAG',primary:true},
-                {table:'products_tags', field:'NAME'},
+            crud:{
+              parent:"prnt-unids",name:"cr-unids",
+              title:"lista de unidades",schema:sch_unids,
+              panels:[
+                {
+                  tipe:"table",
+                  fieldsSet:[
+                    {value:"name",state:"edit"},
+                    {value:"simbol",state:"edit"},
+                  ],
+                },
               ],
-              conditions:[{
-                //before:" AND ",
-                table:"products_tags",
-                field:"ID_COMPANY",
-                inter:"=",
-                value:userData.company.id,
-              }],
-              inserts:[{
-                field:"ID_COMPANY",
-                value:userData.company.id,
-              }],
-    
-              fields:[
-                //{panel:"main",...fld_delete},
-                {panel:"main",name:"etiqueta",box:bx_input,select:"NAME",descripcion:"nombre de la etiqueta del producto/servicio/insumo"},
+            }
+          },
+          {
+            crud:{
+              parent:"prnt-tags",name:"cr-tags",
+              title:"lista de etiquetas",schema:sch_items_tag,
+              panels:[
+                {
+                  tipe:"table",
+                  fieldsSet:[
+                    {value:"name",state:"edit"},
+                  ],
+                },
               ],
             }
           },

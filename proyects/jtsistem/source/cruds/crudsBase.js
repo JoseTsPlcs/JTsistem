@@ -780,7 +780,7 @@ class CrudsGroup extends ODD {
         });
     }
 
-    #crudGetScript({userData,parent,title,head=true,name,schema,panels=[],events=[],joins=[],selects=[],inserts=[]}){
+    #crudGetScript({userData,parent,modal,title,head=true,name,schema,panels=[],events=[],joins=[],selects=[],inserts=[],stateType,stateStart="reload"}){
 
         let u = this;
 
@@ -818,17 +818,25 @@ class CrudsGroup extends ODD {
         var cnxMaidfmFm = cnxMaid.filter(cnx=>cnx.event=="formForm");
         var cnxMaidfmExt = cnxMaid.filter(cnx=>cnx.event=="formExtend");
 
-        var editName = "edit-" + name;
+        var editName = "edit"; //+ name;
         var addName = "add-" + name;
         var cnxName = "join-" + name;
 
+        var filters = [];
+        var orders = [];
+
+        //set fields && filters!!
         panels.forEach(panel => {
+            
+            var addFilters = panel.tipe == "table" && (cnxMaster.length == 0 || cnxMasterTbFm.length > 0) && cnxMaid.length == 0;
+            //console.log(addFilters,"CRUD ",name,"CNXMASTER",cnxMaster.length,"CNXMASTERTBFM",cnxMasterTbFm.length,"CNXMAID",cnxMaid.length);
 
             if(panel.fieldsSet){
 
                 if(panel.fields == null) panel.fields=[];
                 panel.fieldsSet.forEach(fset => {
                     
+                    //field action
                     if(fset.action != null){
 
                         var fieldAction = {};
@@ -873,9 +881,28 @@ class CrudsGroup extends ODD {
                             var ftype = fieldTypes.find(ftype=>ftype.tipe==fsch.tipe);
 
                             var box = (fset.state == "show"? ftype.show.box: ftype.edit.box);
-                            if(fsch.options) box.options = fsch.options;
-
+                            if(fsch.options){
+                                box.options = fsch.options;
+                                //box.value = fsch.options.length[0].value;
+                            }
                             if(fset.boxValue) box.value = fset.boxValue;
+
+                            var attributes = [];
+                            if(panel.tipe == "table"){
+
+                                //attributes.push({name:"class",value:"m-0 py-0 px-1"});
+                                var minWidth = null;
+                                if(fsch.minWidth != null) minWidth = fsch.minWidth;
+                                if(fset.minWidth != null) minWidth = fset.minWidth;
+                                console.log("CRUD ",name," SET ATTR",minWidth,"FIELD",fset,fsch);
+                                
+                                if(minWidth) attributes.push({name:"style",value:"min-width:"+minWidth+"px;"});
+
+                                if(fsch.maxWidth) attributes.push({name:"style",value:"max-width:"+fsch.minWidth+"px;"});
+                            }
+
+                            //get load
+                            var load = (load?{name:load.name,value:"value",show:"show"}:null);
 
                             panel.fields.push({
                                 tipe:fset.tipe?fset.tipe:1,
@@ -883,14 +910,35 @@ class CrudsGroup extends ODD {
                                 name:fsch.name,
                                 box:{...box},
                                 select:fsch.select,
-                                load:(load?{name:load.name,value:"value",show:"show"}:null),
+                                load,
+                                attributes,
+                                col:fset.col,
                             });
+
+                            //box update event
+                            if(fset.update!=null){
+
+                                this.#crudAddActionEventToScript({
+                                    events,
+                                    eventName:"boxUpdate",
+                                    action:({k,field})=>{
+    
+                                        if(field.name == fsch.name){
+    
+                                            fset.update({groups:u,field,crudBuild:k});
+                                        }
+                                    }
+                                });
+                            }
 
                             //selects
                             selects.push({
                                 table:schema.table,
                                 field:fsch.select,
                             });
+
+                            //orders
+                            if(fset.asc != null) orders.push({table:schema.table,field:fsch.select,asc:fset.asc});
 
                             //conection fieldUpdate
                             if(cnxMasterfmFm.length > 0){
@@ -918,8 +966,33 @@ class CrudsGroup extends ODD {
                                 });
                             }                        
 
+                            //add filter
+                            if(addFilters && ftype.filter && ftype.filter.box){
+
+                                var filterBox = {...ftype.filter.box};
+                                if(fsch.options){
+
+                                    filterBox.options = fsch.options;
+                                    //filterBox.value = fsch.options[0].value;
+                                }
+                                if(fset.filter && fset.filter.value) filterBox.value = fset.filter.value;
+
+                                filters.push({
+                                    name:fsch.name,
+                                    box:filterBox,
+                                    load,
+                                    select:{
+                                        table:tableMain,
+                                        field:fsch.select,
+                                        //inter:ftype.filter.inter,
+                                        //tipe:ftype.filter.tipe,
+                                    },
+                                });
+                            }
                         }
-                    }
+
+                        
+                    }                    
 
                 });
 
@@ -933,22 +1006,34 @@ class CrudsGroup extends ODD {
             }
 
         });
+        
 
         //parent
         var parentInfo = this.#parentGet({parentName:parent});
         var parentBuild = parentInfo ? parentInfo.build : this.#parent;
         var parent = parentInfo ? parentInfo.conteiner : this.#parent;
 
+        var modalBuild = null;
+        if(modal){
+
+            var modalInfo = this.#parentGet({parentName:modal});
+            modalBuild = modalInfo.build;
+        }
+        else
+        {
+            if(parentBuild instanceof Modal) modalBuild = parentBuild;
+        }
+
         //add events
 
-        if(parentBuild instanceof Modal){
+        if(modalBuild){
 
             this.#crudAddActionEventToScript({
                 events,
                 eventName:"reloadBefore",
                 action:({})=>{
     
-                    parentInfo.build.SetActive({active:true});
+                    modalBuild.SetActive({active:true});
                 }
             });
 
@@ -957,7 +1042,7 @@ class CrudsGroup extends ODD {
                 eventName:"blockAfter",
                 action:({})=>{
     
-                    parentInfo.build.SetActive({active:false});
+                    modalBuild.SetActive({active:false});
                 }
             });
 
@@ -966,15 +1051,16 @@ class CrudsGroup extends ODD {
                 eventName:"newAfter",
                 action:({})=>{
     
-                    parentInfo.build.SetActive({active:true});
+                    modalBuild.SetActive({active:true});
                 }
             });
 
         }        
         
         //set states
-        var stateStart = "reload";
+        //var stateStart = "reload";
         var afterCancel = "reload";
+        var afterInsert = "reload";
         var newActive = true;
         var insertNoAddFields = false;
         var updateCurrent = null;
@@ -1017,6 +1103,19 @@ class CrudsGroup extends ODD {
             },
         ];
 
+        //no conections table
+        if(cnxMaster.length == 0 && cnxMaid.length == 0){
+
+            if(panels[0].tipe == "table"){
+
+                statetools[0].tools.find(t=>t.name=="reload").show=true;
+                statetools[0].tools.find(t=>t.name=="new").show=stateType!="show";
+                statetools[0].tools.find(t=>t.name=="pages").show=true;
+                statetools[0].tools.find(t=>t.name=="sizes").show=true;
+                statetools[0].tools.find(t=>t.name=="sizes").value=10;
+            }            
+        }
+
         //formForm -> form - form (fieldValue,maidSelect)
         if(cnxMasterfmFm.length > 0 || cnxMaidfmFm.length > 0){
 
@@ -1029,7 +1128,7 @@ class CrudsGroup extends ODD {
                     eventName:"boxUpdate",
                     action:({field,k})=>{
 
-                        var maidCrud = u.#crudGetBuild({crudName:cnx.maidName});
+                        var maidCrud = u.crudGetBuild({crudName:cnx.maidName});
 
                         if(field.name == editName){
                             
@@ -1073,9 +1172,9 @@ class CrudsGroup extends ODD {
 
                     //updateCurrent = true;
                     //statetools[0].tools.find(t=>t.name=="reload").show=true;
-                    statetools[0].tools.find(t=>t.name=="update").show=true;
-                    statetools[0].tools.find(t=>t.name=="new").show=true;
-                    statetools[0].tools.find(t=>t.name=="pages").show=true;
+                    statetools[0].tools.find(t=>t.name=="update").show=(cnxMasterList[0].type!="show");
+                    statetools[0].tools.find(t=>t.name=="new").show=(cnxMasterList[0].type!="show");
+                    statetools[0].tools.find(t=>t.name=="pages").show=(cnxMasterList[0].type!="show");
                 }
 
                 cnxMasterList.forEach(cnx => {
@@ -1086,7 +1185,7 @@ class CrudsGroup extends ODD {
                         eventName:"reloadAfter",
                         action:({k})=>{
 
-                            var maidCrud = u.#crudGetBuild({crudName:cnx.maidName});
+                            var maidCrud = u.crudGetBuild({crudName:cnx.maidName});
                             maidCrud.CrudJoins_Set({
                                 name:"join-"+cnx.masterName,
                                 field:cnx.maidSelect,
@@ -1102,8 +1201,8 @@ class CrudsGroup extends ODD {
                         eventName:"newAfter",
                         action:({k})=>{
 
-                            var maidCrud = u.#crudGetBuild({crudName:cnx.maidName});
-                            maidCrud.SetState({stateName:"new"});
+                            var maidCrud = u.crudGetBuild({crudName:cnx.maidName});
+                            maidCrud.SetState({stateName:"block"});
                         }
                     });
 
@@ -1113,7 +1212,7 @@ class CrudsGroup extends ODD {
                         eventName:"insertAfter",
                         action:({field,value})=>{
 
-                            var maidCrud = u.#crudGetBuild({crudName:cnx.maidName});
+                            var maidCrud = u.crudGetBuild({crudName:cnx.maidName});
                             maidCrud.CrudJoins_Set({
                                 name:"join-"+cnx.masterName,
                                 field:cnx.maidSelect,
@@ -1129,7 +1228,7 @@ class CrudsGroup extends ODD {
                         eventName:"updateAfter",
                         action:({})=>{
 
-                            var maidCrud = u.#crudGetBuild({crudName:cnx.maidName});
+                            var maidCrud = u.crudGetBuild({crudName:cnx.maidName});
                             maidCrud.Update({});
                         }
                     })
@@ -1140,19 +1239,24 @@ class CrudsGroup extends ODD {
             if(cnxMaidList.length > 0){
 
                 stateStart="block";
-                updateCurrent = false;
-                statetools[0].tools.find(t=>t.name=="insert").show=true;
+                updateCurrent = true;
+                statetools[0].tools.find(t=>t.name=="new").show=false;
                 statetools[0].tools.find(t=>t.name=="pages").show=false;
+                statetools[0].tools.find(t=>t.name=="sizes").show=false;
                 statetools[0].tools.find(t=>t.name=="sizes").value=999;
+                statetools[0].tools.find(t=>t.name=="insert").show=(cnxMaidList[0].type!="show");
 
                 
                 statetools[1].tools.find(t=>t.name=="insert").show=false;
                 statetools[1].tools.find(t=>t.name=="cancel").show=false;
-                statetools[1].tools.find(t=>t.name=="addLine").show=true;
+                statetools[1].tools.find(t=>t.name=="addLine").show=false;
 
-                panels[0].fields.unshift({
-                    ...fld_delete,
-                });
+                if(cnxMaidList[0].type!="show"){
+
+                    panels[0].fields.unshift({
+                        ...fld_delete,
+                    });
+                }
 
                 panels[0].fields.forEach(field => {
                     
@@ -1162,15 +1266,16 @@ class CrudsGroup extends ODD {
 
                 cnxMaidList.forEach(cnx => {
                     
-                    this.#crudAddActionEventToScript({
+                    //reload after
+                    /*this.#crudAddActionEventToScript({
                         events,
                         eventName:"reloadAfter",
                         action:()=>{
     
-                            var masterCrud = u.#crudGetBuild({crudName:cnx.masterName});
+                            var masterCrud = u.crudGetBuild({crudName:cnx.masterName});
                             masterCrud.SetState({stateName:"reload",noUseReloadAfter:true});
                         }
-                    });
+                    });*/
                 });
             }
         }
@@ -1181,7 +1286,7 @@ class CrudsGroup extends ODD {
             if(cnxMasterTbFm.length > 0){
 
                 statetools[0].tools.find(t=>t.name=="reload").show=true;
-                statetools[0].tools.find(t=>t.name=="new").show=true;
+                statetools[0].tools.find(t=>t.name=="new").show=stateType!="show";
                 statetools[0].tools.find(t=>t.name=="pages").show=true;
                 statetools[0].tools.find(t=>t.name=="sizes").show=true;
                 statetools[0].tools.find(t=>t.name=="sizes").value = 10;
@@ -1197,7 +1302,7 @@ class CrudsGroup extends ODD {
 
                             if(field.name==editName){
 
-                                var maidCrud = u.#crudGetBuild({crudName:cnx.maidName});
+                                var maidCrud = u.crudGetBuild({crudName:cnx.maidName});
                                 var value = k.Reload_GetData()[y][cnx.masterSelect];
                                 
                                 maidCrud.CrudJoins_Set({
@@ -1205,6 +1310,7 @@ class CrudsGroup extends ODD {
                                     field:cnx.maidSelect,
                                     value,
                                 });
+
                                 maidCrud.SetState({stateName:"reload"});
                             }
                         }
@@ -1216,11 +1322,22 @@ class CrudsGroup extends ODD {
                         eventName:"toolNewUpdate",
                         action:({k})=>{
 
-                            var maidCrud = u.#crudGetBuild({crudName:cnx.maidName});
-                            maidCrud.SetState({stateName:"new"});
+                            var maidCrud = u.crudGetBuild({crudName:cnx.maidName});
+                            var cnxOfMaid = u.#conections.filter(cnxu=>cnxu.masterName==cnx.maidName);
+                            //console.log("NEW TO MAIDNAME ",cnx.maidName," CONECTIONS: ", u.#conections," state: ",cnxOfMaid);   
+                            
+                            if(cnxOfMaid.length > 0) k.Insert({});
+                            else maidCrud.SetState({stateName:"new"});
                         }
-                    })
+                    });
                 });
+
+                if(schema.delete == true){
+
+                    panels[0].fields.unshift({
+                        ...fld_delete,
+                    });
+                }
                 
             }
             
@@ -1228,9 +1345,39 @@ class CrudsGroup extends ODD {
                 
                 stateStart = "block";
                 afterCancel = "block";
-                statetools[0].tools.find(t=>t.name=="reload").show=true;
-                statetools[0].tools.find(t=>t.name=="update").show=true;
-                statetools[0].tools.find(t=>t.name=="cancel").show=true;
+                afterInsert = "block";
+                statetools[0].tools.find(t=>t.name=="reload").show=(cnxMaidTbFm[0].type != "show");
+                statetools[0].tools.find(t=>t.name=="update").show=(cnxMaidTbFm[0].type != "show");
+                statetools[0].tools.find(t=>t.name=="cancel").show=(cnxMaidTbFm[0].type != "show");
+
+                cnxMaidTbFm.forEach(cnx => {
+                    
+                    //insert after
+                    this.#crudAddActionEventToScript({
+                        events,
+                        eventName:"insertAfter",
+                        action:({k,field,value})=>{
+
+                            var masterCrud = u.crudGetBuild({crudName:cnx.masterName});
+                            masterCrud.SetState({stateName:"reload"});
+                        }
+                    });
+
+                    //updateAfter
+                    this.#crudAddActionEventToScript({
+                        events,
+                        eventName:"updateAfter",
+                        action:({})=>{
+                            
+                            if(modalBuild && cnxMaid.length > 0){
+
+                                modalBuild.SetActive({active:false});
+                                var masterCrud = u.crudGetBuild({crudName:cnx.masterName});
+                                masterCrud.SetState({stateName:"reload"});
+                            }
+                        }
+                    });
+                });
             }
         }
 
@@ -1253,7 +1400,7 @@ class CrudsGroup extends ODD {
                         action:({k})=>{
 
                             var value = k.Reload_GetData()[0][cnx.masterSelect];
-                            var crudMaid = u.#crudGetBuild({crudName:cnx.maidName});
+                            var crudMaid = u.crudGetBuild({crudName:cnx.maidName});
                             crudMaid.CrudJoins_Set({
                                 name:cnxName,
                                 field:cnx.maidSelect,
@@ -1268,7 +1415,7 @@ class CrudsGroup extends ODD {
                         eventName:"setStateAfter",
                         action:({stateName})=>{
 
-                            var crudMaid = u.#crudGetBuild({crudName:cnx.maidName});
+                            var crudMaid = u.crudGetBuild({crudName:cnx.maidName});
                             crudMaid.SetState({stateName});
                         }
                     });
@@ -1287,11 +1434,11 @@ class CrudsGroup extends ODD {
 
             stateStart,
             stateTools:statetools,
-            afterCancel,
+            afterCancel,afterInsert,
             newActive,insertNoAddFields,
             updateCurrent,
 
-            panels,
+            panels,filters,
             configShow:false,
 
             tableMain,
@@ -1300,6 +1447,7 @@ class CrudsGroup extends ODD {
             loads,
             events,
             inserts,
+            orders,
         }
 
     }
@@ -1315,9 +1463,38 @@ class CrudsGroup extends ODD {
         event.actions.push({action});
     }
 
-    #crudGetBuild({crudName}){
+    crudGetBuild({crudName}){
 
         return this.#cruds.find(crd=>crd.name==crudName).build;
+    }
+
+    CrudJoin({masterCrud,masterSelect,masterFieldValue,y,maidCrud,maidSelect}){
+
+        var cr_master = this.crudGetBuild({crudName:masterCrud});
+        var value = null;
+
+        if(masterSelect!=null) cr_master.Reload_GetData()[y?y:0][masterSelect];
+        if(masterFieldValue !=null){
+
+           var field = cr_master.bodyGet().fieldsGet().find(f=>f.value==masterFieldValue);
+           var values = cr_master.bodyGet().fieldGetValues({fieldName:field.name});
+           console.log("CRUD JOIN MASTER:",masterCrud, "field",field,"values:",values);
+           
+           if(values != null && values.length > 0) value = values[y?y:0];
+        }
+
+        var cr_join = this.crudGetBuild({crudName:maidCrud});
+        if(value){
+
+            cr_join.CrudJoins_Set({
+                name:"cnx-"+masterCrud,
+                field:maidSelect,
+                value,
+            });
+            cr_join.SetState({stateName:"reload"});
+
+        }
+        else cr_join.SetState({stateName:"block"});
     }
 
     #crudGetValues({crudBuild,select,schema,fieldValue}){
@@ -1357,7 +1534,31 @@ class CrudsGroup extends ODD {
                     labels:layerInfo.grid.labels,
                 });
                 gridScript.parent = this.#parentGetConteiner({layerIndex:layer,parentName:layerInfo.grid.parent});
+                if(layer == 0){
+
+                    var attributes = [];
+                    for (let y = 0; y < gridScript.cols.length; y++) {
+                        
+                        var row = gridScript.cols[y];
+                        
+                        for (let x = 0; x < row.length; x++) {
+                            
+                            var col = row[x];
+
+                            attributes.push({
+                                x,y,
+                                attributes:[{
+                                    name:"class",
+                                    value:"col-12 col-md-"+col+" px-0 px-md-"+paddinForms+" pt-"+paddinForms +" pt-md-0"
+                                }]
+                            });    
+                        }
+
+                    }
+                    gridScript.attributes = attributes;
+                }
                 //console.log("LAYER BUILD GRID", gridScript);
+
                 layerInfo.grid.build = new Grid(gridScript);
         
                 layerInfo.grid.items.forEach(item => {

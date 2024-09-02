@@ -31,6 +31,11 @@ var op_products_onlimit = [
     {value:1,show:"!se acaba!",class:"rounded text-center bg-danger text-white"}
 ];
 
+const op_customer_document = [
+    {value:0,show:"dni"},
+    {value:1,show:"ruc"}
+];
+
 
 const op_taller_check = [
     {value:1,show:""},
