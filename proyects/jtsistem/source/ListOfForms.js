@@ -1455,7 +1455,7 @@ function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax
 
     let md = new Modal({
     parent:gr.GetColData({x:0,y:2}).col,
-    size:"lg",
+    size:"xl",
     });
     var mdParent = md.GetContent();
     //mdParent.setAttribute("style","min-width: 600px;");
