@@ -1615,9 +1615,9 @@ function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax
                 parent:mdGr.GetColData({x:0,y:0}).col,
                 title:"venta",
                 panels:[
-                {col:6,y:0,tipe:"form",title:"informacion",tag:"Informacion General"},
-                {col:6,y:0,tipe:"form",title:"cliente",tag:"Datos del Cliente"},
-                (userData.company.tipe=="2"?{col:12,y:0,tipe:"form",title:"vehicle",tag:"Datos del Vehiculo"}:null),
+                    {col:6,y:0,tipe:"form",title:"cliente",tag:"Datos del Cliente"},
+                    {col:6,y:0,tipe:"form",title:"informacion",tag:"Informacion General"},
+                    (userData.company.tipe=="2"?{col:12,y:0,tipe:"form",title:"vehicle",tag:"Datos del Vehiculo"}:null),
                 ],
                 stateStart:"block",
                 stateTools:[
@@ -1734,15 +1734,15 @@ function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax
 
                 tableMain:"sales_products",
                 selects:[
-                {table:'sales_products', field:'ID',primary:true},
-                {table:'sales_products', field:'ID_SALE'},
-                {table:'sales_products', field:'ID_PRODUCT'},
-                {table:'sales_products', field:'CANT'},
-                {table:'sales_products', field:'PRICE_UNIT'},
-                {table:'sales_products', field:'PRICE_TOTAL'},
-                {table:"products",field:"NAME",as:"PRODUCT_NAME"},
-                {table:"products",field:"ID_PRODUCT_TIPE"},
-                {table:"unids",field:"SIMBOL",as:"UNID_SIMBOL"},
+                    {table:'sales_products', field:'ID',primary:true},
+                    {table:'sales_products', field:'ID_SALE'},
+                    {table:'sales_products', field:'ID_PRODUCT'},
+                    {table:'sales_products', field:'CANT'},
+                    {table:'sales_products', field:'PRICE_UNIT'},
+                    {table:'sales_products', field:'PRICE_TOTAL'},
+                    {table:"products",field:"NAME",as:"PRODUCT_NAME"},
+                    {table:"products",field:"ID_PRODUCT_TIPE"},
+                    {table:"unids",field:"SIMBOL",as:"UNID_SIMBOL"},
                 ],
                 joins:[
                 {
@@ -1762,8 +1762,8 @@ function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax
 
                 fields:[
                     {panel:"informacion",name:"descripcion",attributes:att_ln,box:{tipe:0},select:"PRODUCT_NAME"},
-                    {panel:"informacion",name:"tipo",attributes:att_ln50,box:{tipe:0,options:op_products_tipe},select:"ID_PRODUCT_TIPE"},
-                    {panel:"informacion",name:"unidad",attributes:att_cnt,box:{tipe:0,class:"text-center"},select:"UNID_SIMBOL"},
+                    //{panel:"informacion",name:"tipo",attributes:att_ln50,box:{tipe:0,options:op_products_tipe},select:"ID_PRODUCT_TIPE"},
+                    //{panel:"informacion",name:"unidad",attributes:att_cnt,box:{tipe:0,class:"text-center"},select:"UNID_SIMBOL"},
                     {panel:"informacion",name:"cantidad",attributes:att_cnt,box:{tipe:0,class:"text-center"},select:"CANT"},
                     {panel:"informacion",name:"precio unitario",attributes:att_cnt,box:bx_money,select:"PRICE_UNIT"},
                     {panel:"informacion",name:"precio total",attributes:att_cnt,box:bx_money,select:"PRICE_TOTAL"},
@@ -1840,7 +1840,7 @@ function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax
 
         items.push({
         detail: sale_tb.GetValue({fieldName:"descripcion",y}),
-        type: op_products_tipe.find(op=>op.value==sale_tb.GetValue({fieldName:"tipo",y})).show,
+        type: op_products_tipe.find(op=>op.value==sale_tb.Reload_GetData()[y]["ID_PRODUCT_TIPE"]).show,
         quantity: sale_tb.GetValue({fieldName:"cantidad",y}), 
         unitPrice: parseFloat(sale_tb.GetValue({fieldName:"precio unitario",y})),
         totalPrice: parseFloat(sale_tb.GetValue({fieldName:"precio total",y})),
@@ -1848,6 +1848,7 @@ function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax
     }
 
     generateInvoicePDF({
+        title:"Venta",
         invoiceNumber: sale_fm.GetValue({fieldName:"nro",y:0}),
         invoiceDate: sale_fm.GetValue({fieldName:"fecha de emision",y:0}),
         
@@ -2214,7 +2215,7 @@ async function generateInvoicePDF(invoiceData) {
         // Header
         pdf.setFontSize(fontSizeHeader);
         pdf.setTextColor(40, 40, 40);
-        pdf.text('Cotizacion', margin, startY);
+        pdf.text(invoiceData.title, margin, startY);
 
         // Company Details
         pdf.setFontSize(fontSizeNormal);
