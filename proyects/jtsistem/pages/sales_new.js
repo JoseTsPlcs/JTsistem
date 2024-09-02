@@ -819,6 +819,7 @@ $(document).ready(function() {
                   actions:[{
                     action:({field,y,k})=>{
 
+                      return;
                       if(field.action == "edit"){
 
                         var product_id = k.Reload_GetData()[y]["ID_PRODUCT"];
@@ -879,7 +880,7 @@ $(document).ready(function() {
                             value:tot
                           });
                         }
-                      }*/
+                      },*/
 
                       return {inserts};
                     }
