@@ -833,7 +833,7 @@ const sch_pays = {
             value:"date",
             name:"fecha de emision",
             select:"DATE_EMMIT",access:true,
-            tipe:"date",
+            tipe:"show",
             descripcion:"",
         },
         {
@@ -886,8 +886,139 @@ const sch_pays = {
     ]
 };
 
+const sch_provideers = {
+    table:"provideers",
+    fieldPrimary:"ID_PROVIDEER",
+    company:true,
+    fields:[
+        {
+            value:"name",access:true,
+            name:"nombre",tipe:"input",
+            select:"NAME",
+            descripcion:"",
+        },
+        {
+            value:"ruc",access:true,
+            name:"ruc",tipe:"input",
+            select:"RUC",
+            descripcion:"",
+        },
+    ],
+}
 
+const sch_buys = {
+    table:"buys",
+    fieldPrimary:"ID_BUY",
+    company:true,
+    fields:[
+        {
+            value:"date",access:true,
+            name:"fecha de emision",tipe:"date",
+            select:"DATE_EMMIT",
+            descripcion:"",
+        },
+        {
+            value:"state",access:true,
+            name:"estado de compra",tipe:"options",
+            select:"ID_BUY_STATUS",options:op_buys_status,
+            descripcion:"",
+        },
+        {
+            value:"provideer",access:true,
+            name:"proveedor",tipe:"optionsSearch",
+            select:"ID_PROVIDEER",
+            descripcion:"",
+            load:{
+                name:"ld-provideers",
+                tableMain:sch_provideers.table,
+                selects:[
+                    {table:sch_provideers.table,field:sch_provideers.fieldPrimary,as:"value"},
+                    {table:sch_provideers.table,field:"NAME",as:"show"},
+                ],
+            }
+        },
+        {
+            value:"total",access:true,
+            name:"total",tipe:"money",
+            select:"TOTAL",
+            descripcion:"",
+        },
+    ],
+}
 
+const sch_buys_products = {
+    table:"buys_products",
+    fieldPrimary:"ID_BUY_PRODUCT",
+    delete:true,
+    fields:[
+        {
+            value:"idBuy",access:true,
+            name:"id buy",tipe:"show",
+            select:"ID_BUY",
+            descripcion:"",
+        },
+        {
+            value:"item",access:true,
+            name:"producto/insumo",tipe:"optionsSearch",
+            select:"ID_PRODUCT",
+            descripcion:"",
+            load:{
+                name:"ld-item",
+                tableMain:sch_items.table,
+                selects:[
+                    {table:sch_items.table,field:sch_items.fieldPrimary,as:"value"},
+                    {sql:("CONCAT("+sch_items.table+".NAME,' (',unids.SIMBOL,')') AS 'show'")},
+                ],
+                joins:[
+                    {
+                        main:{table:sch_items.table,field:"UNID_ID"},
+                        join:{table:sch_unids.table,field:sch_unids.fieldPrimary},
+                        tipe:"LEFT",
+                    }
+                ],
+            },
+        },
+        {
+            value:"cant",access:true,
+            name:"cantidad",tipe:"cant",
+            select:"CANT",maxWidth:100,
+            descripcion:"",
+        },
+        {
+            value:"costUnit",access:true,
+            name:"costo unitario",tipe:"money",
+            select:"COST_UNIT",maxWidth:100,
+            descripcion:"",
+        },
+        {
+            value:"costTotal",access:true,
+            name:"costo total",tipe:"money",
+            select:"COST_TOTAL",maxWidth:100,
+            descripcion:"",
+        },
+    ],
+}
+
+const sch_buys_payments = {
+    table:"buys_payments",
+    fieldPrimary:"ID_BUY_PAY",
+    delete:true,
+    fields:[
+        {
+            value:"idBuy",access:true,
+            name:"id buy",tipe:"show",
+            select:"ID_BUY",
+            descripcion:"",
+        },
+        {
+            value:"idPay",access:true,
+            name:"id pay",tipe:"show",
+            select:"ID_PAY",
+            descripcion:"",
+        },
+    ],
+    
+}
 
 /*const schema = {
     tables:[

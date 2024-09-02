@@ -543,9 +543,9 @@ $(document).ready(function() {
 
                       if(stateName=="block"){
 
-                        //w_main.Conteiner_Show({show:false,slow:false,ignoreBlock:true});
-                        //w_total.Conteiner_Show({show:false,slow:false,ignoreBlock:true});
-                        //w_customer.Conteiner_Show({show:false,slow:false,ignoreBlock:true});
+                        w_main.Conteiner_Show({show:false,slow:false,ignoreBlock:true});
+                        w_total.Conteiner_Show({show:false,slow:false,ignoreBlock:true});
+                        w_customer.Conteiner_Show({show:false,slow:false,ignoreBlock:true});
                       } 
                       
                       if(stateName=="reload"){
@@ -596,7 +596,9 @@ $(document).ready(function() {
                       {name:"load",show:false},
                       {name:"question",show:false},
                       {name:"sizes",show:false,value:999},
-                      {name:"new",show:true},
+                      {name:"new",show:false},
+                      {name:"insert",show:true},
+                      
                   ],
                 },
                 {
@@ -619,6 +621,7 @@ $(document).ready(function() {
               stateStart:"block",
               afterInsert:"reload",
               //afterUpdate:"block",
+              insertUseFields:false,
               newLinesStart:1,
               questions:[
                 {
@@ -854,7 +857,7 @@ $(document).ready(function() {
                   actions:[{
                     action:({k,inserts=[]})=>{
 
-                      if(!acc_price_update){
+                      /*if(!acc_price_update){
 
                         var priceUnit = k.GetValues({fieldName:"precio unitario"});
                         var priceTotal = k.GetValues({fieldName:"precio total"});
@@ -876,7 +879,7 @@ $(document).ready(function() {
                             value:tot
                           });
                         }
-                      }
+                      }*/
 
                       return {inserts};
                     }

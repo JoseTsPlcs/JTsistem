@@ -30,7 +30,7 @@ class Crud_set extends ODD {
         delete:false,
     }
 
-    #SetVariables({title,stateTools=[],questions=[],stateStart="reload",afterCancel="reload",afterDelete="reload",afterInsert="reload",afterUpdate="reload",newLinesStart=1,newActive=true,tableMain,selects,joins,inserts=[],orders=[],conditions=[],fields=[],filters=[],loads=[]}){
+    #SetVariables({title,stateTools=[],questions=[],stateStart="reload",afterCancel="reload",afterDelete="reload",afterInsert="reload",afterUpdate="reload",newLinesStart=1,newActive=true,tableMain,selects,joins,inserts=[],orders=[],conditions=[],fields=[],filters=[],loads=[],insertUseFields=true}){
 
         this.#title = title;
         this.#conection = db_lip;
@@ -52,6 +52,7 @@ class Crud_set extends ODD {
 
         
         this.#newActive = newActive;
+        this.#insertUseFields = insertUseFields;
         this.#stateData.stateStart=stateStart;
         this.#stateData.afterCancel = afterCancel;
         this.#stateData.afterDelete = afterDelete;
@@ -1065,6 +1066,7 @@ class Crud_set extends ODD {
         })
     }
 
+    #insertUseFields = true;
     #Insert_Request({inserts=[],success}){
 
         let k = this;
@@ -1075,12 +1077,12 @@ class Crud_set extends ODD {
 
                 var insertSql_inserts = inserts;
 
-                //console.log(this.#title+"- insert start -> ",[...insertSql_inserts]);
+                console.log(this.#title+"- insert start -> ",[...insertSql_inserts]);
 
                 //insert by inserts saved
                 insertSql_inserts = [...insertSql_inserts,...k.#inserts];
 
-                //console.log(this.#title+"- insert add insert in form -> ",[...insertSql_inserts]);
+                console.log(this.#title+"- insert add insert in form -> ",[...insertSql_inserts]);
 
                 //insert by primary new
                 insertSql_inserts.push({
@@ -1089,7 +1091,7 @@ class Crud_set extends ODD {
                     tipe:"secuence",
                 });
 
-                //console.log(this.#title+"- insert add primary new -> ",[...insertSql_inserts]);
+                console.log(this.#title+"- insert add primary new -> ",[...insertSql_inserts]);
 
                 //inserst by crudjoins
                 k.#crudJoins.forEach(jn=>{
@@ -1105,31 +1107,36 @@ class Crud_set extends ODD {
                     }                   
                 });
 
+                
                 //insert by fields
-                k.#fields.forEach(field => {
+                if(this.#insertUseFields == true){
+
+                    k.#fields.forEach(field => {
                     
-                    //no button, no div and select exist
-                    var select = k.#SelectGet({selectName:field.select});
-                    if(field.box.tipe != 0 && select){
-  
-                        //no primary in insert because primary have a value
-                        if(!select.primary){
-
-                            var fieldSelecField = select.field;
-                            var fieldValues = k.GetValues({fieldName:field.name});
-
-                            fieldValues.forEach(v => {
+                        //no button, no div and select exist
+                        var select = k.#SelectGet({selectName:field.select});
+                        if(field.box.tipe != 0 && select){
+      
+                            //no primary in insert because primary have a value
+                            if(!select.primary){
+    
+                                var fieldSelecField = select.field;
+                                var fieldValues = k.GetValues({fieldName:field.name});
+    
+                                fieldValues.forEach(v => {
+                                    
+                                    insertSql_inserts.push({
+                                        field: fieldSelecField,
+                                        value: v,
+                                    });
+                                });    
                                 
-                                insertSql_inserts.push({
-                                    field: fieldSelecField,
-                                    value: v,
-                                });
-                            });    
-                            
-                            //console.log(field.name, fieldValues);
-                        }                        
-                    }
-                });    
+                                //console.log(field.name, fieldValues);
+                            }                        
+                        }
+                    });  
+                }
+                  
                 
                 console.log(this.#title+"- go to insert -> ",[...insertSql_inserts]);
 

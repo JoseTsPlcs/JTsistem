@@ -881,6 +881,7 @@ class CrudsGroup extends ODD {
                             var ftype = fieldTypes.find(ftype=>ftype.tipe==fsch.tipe);
 
                             var box = (fset.state == "show"? ftype.show.box: ftype.edit.box);
+                            if(fset.showBox) box = {...fset.showBox};
                             if(fsch.options){
                                 box.options = fsch.options;
                                 //box.value = fsch.options.length[0].value;
@@ -894,11 +895,11 @@ class CrudsGroup extends ODD {
                                 var minWidth = null;
                                 if(fsch.minWidth != null) minWidth = fsch.minWidth;
                                 if(fset.minWidth != null) minWidth = fset.minWidth;
-                                console.log("CRUD ",name," SET ATTR",minWidth,"FIELD",fset,fsch);
-                                
                                 if(minWidth) attributes.push({name:"style",value:"min-width:"+minWidth+"px;"});
 
-                                if(fsch.maxWidth) attributes.push({name:"style",value:"max-width:"+fsch.minWidth+"px;"});
+                                var maxWidth = null;
+                                if(fsch.maxWidth != null) maxWidth = fsch.maxWidth;
+                                if(maxWidth) attributes.push({name:"style",value:"max-width:"+maxWidth+"px;"});
                             }
 
                             //get load
@@ -1113,7 +1114,17 @@ class CrudsGroup extends ODD {
                 statetools[0].tools.find(t=>t.name=="pages").show=true;
                 statetools[0].tools.find(t=>t.name=="sizes").show=true;
                 statetools[0].tools.find(t=>t.name=="sizes").value=10;
-            }            
+            } 
+            
+            if(panels[0].tipe == "form"){
+
+                statetools[0].tools.find(t=>t.name=="reload").show=true;
+                statetools[0].tools.find(t=>t.name=="update").show=true;
+                statetools[0].tools.find(t=>t.name=="new").show=stateType!="show";
+                statetools[0].tools.find(t=>t.name=="pages").show=true;
+                statetools[0].tools.find(t=>t.name=="sizes").show=false;
+                statetools[0].tools.find(t=>t.name=="sizes").value=1;
+            } 
         }
 
         //formForm -> form - form (fieldValue,maidSelect)
@@ -1170,8 +1181,7 @@ class CrudsGroup extends ODD {
 
                 if(cnxMaid.length == 0){
 
-                    //updateCurrent = true;
-                    //statetools[0].tools.find(t=>t.name=="reload").show=true;
+                    statetools[0].tools.find(t=>t.name=="reload").show=true;
                     statetools[0].tools.find(t=>t.name=="update").show=(cnxMasterList[0].type!="show");
                     statetools[0].tools.find(t=>t.name=="new").show=(cnxMasterList[0].type!="show");
                     statetools[0].tools.find(t=>t.name=="pages").show=(cnxMasterList[0].type!="show");
@@ -1238,13 +1248,15 @@ class CrudsGroup extends ODD {
 
             if(cnxMaidList.length > 0){
 
+                var cnxMaidOfMaid = this.#conections.filter(cnx=>cnx.masterName == cnxMaidList[0].maidName);
+
                 stateStart="block";
                 updateCurrent = true;
                 statetools[0].tools.find(t=>t.name=="new").show=false;
                 statetools[0].tools.find(t=>t.name=="pages").show=false;
                 statetools[0].tools.find(t=>t.name=="sizes").show=false;
                 statetools[0].tools.find(t=>t.name=="sizes").value=999;
-                statetools[0].tools.find(t=>t.name=="insert").show=(cnxMaidList[0].type!="show");
+                statetools[0].tools.find(t=>t.name=="insert").show=(cnxMaidList[0].type!="show" && cnxMaidOfMaid.length == 0);
 
                 
                 statetools[1].tools.find(t=>t.name=="insert").show=false;
@@ -1285,7 +1297,8 @@ class CrudsGroup extends ODD {
 
             if(cnxMasterTbFm.length > 0){
 
-                statetools[0].tools.find(t=>t.name=="reload").show=true;
+                var cnxMaidOfMaster = this.#conections.filter(cnx=>cnx.maidName == cnxMasterTbFm[0].masterName);
+                statetools[0].tools.find(t=>t.name=="reload").show= cnxMaidOfMaster.length == 0;
                 statetools[0].tools.find(t=>t.name=="new").show=stateType!="show";
                 statetools[0].tools.find(t=>t.name=="pages").show=true;
                 statetools[0].tools.find(t=>t.name=="sizes").show=true;
@@ -1332,7 +1345,7 @@ class CrudsGroup extends ODD {
                     });
                 });
 
-                if(schema.delete == true){
+                if(!panels[0].fields.find(f=>f.action=="delete") && schema.delete == true){
 
                     panels[0].fields.unshift({
                         ...fld_delete,
@@ -1359,7 +1372,18 @@ class CrudsGroup extends ODD {
                         action:({k,field,value})=>{
 
                             var masterCrud = u.crudGetBuild({crudName:cnx.masterName});
-                            masterCrud.SetState({stateName:"reload"});
+
+                            if(masterCrud.SelectPrimaryGet()==cnx.masterSelect) masterCrud.SetState({stateName:"reload"});
+                            else
+                            {
+                                masterCrud.Insert({
+                                    inserts:[{field,value,tipe:"value"}],
+                                    success:()=>{
+    
+                                        masterCrud.SetState({stateName:"reload"});
+                                    }
+                                });
+                            }
                         }
                     });
 

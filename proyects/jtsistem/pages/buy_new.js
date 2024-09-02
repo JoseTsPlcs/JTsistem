@@ -5,504 +5,152 @@ $(document).ready(function() {
 
     success:({userData,pageData})=>{
 
-        //----------buid dooms--------
-
-        var grBody = new Grid({
-          parent:pageData.body,
-          cols:[
-            [12],//modal provideer
-            [6,6],//buy
-            [12],//steps
-          ],
-          attributes:[
-            {x:0,y:1,attributes:[{name:"class",value:"col-12 col-md-4"}/*,{name:"style",value:"background-color: lightcoral;"}*/]},
-            {x:1,y:1,attributes:[{name:"class",value:"col-12 col-md-8 px-"+paddinForms}/*,{name:"style",value:"background-color: lightblue; min-height: 600px; flex: 1;"}*/]},
-          ]
-        });
-        var stpGeneral = new Steps({
-          parent:grBody.GetColData({x:1,y:1}).col,
-          steps:[
+        new CrudsGroup({
+          userData,parent:pageData.body,
+          layers:[
             {
-              name:'<i class="bi bi-card-checklist"></i> productos',
-              window:{
-                //head:false,
-                grid:{cols:[[12]]}
+              grid:{
+                items:[
+                  {name:"prnt-buy"},
+                  {name:"prnt-pay-md"},
+                ],
               }
             },
+            {modal:{parent:"prnt-pay-md",name:"md-pay"}},
+            //-----buy-----
             {
-              name:'<i class="bi bi-currency-dollar"></i> pagos',
-              window:{
-                //head:false,
-                grid:{cols:[[12],[12]]}
-              }
-            },
-          ],
-        });
-        var mdPay = new Modal({
-          parent:stpGeneral.GetStep({stepIndex:1}).window.Conteiner_GetColData({x:0,y:1}).col,
-        });
-        var mdProvideer = new Modal({
-          parent:grBody.GetColData({x:0,y:0}).col,
-        });
-        stpGeneral.SetStepIndex({stepIndex:0});
-        
-        //---------config cruds--------
-
-        var conections = new ConsCruds({
-
-          test:true,
-          cruds:[
-            {
-              name:"buy",
-              active:true,
-              script:{
-                parent:grBody.GetColData({x:0,y:1}).col,
-                title:"compra",head:true,
+              crud:{
+                parent:"prnt-buy",name:"cr-buy",
+                title:"compra",schema:sch_buys,
                 panels:[
-                  {col:12,y:0,title:"principal",tipe:"form",blocked:false},
-                  {col:12,y:0,title:"proveedor",tipe:"form",blocked:false},
-                ],
-                stateStart:"block",
-                afterUpdate:"block",
-                stateTools:[
                   {
-                      name:"reload",
-                      tools:[
-                          {name:"config",show:false},
-                          {name:"load",show:true},
-                          
-                          {name:"excel",show:false},
-                          {name:"pdf",show:false},
-              
-                          {name:"sizes",show:false,value:1},
-                          {name:"reload",show:true},
-                          {name:"update",show:true},
-                          {name:"new",show:true},
-                          {name:"insert",show:false},
-                          {name:"cancel",show:false},
-                          
-                          {name:"pages",show:false},
-                      ],
+                    tipe:"form",title:"informacion general",col:4,
+                    fieldsSet:[
+                      {value:"date",state:"edit"},
+                      {value:"state",state:"edit"},
+                      {value:"provideer",state:"edit"},
+                      {value:"total",state:"show"},
+                    ],
                   },
                   {
-                      name:"new",
-                      tools:[
-                          {name:"config",show:false},
-                          {name:"load",show:true},
-                          
-                          {name:"excel",show:false},
-                          {name:"pdf",show:false},
-              
-                          {name:"sizes",show:false,value:1},
-                          {name:"reload",show:false},
-                          {name:"update",show:false},
-                          {name:"new",show:false},
-                          {name:"insert",show:true},
-                          {name:"cancel",show:false},
-                          
-                          {name:"pages",show:false},
-                      ],
+                    tipe:"form",head:false,col:8,
+                    fieldsSet:[
+                      {action:"div",name:"prnt-buy-stps"},
+                    ],
                   },
                   {
-                    name:"block",
-                    tools:[
-                        {name:"config",show:false},
-                        {name:"load",show:false},
-                        
-                        {name:"excel",show:false},
-                        {name:"pdf",show:false},
-            
-                        {name:"sizes",show:false,value:1},
-                        {name:"reload",show:false},
-                        {name:"update",show:false},
-                        {name:"new",show:false},
-                        {name:"insert",show:true},
-                        {name:"cancel",show:false},
-                        
-                        {name:"pages",show:false},
+                    tipe:"form",title:"total",
+                    fieldsSet:[
+                      {value:"total",state:"show",showBox:bx_moneyh1},
                     ],
-                  }
-                ],
-                questions:[
-                  {
-                    value:"v1",
-                    elementsInfo:[
-                      {
-                        id:"bodyMain_conteiner_undefined_row_1_div_1_1_conteiner_undefined_row_0_div_0_0_block5_button0",
-                        descripcion:"selecciona para mostrar lista de productos/insumos",
-                      },
-                      {
-                        id:"bodyMain_conteiner_undefined_row_1_div_1_1_conteiner_undefined_row_0_div_0_0_block5_button1",
-                        descripcion:"selecciona para mostrar lista de pagos",
-                      },
-                    ],
-                  }
-                ],
-
-                tableMain:"buys",
-                selects:[
-                  {table:'buys', field:'ID_BUY',primary:true},
-                  {table:'buys', field:'DATE_EMMIT'},
-                  {table:'buys', field:'ID_BUY_STATUS'},
-                  {table:'buys', field:'ID_PROVIDEER'},
-                  {table:'buys', field:'TOTAL'},
-                ],
-                inserts:[
-                  {
-                    field:"ID_COMPANY",
-                    value:userData.company.id,
-                  }
-                ],
-                loads:[
-                  {
-                    name:"ld-provideers",
-                    tableMain:"provideers",
-                    selects:[
-                      {table:"provideers",field:"ID_PROVIDEER",as:"value"},
-                      {table:"provideers",field:"NAME",as:"show"},
-                    ],
-                    conditions:[{
-                      table:"provideers",
-                      field:"ID_COMPANY",
-                      inter:"=",
-                      value:company_id,
-                    }],
                   },
-                ],
-
-                fields:[
-                  {panel:"principal",col:12,y:0,name:"id",box:{tipe:0},select:"ID_BUY",descripcion:"nro de compra"},
-                  {panel:"principal",col:12,y:1,name:"fecha de emision",box:bx_date,select:"DATE_EMMIT",descripcion:"fecha de la compra"},
-                  {panel:"principal",col:12,y:2,name:"estado",box:{tipe:3,options:op_buys_status,value:1},select:"ID_BUY_STATUS",descripcion:"estado de la compra"},
-                  {panel:"principal",col:12,y:3,name:"total",box:bx_moneyh3,select:"TOTAL",descripcion:"total del costo de la compra"},
-                  {panel:"principal",col:12,y:4,name:"pagado",box:bx_money,descripcion:"total pagado"},
-
-                  {panel:"proveedor",col:12,y:0,name:"proveedor",box:{tipe:8,value:1,class:"w-100"},select:"ID_PROVIDEER",load:{name:"ld-provideers",show:"show"},descripcion:"selecciona el proveedor de la compra"},
-                  {panel:"proveedor",col:6,...fld_edit,descripcion:"edita informacion del proveedor"},
-                  {panel:"proveedor",col:6,...fld_add,descripcion:"añade nuevo proveedor"},
-                  
                 ],
               }
             },
             {
-              name:"provieeder",
-              active:true,
-              script:{
-                parent:mdProvideer.GetContent(),
-                title:"proveedor",
-                panels:[{col:12,y:0,title:"main",tipe:"form"}],
-                stateTools:stTls_fm_maid, 
-                stateStart:"block",
-                afterInsert:"block",
-                afterUpdate:"block",
-                afterCancel:"block",
-
-                tableMain:"provideers",
-                selects:[
-                  {table:'provideers', field:'ID_PROVIDEER',primary:true},
-                  {table:'provideers', field:'ID_COMPANY'},
-                  {table:'provideers', field:'NAME'},
-                  //{table:'provideers', field:'ID_PROVIDEER_TIPE'},
-                  {table:'provideers', field:'RUC'},
-                ],
-                inserts:ins_general,
-
-                fields:[
-                  {panel:"main",name:"nombre",box:bx_input,select:"NAME",descripcion:"nombre del proveedor"},
-                  {panel:"main",name:"ruc",box:bx_input,select:"RUC",descripcion:"ruc del proveedor"},
-                ],
-                events:[
-                  {
-                    name:"modalSetActive",
-                    actions:[{
-                      action:({k,active})=>{
-
-                        mdProvideer.SetActive({active});
-                      }
-                    }]
-                  }
+              steps:{
+                parent:"prnt-buy-stps",
+                items:[
+                  {name:"stp-pays",title:"pagos"},
+                  {name:"stp-products",title:"items"},
                 ],
               }
             },
+            //----products------
             {
-              name:"products",
-              active:true,
-              script:{
-
-                parent:stpGeneral.GetStep({stepIndex:0}).window.Conteiner_GetColData({x:0,y:0}).col,
-                title:"lista de productos",head:false,
+              crud:{
+                parent:"stp-products",name:"cr-buy-products",
+                title:"lista de compras",schema:sch_buys_products,
                 panels:[
-                  {col:12,y:0,title:"main",tipe:"table",h:600},
+                  {
+                    tipe:"table",h:600,
+                    fieldsSet:[
+                      {value:"item",state:"edit"},
+                      {value:"cant",state:"edit"},
+                      {value:"costUnit",state:"edit"},
+                      {value:"costTotal",state:"edit"},
+                    ],
+                  }
                 ],
-                stateStart:"block",
-                stateTools:stTls_tb_maid,
-
-                tableMain:"buys_products",
+              }
+            },
+            //-----pays------
+            {
+              crud:{
+                parent:"stp-pays",name:"cr-buy-pays",h:0,
+                title:"lista de pagos",schema:sch_buys_payments,
                 selects:[
-                  {table:'buys_products', field:'ID_BUY_PRODUCT',primary:true},
-                  {table:'buys_products', field:'ID_BUY'},
-                  {table:'buys_products', field:'ID_PRODUCT'},
-                  {table:'buys_products', field:'CANT'},
-                  {table:'buys_products', field:'COST_UNIT'},
-                  {table:'buys_products', field:'COST_TOTAL'},
-                  {table:"unids",field:"SIMBOL"},
+                  {table:sch_buys_payments.table,field:"ID_PAY"},
+                  {table:sch_pays.table,field:"TOTAL"},
+                  {table:sch_accounts.table,field:"NAME"},
                 ],
                 joins:[
                   {
-                    main:{table:"buys_products",field:"ID_PRODUCT"},
-                    join:{table:"products",field:"ID_PRODUCT"},
+                    main:{table:sch_buys_payments.table,field:"ID_PAY"},
+                    join:{table:sch_pays.table,field:"ID_PAY"},
                     tipe:"LEFT",
                   },
                   {
-                    main:{table:"products",field:"UNID_ID"},
-                    join:{table:"unids",field:"ID_UNID"},
+                    main:{table:sch_pays.table,field:"ID_ACCOUNT"},
+                    join:{table:sch_accounts.table,field:"ID_ACCOUNT"},
                     tipe:"LEFT",
                   }
                 ],
-                loads:[
+                panels:[
                   {
-                    name:"ld-supplies-products",
-                    tableMain:"products",
-                    selects:[
-                        {table:'products', field:'ID_PRODUCT',as:"value"},
-                        {table:'products', field:'NAME',as:"show"},
+                    tipe:"table",head:false,
+                    fields:[
+                      {name:"total",box:{...bx_money},select:"TOTAL",attributes:[{name:"style",value:"min-width:100px"}]},
+                      {name:"cuenta",box:{...bx_shw},select:"NAME",attributes:[{name:"style",value:"min-width:150px"}]},
                     ],
-                    conditions:[
-                        {
-                            before:"(",
-                            table:"products",
-                            field:"ID_PRODUCT_TIPE",
-                            inter:"=",
-                            value:2,
-                        },
-                        {
-                            before:" OR ",
-                            table:"products",
-                            field:"ID_PRODUCT_TIPE",
-                            inter:"=",
-                            value:3,
-                            after:") "
-                        },
-                        {
-                            before:" AND ",
-                            table:"products",
-                            field:"ACTIVE",
-                            inter:"=",
-                            value:1,
-                        },
-                        {
-                            before:" AND ",
-                            table:"products",
-                            field:"ID_COMPANY",
-                            inter:"=",
-                            value:company_id,
-                        },
+                    fieldsSet:[
+                      //{value:"idBuy",state:"show"},
+                      //{value:"idPay",state:"show"},
                     ],
-                  }
-                ],
-
-                fields:[
-                  {panel:"main",...fld_delete,attributes:att_btn},
-                  //{panel:"main",name:"id",box:{tipe:0},select:"ID_BUY_PRODUCT"},
-                  //{panel:"main",name:"id compra",box:{tipe:0},select:"ID_BUY"},
-                  {panel:"main",name:"producto/insumo",box:{tipe:8,class:"w-100"},attributes:att_ln,select:"ID_PRODUCT",load:{name:"ld-supplies-products",show:"show"},descripcion:"selecciona producto/insumo"},
-                  {panel:"main",name:"unidad",box:bx_shw,select:"SIMBOL",descripcion:"unidad del producto/insumo"},
-                  {panel:"main",name:"cantidad",box:bx_cant,attributes:att_cnt,select:"CANT",descripcion:"cantidad del producto/insumo"},
-                  //{panel:"main",name:"unidad",box:{tipe:1}},
-                  {panel:"main",name:"costo unitario",box:{tipe:1,value:0},attributes:att_cnt,select:"COST_UNIT",descripcion:"costo unitario del producto/insumo, calcula automaticamente"},
-                  {panel:"main",name:"costo total",box:{tipe:1,value:0},attributes:att_cnt,select:"COST_TOTAL",descripcion:"costo total del producto/insumo, calcula automaticamente"},
-                ],
-
-                events:[
-                  {
-                    name:"calculateTotal",
-                    actions:[
-                      {
-                        action:({k})=>{
-              
-                          var costTotal = 0;
-                          var costTotalValues = k.GetValues({fieldName:"costo total"});
-                          costTotalValues.forEach(ct => {
-                            
-                            costTotal += parseFloat(ct);
-                          });
-                          
-                          var cr_buy = conections.Crud_GetBuild({name:"buy"});
-                          cr_buy.SetValuesToBox({values:[costTotal],fieldName:"total"});
-                          var data = cr_buy.Reload_GetData();
-                          if(data.length>0){
-              
-                            cr_buy.Update_AddChange({
-                              fieldName:"total",
-                              value:costTotal,
-                              primary:data[0]["ID_BUY"]
-                            });
-                          }            
-                        }
-                      }
-                    ],
-                  },
-                  {
-                    name:"printAfter",
-                    actions:[
-                      {
-                        action:({k})=>{
-              
-                          k.CallEvent({name:"calculateTotal"});    
-                        }
-                      }
-                    ],
-                  },
-                  {
-                    name:"updateAfter",
-                    actions:[
-                      {
-                        action:({k})=>{
-                        
-                          k.CallEvent({name:"calculateTotal"});    
-                        }
-                      }
-                    ],
-                  },
-                  {
-                    name:"boxUpdate",
-                    actions:[{
-                      action:({field,k,y})=>{
-
-                        if(k.StateGet()=="new"){
-
-                          var cant = parseFloat(k.GetValue({fieldName:"cantidad",y}));
-                          var tot = parseFloat(k.GetValue({fieldName:"costo total",y}));
-                          var uni  = parseFloat(k.GetValue({fieldName:"costo unitario",y}));
-
-                          if(field.name == "cantidad"){
-
-                            if(tot!=0) uni = tot/cant;
-
-                            if(uni!=0) tot = cant * uni;
-                          }
-
-                          if(field.name == "costo unitario")  tot = cant * uni;
-                          if(field.name == "costo total")  uni = tot/cant;
-
-                          k.SetValue({fieldName:"cantidad",y,value:cant});
-                          k.SetValue({fieldName:"costo unitario",y,value:uni});
-                          k.SetValue({fieldName:"costo total",y,value:tot});
-                        }
-                      }
-                    }]
                   }
                 ],
               }
             },
             {
-              name:"pays",
-              active:true,
-              script:{
-                ...scr_fm_pays({
-                  head:false,
-                  parent:stpGeneral.GetStep({stepIndex:1}).window.Conteiner_GetColData({x:0,y:0}).col,
-                  tableName:"buys_payments",
-                  priFieldName:"ID_BUY_PAY",
-                  joinFieldName:"ID_BUY",
-                  events:[
-                    {
-                      name:"calculateTotal",
-                      actions:[
-                        {
-                          action:({k})=>{
-                
-                            var payTotal = 0;
-                            var costTotalValues = k.GetValues({fieldName:"total"});
-                            costTotalValues.forEach(ct => {
-                              
-                              payTotal += parseFloat(ct);
-                            });
-                            
-                            var cr_buy = conections.Crud_GetBuild({name:"buy"});
-                            cr_buy.SetValuesToBox({values:[payTotal],fieldName:"pagado"});         
-                          }
-                        }
-                      ],
-                    },
-                    {
-                      name:"printAfter",
-                      actions:[{
-                        action:({k})=>{
-        
-                          k.CallEvent({name:"calculateTotal"});
-                        }
-                      }]
-                    },
-                  ],
-                }),          
+              crud:{
+                parent:"md-pay",name:"cr-buy-pay",
+                title:"pago",schema:sch_pays,
+                panels:[
+                  {
+                    tipe:"form",head:false,
+                    fieldsSet:[
+                      {value:"date",state:"edit"},
+                      {value:"account",state:"edit"},
+                      {value:"total",state:"edit"},
+                      {value:"tag",state:"edit"},
+                      {value:"income",state:"edit"},
+                    ],
+                  }
+                ],
               }
-            },
-            {
-              name:"pay",
-              active:true,
-              script:{
-                parent:mdPay.GetContent(),
-                ...scr_pay({
-                  tagValue:2,
-                  events:[
-                    {
-                      name:"modalSetActive",
-                      actions:[
-                        {
-                          action:({active})=>{
-                
-                            mdPay.SetActive({active});
-                          }
-                        }
-                      ],
-                    },
-                  ],
-                }),
-              },
-            },
+            }
           ],
-
-
           conections:[
             {
-              tipe:"fm-tb",
-              master:"buy",
-              masterField:"ID_BUY",
-              maid:"products",
-              maidField:"ID_BUY"
+              masterName:"cr-buy",
+              masterSelect:"ID_BUY",
+              event:"list",
+              maidName:"cr-buy-products",
+              maidSelect:"ID_BUY",
             },
             {
-              tipe:"fm-tb",
-              master:"buy",
-              masterField:"ID_BUY",
-              maid:"pays",
-              maidField:"ID_BUY"
+              masterName:"cr-buy",
+              masterSelect:"ID_BUY",
+              event:"list",
+              maidName:"cr-buy-pays",
+              maidSelect:"ID_BUY",
             },
             {
-              tipe:"tb-fm",
-              master:"pays",
-              masterField:"ID_PAY",
-              maid:"pay",
-              maidField:"ID_PAY",
-            },
-            {
-              tipe:"fm-fm",
-              master:"buy",
-              masterActionEdit:"edit",
-              masterActionAdd:"add",
-              masterField:"proveedor",
-              maid:"provieeder",
-              maidField:"ID_PROVIDEER",
-            },
-          ],
-
-
-          searchs:[
-            {
-              crudName:"buy",
-              valueName:"id_buy",
-              fieldName:"ID_BUY"
+              masterName:"cr-buy-pays",
+              masterSelect:"ID_PAY",
+              event:"tableForm",
+              maidName:"cr-buy-pay",
+              maidSelect:"ID_PAY",
             },
           ],
         });
