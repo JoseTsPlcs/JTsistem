@@ -1415,11 +1415,11 @@ function src_item_fm({userData}){
             
             {panel:"main",col:12,tipe:1,name:"tipo",box:{...bx_op({ops:op_products_tipe})},select:"ID_PRODUCT_TIPE",descripcion:"seleccionar si es producto/servicio/insumo"},
 
-            (item_config?{panel:"main",col:8,tipe:1,colAllLevel:true,name:"etiqueta",box:{tipe:3,value:1},select:"ID_PRODUCT_TAG",load:{name:"ld-products_tags",show:"show"},descripcion:"seleccionar etiqueta"}:null),
+            (true?{panel:"main",col:8,tipe:1,colAllLevel:true,name:"etiqueta",box:{tipe:3,value:1,class:"w-100"},select:"ID_PRODUCT_TAG",load:{name:"ld-products_tags",show:"show"},descripcion:"seleccionar etiqueta"}:null),
             (item_config?{panel:"main",col:2,tipe:0,colAllLevel:true,name:"edit-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-pencil-square"></i>'},action:"edit-tag",descripcion:"editar etiqueta"}:null),
             (item_config?{panel:"main",col:2,tipe:0,colAllLevel:true,name:"add-tag",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-plus-circle"></i>'},action:"add-tag",descripcion:"añadir etiqueta"}:null),
 
-            (item_config?{panel:"main",col:8,tipe:1,colAllLevel:true,name:"unidad",box:{...bx_op({ops:[]})},select:"UNID_ID",load:{name:"ld-unids",show:"show"},descripcion:"seleccionar unidad"}:null),
+            (true?{panel:"main",col:8,tipe:1,colAllLevel:true,name:"unidad",box:{...bx_op({ops:[]}),class:"w-100"},select:"UNID_ID",load:{name:"ld-unids",show:"show"},descripcion:"seleccionar unidad"}:null),
             (item_config?{panel:"main",col:2,tipe:0,colAllLevel:true,name:"edit-und",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-pencil-square"></i>'},action:"edit-und",descripcion:"editar unidad"}:null),
             (item_config?{panel:"main",col:2,tipe:0,colAllLevel:true,name:"add-und",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-plus-circle"></i>'},action:"add-und",descripcion:"añadir unidad"}:null),
 
