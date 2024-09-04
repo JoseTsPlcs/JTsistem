@@ -746,14 +746,13 @@ class Crud_set extends ODD {
                     
                     //console.log(box);
                     box.SetOptions(loadOptions);
+                    box.SetValue(loadOptions[0].value);
                 }); 
             }
 
             //console.log(field.box.options!=null);
 
         });
-
-        console.log(this.#fields);
 
         //filters
         this.#filters.Filters_Get().forEach(filter=>{
@@ -1200,8 +1199,8 @@ class Crud_set extends ODD {
 
                 fieldsOfPanel.forEach(f => {
                     
-                    if(f.action == "edit") console.log("new -> field:",f);
-                    this.SetValuesToBox({values:[f.box.value],fieldName:f.name});
+                    var value = f.load ? this.Loaded_GetLoadData({loadName:f.load.name}).result[0].value : f.box.value;
+                    this.SetValuesToBox({values:[value],fieldName:f.name});
                 });
 
                 break;

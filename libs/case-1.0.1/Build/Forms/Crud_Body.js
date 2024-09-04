@@ -309,7 +309,9 @@ class Crud_Body extends ODD {
 
             fieldsOfPanel.forEach(f => {
                 
-              panel.build.fieldSetValues({values:[f.box.value],fieldName:f.name});
+              var value = f.box.value;
+              if(f.box.options) value = f.box.options[0].value;
+              panel.build.fieldSetValues({values:[value],fieldName:f.name});
             });
 
             break;

@@ -120,6 +120,7 @@ const sch_items = {
 
     table:"products",
     fieldPrimary:"ID_PRODUCT",
+    company:true,
     fields:[
         {
             value:"idItem",
@@ -238,6 +239,7 @@ const sch_items = {
 const sch_unids = {
     table:"unids",
     fieldPrimary:"ID_UNID",
+    company:true,
     fields:[
         {
             value:"name",
