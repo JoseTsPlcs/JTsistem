@@ -138,8 +138,8 @@ $(document).ready(function() {
                   actions:[{
                     action:({result,k})=>{
 
-                      console.log("PRINT BEFORE", result);
                       var period = k.bodyGet().configGetWindowFilters().Filter_GetBox({filterName:"rango de fecha"}).GetValue();
+                      console.log("PRINT BEFORE",period, result);
 
                       var products = [];
                       var dates = [];
@@ -147,6 +147,7 @@ $(document).ready(function() {
                       result.forEach(rst => {
                         
                         var dateLabel = Date_GetLabel({dateString:rst["DATE_EMMIT"],period});
+                        
                         if(!dates.find(d=>d==dateLabel)) dates.push(dateLabel);
 
                         var productFound = products.find(p=>p.id == rst["ID_PRODUCT"]);

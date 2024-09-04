@@ -346,7 +346,10 @@ class Crud_Master extends ODD {
 
     ReloadDataSetAdd({dataSetName,result=[]}){
 
-        this.#reloadDataSets.push({name:dataSetName,result});
+        var dataSet = this.ReloadDataSetGet({dataSetName});
+        if(dataSet == null) this.#reloadDataSets.push({name:dataSetName,result});
+        else dataSet.result = result;
+        
     }
 
     ReloadDataSetGet({dataSetName}){
