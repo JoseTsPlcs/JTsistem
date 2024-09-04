@@ -17,6 +17,7 @@ $(document).ready(function() {
             }
           },
           {modal:{parent:"prnt-md-recipe",name:"md-recipe"}},
+          //--------contorl------
           {
             crud:{
               parent:"prnt-items",name:"cr-items",
@@ -30,11 +31,13 @@ $(document).ready(function() {
                     {value:"tipe",state:"show",filter:{value:[op_products_tipe[1].show,op_products_tipe[2].show]}},
                     {value:"tag",state:"show"},
                     {value:"unid",state:"show"},
+                    {value:"produccionAutomate",state:"show"},
                   ],
                 }
               ],
             }
           },
+          //--------form------
           {
             crud:{
               parent:"md-recipe",name:"cr-recipe",
@@ -47,6 +50,7 @@ $(document).ready(function() {
                     {value:"tipe",state:"show"},
                     {value:"cantRecipe",state:"edit",col:12},
                     {value:"unid",state:"show",col:12,tipe:0},
+                    {value:"produccionAutomate",state:"edit",col:12},
                     {name:"prnt-recipe-inputs",action:"div"},
                   ],
                 }

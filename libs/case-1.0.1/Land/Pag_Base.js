@@ -85,9 +85,13 @@ var PagesData = [
       paginas:[
           {state:"active",name:'informSales',title:"ventas pagadas",href:"inform_sales.php"},
           {state:"active",name:'informProducts',title:"productos vendidos",href:"inform_products.php"},
-          {state:"hide",name:'informPay',title:"ventas - por cobrar",href:"inform_nopaid.php"},
-          {state:"hide",name:'informTransacctions',title:"transacciones",href:"inform_pays.php"},
-          {state:"hide",name:'informAccounts',title:"contador",href:"inform_accounts.php"},
+          {state:"active",name:'informCustomers',title:"clientes frecuentas",href:"inform_customers.php"},
+          //{state:"active",name:'informBuys',title:"compras",href:"inform_buys.php"},
+          //{state:"active",name:'informProduccions',title:"produccion",href:"inform_buys.php"},
+
+          //{state:"hide",name:'informPay',title:"ventas - por cobrar",href:"inform_nopaid.php"},
+          //{state:"hide",name:'informTransacctions',title:"transacciones",href:"inform_pays.php"},
+          //{state:"hide",name:'informAccounts',title:"contador",href:"inform_accounts.php"},
       ],
   },
   {

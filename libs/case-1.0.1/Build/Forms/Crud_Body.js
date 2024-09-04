@@ -80,6 +80,42 @@ class Crud_Body extends ODD {
       
     }
     panelGet({panelName}){return this.#panels.find(panel=>panel.build.nameGet()==panelName);}
+    
+    #panelsBuild(){
+
+      this.#panelsGrid = new Grid({
+        parent:this.#bodyForm.Field_GetBox({fieldName:"body-cont"}).Blocks_Get()[0],
+        ...GetGridConfig({panels:this.#panels}),
+      });
+     
+      let k = this;
+      for (let p = 0; p < this.#panels.length; p++) {
+
+        var panel = this.#panels[p];
+        var panelParent = this.#panelsGrid.GetColData({x:panel.x,y:panel.y}).col;
+        panel.build = new Panel({
+          parent:panelParent,
+          name:"panel"+p,
+          ...panel,
+          events:[
+            {
+              name:"boxUpdate",
+              actions:[{
+                action:(params)=>{k.CallEvent({name:"boxUpdate",params})}
+              }]
+            }
+          ],
+        });
+
+      }
+      
+    }
+
+    #panelsGetParent({parentName}){
+
+
+    }
+
 
     fieldsGet(){
 
@@ -309,6 +345,7 @@ class Crud_Body extends ODD {
                   box.Block({active});
                 });
               });
+              //panel.build.buildGet().Conteiner_Show({show:active,slow:active});
 
             break;
         }

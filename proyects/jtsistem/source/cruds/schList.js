@@ -222,6 +222,16 @@ const sch_items = {
             tipe:"input",
             descripcion:"cantidad que se obtiene al momento de realizar la receta",
         },
+        {
+            value:"produccionAutomate",name:"produccion automatica",
+            tipe:"options",access:true,
+            options:[
+                {value:0,show:"produccion manual",class:"rounded text-center bg-primary text-white"},
+                {value:1,show:"produccion automatica",class:"rounded text-center bg-warning text-white"},
+            ],
+            select:"PRODUCCION_AUTOMATE",
+            descripcion:"",
+        }
     ],
 }
 

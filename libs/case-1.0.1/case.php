@@ -29,8 +29,9 @@ echo '<script src="'.$src.'Build/Modulos/Config.js"></script>';
 echo '<script src="'.$src.'Build/Modulos/List.js"></script>';
 
 echo '<script src="'.$src.'Build/Forms/Panel.js"></script>';
-echo '<script src="'.$src.'Build/Forms/PanelForm.js"></script>';
-echo '<script src="'.$src.'Build/Forms/PanelTable.js"></script>';
+echo '<script src="'.$src.'Build/Forms/PanelBuild.js"></script>';
+echo '<script src="'.$src.'Build/Forms/PanelKpi.js"></script>';
+echo '<script src="'.$src.'Build/Forms/PanelChart.js"></script>';
 
 echo '<script src="'.$src.'Build/Forms/Crud.js"></script>';
 echo '<script src="'.$src.'Build/Forms/Crud_Body.js"></script>';

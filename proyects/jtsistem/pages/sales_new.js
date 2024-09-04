@@ -718,8 +718,8 @@ $(document).ready(function() {
                 //{panel:"main",name:"tipo",box:{tipe:0,options:op_products_tipe},attributes:att_shw,select:"ID_PRODUCT_TIPE",descripcion:"muestra el tipo de (producto/servicio)"},
                 //{panel:"main",name:"unidad",box:bx_shw,attributes:att_shw,select:"SIMBOL",descripcion:"muestra la unidad del (producto/servicio)"},
                 {panel:"main",name:"cantidad",box:bx_cant,attributes:att_cnt,select:"CANT",descripcion:"muestra la cantidad de (producto/servicio) que se esta vendiendo"},
-                {panel:"main",name:"precio unitario",box:(acc_price_update?{tipe:1,value:0}:bx_money),attributes:att_shw,select:"PRICE_UNIT",descripcion:((acc_price_update?"seleccion":"muestra")+" precio unitario del (producto/servicio)")},
-                {panel:"main",name:"precio total",box:(acc_price_update?{tipe:1,value:0}:bx_money),attributes:att_shw,select:"PRICE_TOTAL",descripcion:((acc_price_update?"seleccion":"muestra")+" precio total del (producto/servicio)")},
+                {panel:"main",name:"precio unitario",box:(acc_price_update?{tipe:1,value:0}:bx_money),attributes:[{name:"style",value:"min-width:120px;"}],select:"PRICE_UNIT",descripcion:((acc_price_update?"seleccion":"muestra")+" precio unitario del (producto/servicio)")},
+                {panel:"main",name:"precio total",box:(acc_price_update?{tipe:1,value:0}:bx_money),attributes:[{name:"style",value:"min-width:120px;"}],select:"PRICE_TOTAL",descripcion:((acc_price_update?"seleccion":"muestra")+" precio total del (producto/servicio)")},
                 (acc_item_worker?{panel:"main",name:"trabajador asignado",attributes:att_ln50,box:{tipe:8,value:"null",class:"w-100"},select:"ID_WORKER",load:{name:"ld-workers",show:"show",value:"value"},descripcion:"selecciona al trabajador asignado al (producto/servicio)"}:null)
               ],
               events:[
