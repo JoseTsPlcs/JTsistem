@@ -68,29 +68,44 @@ $(document).ready(function() {
               ],
               loads:[
                   //ld_unids,
-                  ld_products_tags,
+                  {
+                    name:"ld-products_tags",
+                    tableMain:"products_tags",
+                    selects:[
+                      {table:"products_tags",field:"ID_PRODUCT_TAG",as:"value"},
+                      {table:"products_tags",field:"NAME",as:"show"},
+                    ],
+                    conditions:[
+                      {
+                        table:"products_tags",
+                        field:"ID_COMPANY",
+                        inter:"=",
+                        value:userData.company.id,
+                      },
+                    ],
+                  }
               ],
               conditions:[
                 {
                   table:"sales",
                   field:"ID_COMPANY",
                   inter:"=",
-                  value:company_id,
+                  value:userData.company.id,
                 },
-                {
+                /*{
                   before:" AND ",
                   table:"sales",
                   field:"PAID",
                   inter:"=",
                   value:1,
-                },
-                {
+                },*/
+                /*{
                   before:" AND ",
                   table:"sales",
                   field:"ID_STATUS",
                   inter:"!=",
                   value:5,
-                },
+                },*/
               ],
 
               configShow:true,    
@@ -100,7 +115,7 @@ $(document).ready(function() {
                   {col:6,name:"fecha max",box:{tipe:2,value:Date_EndQuarter()},select:{table:"sales",field:"DATE_EMMIT",tipe:"max"},descripcion:"buscar por fecha menor o igual a las seleccionada"},
                   {name:"producto",box:bx_input,select:{table:"products",field:"NAME"},descripcion:"buscar por nombre de producto/servicio/insumo"},
                   {name:"tipo",box:{tipe:4,options:op_products_tipe},select:{table:"products",field:"ID_PRODUCT_TIPE"},descripcion:"buscar por producto/servicio/insumo"},
-                  (true?{name:"etiqueta",box:{tipe:4,options:[]},select:{table:"products",field:"ID_PRODUCT_TAG"},load:{name:"ld-products_tags",show:"show"},descripcion:"buscar por etiqueta"}:null),
+                  {name:"etiqueta",box:{tipe:4,options:[]},select:{table:"products",field:"ID_PRODUCT_TAG"},load:{name:"ld-products_tags",show:"show"},descripcion:"buscar por etiqueta"},
               ],
               panels:[
                 {
@@ -195,7 +210,7 @@ $(document).ready(function() {
                       console.log("TRANSFORM DATA",products,dates);
                       k.ReloadDataSetAdd({dataSetName:"products",result:products});
                       
-                      EvolProduct({productName:products[0].name});
+                      if(products.length > 0) EvolProduct({productName:products[0].name});
 
                       //-----print top list-----
 
