@@ -337,6 +337,22 @@ class Crud_Master extends ODD {
     //reload
 
     #reloadData = [];
+    #reloadDataSets = [
+        /*{
+            name:"main",
+            results:[],
+        },*/
+    ];
+
+    ReloadDataSetAdd({dataSetName,result=[]}){
+
+        this.#reloadDataSets.push({name:dataSetName,result});
+    }
+
+    ReloadDataSetGet({dataSetName}){
+
+        return this.#reloadDataSets.find(st=>st.name==dataSetName);
+    }
 
     Reload_GetData(){
 
@@ -469,6 +485,13 @@ class Crud_Master extends ODD {
                 var select = field.select;
                 
                 if(select || field.action!=null){
+
+                    if(panel.dataSet != null){
+
+                        var dataset = this.#reloadDataSets.find(dst=>dst.name==panel.dataSet);
+                        if(dataset != null) result = dataset.result;
+                        else result = [];
+                    }
 
                     var values = result.map(rst=>{return select ? rst[select] : field.box.value});
                     panel.build.fieldSetValues({fieldName:field.name,values});

@@ -192,6 +192,7 @@ class ConsInform extends ODD {
     
                 var chartParent = document.createElement("canvas");
                 parent.appendChild(chartParent);
+                
                 console.log("evol:",chart);
                 chart.build = new Chart(chartParent, {
                     type: 'bar',

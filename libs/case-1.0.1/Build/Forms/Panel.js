@@ -11,7 +11,13 @@ class Panel extends ODD {
 
     #tipe = "";
     tipeGet(){return this.#tipe;}
+
     #title = "";
+    titleSet({title}){
+        
+        if(this.#build instanceof PanelBuild) this.#build.titleSet({title});
+    }
+
     #name = "";
     nameGet(){return this.#name;}
 
@@ -30,6 +36,7 @@ class Panel extends ODD {
         for (let fld = 0; fld < fields.length; fld++) {
             
             var field = fields[fld];
+            if(field.title == null) field.title = field.name;
             field.index = fld;
             field.panel = {name:this.#name,build:null};
         }
@@ -43,6 +50,10 @@ class Panel extends ODD {
     }
     fieldSetValues({fieldName,values=[]}){
         
+        if(this.#build instanceof PanelBuild){
+
+            this.#build.fieldSetValues({fieldName,values});
+        }
 
         switch (this.#tipe) {
 
@@ -64,6 +75,11 @@ class Panel extends ODD {
 
     }
     fieldGetBoxes({fieldName}){
+
+        if(this.#build instanceof PanelBuild){
+
+            return this.#build.fieldGetBoxes({fieldName});
+        }
 
         var boxs = [];
 
@@ -100,18 +116,10 @@ class Panel extends ODD {
     #panelWindow = null;
     #panelConteiner = null;
     #build = null;
+    buildGet(){return this.#build};
 
-    #Build({parent,head=true,h}){
+    #Build({parent,head=true,h,maxH}){
 
-        /*this.#panelWindow = new Window({
-            parent,title:"title panel",h:0,
-            head:false,blocked:true,
-            grid:{
-                cols:[[12]],
-            }
-        });
-
-        this.#panelConteiner = this.#panelWindow.Conteiner_GetColData({x:0,y:0}).col;*/
         this.#panelConteiner = parent;
         let k = this;
 
@@ -129,12 +137,13 @@ class Panel extends ODD {
                 ],
             }
         ];
+        
 
         switch (this.#tipe) {
             case "table":
 
                 this.#build = new Table_Grid({
-                    head:false,h,
+                    head:false,h,maxH,
                     parent:this.#panelConteiner,
                     fields:this._fields,
                     events,
@@ -152,6 +161,26 @@ class Panel extends ODD {
                     events,
                 });
                 
+            break;
+
+            case "kpi":
+
+                this.#build = new PanelKpi({
+                    parent,
+                    title:this.#title,
+                    fields:this._fields,
+                });
+
+            break;
+
+            case "chart":
+                
+                this.#build = new PanelChart({
+                    parent,
+                    title:this.#title,
+                    fields:this._fields,
+                });
+
             break;
         }
     }

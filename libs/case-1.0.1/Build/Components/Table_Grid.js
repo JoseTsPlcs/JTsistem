@@ -25,11 +25,10 @@ class Table_Grid extends ODD {
     this.#fields=fields;
     this.#fields.forEach(f=>{
 
+      if(f.title == null) f.title = f.name;
       f.th = null,
       f.boxs = [];
     });
-
-    //console.log({...fields});
   }
 
   Fields_Add({name,box,attributes=[]}){
@@ -44,7 +43,7 @@ class Table_Grid extends ODD {
     //f.dom = th;
     th.setAttribute("scope","col");
     this.#header_line.appendChild(th);
-    th.innerHTML = name;
+    th.innerHTML = title;
 
     //console.log(this.#header_line);
 
@@ -58,7 +57,7 @@ class Table_Grid extends ODD {
   //#parent = null;
   #header_line =null;
 
-  #Build({parent=null,attributes=[],h}){
+  #Build({parent=null,attributes=[],h,maxH=null}){
 
     if(parent == null){
 
@@ -76,7 +75,7 @@ class Table_Grid extends ODD {
       dom:tb_r,
       startAttributes:[
         {name:"class",value:"table-responsive"},
-        {name:"style",value:(h!=null?"min-height: "+h+"px":"")},
+        {name:"style",value:(h!=null?"min-height: "+h+"px":"") + (maxH ? " max-height: "+maxH+"px" :"")},
       ],
       attributes,
     });
@@ -112,7 +111,7 @@ class Table_Grid extends ODD {
       f.dom = th;
       th.setAttribute("scope","col");
       this.#header_line.appendChild(th);
-      th.innerHTML = f.name;
+      th.innerHTML = f.title;
       f.th = th;
 
       if(f.attributes){

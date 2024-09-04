@@ -87,7 +87,7 @@ function scr_base({schema=null,userData,fieldsSet=[],stateGeneral="hide",parent,
 
         if(field.access != true){
             
-            //console.log("FIELD NEED GET ACSSESS",field,"access:",field.access);
+            
             
             field.access = Access_Get(userData.access,field.access); 
         }
@@ -135,8 +135,6 @@ function scr_base({schema=null,userData,fieldsSet=[],stateGeneral="hide",parent,
                 if(fset.col != null) actFound.col = fset.col;
                 if(fset.label != null) actFound.label = fset.label;
                 if(fset.load != null) actFound.load = fset.load;
-                
-                //if(fset.value=="name")console.log("---------fasmdoaksmdasd",actFound);
                 
                 actives.push(actFound);
             }
@@ -208,7 +206,6 @@ function scr_base({schema=null,userData,fieldsSet=[],stateGeneral="hide",parent,
         });
     }
     //------fields-----
-    console.log("SCR BASE ACTIVES:",actives);
     
     var fields = actives.map(act=>{
 
@@ -505,7 +502,7 @@ function pageBuildCruds({userData,pageData}) {
                                 conection:cnx,y:0,
                             });
 
-                            if(script.title=="orden de produccion") console.log("reloadAfter Event!!!!", k);
+                           
                         
                         }
                     }
@@ -585,7 +582,6 @@ function pageBuildCruds({userData,pageData}) {
 
         
 
-        //if(script.title=="receta") console.log("daskdmaskdkmas SCRIPT!!!-----",script);
 
         crd.build = new Crud_Master({...script});
     });
@@ -662,7 +658,7 @@ class pageBuild extends ODD {
                     labels:layerInfo.grid.labels,
                 });
                 gridScript.parent = this.#parentGetConteiner({layerIndex:layer,parentName:layerInfo.grid.parent});
-                //console.log("LAYER BUILD GRID", gridScript);
+                
                 layerInfo.grid.build = new Grid(gridScript);
         
                 layerInfo.grid.items.forEach(item => {
@@ -752,10 +748,12 @@ class CrudsGroup extends ODD {
         this.#Build(i);
     }
 
-    #setVaribles({}){
+    #setVaribles({test=false}){
 
-
+        this.#test = test;
     }
+
+    #test = true;
 
     #conections = [];
 
@@ -766,21 +764,9 @@ class CrudsGroup extends ODD {
         //this.#crudsBuild({cruds,userData});
     };
 
-    #cruds=[];
-    #crudsBuild({cruds=[],userData}){
+    #cruds=[];#fromPage = null;
 
-        this.#cruds = cruds;
-        this.#cruds.forEach(crud => {
-            
-            var script = this.#crudGetScript({...crud,userData});
-            //script.parent = this.#parentGetConteiner({layerIndex:999,parentName:crud.parent});
-            //console.log("GET SCRIPT OF CRUD ",crud, "SCRIPT:",script);
-            
-            crud.build = new Crud_Master(script);
-        });
-    }
-
-    #crudGetScript({userData,parent,modal,title,head=true,name,schema,panels=[],events=[],joins=[],selects=[],inserts=[],stateType,stateStart="reload"}){
+    #crudGetScriptBySchema({userData,parent,modal,title,head=true,name,schema,panels=[],events=[],joins=[],selects=[],inserts=[],conditions=[],loads=[],stateType,stateStart="reload"}){
 
         let u = this;
 
@@ -792,8 +778,6 @@ class CrudsGroup extends ODD {
                 primary:true
             }
         );
-        var conditions = [];
-        var loads = [];
 
         if(schema.company == true){
 
@@ -811,12 +795,16 @@ class CrudsGroup extends ODD {
         var cnxMasterTbFm = cnxMaster.filter(cnx=>cnx.event=="tableForm");
         var cnxMasterfmFm = cnxMaster.filter(cnx=>cnx.event=="formForm");
         var cnxMasterfmExt = cnxMaster.filter(cnx=>cnx.event=="formExtend");
+        var cnxMasterSearch = cnxMaster.filter(cnx=>cnx.event=="search");
+        var cnxMasterSum = cnxMaster.filter(cnx=>cnx.event=="sum");
+        var cnxMasterIsMaid = this.#conections.filter(cnx=>cnx.maidName==name);
 
         var cnxMaid = this.#conections.filter(cnx=>cnx.maidName==name);
         var cnxMaidList = cnxMaid.filter(cnx=>cnx.event=="list");
         var cnxMaidTbFm = cnxMaid.filter(cnx=>cnx.event=="tableForm");
         var cnxMaidfmFm = cnxMaid.filter(cnx=>cnx.event=="formForm");
         var cnxMaidfmExt = cnxMaid.filter(cnx=>cnx.event=="formExtend");
+        var cnxMaidSum = cnxMaid.filter(cnx=>cnx.event=="sum");
 
         var editName = "edit"; //+ name;
         var addName = "add-" + name;
@@ -829,8 +817,7 @@ class CrudsGroup extends ODD {
         panels.forEach(panel => {
             
             var addFilters = panel.tipe == "table" && (cnxMaster.length == 0 || cnxMasterTbFm.length > 0) && cnxMaid.length == 0;
-            //console.log(addFilters,"CRUD ",name,"CNXMASTER",cnxMaster.length,"CNXMASTERTBFM",cnxMasterTbFm.length,"CNXMAID",cnxMaid.length);
-
+            
             if(panel.fieldsSet){
 
                 if(panel.fields == null) panel.fields=[];
@@ -884,7 +871,7 @@ class CrudsGroup extends ODD {
                             if(fset.showBox) box = {...fset.showBox};
                             if(fsch.options){
                                 box.options = fsch.options;
-                                //box.value = fsch.options.length[0].value;
+                                box.value = fsch.options[0].value;
                             }
                             if(fset.boxValue) box.value = fset.boxValue;
 
@@ -1010,14 +997,14 @@ class CrudsGroup extends ODD {
         
 
         //parent
-        var parentInfo = this.#parentGet({parentName:parent});
+        var parentInfo = this.parentGet({parentName:parent});
         var parentBuild = parentInfo ? parentInfo.build : this.#parent;
         var parent = parentInfo ? parentInfo.conteiner : this.#parent;
 
         var modalBuild = null;
         if(modal){
 
-            var modalInfo = this.#parentGet({parentName:modal});
+            var modalInfo = this.parentGet({parentName:modal});
             modalBuild = modalInfo.build;
         }
         else
@@ -1062,6 +1049,7 @@ class CrudsGroup extends ODD {
         //var stateStart = "reload";
         var afterCancel = "reload";
         var afterInsert = "reload";
+        var afterUpdate = "reload";
         var newActive = true;
         var insertNoAddFields = false;
         var updateCurrent = null;
@@ -1100,6 +1088,7 @@ class CrudsGroup extends ODD {
                 tools:[
                     {name:"load",show:false},
                     {name:"question",show:false},
+                    {name:"insert",show:false},
                 ],
             },
         ];
@@ -1132,6 +1121,26 @@ class CrudsGroup extends ODD {
 
             if(cnxMasterfmFm.length > 0){
 
+                var masterFieldIndex = panels[0].fields.findIndex(f=>f.value==cnxMasterfmFm[0].masterFieldValue);
+                var masterField = panels[0].fields[masterFieldIndex];
+                masterField.tipe = 0;
+                masterField.col = 8;
+
+                panels[0].fields.splice(
+                    masterFieldIndex+1,0,
+                    {
+                    ...fld_edit,
+                    name:editName,col:2
+                    }
+                );
+                panels[0].fields.splice(
+                    masterFieldIndex+1,0,
+                    {
+                    ...fld_add,
+                    name:addName,col:2
+                    }
+                );
+
                 cnxMasterfmFm.forEach(cnx => {
                     
                     this.#crudAddActionEventToScript({
@@ -1143,7 +1152,7 @@ class CrudsGroup extends ODD {
 
                         if(field.name == editName){
                             
-                            var fieldOfValue = schema.fields.find(fsch=>fsch.value == cnx.fieldValue);                            
+                            var fieldOfValue = schema.fields.find(fsch=>fsch.value == cnx.masterFieldValue);                            
                             var value = k.bodyGet().fieldGetValues({fieldName:fieldOfValue.name})[0];
 
                             maidCrud.CrudJoins_Set({
@@ -1170,6 +1179,38 @@ class CrudsGroup extends ODD {
                 statetools[0].tools.find(t=>t.name=="reload").show=true;
                 statetools[0].tools.find(t=>t.name=="update").show=true;
                 statetools[0].tools.find(t=>t.name=="cancel").show=true;
+
+                cnxMaidfmFm.forEach(cnx => {
+                    
+                    this.#crudAddActionEventToScript({
+                        events,
+                        eventName:"insertAfter",
+                        action:({field,value})=>{
+
+                            var crudMaster = u.crudGetBuild({crudName:cnx.masterName});
+                            crudMaster.Load_Reset({success:()=>{
+
+                                
+                                if(modalBuild) modalBuild.SetActive({active:false});
+                                var masterField = crudMaster.bodyGet().fieldsGet().find(f=>f.value==cnx.masterFieldValue);
+                                crudMaster.bodyGet().fieldSetValues({fieldName:masterField.name,values:[value]});
+                            }});
+                        }
+                    });
+
+                    this.#crudAddActionEventToScript({
+                        events,
+                        eventName:"updateAfter",
+                        action:({})=>{
+
+                            if(modalBuild) modalBuild.SetActive({active:false});
+                            
+                            var crudMaster = u.crudGetBuild({crudName:cnx.masterName});
+                            
+                            crudMaster.Load_Reset({});
+                        }
+                    });
+                });
             }
         }
 
@@ -1178,13 +1219,20 @@ class CrudsGroup extends ODD {
 
             
             if(cnxMasterList.length > 0){
-
-                if(cnxMaid.length == 0){
+                
+                if(cnxMasterIsMaid.length == 0){
 
                     statetools[0].tools.find(t=>t.name=="reload").show=true;
                     statetools[0].tools.find(t=>t.name=="update").show=(cnxMasterList[0].type!="show");
-                    statetools[0].tools.find(t=>t.name=="new").show=(cnxMasterList[0].type!="show");
+                    statetools[0].tools.find(t=>t.name=="new").show=this.#test;
                     statetools[0].tools.find(t=>t.name=="pages").show=(cnxMasterList[0].type!="show");
+
+                    if(!this.#test){
+
+                        stateStart = "block";
+                        statetools[2].tools.find(t=>t.name=="insert").show=true;   
+                        //afterUpdate = "block";
+                    }                  
                 }
 
                 cnxMasterList.forEach(cnx => {
@@ -1201,7 +1249,7 @@ class CrudsGroup extends ODD {
                                 field:cnx.maidSelect,
                                 value:k.Reload_GetData()[0][cnx.masterSelect],
                             });
-                            maidCrud.SetState({stateName:"reload"});                           
+                            maidCrud.SetState({stateName:"reload"});                         
                         }
                     });
 
@@ -1220,15 +1268,21 @@ class CrudsGroup extends ODD {
                     this.#crudAddActionEventToScript({
                         events,
                         eventName:"insertAfter",
-                        action:({field,value})=>{
+                        action:({field,value,k})=>{
 
-                            var maidCrud = u.crudGetBuild({crudName:cnx.maidName});
+                            /*var maidCrud = u.crudGetBuild({crudName:cnx.maidName});
                             maidCrud.CrudJoins_Set({
                                 name:"join-"+cnx.masterName,
                                 field:cnx.maidSelect,
                                 value,
                             });
-                            maidCrud.Insert({});
+                            maidCrud.Insert({});*/
+                            k.CrudJoins_Set({
+                                name:"join-"+cnx.masterName,
+                                field:cnx.masterSelect,
+                                value,
+                            });
+                            k.SetState({stateName:"reload"});
                         }
                     });
 
@@ -1241,7 +1295,37 @@ class CrudsGroup extends ODD {
                             var maidCrud = u.crudGetBuild({crudName:cnx.maidName});
                             maidCrud.Update({});
                         }
-                    })
+                    });
+
+                    //blockAfter
+                    this.#crudAddActionEventToScript({
+                        events,
+                        eventName:"blockAfter",
+                        action:({k})=>{
+
+                            var maidCrud = u.crudGetBuild({crudName:cnx.maidName});
+                            maidCrud.SetState({stateName:"block"});
+                        }
+                    });
+
+                    //setStateAfter
+                    this.#crudAddActionEventToScript({
+                        events,
+                        eventName:"setStateAfter",
+                        action:({k,stateName})=>{
+
+                            var open = stateName!="block";
+                            k.bodyGet().panelsGet().forEach(panel => {
+
+                                var build = panel.build.buildGet();
+                                if(build instanceof Window){
+                                                                 
+                                    build.Conteiner_Show({show:open,slow:open,ignoreBlock:true});
+                                }
+                            });
+                        }
+                    });
+
                 });
 
             }
@@ -1337,8 +1421,7 @@ class CrudsGroup extends ODD {
 
                             var maidCrud = u.crudGetBuild({crudName:cnx.maidName});
                             var cnxOfMaid = u.#conections.filter(cnxu=>cnxu.masterName==cnx.maidName);
-                            //console.log("NEW TO MAIDNAME ",cnx.maidName," CONECTIONS: ", u.#conections," state: ",cnxOfMaid);   
-                            
+                           
                             if(cnxOfMaid.length > 0) k.Insert({});
                             else maidCrud.SetState({stateName:"new"});
                         }
@@ -1453,12 +1536,86 @@ class CrudsGroup extends ODD {
             }
         }
 
+        //search
+        if(cnxMasterSearch.length > 0){
+            
+            cnxMasterSearch.forEach(cnx => {
+                
+                this.#crudAddActionEventToScript({
+                    events,
+                    eventName:"stateSetFirst",
+                    action:({k})=>{
+
+                        var pageData = PageRecive();
+                        var searchValue = pageData ?  pageData[cnx.searchValue]: null;
+                        if(searchValue){
+    
+                            u.#fromPage = pageData.from;
+                            k.CrudJoins_Set({
+                            name:"search-",
+                            field:cnx.masterSelect,
+                            value:searchValue,
+                            });
+                            k.SetState({stateName:"reload"});
+                        }
+                    }
+                });
+
+                this.#crudAddActionEventToScript({
+                    events,
+                    eventName:"updateAfter",
+                    action:({k})=>{
+
+                        if(u.#fromPage) PageSend({url:u.#fromPage});
+                    }
+                });
+            });
+        }
+
+        //sum
+        if(cnxMasterSum.length > 0 || cnxMaidSum.length > 0){
+
+            if(cnxMaidSum.length > 0){
+
+                cnxMaidSum.forEach(cnx => {
+                    
+                    this.#crudAddActionEventToScript({
+                        events,
+                        eventName:"printAfter",
+                        action:({k})=>{
+    
+                            var maidField = schema.fields.find(f=>f.value==cnx.maidFieldValue);
+                            var maidValues = k.bodyGet().fieldGetValues({fieldName:maidField.name});
+         
+                            
+                            var sum = maidValues.reduce((acc,v)=>{return acc+parseFloat(v)},0);
+                            
+                            var crudMaster = u.crudGetBuild({crudName:cnx.masterName});
+                            var masterField = crudMaster.bodyGet().fieldsGet().find(f=>f.value==cnx.masterFieldValue);
+                            crudMaster.bodyGet().fieldSetValues({fieldName:masterField.name,values:[sum]});
+
+                            if(masterField.box.tipe==0){
+
+                                var primary = crudMaster.Reload_GetPrimaryValues({})[0];
+                                crudMaster.Update_AddChange({
+                                    fieldName:masterField.name,
+                                    value:sum,
+                                    primary,
+                                });
+                            };
+
+                        }
+                    })
+                });
+            }
+        }
+
         return {
             title,head,parent,
 
             stateStart,
             stateTools:statetools,
-            afterCancel,afterInsert,
+            afterCancel,afterInsert,afterUpdate,
             newActive,insertNoAddFields,
             updateCurrent,
 
@@ -1474,6 +1631,40 @@ class CrudsGroup extends ODD {
             orders,
         }
 
+    }
+
+    #crudGetScriptByNormal(crud){
+
+        if(crud.events == null) crud.events = [];
+
+        /*var cnxDataSet = this.#conections.filter(cnx=>cnx.event=="dataSetToPanel");
+        if(cnxDataSet.length > 0){
+
+            cnxDataSet.forEach(cnx => {
+                
+                this.#crudAddActionEventToScript({
+                    events:crud.events,
+                    eventName:"PrintAfter",
+                    action:()=>{
+
+                        var crudMain = this.parentGet({parentName:cnx.crudName}).build;
+                        var dataSet = crudMain.ReloadDataSetGet({dataSetName:cnx.dataSetName});
+
+                        var panel = this.parentGet({parentName:cnx.panelName}).build;
+                        panel.fieldsGet().forEach(field => {
+                            
+                            var values = cnx.parentValues({fieldName:field.name});
+                            panel.fieldSetValues({fieldName:field.name,values,dataSet});
+                        });
+                    }
+                });               
+
+            });
+        }*/
+
+        return{
+            ...crud
+        };
     }
 
     #crudAddActionEventToScript({events,eventName,action}){
@@ -1502,7 +1693,6 @@ class CrudsGroup extends ODD {
 
            var field = cr_master.bodyGet().fieldsGet().find(f=>f.value==masterFieldValue);
            var values = cr_master.bodyGet().fieldGetValues({fieldName:field.name});
-           console.log("CRUD JOIN MASTER:",masterCrud, "field",field,"values:",values);
            
            if(values != null && values.length > 0) value = values[y?y:0];
         }
@@ -1581,8 +1771,6 @@ class CrudsGroup extends ODD {
                     }
                     gridScript.attributes = attributes;
                 }
-                //console.log("LAYER BUILD GRID", gridScript);
-
                 layerInfo.grid.build = new Grid(gridScript);
         
                 layerInfo.grid.items.forEach(item => {
@@ -1646,7 +1834,7 @@ class CrudsGroup extends ODD {
             if(layerInfo.crud){
 
                 this.#cruds.push(layerInfo.crud);
-                var script = this.#crudGetScript({...layerInfo.crud,userData});
+                var script = layerInfo.crud.schema ? this.#crudGetScriptBySchema({...layerInfo.crud,userData}) : this.#crudGetScriptByNormal(layerInfo.crud);
                 layerInfo.crud.build = new Crud_Master(script);
 
                 layerInfo.crud.build.bodyGet().fieldsGet().forEach(field => {
@@ -1654,6 +1842,7 @@ class CrudsGroup extends ODD {
                     if(field.action == "div"){
 
                         var fieldBoxs = layerInfo.crud.build.bodyGet().fieldGetBoxes({fieldName:field.name});
+                        
                         this.#parentAdd({
                             name:field.name,
                             build:fieldBoxs[0],
@@ -1663,23 +1852,67 @@ class CrudsGroup extends ODD {
                     }
 
                 });
+
+                this.#parentAdd({
+                    name:layerInfo.crud.name,
+                    build:layerInfo.crud.build,
+                });
+            }
+
+            //------panel-------
+            if(layerInfo.panel){
+
+                var prnt = this.#parentGetConteiner({layerIndex:layer,parentName:layerInfo.panel.parent});
+                
+                layerInfo.panel.build = new Panel({
+                    ...layerInfo.panel,
+                    parent:prnt,
+                });
+
+                this.#parentAdd({
+                    name:layerInfo.panel.name,
+                    build:layerInfo.panel.build,
+                });
+
+                if(layerInfo.panel.tipe=="form"){
+
+                    layerInfo.panel.build.fieldsGet().forEach(field => {
+                    
+                        if(field.action == "div"){
+    
+                            var fieldBoxs = layerInfo.panel.build.fieldGetBoxes({fieldName:field.name});
+                            
+                            this.#parentAdd({
+                                name:field.name,
+                                build:fieldBoxs[0],
+                                conteiner:fieldBoxs[0].Blocks_Get()[0],
+                            });
+                            
+                        }
+    
+                    });
+                }
             }
 
         }
     }
 
     #parents = [];
-    #parentGet({parentName}){
+    parentGet({parentName}){
 
-        return this.#parents.find(p=>p.name==parentName);
+        var parent = this.#parents.find(p=>p.name==parentName);
+        if(parent == null) console.log("PARENT GET ",parentName, "RESULT IS NULL",parent,"LSIT",this.#parents);
+        return parent;
     }
     #parentGetConteiner({layerIndex=0,parentName}){
 
         if(layerIndex == 0) return this.#parent;
 
-        var parent = this.#parents.find(p=>p.name==parentName);
         
-        return parent.conteiner;
+        var parent = this.#parents.find(p=>p.name==parentName);
+        var conteiner = parent.conteiner;
+        
+        return conteiner;
     }
     #parentAdd({name,build,conteiner}){
         
