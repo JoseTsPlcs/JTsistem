@@ -92,20 +92,20 @@ $(document).ready(function() {
                   inter:"=",
                   value:userData.company.id,
                 },
-                /*{
+                {
                   before:" AND ",
                   table:"sales",
                   field:"PAID",
                   inter:"=",
                   value:1,
-                },*/
-                /*{
+                },
+                {
                   before:" AND ",
                   table:"sales",
                   field:"ID_STATUS",
                   inter:"!=",
                   value:5,
-                },*/
+                },
               ],
 
               configShow:true,    

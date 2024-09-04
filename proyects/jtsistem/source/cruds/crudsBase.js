@@ -780,7 +780,7 @@ class CrudsGroup extends ODD {
         );
 
         if(schema.company == true){
-
+            
             conditions.push({
                 table:schema.table,
                 field:"ID_COMPANY",
@@ -1609,6 +1609,7 @@ class CrudsGroup extends ODD {
                 });
             }
         }
+        
 
         return {
             title,head,parent,
@@ -1629,6 +1630,7 @@ class CrudsGroup extends ODD {
             events,
             inserts,
             orders,
+            conditions,
         }
 
     }
