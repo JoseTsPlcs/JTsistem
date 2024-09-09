@@ -468,7 +468,7 @@ const sch_sales = {
             value:"dscto",
             name:"descuento a la venta",
             select:"DSCTO",access:true,
-            tipe:"cant",
+            tipe:"porcent",
             descripcion:"descuento a la venta",
         },
         {
