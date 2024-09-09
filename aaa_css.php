@@ -20,5 +20,9 @@
     <link rel="stylesheet" href="'.$srcPathReturn.'style.css">';
 
     echo '<link rel="stylesheet" href="'.$srcPathReturn.'tutorialStyle.css">';
+
+    echo '<link rel="icon" href="'.$srcPathReturn.'proyects/jtsistem/imagenes/iconGear.png" type="image/x-icon">';
+
+    echo '<link rel="manifest" href="'.$srcPathReturn.'proyects/jtsistem/source/manifest.json">';
    
 ?>
