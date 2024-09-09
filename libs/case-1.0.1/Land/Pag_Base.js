@@ -22,8 +22,8 @@ var PagesData = [
     seccion:'pos',
     paginas:[
       {state:"hide",name:"orders",title:"ordenes de trabajos",href:"check-in.php"},
-      {state:"active",name:"saleNew2",title:"venta nueva",href:"sales_new.php"},
-      {state:"hide",name:"saleNew2",title:"venta nueva 2",href:"sales_new2.php"},
+      {state:"active",name:"saleNew2",title:"venta nueva",href:"sales_new2.php"},
+      //{state:"hide",name:"saleNew2",title:"venta nueva 2",href:"sales_new2.php"},
       {state:"hide",name:"box",title:"caja",href:"pays_account.php"},
       {state:"hide",name:"box2asddd",title:"caja version 2",href:"box.php"},
       {state:"hide",name:"vehicles",title:"vehiculos",href:"vehicles.php"},
