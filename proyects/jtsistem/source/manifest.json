@@ -2,7 +2,7 @@
 {
     "name": "jtsistem",
     "short_name": "jtsistem",
-    "start_url": "/Index.html",
+    "start_url": "/Index.php",
     "display": "standalone",
     "background_color": "#1a2c40",
     "theme_color": "#1a2c40",
