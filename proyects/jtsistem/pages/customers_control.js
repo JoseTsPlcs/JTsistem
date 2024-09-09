@@ -18,7 +18,6 @@ $(document).ready(function() {
               ],
             }
           },
-          {modal:{parent:"prnt-md",name:"md-cust"}},
           {
             crud:{
               parent:"main",name:"cr-cus-tb",
@@ -39,34 +38,10 @@ $(document).ready(function() {
               ],
             }
           },
-          {
-            crud:{
-              parent:"md-cust",name:"cr-cus-fm",
-              schema:sch_customers,title:"cliente",
-              panels:[
-                {
-                  tipe:"form",head:false,
-                  fieldsSet:[
-                    {value:"name",state:"edit"},
-                    {value:"document",state:"edit"},
-                    {value:"nroDoc",state:"edit"},
-                    {value:"cel",state:"edit"},
-                    {value:"dir",state:"edit"},
-                    {value:"email",state:"edit"},
-                    {value:"comment",state:"edit"},
-                  ],
-                }
-              ],
-            }
-          }
         ],
-        conections:[
+        groups:[
           {
-            masterName:"cr-cus-tb",
-            masterSelect:"ID_CUSTOMER",
-            event:"tableForm",
-            maidName:"cr-cus-fm",
-            maidSelect:"ID_CUSTOMER",
+            ...gp_customer({parentName:"prnt-md",masterCrud:"cr-cus-tb"}),
           }
         ],
       })

@@ -1577,9 +1577,9 @@ function scr_sales_control({parent,userData,title,fechaMin=Date_Today(),fechaMax
             
                             var id_sale = k.Reload_GetData()[y]["ID_SALE"];
                             PageSend({
-                            url:"sales_new.php",
+                            url:"sales_new2.php",
                             send:{id_sale},
-                            })
+                            });
                             //console.log("edit sale!!", sale_id);
                         }
                         }

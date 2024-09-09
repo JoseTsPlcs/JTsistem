@@ -25,6 +25,7 @@ var PagesData = [
       {state:"active",name:"saleNew",title:"venta nueva",href:"sales_new.php"},
       {state:"hide",name:"saleNew2",title:"venta nueva 2",href:"sales_new2.php"},
       {state:"hide",name:"box",title:"caja",href:"pays_account.php"},
+      {state:"hide",name:"box2asddd",title:"caja version 2",href:"box.php"},
       {state:"hide",name:"vehicles",title:"vehiculos",href:"vehicles.php"},
       {state:"hide",name:"inmuebles",title:"inmuebles",href:"inmuebles.php"},
     ],
@@ -85,9 +86,9 @@ var PagesData = [
       paginas:[
           {state:"active",name:'informSales',title:"ventas pagadas",href:"inform_sales.php"},
           {state:"active",name:'informProducts',title:"productos vendidos",href:"inform_products.php"},
-          {state:"active",name:'informCustomers',title:"clientes frecuentas",href:"inform_customers.php"},
-          {state:"hide",name:'informBuys',title:"compras",href:"inform_buys.php"},
-          {state:"hide",name:'informProduccions',title:"produccion",href:"inform_buys.php"},
+          {state:"active",name:'informCustomers',title:"clientes frecuentes",href:"inform_customers.php"},
+          {state:"active",name:'informCustomersNews',title:"clientes nuevos",href:"inform_customers_news.php"},
+          {state:"hide",name:'informFlujo',title:"flujo de caja",href:"inform_flujo.php"},
 
           {state:"hide",name:'informPay',title:"ventas - por cobrar",href:"inform_nopaid.php"},
           {state:"hide",name:'informTransacctions',title:"transacciones",href:"inform_pays.php"},
@@ -359,7 +360,7 @@ class Pag_Base extends ODD {
     var nav = `
       <nav class="navbar navbar-dark bg-dark px-2">
         <a class="navbar-brand" href="admin_account.php">JtSistem</a>
-        <button class="navbar-toggler mr-2" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler mr-2 text-white" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <i class="lni lni-grid-alt"></i>
         </button>
 
@@ -377,7 +378,7 @@ class Pag_Base extends ODD {
           nav += `
       
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             `+secc.icon+" "+secc.title+`
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -403,6 +404,21 @@ class Pag_Base extends ODD {
 
     nav += `
 
+      <li class="nav-item active">
+        <a class="nav-link" href="tutorial.php">
+          <i class="bi bi-question-circle"></i><span> Tutorial</span>
+        </a>
+      </li>
+
+      <li class="nav-item active">
+        <a class="nav-link" href="../../../">
+          <i class="lni lni-exit"></i><span> Salir</span>
+        </a>
+      </li>
+    `;
+
+    nav += `
+
           
           </ul>
         </div>
@@ -424,16 +440,18 @@ class Pag_Base extends ODD {
     //is log?
     let k = this;
     $.post("../../../libs/case-1.0.1/Land/IsLog.php",{},function(resp) {
-
-      //console.log("is log----resp:",resp);
-
+      
       resp = JSON.parse(resp);
+      if(resp.error != null){
+
+        k.#IsLog_Fail({error:resp.error});
+        return;
+      }
+      
       var userData = resp;
 
       console.log("-------login-------");
       console.log("userData:",userData);
-
-      //--------------------
 
       functionOnlogPage.forEach(fct => {
     
@@ -442,22 +460,14 @@ class Pag_Base extends ODD {
 
       if(success!=null)success({userData});
 
-      /*try {
-          
-
-      } catch (error) {
-          
-        //console.log(error);
-        k.#IsLog_Fail({error});
-      }*/
     }); 
 
   }
 
   #IsLog_Fail({error}){
 
-    if(controlTest.out) alert("error no found user, error:",error);
-    else window.location.href = "login.php";
+    //alert("error:",error);
+    window.location.href = "../../../Index.php";
   }
 
   #page = {

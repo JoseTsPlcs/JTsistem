@@ -116,3 +116,7 @@ main {
         margin-left: 0; /* Sin margen para el contenido en pantallas pequeñas */
     }
 }
+
+.nav-item.dropdown {
+    color: #ffffff !important;
+}

@@ -131,7 +131,14 @@ class Crud_Body extends ODD {
       
       return fields;
     }
-    fieldGet({fieldName}){return this.fieldsGet().find(f=>(f.name==fieldName));}
+    fieldGet({fieldName}){
+
+      var fields = this.fieldsGet();
+      var fieldInfo = fields.find(f=>(f.name==fieldName));
+      if(fieldInfo == null) console.log("no found field: ",fieldName,"fields:",fields);
+      
+      return fieldInfo;
+    }
 
     fieldSetValues({fieldName,values}){
 
@@ -167,7 +174,7 @@ class Crud_Body extends ODD {
     }
 
     #builded = false;
-    #Build({parent,title,head,blocked,filters=[]}){
+    #Build({parent,title,head,blocked,filters=[],config}){
 
       let k = this;
 
@@ -201,7 +208,10 @@ class Crud_Body extends ODD {
       });
       
       this.#config.windowFilters = new windowFilters({
-        title:"busqueda",head:true,
+        title:(config&&config.title!=null?config.title:"busqueda"),
+        head:(config&&config.head!=null?config.head:true),
+        show:(config&&config.show!=null?config.show:false),
+        toolsPositions:(config&&config.positions?config.positions:[]),
         parent: this.#config.window.Conteiner_GetColData({x:0,y:0}).col,
         filters,
         events:[
@@ -355,3 +365,4 @@ class Crud_Body extends ODD {
     }
 
 }
+

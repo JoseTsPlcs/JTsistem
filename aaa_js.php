@@ -39,6 +39,8 @@
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ListOfConections.js"></script>';
 
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/cruds/crudsBase.js"></script>';
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/cruds/CrudsGroup.js"></script>';
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/cruds/Groups.js"></script>';
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ListOfForms.js"></script>';
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/LoadPage.js"></script>';
 

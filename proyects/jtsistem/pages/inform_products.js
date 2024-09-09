@@ -92,20 +92,6 @@ $(document).ready(function() {
                   inter:"=",
                   value:userData.company.id,
                 },
-                {
-                  before:" AND ",
-                  table:"sales",
-                  field:"PAID",
-                  inter:"=",
-                  value:1,
-                },
-                {
-                  before:" AND ",
-                  table:"sales",
-                  field:"ID_STATUS",
-                  inter:"!=",
-                  value:5,
-                },
               ],
 
               configShow:true,    
@@ -116,6 +102,8 @@ $(document).ready(function() {
                   {name:"producto",box:bx_input,select:{table:"products",field:"NAME"},descripcion:"buscar por nombre de producto/servicio/insumo"},
                   {name:"tipo",box:{tipe:4,options:op_products_tipe},select:{table:"products",field:"ID_PRODUCT_TIPE"},descripcion:"buscar por producto/servicio/insumo"},
                   {name:"etiqueta",box:{tipe:4,options:[]},select:{table:"products",field:"ID_PRODUCT_TAG"},load:{name:"ld-products_tags",show:"show"},descripcion:"buscar por etiqueta"},
+                  {name:"pagado",box:{tipe:4,options:op_sales_paid,value:[op_sales_paid[0].show]},select:{table:"sales",field:"PAID"}},
+                  {name:"estado de ventas",box:{tipe:4,options:op_sales_status,value:op_sales_status.filter(st=>st.value!=5).map(st=>{return st.show})},select:{table:"sales",field:"ID_STATUS"}},
               ],
               panels:[
                 {
@@ -225,8 +213,8 @@ $(document).ready(function() {
                         values:products.map(p=>{return p.money}),
                       });
                       tb_top.fieldSetValues({
-                        fieldName:"edt",
-                        values:Array(products.length).fill('<i class="bi bi-search"></i>'),
+                        fieldName:fld_search.name,
+                        values:Array(products.length).fill(fld_search.box.value),
                       });
 
                       return {data:products};
@@ -237,14 +225,24 @@ $(document).ready(function() {
               ],
             }
           },
+          //window top
+          {
+            panel:{
+              parent:"prnt-top",
+              tipe:"form",title:"top de productos",
+              fields:[
+                {action:"div",name:"div-top",tipe:0,box:{tipe:0,class:"w-100 conteiner"}},
+              ],
+            }
+          },
           //top
           {
             panel:{
-              parent:"prnt-top",tipe:"table",maxH:200,name:"tb-top",
+              parent:"div-top",tipe:"table",maxH:200,name:"tb-top",
               fields:[
                 {name:"product",title:"producto",attributes:att_ln},
                 {name:"total",title:"total vendido",box:{...bx_money},attributes:att_ln},
-                {...fld_edit,attributes:att_btn},
+                {...fld_search,attributes:att_btn},
               ],
               events:[
                 {
@@ -252,7 +250,7 @@ $(document).ready(function() {
                   actions:[{
                     action:({k,field,y,value})=>{
 
-                      if(field.action == "edit"){
+                      if(field.action == "search"){
                         
                         EvolProduct({productName:k.fieldGetValues({fieldName:"product"})[y]});
                       }

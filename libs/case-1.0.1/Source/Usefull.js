@@ -259,8 +259,8 @@ function Date_GetPeriod({ data, dataField, period = "day" }) {
     return uniqueLabels;
 }
 
-function Date_GetDetails({ dateString }) {
-    const date = new Date(dateString+"T00:00:00");
+function Date_GetDetails({ dateString, current=false }) {
+    const date = new Date((!current?dateString+"T00:00:00":dateString));
 
     // Obtener el día del mes
     const dayOfMonth = date.getDate();
@@ -302,9 +302,9 @@ function Date_GetDetails({ dateString }) {
     };
 }
 
-function Date_GetLabel({dateString,period="day"}) {
+function Date_GetLabel({dateString,current,period="day"}) {
     
-    var detail = Date_GetDetails({dateString});
+    var detail = Date_GetDetails({dateString,current});
 
     switch(period){
 

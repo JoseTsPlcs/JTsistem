@@ -448,9 +448,14 @@ class Box {
       const df =  this.#format && this.#format.decimals ? 0 : '';
       if(v == null) v = df; 
 
+      
       if(this.#format.decimals) v = parseFloat(v).toFixed(this.#format.decimals);
-      if(this.#format.start) v = this.#format.start + v;
-      if(this.#format.end) v =  v + this.#format.end;
+      if(this.#format.ceroIsNull==true && v == 0) v = "-";
+      else
+      {        
+        if(this.#format.start) v = this.#format.start + v;
+        if(this.#format.end) v =  v + this.#format.end;
+      }
     }
 
     return v;

@@ -190,6 +190,10 @@ class Form extends ODD {
     _Fields_Set({fields=[]}){
 
         fields = fields.filter(f=>f!=null);
+        fields.forEach(fld => {
+            
+            if(fld.title == null) fld.title = fld.name;
+        });
         this.#fields=fields;
     }
     Fields_Get(){return this.#fields};

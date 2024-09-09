@@ -185,6 +185,16 @@ class Table_Grid extends ODD {
     }
   }
 
+  FieldSetTitle({fieldName,title}){
+
+    var field = this.#fields.find(f=>f.name == fieldName);
+    if(field){
+
+      field.title = title;
+      field.th.innerHTML = field.title;
+    }
+  }
+
   Fields_Add({value,fieldName,boxNew}){
 
 
@@ -198,6 +208,8 @@ class Table_Grid extends ODD {
   Fields_GetBoxs({fieldName}){
 
     var field = this.#fields.find(f=>f.name==fieldName);
+    if(field == null) console.log("no found field in grid, name:",fieldName,"fields:",this.#fields);
+    
     return field.boxs;
   }
 
