@@ -691,8 +691,6 @@ self.addEventListener('install', function(event) {
     event.waitUntil(
       caches.open('mi-app-cache').then(function(cache) {
         return cache.addAll([
-          '/',
-          '/Index.html',
         ]);
       })
     );
