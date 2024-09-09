@@ -67,18 +67,21 @@ $(document).ready(function() {
                     var priceTotals = listItems.fieldGetValues({fieldName:"priceTotal"});
                     var totalItems = priceTotals.reduce((acc,v)=>{return acc + parseFloat(v);},0);
                     sale.fieldSetValues({fieldName:"totaldscto",values:[totalItems]});
-                    
-                    var listPays = group.crudGetBuild({crudName:"cr-list-pays"}).bodyGet();
-                    var payedTotals = listPays.fieldGetValues({fieldName:"total"});
-                    var totalPayed = payedTotals.reduce((acc,v)=>{return acc + parseFloat(v);},0);
-                    sale.fieldSetValues({fieldName:"totalPay",values:[totalPayed]});
 
                     var dsct = parseFloat(sale.fieldGetValues({fieldName:"dscto"})[0]);
                     var totaltoPay = totalItems * (1 - dsct/100); 
                     sale.fieldSetValues({fieldName:"total",values:[totaltoPay]});
+                    
+                    if(acc_pays){
 
-                    var payed = totaltoPay.toFixed(2) == totalPayed.toFixed(2) ? 1 : 0;
-                    sale.fieldSetValues({fieldName:"pay",values:[payed]});
+                      var listPays = group.crudGetBuild({crudName:"cr-list-pays"}).bodyGet();
+                      var payedTotals = listPays.fieldGetValues({fieldName:"total"});
+                      var totalPayed = payedTotals.reduce((acc,v)=>{return acc + parseFloat(v);},0);
+                      sale.fieldSetValues({fieldName:"totalPay",values:[totalPayed]});
+
+                      var payed = totaltoPay.toFixed(2) == totalPayed.toFixed(2) ? 1 : 0;
+                      sale.fieldSetValues({fieldName:"pay",values:[payed]});
+                    }
 
                     var primary = saleCrud.Reload_GetData_Primarys()[0];
                     var payField = sale.fieldGet({fieldName:"pay"});

@@ -75,6 +75,11 @@ var fieldTypes = [
         show:{box:{...bx_shw}},
     },
     {
+        tipe:"porcent",
+        edit:{box:{...bx_cant,value:0}},
+        show:{box:{...bx_shw,format:{end:"%"}}},
+    },
+    {
         tipe:"comment",
         edit:{box:{tipe:9,value:""}},
         show:{box:{...bx_shw}},
