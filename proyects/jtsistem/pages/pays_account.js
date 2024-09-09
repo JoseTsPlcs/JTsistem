@@ -168,7 +168,7 @@ $(document).ready(function() {
                         value:1
                     },
                   ],
-                }
+                },
               ],
               
               configShow:true,

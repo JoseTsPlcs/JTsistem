@@ -2,8 +2,9 @@ class Label {
 
     #parent = null;
     parentGet(){return this.#parent};
-    #name = "field";
+    #name = "fieldName";
     GetName(){return this.#name;}
+    #title = "field";
     #box = null;
     #tipe = 1;
     #gridcont = null;
@@ -20,6 +21,7 @@ class Label {
 
         this.#parent = i.parent ? i.parent : document.body;
         if(i.name) this.#name = i.name;
+        if(i.title) this.#title = i.title;
         this.#box = i.box ? i.box : {tipe:0};
 
         if(i.tipe==null) i.tipe=1;
@@ -46,7 +48,7 @@ class Label {
             parent: k.#parent,
             cols: col,
             boxs:[
-                {x:label_coord.x, y:label_coord.y, box:{tipe:0,default:k.#name + ":",class:'text-center'}},//label
+                {x:label_coord.x, y:label_coord.y, box:{tipe:0,default:k.#title + ":",class:'text-center'}},//label
                 {x:input_coord.x, y:input_coord.y, box:k.#box},//input
             ],
             attributes:[

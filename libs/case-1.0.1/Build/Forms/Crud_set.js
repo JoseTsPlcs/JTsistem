@@ -45,6 +45,10 @@ class Crud_set extends ODD {
         });
         this.#selectPrimary = selects.find(slc=>slc.primary==true);
         this.#fields = fields.filter(f=>f!=null);
+        this.#fields.forEach(fld => {
+            
+            if(fld.title == null) fld.title = fld.name;
+        });
 
         loads=loads.filter(ld=>ld!=null);
         this.#loadData.max = loads.length;

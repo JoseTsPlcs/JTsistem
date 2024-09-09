@@ -59,15 +59,15 @@ class PanelChart extends PanelBuild {
                 labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange',"Mes1","mes2"],
                 datasets: [
                     {
-                    label: 'precios',
-                    data: [12, 19, 3, 5, 2, 3],
-                    borderWidth: 1,
-                    type:"line",
+                        label: 'precios',
+                        data: [12, 19, 3, 5, 2, 3],
+                        borderWidth: 1,
+                        type:"line",
                     },
                     {
-                    label: 'precios',
-                    data: [12, 19, 3, 5, 2, 3],
-                    borderWidth: 1,
+                        label: 'precios',
+                        data: [12, 19, 3, 5, 2, 3],
+                        borderWidth: 1,
                     },
                 ]
             },
@@ -82,10 +82,10 @@ class PanelChart extends PanelBuild {
                 responsive: true,
                 scales: {
                     x: {
-                    stacked: true,
+                        stacked: false,
                     },
                     y: {
-                    stacked: true
+                        stacked: false
                     }
                 }
             }

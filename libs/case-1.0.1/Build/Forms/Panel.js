@@ -43,6 +43,17 @@ class Panel extends ODD {
 
         this._fields = fields;
     }
+    fieldSetTitle({fieldName,title}){
+
+        switch (this.#tipe) {
+            case "table":
+                this.#build.FieldSetTitle({fieldName,title});    
+            break;
+        
+            default:
+                break;
+        }
+    }
     fieldsGet(){return this._fields;}
     fieldGet({fieldName}){
 

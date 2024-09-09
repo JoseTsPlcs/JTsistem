@@ -32,7 +32,7 @@ var modulos = [
     {
         value:"md-box",
         show:"Módulo de Caja",
-        pages:["box"],
+        pages:["box","cashConfig"],
         access:[
             {value:"edit",show:"editar control de caja"},
         ],
@@ -50,7 +50,7 @@ var modulos = [
     {
         value:"md-buy",
         show:"Módulo de Compras",
-        pages:["buyControl","buyNew","provieeders"],
+        pages:["buyControl","buyNew","provieeders","informFlujo"],
         access:[
         ],
     },

@@ -66,8 +66,17 @@ const sch_customers = {
             select:'DESCRIPCION',
             minWidth:300,
             access:"md-customer-coment",
-            tipe:"input",
+            tipe:"comment",
             descripcion:"descripcion del cliente",
+        },
+        {
+            value:"dateInsert",
+            name:"fecha de ingreso",
+            select:'DATE_INSERT',
+            minWidth:300,
+            access:true,
+            tipe:"date",
+            descripcion:"fecha de ingreso del cliente",
         },
     ],
     panels:[
@@ -411,7 +420,10 @@ const sch_sales = {
             value:"emit",
             name:"venta emitida a sunat",minWidth:250,
             select:"DOCUMENT_EMMIT",access:true,
-            tipe:"active",options:[{value:0,show:"venta no emitida"},{value:1,show:"venta emitida a sunat"}],
+            tipe:"active",options:[
+                {value:0,show:"venta no emitida",class:"rounded text-center bg-danger text-white"},
+                {value:1,show:"venta emitida a sunat",class:"rounded text-center bg-success text-white"}
+            ],
             descripcion:"si ya se emitio (nota de pago/boleta/factura) a sunat",
         },
         {
@@ -490,7 +502,7 @@ const sch_sales_products = {
         },
         {
             value:"item",
-            name:"producto/servicio",minWidth:500,
+            name:"producto/servicio",minWidth:300,
             select:"ID_PRODUCT",access:true,
             tipe:"optionsSearch",
             descripcion:"",
@@ -785,7 +797,10 @@ const sch_accounts = {
         {
             value:"open",access:true,
             name:"estado",select:"OPEN",
-            tipe:"active",
+            tipe:"options",options:[
+                {value:0,show:"cerrado",class:"rounded text-center bg-danger text-white"},
+                {value:1,show:"abierto",class:"rounded text-center bg-success text-white"},
+            ],
             descripcion:"",
         },
         {
@@ -814,8 +829,8 @@ const shc_pay_tag = {
             select:"INCOME",name:"ingreso",
             tipe:"options",
             options:[
-                {value:0,show:"egreso"},
-                {value:1,show:"ingreso"},
+                {value:0,show:"egreso",class:"rounded text-center bg-danger text-white"},
+                {value:1,show:"ingreso",class:"rounded text-center bg-success text-white"},
             ],
             descripcion:"",
         },
@@ -860,8 +875,8 @@ const sch_pays = {
             name:"ingreso/egreso",
             select:"INCOME",access:true,
             tipe:"options",options:[
-                {value:0,show:"egreso"},
-                {value:1,show:"ingreso"},
+                {value:0,show:"egreso",class:"rounded text-center bg-danger text-white"},
+                {value:1,show:"ingreso",class:"rounded text-center bg-success text-white"},
             ],
             descripcion:"",
         },
@@ -1030,6 +1045,64 @@ const sch_buys_payments = {
         },
     ],
     
+}
+
+const sch_control_accounts = {
+    table:"control_accounts",
+    fieldPrimary:"ID_CONTROL_ACCOUNT",
+    company:true,
+    fields:[
+        {
+            value:"account",name:"cuenta",tipe:"options",
+            select:"ID_ACCOUNT",access:true,
+            descripcion:"",
+            load:{
+                name:"ld-accounts",
+                tableMain:sch_accounts.table,
+                selects:[
+                    {table:sch_accounts.table,field:sch_accounts.fieldPrimary,as:"value"},
+                    {table:sch_accounts.table,field:"NAME",as:"show"},
+                ],
+                conditions:[
+                    {
+                        table:sch_accounts.table,
+                        field:"CONTROL_BY_OPEN",
+                        inter:"=",
+                        value:1,
+                    }
+                ],
+            }
+        },
+        {
+            value:"open_emmit",name:"fecha de apertura",tipe:"show",
+            select:"DATE_EMMIT_OPEN",access:true,
+            descripcion:"",
+        },
+        {
+            value:"open_total",name:"total de apertura",tipe:"money",
+            select:"TOTAL_OPEN",access:true,
+            descripcion:"",
+        },
+        {
+            value:"status",name:"estado",tipe:"options",
+            select:"OPEN",access:true,
+            options:[
+                {value:0,show:"cerrado",class:"rounded text-center bg-danger text-white"},
+                {value:1,show:"abierto",class:"rounded text-center bg-success text-white"},
+            ],
+            descripcion:"",
+        },
+        {
+            value:"close_emmit",name:"fecha de cierre",tipe:"show",
+            select:"DATE_EMMIT_CLOSE",access:true,
+            descripcion:"",
+        },
+        {
+            value:"close_total",name:"total de cierre",tipe:"money",
+            select:"TOTAL_CLOSE",access:true,
+            descripcion:"",
+        },
+    ],
 }
 
 /*const schema = {

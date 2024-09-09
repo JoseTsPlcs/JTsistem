@@ -135,8 +135,10 @@ const bx_moneyh3 = {tipe:0,class:"h3 text-left",format:{decimals:2,start:money_u
 
 const bx_area_show = {tipe:0,class:"text-center",format:{decimals:2,end:"m2"},value:0};
 
-const bx_income = {tipe:0,format:{decimals:2,start:money_use,limit:{value:0,less:{attributes:[{name:"class",value:"text-danger"}]},more:{attributes:[{name:"class",value:"text-success"}]}}},value:0};
-const bx_incomeh1 = {tipe:0,format:{decimals:2,start:money_use,limit:{value:0,less:{attributes:[{name:"class",value:"h1 text-danger"}]},more:{attributes:[{name:"class",value:"h1 text-success"}]}}},value:0};
+const bx_saldo = {tipe:0,format:{decimals:2,start:money_use,limit:{value:0,less:{attributes:[{name:"class",value:"text-danger"}]},more:{attributes:[{name:"class",value:"text-success"}]}}},value:0};
+
+const bx_income = {tipe:0,format:{ceroIsNull:true,decimals:2,start:money_use,limit:{value:0,less:{attributes:[{name:"class",value:"text-danger"}]},more:{attributes:[{name:"class",value:"text-success"}]}}},value:0};
+const bx_incomeh1 = {tipe:0,format:{ceroIsNull:true,decimals:2,start:money_use,limit:{value:0,less:{attributes:[{name:"class",value:"h1 text-danger"}]},more:{attributes:[{name:"class",value:"h1 text-success"}]}}},value:0};
 
 const bx_date = {tipe:2,value:Date_Today()};
 const bx_date_start = {tipe:2,value:Date_FirstOfMoth()};
@@ -170,10 +172,11 @@ const att_cnt2 = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"widt
 
 //---------fields---------
 
-const fld_delete = {name:"dlt",box:{tipe:5,value:'<i class="bi bi-x-circle"></i>',class:"btn btn-danger btn"},action:"delete",descripcion:"seleccionar para borrar registro"};
-const fld_edit = {name:"edt",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn"},action:"edit",descripcion:"seleccionar para editar registro"};
-const fld_add = {name:"add",box:{tipe:5,value:'<i class="bi bi-plus-circle"></i>',class:"btn btn-primary btn"},action:"add",descriptcon:"seleccionar para añadir registro"};
-const fld_show = {name:"add",box:{tipe:5,value:'<i class="bi bi-eye-fill"></i>',class:"btn btn-primary btn"},action:"show",descripcion:"seleccionar para mostrar detalle del registro"};
+const fld_delete = {name:"dlt",title:"borrar",box:{tipe:5,value:'<i class="bi bi-x-circle"></i>',class:"btn btn-danger btn"},action:"delete",descripcion:"seleccionar para borrar registro"};
+const fld_edit = {name:"edit",title:"editar",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn"},action:"edit",descripcion:"seleccionar para editar registro"};
+const fld_add = {name:"add",title:"añadir",box:{tipe:5,value:'<i class="bi bi-plus-circle"></i>',class:"btn btn-primary btn"},action:"add",descriptcon:"seleccionar para añadir registro"};
+const fld_show = {name:"show",title:"mostrar",box:{tipe:5,value:'<i class="bi bi-eye-fill"></i>',class:"btn btn-primary btn"},action:"show",descripcion:"seleccionar para mostrar detalle del registro"};
+const fld_search = {name:"edit",title:"buscar",box:{tipe:5,value:'<i class="bi bi-search"></i>',class:"btn btn-primary btn"},action:"search",descripcion:"seleccionar para editar registro"};
 
 function fld_ld_worker({panel="main",edit=true}){
 

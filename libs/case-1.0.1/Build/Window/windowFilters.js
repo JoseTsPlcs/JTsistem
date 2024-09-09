@@ -74,7 +74,8 @@ class windowFilters extends ODD {
     #window = null;
     #form = null;
     #Build({parent,title,head,show,blocked,toolsPositions,questions}){
-
+        
+        
         let k = this;
         this.#form = new Form({
             parent,//:content.GetColData({x:0,y:0}).col,
@@ -83,7 +84,7 @@ class windowFilters extends ODD {
             tools:[
                 {show:true,position:"botton-center",name:"reload",action:"reload",box:{value:"recargar",tipe:5,class:"btn btn-primary btn-sm"},descripcion:"presiona para recargar la data"},
                 {show:true,position:"botton-center",name:"clear",action:"clear",box:{value:"limpiar",tipe:5,class:"btn btn-primary btn-sm"},descripcion:"presiona para colocar los filtros por defecto"},
-                {show:true,position:"head-right",name:"quest"},
+                {show:false,position:"head-right",name:"quest"},
             ],
             events:[
                 {

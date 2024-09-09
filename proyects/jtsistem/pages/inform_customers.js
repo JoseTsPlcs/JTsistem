@@ -6,7 +6,6 @@ $(document).ready(function() {
 
     success:({userData,pageData})=>{
 
-
       var group = new CrudsGroup({
         layers:[
           {
@@ -52,20 +51,6 @@ $(document).ready(function() {
                   inter:"=",
                   value:company_id,
                 },
-                {
-                  before:" AND ",
-                  table:"sales",
-                  field:"PAID",
-                  inter:"=",
-                  value:1,
-                },
-                {
-                  before:" AND ",
-                  table:"sales",
-                  field:"ID_STATUS",
-                  inter:"!=",
-                  value:5,
-                },
               ],
 
               configShow:false,    
@@ -74,6 +59,8 @@ $(document).ready(function() {
                   {name:"cliente",box:{tipe:1,class:"w-100"},select:{table:"customers",field:"NAME",inter:"LIKE"}},
                   {col:6,name:"fecha min",box:{tipe:2,value:Date_StartQuarter()},select:{table:"sales",field:"DATE_EMMIT",tipe:"min"},descripcion:"buscar por fecha mayor o igual a las seleccionada"},
                   {col:6,name:"fecha max",box:{tipe:2,value:Date_EndQuarter()},select:{table:"sales",field:"DATE_EMMIT",tipe:"max"},descripcion:"buscar por fecha menor o igual a las seleccionada"},
+                  {name:"pagado",box:{tipe:4,options:op_sales_paid,value:[op_sales_paid[0].show]},select:{table:"sales",field:"PAID"}},
+                  {name:"estado de ventas",box:{tipe:4,options:op_sales_status,value:op_sales_status.filter(st=>st.value!=5).map(st=>{return st.show})},select:{table:"sales",field:"ID_STATUS"}},
               ],
 
               events:[
@@ -149,7 +136,7 @@ $(document).ready(function() {
                       var tb_lst = group.parentGet({parentName:"tb-list"}).build;
                       tb_lst.fieldSetValues({fieldName:"cliente",values:customers.map(ct=>{return ct.name})});
                       tb_lst.fieldSetValues({fieldName:"total",values:customers.map(ct=>{return ct.total})});
-                      tb_lst.fieldSetValues({fieldName:"edt",values:Array(customers.length).fill('<i class="bi bi-search"></i>'),})
+                      tb_lst.fieldSetValues({fieldName:fld_search.name,values:Array(customers.length).fill(fld_search.box.value),})
 
                       k.CallEvent({name:"customerEvol",params:{customerName:customers[0].name}});
                       
@@ -218,10 +205,17 @@ $(document).ready(function() {
           {panel:{name:"kpi-prom",parent:"prnt-prom",tipe:"kpi",fields:[{name:"prom",title:"promedio comprado",box:{...bx_moneyh1}}]}},
           {
             panel:{
-              parent:"prnt-tb",name:"tb-list",
+              parent:"prnt-tb",
+              tipe:"form",title:"top de clientes",
+              fields:[{action:"div",name:"prnt-top",tipe:0,box:{tipe:0,class:"w-100 conteiner"}}],
+            }
+          },
+          {
+            panel:{
+              parent:"prnt-top",name:"tb-list",
               tipe:"table",maxH:300,
               fields:[
-                {...fld_edit},
+                {...fld_search},
                 {name:"total",box:{...bx_money}},
                 {name:"cliente",box:{...bx_shw}},
               ],
@@ -231,7 +225,7 @@ $(document).ready(function() {
                   actions:[{
                     action:({field,y})=>{
                       
-                      if(field.action == "edit"){
+                      if(field.action == fld_search.action){
 
                         var cr_main = group.parentGet({parentName:"cr-main"}).build;
                         

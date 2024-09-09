@@ -67,8 +67,8 @@ class Crud_Master extends ODD {
             if(toolLoad) toolLoad.show = loads.length > 0; 
             var toolConfig = st.tools.find(t=>t.name == "config");
             if(toolConfig) toolConfig.show = filters.length > 0; 
-            var toolQuest = st.tools.find(t=>t.name == "question");
-            if(toolQuest) toolQuest.show = true;
+            /*var toolQuest = st.tools.find(t=>t.name == "question");
+            if(toolQuest) toolQuest.show = true;*/
         }); 
         stateTools.forEach(st => {
                 
@@ -107,13 +107,12 @@ class Crud_Master extends ODD {
     #body = null;
     bodyGet(){return this.#body;}
 
-    #Build({parent,title,head=true,attributes,panels,filters,configShow,configHead,configTitle,configToolsPositions,config}){
+    #Build({parent,title,head=true,attributes,panels,filters,config}){
 
         let k = this;
         this.#body = new Crud_Body({
             parent,title,head,
-            filters,
-            configShow,
+            filters,config,
             panels,
             events:[
                 {
