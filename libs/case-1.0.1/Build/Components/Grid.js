@@ -181,6 +181,8 @@ class Grid extends ODD {
       
       const col = this.GetColData({x:label.x,y:label.y});
       if(col !=null){
+
+        if(label.title==null) label.title = label.name;
         
         label.box = {
           ...label.box,

@@ -9,7 +9,7 @@ $(document).ready(function() {
         {
           value:"md-sale",
           questions:[
-            {name:"saleNew",descripcion:"Cómo crear una nueva venta",page:"saleNew"},
+            //{name:"saleNew",descripcion:"Cómo crear una nueva venta",page:"saleNew2"},
             {descripcion:"Cómo editar o anular un registro de ventas",page:"salesCotizacion"},
             {descripcion:"Seguimiento de ventas existentes",page:"salesCotizacion"},
             {descripcion:"Seguimiento de pagos pendientes",page:"salesPay"},
@@ -51,7 +51,7 @@ $(document).ready(function() {
           value:"md-bills",
           questions:[
             {descripcion:"Cómo generar una factura a partir de una venta",page:"bills"},
-            {descripcion:"Generación de reportes financieros",page:"informAccounts"},
+            //{descripcion:"Generación de reportes financieros",page:"informAccounts"},
           ],
         },
         /*
@@ -67,8 +67,9 @@ $(document).ready(function() {
         for (let q = 0; q < modulo.questions.length; q++) {
 
           var question = modulo.questions[q];
-          question.value = modulo.name + "-" + question.name;          
-          question.access = PageDataFind({pageName:question.page}).state=="active";
+          question.value = modulo.name + "-" + question.name;      
+          var questionPage = PageDataFind({pageName:question.page});
+          question.access = questionPage.state=="active";
           if(question.access) modulo.access = true;
         }
 
