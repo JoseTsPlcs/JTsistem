@@ -386,8 +386,8 @@ function GetGridConfig({panels=[],breaklevel="md"}){
         attributes:[],
         events:[],
     };
-
-    //panels = panels.filter(f=>f!=null);
+    
+    panels = panels.filter(p=>p!=null);
 
     var y = 0;
     var x = 0;

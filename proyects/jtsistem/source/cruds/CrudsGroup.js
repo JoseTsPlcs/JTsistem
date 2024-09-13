@@ -1190,6 +1190,8 @@ class CrudsGroup extends ODD {
             //------grid------------
             if(layerInfo.grid){
 
+                layerInfo.grid.items = layerInfo.grid.items.filter(itm=>itm!=null);
+
                 var gridScript = GetGridConfig({
                     panels:layerInfo.grid.items,
                     labels:layerInfo.grid.labels,
