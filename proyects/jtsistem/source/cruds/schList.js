@@ -200,14 +200,14 @@ const sch_items = {
             value:"stock",
             name:"stock total",state:"show",minWidth:70,
             select:"STOCK_TOTAL",access:"md-items-stock",
-            tipe:"input",
+            tipe:"cant",
             descripcion:"stock actual del producto/insumo/servicio",
         },
         {
             value:"limit",
             name:"stock minimo",state:"show",minWidth:70,
             select:"STOCK_LIMIT",access:"md-items-stock",
-            tipe:"input",
+            tipe:"cant",
             descripcion:"stock minimo del producto/insumo/servicio, en caso el stock sea menor o igual, se lanza una alerta",
         },
         {
@@ -467,7 +467,7 @@ const sch_sales = {
         {
             value:"dscto",
             name:"descuento a la venta",
-            select:"DSCTO",access:true,
+            select:"DSCTO",access:"md-sale-dscto",
             tipe:"porcent",
             descripcion:"descuento a la venta",
         },
@@ -502,7 +502,7 @@ const sch_sales_products = {
         },
         {
             value:"item",
-            name:"producto/servicio",minWidth:300,
+            name:"producto/servicio",maxWidth:300,
             select:"ID_PRODUCT",access:true,
             tipe:"optionsSearch",
             descripcion:"",
@@ -1075,7 +1075,7 @@ const sch_control_accounts = {
         },
         {
             value:"open_emmit",name:"fecha de apertura",tipe:"show",
-            select:"DATE_EMMIT_OPEN",access:true,
+            select:"DATE_EMMIT_OPEN",access:true,minWidth:200,
             descripcion:"",
         },
         {
@@ -1094,7 +1094,7 @@ const sch_control_accounts = {
         },
         {
             value:"close_emmit",name:"fecha de cierre",tipe:"show",
-            select:"DATE_EMMIT_CLOSE",access:true,
+            select:"DATE_EMMIT_CLOSE",access:true,minWidth:200,
             descripcion:"",
         },
         {
@@ -1102,6 +1102,11 @@ const sch_control_accounts = {
             select:"TOTAL_CLOSE",access:true,
             descripcion:"",
         },
+        {
+            value:"comment",name:"comentario",tipe:"comment",
+            select:"COMMENT",access:true,
+            descripcion:"",
+        }
     ],
 }
 

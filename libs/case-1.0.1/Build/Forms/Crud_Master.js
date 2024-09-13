@@ -864,6 +864,18 @@ class Crud_Master extends ODD {
     ];
     #updateCurrent = false;
 
+    Update_AddChangeField({fieldName,value,y=0}){
+
+        var primary = this.Reload_GetData_Primarys({})[y];
+        
+        this.Update_AddChange({
+            fieldName,
+            value,
+            primary,
+        });
+        
+    }
+
     Update_AddChange({fieldName,value,primary}){
 
         var changePrimary = this.#update_listOfChanges.find(ch=>ch.primary==primary);
@@ -894,8 +906,7 @@ class Crud_Master extends ODD {
                 ],
             });
         }
-
-        //console.log(this.#title,"-> update change", "field:",fieldName," value:",value,"list:",this.#update_listOfChanges);
+        
         this.#Event_AddChange({fieldName,value,primary});
     }
 

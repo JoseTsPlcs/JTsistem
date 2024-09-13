@@ -59,6 +59,7 @@ function crudSetBySchema({crud,userData}) {
             var addFilters = crud.addFilters != null ? crud.addFilters : panel.tipe == "table";
             
             if(panel.fields == null) panel.fields = [];
+            panel.fields = panel.fields.filter(fld=>fld!=null);
 
             if(panel.fieldsSet){
 
@@ -74,8 +75,17 @@ function crudSetBySchema({crud,userData}) {
                                 fieldAction = {
                                     action:fset.action,
                                     name:fset.name,
-                                    tipe:0,
+                                    tipe:0,col:fset.col,
                                     box:{tipe:0,class:"bg-success conteiner w-100 p-0 m-0"},
+                                }
+                            break;
+
+                            case "button":
+                                fieldAction = {
+                                    action:fset.action,
+                                    name:fset.name,
+                                    tipe:0,col:fset.col,
+                                    box:{value:fset.value,tipe:5,class:(fset.class?fset.class:"bg-success conteiner w-100 p-0 m-0")},
                                 }
                             break;
                         }
@@ -214,7 +224,7 @@ function crudSetBySchema({crud,userData}) {
                             name:"reload",
                             tools:[
                                 {name:"reload",show:true},
-                                {name:"new",show:true},
+                                {name:"new",show:(crud.stateType!="show")},
                                 {name:"sizes",show:true,value:10},
                                 {name:"pages",show:true},
                             ],
@@ -341,9 +351,9 @@ class CrudsGroup extends ODD {
 
         }  
 
-        var editName = crud.name + "-edit";
-        var addName = crud.name + "-add";
-        var cnxName = crud.name+"-cnx";
+        let editName = crud.name + "-edit";
+        let addName = crud.name + "-add";
+        let cnxName = crud.name+"-cnx";
         
         //conections
         var cnxMaster = this.#conections.filter(cnx=>cnx.masterName == crud.name);
@@ -353,6 +363,8 @@ class CrudsGroup extends ODD {
         var cnxMasterfmExt = cnxMaster.filter(cnx=>cnx.event == "formExtend");
         var cnxMasterSearch = cnxMaster.filter(cnx=>cnx.event == "search");
         var cnxMasterSum = cnxMaster.filter(cnx=>cnx.event == "sum");
+        var cnxMasterEdit = cnxMaster.filter(cnx=>cnx.event == "btn-edit");
+        var cnxMasterCnx = cnxMaster.filter(cnx=>cnx.event == "cnx");
 
         
         var cnxMaid = this.#conections.filter(cnx=>cnx.maidName == crud.name);
@@ -361,9 +373,11 @@ class CrudsGroup extends ODD {
         var cnxMaidTbFm = cnxMaid.filter(cnx=>cnx.event == "tableForm");
         var cnxMaidfmExt = cnxMaid.filter(cnx=>cnx.event == "formExtend");
         var cnxMaidSum = cnxMaid.filter(cnx=>cnx.event == "sum");
+        var cnxMaidEdit = cnxMaid.filter(cnx=>cnx.event == "btn-edit");
+        var cnxMaidCnx = cnxMaid.filter(cnx=>cnx.event == "cnx");
         
         //set states
-        if(cnxMaster.length > 0 || cnxMaid.length > 0){
+        if((cnxMaster.length > 0 || cnxMaid.length > 0) && !(cnxMasterCnx.length > 0 || cnxMaidCnx.length > 0)){
 
             crud.afterCancel = "reload";
             crud.afterInsert = "reload";
@@ -411,44 +425,171 @@ class CrudsGroup extends ODD {
             ];
         }
 
+        //bnt-edit -> (masterName,masterField,masterSelect,maidSelect)
+        if(cnxMasterEdit.length > 0 || cnxMaidEdit.length > 0){
+
+            if(cnxMasterEdit.length > 0){
+
+                cnxMasterEdit.forEach(cnx => {
+
+                    var cnxName = cnx.masterName + "-cnx-" + cnx.maidName;
+                    var cnxEditName = cnx.masterName + "-edit-" + cnx.maidName;
+
+                    crud.panels[0].fields.unshift({
+                        ...fld_edit,
+                        name:cnxEditName,
+                    });
+
+                    u.#crudAddActionEventToScript({
+                        events:crud.events,
+                        eventName:"boxUpdate",
+                        action:({field,y,k})=>{
+
+                            if(field.name == cnxEditName){
+                                
+                                var value = null;
+
+                                if(cnx.masterFieldName){
+
+                                    var crudMaster = k;
+                                    var masterValues = crudMaster.bodyGet().fieldGetValues({fieldName:cnx.masterFieldName});
+                                    console.log("MASTER VALUES",masterValues);
+                                    value = masterValues[y];
+                                }
+                                
+                                if(value != null){
+
+                                    var crudMaid = u.crudGetBuild({crudName:cnx.maidName});
+                                    crudMaid.CrudJoins_Set({
+                                        name:cnxName,
+                                        value,
+                                        field:cnx.maidSelect,
+                                    });
+                                    crudMaid.SetState({stateName:"reload"});
+                                }                                
+                            }
+                        }
+                    });
+                });
+            }
+
+            if(cnxMaidEdit.length > 0){
+
+                crud.stateStart = "block";
+                crud.afterCancel = "block";
+                crud.stateTools[0].tools.find(t=>t.name=="reload").show=false;
+                crud.stateTools[0].tools.find(t=>t.name=="update").show=true;
+                crud.stateTools[0].tools.find(t=>t.name=="cancel").show=true;
+            }
+        }
+
+        //cnx -> 
+        if(cnxMasterCnx.length > 0 || cnxMaidCnx.length > 0){
+
+            if(cnxMasterCnx.length > 0){
+
+                cnxMasterCnx.forEach(cnx => {
+
+                    var cnxName =  cnx.masterName + "-cnx-" + cnx.MaidName;
+                    var editName = cnx.masterName + "-edit-" + cnx.MaidName;
+
+                    if(cnx.masterAction == "edit"){
+
+                        crud.panels[0].fields.unshift({
+                            ...fld_edit,
+                            name:editName,
+                        });
+                    }
+                    
+                    u.#crudAddActionEventToScript({
+                        events:crud.events,
+                        eventName:"reloadAfter",
+                        action:({k})=>{
+
+                            if(cnx.masterAction == null) u.#crudConectToMaid({...cnx});
+                        }
+                    });
+
+                    u.#crudAddActionEventToScript({
+                        events:crud.events,
+                        eventName:"boxUpdate",
+                        action:({k,field,y})=>{
+
+                            if(field.name == editName){
+                                
+                                u.#crudConectToMaid({...cnx,y});
+                            }                            
+                        }
+                    });
+                });
+            }
+
+            if(cnxMaidCnx.length > 0){
+
+                crud.filters = [];                
+                crud.stateStart = "block";
+                crud.updateCurrent = true;
+                /*crud.stateTools[0].tools.find(t=>t.name=="new").show=false;
+                crud.stateTools[0].tools.find(t=>t.name=="pages").show=false;
+                crud.stateTools[0].tools.find(t=>t.name=="sizes").show=false;
+                crud.stateTools[0].tools.find(t=>t.name=="sizes").value=999;
+                crud.stateTools[0].tools.find(t=>t.name=="insert").show=(cnxMaidList[0].type!="show" && cnxMaidOfMaid.length == 0);
+
+                
+                crud.stateTools[1].tools.find(t=>t.name=="insert").show=false;
+                crud.stateTools[1].tools.find(t=>t.name=="cancel").show=false;
+                crud.stateTools[1].tools.find(t=>t.name=="addLine").show=false;*/
+
+                if(cnxMaidCnx[0].type!="show" && crud.panels[0].tipe=="table"){
+
+                    crud.panels[0].fields.unshift({
+                        ...fld_delete,
+                    });
+                }
+            }
+        }
+
         //formForm -> form - form (masterFieldName,maidSelect)
         if(cnxMasterfmFm.length > 0 || cnxMaidfmFm.length > 0){
 
-            if(cnxMasterfmFm.length > 0){
-
-                var masterFieldIndex = crud.panels[0].fields.findIndex(f=>f.name==cnxMasterfmFm[0].masterFieldName);
-                var masterField = crud.panels[0].fields[masterFieldIndex];
-                masterField.tipe = 0;
-                masterField.col = 8;
-                masterField.colAllLevel = true;
-
-                crud.panels[0].fields.splice(
-                    masterFieldIndex+1,0,
-                    {
-                        ...fld_edit,
-                        colAllLevel:true,
-                        name:editName,col:2
-                    }
-                );
-                crud.panels[0].fields.splice(
-                    masterFieldIndex+1,0,
-                    {
-                        ...fld_add,
-                        colAllLevel:true,
-                        name:addName,col:2
-                    }
-                );
+            if(cnxMasterfmFm.length > 0){                
 
                 cnxMasterfmFm.forEach(cnx => {
+
+                    var masterFieldIndex = crud.panels[0].fields.findIndex(f=>f.name==cnx.masterFieldName);
+                    var masterField = crud.panels[0].fields[masterFieldIndex];
+                    masterField.tipe = 0;
+                    masterField.col = 8;
+                    masterField.colAllLevel = true;
+
+                    var cnxAddName = addName + "-" + cnx.maidName;
+                    var cnxEditName = editName + "-" + cnx.maidName;
+
+                    crud.panels[0].fields.splice(
+                        masterFieldIndex+1,0,
+                        {
+                            ...fld_edit,
+                            colAllLevel:true,
+                            name:cnxEditName,col:2
+                        }
+                    );
+                    crud.panels[0].fields.splice(
+                        masterFieldIndex+1,0,
+                        {
+                            ...fld_add,
+                            colAllLevel:true,
+                            name:cnxAddName,col:2
+                        }
+                    );
                     
                     this.#crudAddActionEventToScript({
                     events:crud.events,
                     eventName:"boxUpdate",
                     action:({field,k})=>{
 
-                        var maidCrud = u.crudGetBuild({crudName:cnx.maidName});
+                        var maidCrud = u.crudGetBuild({crudName:cnx.maidName});                        
 
-                        if(field.name == editName){
+                        if(field.name == cnxEditName){
                                                       
                             var value = k.bodyGet().fieldGetValues({fieldName:cnx.masterFieldName})[0];
                             maidCrud.CrudJoins_Set({
@@ -459,7 +600,7 @@ class CrudsGroup extends ODD {
                             maidCrud.SetState({stateName:"reload"});
                         }
 
-                        if(field.name == addName){
+                        if(field.name == cnxAddName){
 
                             maidCrud.SetState({stateName:"new"});
                         }
@@ -488,8 +629,9 @@ class CrudsGroup extends ODD {
 
                                 
                                 if(crud.modalBuild) crud.modalBuild.SetActive({active:false});
-                                var masterField = crudMaster.bodyGet().fieldsGet().find(f=>f.value==cnx.masterFieldValue);
+                                var masterField = crudMaster.bodyGet().fieldsGet().find(f=>f.value==cnx.masterFieldName);
                                 crudMaster.bodyGet().fieldSetValues({fieldName:masterField.name,values:[value]});
+                                crudMaster.Update_AddChangeField({fieldName:masterField.name,value});
                             }});
                         }
                     });
@@ -529,8 +671,8 @@ class CrudsGroup extends ODD {
 
                         crud.stateStart = "block";
                         crud.stateTools[2].tools.find(t=>t.name=="insert").show=true;   
-                        //crud.afterUpdate = "block";
-                    }                  
+                        crud.afterUpdate = "block";
+                    }
                 }
 
                 cnxMasterList.forEach(cnx => {
@@ -630,7 +772,7 @@ class CrudsGroup extends ODD {
 
             if(cnxMaidList.length > 0){
 
-                var cnxMaidOfMaid = this.#conections.filter(cnx=>cnx.masterName == cnxMaidList[0].maidName);
+                var cnxMaidOfMaid = this.#conections.filter(cnx=>cnx.event == "tableForm" && cnx.masterName == cnxMaidList[0].maidName);
                 crud.filters = [];
 
                 crud.stateStart="block";
@@ -676,7 +818,7 @@ class CrudsGroup extends ODD {
                 crud.stateTools[0].tools.find(t=>t.name=="pages").show=true;
                 crud.stateTools[0].tools.find(t=>t.name=="sizes").show=true;
                 crud.stateTools[0].tools.find(t=>t.name=="sizes").value = 10;
-                crud.newActive = false;
+                crud.newActive = false;               
 
                 cnxMasterTbFm.forEach(cnx => {
                     
@@ -911,6 +1053,58 @@ class CrudsGroup extends ODD {
         event.actions.push({action});
     }
 
+    #crudGetValue({crudName,selectName,fieldName,y=0}){
+
+        var value = null;
+
+        var crudBuild = this.crudGetBuild({crudName});
+        
+        if(selectName){
+
+            var data = crudBuild.Reload_GetData();
+            value = data[y][selectName];
+        }
+
+        if(fieldName){
+
+            var values = crudBuild.bodyGet().fieldGetValues({fieldName});
+            value = values[y];
+        }
+
+        return value;
+    }
+
+    #crudConectToMaid({masterName,masterSelect,masterFieldName,y=0,maidName,maidSelect}){
+
+        var cnxName = masterName + "-cnx-" + maidName;
+        var masterValue = null;
+        var masterCrudBuild = this.crudGetBuild({crudName:masterName});
+        
+        if(masterSelect){
+
+            var data = masterCrudBuild.Reload_GetData();
+            masterValue = data[y][masterSelect];
+        }
+
+        if(masterFieldName){
+
+            var values = masterCrudBuild.bodyGet().fieldGetValues({fieldName:masterFieldName});
+            masterValue = values[y];
+        }
+
+        if(masterValue){
+
+            var maidCrudBuild = this.crudGetBuild({crudName:maidName});
+            
+            maidCrudBuild.CrudJoins_Set({
+                name:cnxName,
+                field:maidSelect,
+                value:masterValue,
+            });
+            maidCrudBuild.SetState({stateName:"reload"});
+        }
+    }
+
     #crudSetParent({crud}){
 
         if(typeof crud.parent === "string"){
@@ -936,7 +1130,7 @@ class CrudsGroup extends ODD {
         return this.#cruds.find(crd=>crd.name==crudName).build;
     }
 
-    CrudJoin({masterCrud,masterSelect,masterFieldValue,y,maidCrud,maidSelect}){
+    CrudJoin({masterCrud,masterSelect,masterFieldValue,y=0,maidCrud,maidSelect}){
 
         var cr_master = this.crudGetBuild({crudName:masterCrud});
         var value = null;

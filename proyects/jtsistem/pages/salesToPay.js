@@ -11,7 +11,7 @@ $(document).ready(function() {
         fechaMax:null,
         fechaMin:null,
         status:[op_sales_status[1].show,op_sales_status[2].show,op_sales_status[3].show],
-        pays:[op_sales_paid[1].show],
+        pays:[op_sales_paid[0].show],
         orderField:"ID_STATUS",
       });
 

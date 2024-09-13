@@ -31,7 +31,7 @@ $(document).ready(function() {
                     {value:"limit",state:"edit"},
                     {value:"limitOn",state:"show"},
 
-                    {value:"tipe",state:"show"},
+                    {value:"tipe",state:"show",filter:{value:op_products_tipe.filter(op=>op.value!=1).map(op=>{return op.show})}},
                     {value:"tag",state:"show"},
                     {value:"active",state:"show"},
                   ],

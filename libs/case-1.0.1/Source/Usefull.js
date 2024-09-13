@@ -384,6 +384,7 @@ function GetGridConfig({panels=[],breaklevel="md"}){
         cols:[],
         labels:[],
         attributes:[],
+        events:[],
     };
 
     //panels = panels.filter(f=>f!=null);
@@ -395,7 +396,7 @@ function GetGridConfig({panels=[],breaklevel="md"}){
 
     for (let p = 0; p < panels.length; p++) {
 
-        var panel = panels[p];
+        let panel = panels[p];
         panel.x = x;
         panel.y = y;
 
@@ -424,7 +425,25 @@ function GetGridConfig({panels=[],breaklevel="md"}){
             x++;
         }
 
-        if(panel.box) grid.labels.push(panel);
+        if(panel.box){
+
+            grid.labels.push(panel);
+            let updateAction = panel.update ? panel.update : panel.box.update;
+            if(updateAction!=null){
+                
+                grid.events.push({
+                    name:"labelUpdate",
+                    actions:[{
+                        name:panel.name,
+                        action:(params)=>{
+
+                            if(params.label.name == panel.name) updateAction(params);
+                        }
+                    }]
+                });
+            }
+        }
+        
     }
 
     grid.panels = panels;

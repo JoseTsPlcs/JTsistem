@@ -49,8 +49,8 @@ const op_sales_status = [
     {value:5,show:"anulado",class:"rounded text-center bg-danger text-white"},
 ];
 const op_sales_paid = [
-    {value:1,show:"pagado",class:"rounded text-center bg-success text-white"},
     {value:0,show:"sin pagar",class:"rounded text-center bg-danger text-white"},
+    {value:1,show:"pagado",class:"rounded text-center bg-success text-white"},
 ];
 const op_sales_document = [
     {value:1,show:"nota de pago"},
