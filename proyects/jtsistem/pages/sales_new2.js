@@ -61,9 +61,6 @@ $(document).ready(function() {
                 actions:[{
                   action:({k})=>{
 
-                    console.log("SALE FILTER!!");
-                    
-
                     var saleCrud = k;
                     var sale = saleCrud.bodyGet();
 
@@ -71,9 +68,6 @@ $(document).ready(function() {
                     var priceTotals = listItems.fieldGetValues({fieldName:"priceTotal"});
                     var totalItems = priceTotals.reduce((acc,v)=>{return acc + parseFloat(v);},0);
                     sale.fieldSetValues({fieldName:"totaldscto",values:[totalItems]});
-
-                    console.log("TOTAL DSCTO:",totalItems,"PRICESTOTALS:",priceTotals);
-                    
 
                     var dsct = parseFloat(sale.fieldGetValues({fieldName:"dscto"})[0]);
                     var totaltoPay = totalItems * (1 - dsct/100); 
@@ -220,20 +214,6 @@ $(document).ready(function() {
           masterSelect:"ID_SALE",
           searchValue:"id_sale",
         },
-        {
-          event:"formForm",
-          masterName:"cr-item",
-          masterFieldName:"unid",
-          maidName:"cr-unid",
-          maidSelect:"ID_UNID",
-        },
-        {
-          event:"formForm",
-          masterName:"cr-item",
-          masterFieldName:"tag",
-          maidName:"cr-tag",
-          maidSelect:"ID_PRODUCT_TAG",
-        },
       ],
       groups:[
         {
@@ -315,8 +295,8 @@ $(document).ready(function() {
                         {value:"unid",state:"edit"},
                         {value:"price",state:"edit",col:6},
                         {value:"costUnit",state:"edit",col:6},
-                        {value:"stock",state:"edit",col:6},
-                        {value:"limit",state:"edit",col:6},
+                        {value:"stock",state:"edit",col:6,boxValue:999},
+                        {value:"limit",state:"edit",col:6,boxValue:-999},
                       ],
                     }
                   ],
@@ -365,7 +345,21 @@ $(document).ready(function() {
                 event:"btn-edit",
                 maidName:"cr-item",
                 maidSelect:"ID_PRODUCT",
-              }
+              },
+              {
+                event:"formForm",
+                masterName:"cr-item",
+                masterFieldName:"unid",
+                maidName:"cr-unid",
+                maidSelect:"ID_UNID",
+              },
+              {
+                event:"formForm",
+                masterName:"cr-item",
+                masterFieldName:"tag",
+                maidName:"cr-tag",
+                maidSelect:"ID_PRODUCT_TAG",
+              },
             ],
           }:null
         ),
