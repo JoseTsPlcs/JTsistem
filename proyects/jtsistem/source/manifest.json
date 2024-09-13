@@ -2,7 +2,7 @@
 {
     "name": "jtsistem",
     "short_name": "jtsistem",
-    "start_url": "https://jtsistem.azurewebsites.net/",
+    "start_url": "http://localhost/JTsistem/",
     "display": "standalone",
     "background_color": "#1a2c40",
     "theme_color": "#1a2c40",

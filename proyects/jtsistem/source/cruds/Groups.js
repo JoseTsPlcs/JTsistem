@@ -1,4 +1,9 @@
 
+function gp_conect_md({}) {
+    
+}
+
+
 function gp_customer({parentName,masterCrud,masterFieldName=null}) {
   
     return {

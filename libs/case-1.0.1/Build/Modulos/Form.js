@@ -176,7 +176,7 @@ class Form extends ODD {
         else box.Hide();
         tool.show = show;
 
-        console.log(toolName,tool,show,"box: ", box);
+        console.log("TOOL SET",toolName,tool,show,"BOX: ", box);
     }
     ToolGetBox({toolName}){
 

@@ -5,7 +5,8 @@ $(document).ready(function() {
     success:({userData,pageData})=>{
       
       var acc_price_update = Access_Get(userData.access,"md-items-sale-price");
-      var acc_pays = Access_Get(userData.access,"md-box");
+      var acc_pays = Access_Get(userData.access,"md-box-general");
+      var acc_item_edit = Access_Get(userData.access,"md-items-sale-add");
 
      var group = new CrudsGroup({
       parent:pageData.body,userData,test:false,
@@ -45,7 +46,7 @@ $(document).ready(function() {
               {
                 tipe:"form",title:"total",col:12,
                 fields:[
-                  {name:"totalPay",title:"total pagado",box:{...bx_money}},
+                  (acc_pays?{name:"totalPay",title:"total pagado",box:{...bx_money}}:null),
                 ],
                 fieldsSet:[
                   {position:"last",value:"total",showBox:{...bx_moneyh1}},
@@ -60,6 +61,9 @@ $(document).ready(function() {
                 actions:[{
                   action:({k})=>{
 
+                    console.log("SALE FILTER!!");
+                    
+
                     var saleCrud = k;
                     var sale = saleCrud.bodyGet();
 
@@ -67,6 +71,9 @@ $(document).ready(function() {
                     var priceTotals = listItems.fieldGetValues({fieldName:"priceTotal"});
                     var totalItems = priceTotals.reduce((acc,v)=>{return acc + parseFloat(v);},0);
                     sale.fieldSetValues({fieldName:"totaldscto",values:[totalItems]});
+
+                    console.log("TOTAL DSCTO:",totalItems,"PRICESTOTALS:",priceTotals);
+                    
 
                     var dsct = parseFloat(sale.fieldGetValues({fieldName:"dscto"})[0]);
                     var totaltoPay = totalItems * (1 - dsct/100); 
@@ -119,7 +126,16 @@ $(document).ready(function() {
                     }
                   }
                 }]
-              }
+              },
+              {
+                name:"printAfter",
+                actions:[{
+                  action:({field,k})=>{
+
+                    k.CallEvent({name:"saleFilter"});
+                  }
+                }]
+              },
             ],
           }
         },
@@ -133,10 +149,35 @@ $(document).ready(function() {
             ],
           }
         },
+        {
+          grid:{
+            parent:"stp-items",
+            items:[
+              (
+                acc_item_edit?
+                {
+                  name:"item-add",tipe:0,col:4,
+                  box:{
+                    ...fld_add.box,
+                    value:'<i class="bi bi-plus-circle"></i> Añadir Nuevo Item',
+                  },                
+                  update:(params)=>{
+  
+                    var cr_item = group.crudGetBuild({crudName:"cr-item"});
+                    cr_item.SetState({stateName:"new"});
+                    
+                  }
+                }:null
+              ),
+              {name:"item-cont",box:{tipe:0,class:"conteiner"},tipe:0},
+              {name:"stp-items-div",col:12},
+            ],
+          }
+        },
         //------items------
         {
           crud:{
-            parent:"stp-items",
+            parent:"stp-items-div",
             name:"cr-items",title:"lista de productos",
             schema:sch_sales_products,
             panels:[{
@@ -147,14 +188,28 @@ $(document).ready(function() {
                 {value:"priceUnit",state:(acc_price_update?"edit":"show")},
                 {value:"priceTotal",state:(acc_price_update?"edit":"show")},
               ],
-            }]
+            }],
+            events:[
+              {
+                name:"printAfter",
+                actions:[{
+                  action:({})=>{
+
+                    var crudSale = group.crudGetBuild({crudName:"cr-sale"});
+                    crudSale.CallEvent({name:"saleFilter"});
+                  }
+                }]
+              }
+            ],
           }
         },
+        
       ],
       conections:[
         {
           masterName:"cr-sale",
           masterSelect:"ID_SALE",
+          masterStateStart:"insert",
           event:"list",
           maidName:"cr-items",
           maidSelect:"ID_SALE",
@@ -164,7 +219,21 @@ $(document).ready(function() {
           masterName:"cr-sale",
           masterSelect:"ID_SALE",
           searchValue:"id_sale",
-        }
+        },
+        {
+          event:"formForm",
+          masterName:"cr-item",
+          masterFieldName:"unid",
+          maidName:"cr-unid",
+          maidSelect:"ID_UNID",
+        },
+        {
+          event:"formForm",
+          masterName:"cr-item",
+          masterFieldName:"tag",
+          maidName:"cr-tag",
+          maidSelect:"ID_PRODUCT_TAG",
+        },
       ],
       groups:[
         {
@@ -211,6 +280,93 @@ $(document).ready(function() {
                 }]
               }],
             }),
+          }:null
+        ),
+        (
+          acc_item_edit ?
+          {
+            layers:[
+              //-----item new------
+              {
+                grid:{
+                  parent:"item-cont",
+                  items:[
+                    {name:"prnt-item-main"},
+                    {name:"prnt-item-unid"},
+                    {name:"prnt-item-tag"},
+                  ],
+                }
+              },
+              {modal:{parent:"prnt-item-main",name:"md-item-maid"}},
+              {modal:{parent:"prnt-item-unid",name:"md-item-unid"}},
+              {modal:{parent:"prnt-item-tag",name:"md-item-tag"}},
+              {
+                crud:{
+                  parent:"md-item-maid",title:"item",
+                  schema:sch_items,name:"cr-item",stateStart:"block",
+                  afterCancel:"block",
+                  panels:[
+                    {
+                      tipe:"form",head:false,
+                      fieldsSet:[
+                        {value:"name",state:"edit"},
+                        {value:"tipe",state:"edit"},
+                        {value:"tag",state:"edit"},
+                        {value:"unid",state:"edit"},
+                        {value:"price",state:"edit",col:6},
+                        {value:"costUnit",state:"edit",col:6},
+                        {value:"stock",state:"edit",col:6},
+                        {value:"limit",state:"edit",col:6},
+                      ],
+                    }
+                  ],
+                  events:[{
+                    name:"insertAfter",
+                    actions:[{
+                      action:({})=>{
+
+                        var crudItems = group.crudGetBuild({crudName:"cr-items"});
+                        crudItems.Load_Reset({});
+                      }
+                    }]
+                  }],
+                }
+              },
+              {
+                crud:{
+                  parent:"md-item-unid",title:"unidad",
+                  schema:sch_unids,name:"cr-unid",
+                  panels:[{
+                    tipe:"form",head:false,
+                    fieldsSet:[
+                      {value:"name",state:"edit"},
+                      {value:"simbol",state:"edit"},
+                    ]
+                  }]
+                }
+              },
+              {
+                crud:{
+                  parent:"md-item-tag",title:"etiqueta",
+                  schema:sch_items_tag,name:"cr-tag",
+                  panels:[{
+                    tipe:"form",head:false,
+                    fieldsSet:[
+                      {value:"name",state:"edit"},
+                    ]
+                  }]
+                }
+              },
+            ],
+            conections:[
+              {
+                masterName:"cr-items",
+                masterFieldName:"item",
+                event:"btn-edit",
+                maidName:"cr-item",
+                maidSelect:"ID_PRODUCT",
+              }
+            ],
           }:null
         ),
       ],

@@ -211,7 +211,7 @@ class Crud_Body extends ODD {
         title:(config&&config.title!=null?config.title:"busqueda"),
         head:(config&&config.head!=null?config.head:true),
         show:(config&&config.show!=null?config.show:false),
-        toolsPositions:(config&&config.positions?config.positions:[]),
+        toolsPositions:(config&&config.toolsPositions?config.toolsPositions:[]),
         parent: this.#config.window.Conteiner_GetColData({x:0,y:0}).col,
         filters,
         events:[
