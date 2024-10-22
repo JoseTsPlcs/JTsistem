@@ -1,0 +1,202 @@
+/* Estilos generales */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+::after,
+::before {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+li {
+    list-style: none;
+}
+
+h1 {
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+.wrapper {
+    display: flex;
+}
+
+.main {
+    min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    transition: all 0.35s ease-in-out;
+    background-color: #f0f0f0;
+}
+
+#sidebar {
+    width: 70px;
+    min-width: 70px;
+    z-index: 1000;
+    transition: all .25s ease-in-out;
+    background-color: #0e2238;
+    display: flex;
+    flex-direction: column;
+}
+
+#sidebar.expand {
+    width: 260px;
+    min-width: 260px;
+}
+
+.toggle-btn {
+    background-color: transparent;
+    cursor: pointer;
+    border: 0;
+    padding: 1rem 1.5rem;
+}
+
+.toggle-btn i {
+    font-size: 1.5rem;
+    color: #FFF;
+}
+
+.sidebar-logo {
+    margin: auto 0;
+}
+
+.sidebar-logo a {
+    color: #FFF;
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+#sidebar:not(.expand) .sidebar-logo,
+#sidebar:not(.expand) a.sidebar-link span {
+    display: none;
+}
+
+.sidebar-nav {
+    padding: 2rem 0;
+    flex: 1 1 auto;
+}
+
+a.sidebar-link {
+    padding: .625rem 1.625rem;
+    color: #FFF;
+    display: block;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    border-left: 3px solid transparent;
+}
+
+.sidebar-link i {
+    font-size: 1.1rem;
+    margin-right: .75rem;
+}
+
+a.sidebar-link:hover {
+    background-color: rgba(255, 255, 255, .075);
+    border-left: 3px solid #3b7ddd;
+}
+
+.sidebar-item {
+    position: relative;
+}
+
+#sidebar:not(.expand) .sidebar-item .sidebar-dropdown {
+    position: absolute;
+    top: 0;
+    left: 70px;
+    background-color: #0e2238;
+    padding: 0;
+    min-width: 15rem;
+    display: none;
+}
+
+#sidebar:not(.expand) .sidebar-item:hover .has-dropdown+.sidebar-dropdown {
+    display: block;
+    max-height: 15em;
+    width: 100%;
+    opacity: 1;
+}
+
+#sidebar.expand .sidebar-link[data-bs-toggle="collapse"]::after {
+    border: solid;
+    border-width: 0 .075rem .075rem 0;
+    content: "";
+    display: inline-block;
+    padding: 2px;
+    position: absolute;
+    right: 1.5rem;
+    top: 1.4rem;
+    transform: rotate(-135deg);
+    transition: all .2s ease-out;
+}
+
+#sidebar.expand .sidebar-link[data-bs-toggle="collapse"].collapsed::after {
+    transform: rotate(45deg);
+    transition: all .2s ease-out;
+}
+
+
+/* Estilos para la barra horizontal */
+.horizontal-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%; /* Llena el ancho del contenedor */
+    background-color: #0e2238; /* Mismo color que la barra vertical */
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 999; /* Asegúrate de que esté debajo de la barra vertical */
+    display: flex;
+    justify-content: flex-end; /* Alinea el ícono a la derecha */
+}
+
+.horizontal-bar .btn {
+    color: #ffffff;
+    background-color: transparent;
+    border: none;
+    font-size: 24px; /* Tamaño del ícono */
+    padding: 0px;
+    transition: background-color 0.3s;
+}
+
+.horizontal-bar .btn:hover {
+    background-color: #1a2c40; /* Color de hover para coincidir con el color de la barra vertical */
+}
+
+.navbar.bg-dark {
+    background-color: #1a2c40 !important;
+}
+
+/* Limitar el tamaño máximo del dropdown en dispositivos móviles */
+@media (max-width: 576px) {
+    .dropdown-menu {
+      max-width: 100vw; /* Limitar el ancho máximo al tamaño del viewport */
+      overflow-x: hidden; /* Evitar que se desborde horizontalmente */
+      position: absolute; /* Asegurar que el dropdown esté posicionado */
+      left: 0; /* Alinear al borde izquierdo de la pantalla */
+      right: 0; /* Alinear al borde derecho de la pantalla */
+      z-index: 1099;
+    }
+  
+    /* Asegurarse de que el dropdown esté visible */
+    .dropdown-menu.show {
+      display: block; /* Asegurarse de que el dropdown se muestre */
+    }
+  }
+  
+
+
+
+
+
+
+
+
+
