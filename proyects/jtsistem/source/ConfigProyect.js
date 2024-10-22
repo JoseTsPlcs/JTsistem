@@ -1,8 +1,8 @@
 
-const primaryShow = true;
+const primaryShow = false;
 const ambient = 'dev';
 const test = false;
-const testNew = true;
+const testNew = false;
 const testPay = false;
 const testPaySet = false;
 const testAccess = false;

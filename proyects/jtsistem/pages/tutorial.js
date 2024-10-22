@@ -130,7 +130,6 @@ $(document).ready(function() {
       UpdateNotifications();      
       setInterval(UpdateNotifications,1000);
 
-
       tutorialsData.forEach(t=>{ 
         if(t.access==null)t.access = true;
         else if(typeof t.access === "string") t.access = Access_Get(userData.access,t.access);
