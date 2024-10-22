@@ -293,7 +293,7 @@ class Table_Grid extends ODD {
     });
 
     var line = this.#linesDoom[y];
-    console.log("line",line);
+    //console.log("line",line);
     var tr = line.line;
     tr.remove();
   }

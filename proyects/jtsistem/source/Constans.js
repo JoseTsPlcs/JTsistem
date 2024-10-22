@@ -71,6 +71,8 @@ const op_products_tipe = [
     {value:1,show:"servicio",class:"rounded text-center bg-primary text-white"},
     {value:2,show:"insumo",class:"rounded text-center bg-warning text-white"},
     {value:3,show:"producto",class:"rounded text-center bg-success text-white"},
+    {value:4,show:"receta",class:"rounded text-center bg-danger text-white"},
+    {value:5,show:"paquete",class:"rounded text-center bg-info text-white"},
 ];
 const op_buys_status = [
     {value:1,show:"cotizacion",class:"rounded text-center bg-secondary text-white"},
@@ -90,6 +92,7 @@ const op_date_ranges = [
     {value:"month",show:"mensual"},
     {value:"tri",show:"trimestre"},
 ];
+
 
 const op_control_type = [
     {value:1,show:"abrir"},
@@ -172,11 +175,12 @@ const att_cnt2 = [{name:"class",value:"m-0 py-0 px-1"},{name:"style",value:"widt
 
 //---------fields---------
 
-const fld_delete = {name:"dlt",title:"borrar",box:{tipe:5,value:'<i class="bi bi-x-circle"></i>',class:"btn btn-danger btn"},action:"delete",descripcion:"seleccionar para borrar registro"};
-const fld_edit = {name:"edit",title:"editar",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn"},action:"edit",descripcion:"seleccionar para editar registro"};
-const fld_add = {name:"add",title:"añadir",box:{tipe:5,value:'<i class="bi bi-plus-circle"></i>',class:"btn btn-primary btn"},action:"add",descriptcon:"seleccionar para añadir registro"};
-const fld_show = {name:"show",title:"mostrar",box:{tipe:5,value:'<i class="bi bi-eye-fill"></i>',class:"btn btn-primary btn"},action:"show",descripcion:"seleccionar para mostrar detalle del registro"};
-const fld_search = {name:"edit",title:"buscar",box:{tipe:5,value:'<i class="bi bi-search"></i>',class:"btn btn-primary btn"},action:"search",descripcion:"seleccionar para editar registro"};
+const fld_delete = {name:"dlt",title:"borrar",box:{tipe:5,value:'<i class="bi bi-x-circle"></i>',class:"btn btn-danger btn"},action:"delete",descripcion:"para borrar [registro]"};
+const fld_edit = {name:"edit",title:"editar",box:{tipe:5,value:'<i class="bi bi-pencil-square"></i>',class:"btn btn-primary btn"},action:"edit",descripcion:"para editar [registro]"};
+const fld_add = {name:"add",title:"añadir",box:{tipe:5,value:'<i class="bi bi-plus-circle"></i>',class:"btn btn-primary btn"},action:"add",descripcion:"para añadir [registro]"};
+const fld_show = {name:"show",title:"mostrar",box:{tipe:5,value:'<i class="bi bi-eye-fill"></i>',class:"btn btn-primary btn"},action:"show",descripcion:"para mostrar el detalle de [registro]"};
+const fld_search = {name:"edit",title:"buscar",box:{tipe:5,value:'<i class="bi bi-search"></i>',class:"btn btn-primary btn"},action:"search",descripcion:"para editar [registro]"};
+const fld_copy = {name:"copy",title:"copiar",box:{tipe:5,value:'<i class="bi bi-arrow-bar-left"></i><i class="bi bi-clipboard"></i>',class:"btn btn-primary btn"},action:"copy",descripcion:"para copiar"};
 
 function fld_ld_worker({panel="main",edit=true}){
 
@@ -192,3 +196,4 @@ function fld_ld_worker({panel="main",edit=true}){
 //---------filter
 
 const flt_active = {name:"activo",box:{tipe:4,options:op_active,value:["activo"]}};
+const flt_period = {name:"periodo",box:{tipe:3,options:op_date_ranges,value:"day"},descripcion:"selecciona el periodo (diario/semanal/mensual/trimestral) que se mostrar los datos"};

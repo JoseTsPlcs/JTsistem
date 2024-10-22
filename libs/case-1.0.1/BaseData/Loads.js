@@ -34,6 +34,14 @@ class Loads extends ODD {
 
         return this.#loads;
     }
+    loadGet({loadName}){
+
+        return this.#loads.find(ld=>ld.name==loadName);
+    }
+    loadGetResult({loadName}){
+
+        return this.loadGet({loadName}).result;
+    }
 
     //------
 
@@ -82,7 +90,6 @@ class Loads extends ODD {
 
     #Loaded({success}){
         
-        //console.log("loads - loaded");
         if(this.#screenload) this.#screenload.SetState({state:false});
         var params =  {loads:this.#loads};
         this.CallEvent({name:"loaded",params});

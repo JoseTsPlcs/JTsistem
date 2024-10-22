@@ -5,358 +5,197 @@ $(document).ready(function() {
 
     success:({userData,pageData})=>{
 
-      var acc_rucs = Access_Get(userData.access,"mod-bill-rucs");
+      const fieldCopy = [
+        {fieldName:"nroDoc",copyName:"copy-doc"},
+        {fieldName:"item",copyName:"copy-item"},
+        {fieldName:"cant",copyName:"copy-cant"},
+        {fieldName:"priceUnit",copyName:"copy-price-unit"}
+      ];
 
-      var gr = new Grid({
-        parent:pageData.body,
-        cols:[[6,6],[6,6],[12],[12]],
-        boxs:[
-          {x:0,y:0,box:{tipe:0,value:"Igv:",class:"h1 text-center"}},
-          {x:1,y:0,box:bx_moneyh1},
-    
-          {x:0,y:1,box:{tipe:0,value:"total:",class:"h3 text-center"}},
-          {x:1,y:1,box:bx_moneyh3},
+      function fieldCopyClipboard({crudBuild,field,y=0}) {
+        
+        var fieldCopyFound = fieldCopy.find(cp=>cp.copyName==field.name);
+        
+        if(fieldCopyFound){
+
+          navigator.clipboard.writeText(crudBuild.bodyGet().fieldGetValues({fieldName:fieldCopyFound.fieldName})[y]);
+        }       
+      }
+
+      var customerJoin = GetInfoBySchema({
+        userData,
+        schema:sch_customers,
+        fieldsSet:[
+          {value:"name"},
+          {value:"nroDoc"},
         ],
       });
-      var md = new Modal({parent:gr.GetColData({x:0,y:3}).col,size:"lg"});
-      var mdgr = new Grid({
-        parent:md.GetContent(),
-        cols:[[12],[12]],
-      });
-      //md.SetActive({active:true});
-    
-      new ConsCruds({
-    
-        cruds:[
+      customerJoin.join = {
+        main:{table:sch_sales.table,field:sch_customers.fieldPrimary},
+        join:{table:sch_customers.table,field:sch_customers.fieldPrimary},
+        tipe:"LEFT",
+      };
+
+      var group = new CrudsGroup({
+        userData,pageData,
+        parent:pageData.body,
+        layers:[
           {
-            name:"bills",
-            active:true,
-            script:{
-    
-              parent:gr.GetColData({x:0,y:2}).col,
-              title:"lista de facturas",
-              panels:[{col:12,y:0,title:"main",tipe:"table"}],
-              stateTools:stTls_tb_all,
-          
-              tableMain:"sales",
-              selects:[
-                {table:'sales', field:'ID_SALE',primary:true},
-                {table:'sales', field:'DATE_EMMIT'},
-                {table:'sales', field:'ID_STATUS'},
-                {table:'sales', field:'PAID'},
-                {table:'sales', field:'ID_DOCUMENT'},
-                {table:'sales', field:'ID_CUSTOMER'},
-                {table:'sales', field:'TOTAL'},
-                {table:"sales",field:"DOCUMENT_EMMIT"},
-                {table:'customers',field:'NAME'},
-              ],
-              joins:[
-                {main:{table:"sales",field:"ID_CUSTOMER"},join:{table:"customers",field:"ID_CUSTOMER"},tipe:"LEFT"}
-              ],
-              conditions:[
-                {
-                  before:" AND ",
-                  table:"sales",
-                  field:"ID_COMPANY",
-                  inter:"=",
-                  value:userData.company.id,
-                }
-              ],
-              orders:[
-                {field:"DATE_EMMIT",asc:false},
-              ],
-              loads:[
-                (acc_rucs?{...ld_rucs}:null),
-              ],
-          
-              configShow:false,
-              filters:[
-                {col:12,y:0,name:"cliente",box:bx_input,select:{table:"customers",field:"NAME"}},
-                {col:6,y:1,name:"fecha min",box:bx_date_start,select:{table:"sales",field:"DATE_EMMIT",tipe:"min"}},
-                {col:6,y:1,name:"fechamax",box:bx_date_end,select:{table:"sales",field:"DATE_EMMIT",tipe:"max"}},
-                {col:12,y:2,name:"estado",box:{tipe:4,options:op_sales_status},select:{table:"sales",field:"ID_STATUS"}},
-                {col:12,y:2,name:"cancelado",box:{tipe:4,options:op_sales_paid},select:{table:"sales",field:"PAID"}},
-                {col:12,name:"emitido",box:{tipe:4,options:op_document_emmit},select:{table:"sales",field:"DOCUMENT_EMMIT"}},
-                {col:12,y:2,name:"documento",box:{tipe:4,options:op_sales_document,value:["factura","boleta"]},select:{table:"sales",field:"ID_DOCUMENT"}},
-                (acc_rucs?{name:"ruc",box:{tipe:4,options:[{value:"null",show:"Seleccionar Cliente"}]},load:{name:"ld-rucs",value:"value",show:"show"},select:{table:"sales",field:"ID_RUC"}}:null),
-              ],
-              fields:[
-                //{panel:"main",name:"id",box:{tipe:0},select:"ID_SALE"},
-          
-                {panel:"main",...fld_show,action:"edit"},
-                {panel:"main",name:"cliente",box:{tipe:0},select:"NAME"},
-                {panel:"main",name:"estado",box:{tipe:0,options:op_sales_status},select:"ID_STATUS"},
-                {panel:"main",name:"cancelado",attributes:[{name:"style",value:"min-width: 120px;"}],box:{tipe:0,options:op_sales_paid},select:"PAID"},
-                {panel:"main",name:"total",box:bx_money,select:"TOTAL"},
-                {panel:"main",name:"documento",box:{tipe:0,options:op_sales_document},select:"ID_DOCUMENT"},
-                {panel:"main",name:"fecha de emision",box:{tipe:0},select:"DATE_EMMIT"},
-                {panel:"main",name:"emitido",box:{tipe:6,name:"emitido",options:op_document_emmit},select:"DOCUMENT_EMMIT"},
-                (acc_rucs?{panel:"main",name:"ruc",box:{tipe:4},load:{name:"ld-rucs",value:"value",show:"show"}}:null),
-              ],   
-              
-              events:[
-                {
-                  name:"printAfter",
-                  actions:[{
-                    action:({result})=>{
-    
-                      var total = result.reduce((acum,val)=>{
-    
-                        return acum + parseFloat(val["TOTAL"]);
-                      },0);
-                      var igv = total * 18/100;
-    
-                      gr.GetColData({x:1,y:0}).boxs[0].SetValue(igv);
-                      gr.GetColData({x:1,y:1}).boxs[0].SetValue(total);
-    
-                    }
-                  }]
-                }
-              ],
+            grid:{
+              items:[
+                {name:"prnt-card",col:12},
+                {name:"prnt-bills",col:12},
+                {name:"prnt-md-bill"},
+              ]
             }
           },
           {
-            name:"saleBill",
-            active:true,
-            script:{
-              parent:mdgr.GetColData({x:0,y:0}).col,
-              title:"factura",
-              panels:[{col:12,y:0,title:"main",tipe:"form"}],
-              stateStart:"block",
-              stateTools:stTls_tb_show, 
-    
-              tableMain:"sales",
-              selects:[
-                {table:'sales', field:'ID_SALE',primary:true},
-                {table:'sales', field:'DATE_EMMIT'},
-                {table:'sales', field:'ID_STATUS'},
-                {table:'sales', field:'ID_DOCUMENT'},
-                {table:'sales', field:'ID_CUSTOMER'},
-                {table:'sales', field:'TOTAL'},
-                {table:'customers',field:'NAME'},
-                {table:'customers',field:'NRO_DOCUMENT'},
-                {table:'customers',field:'COMPANY'},
-              ],
-              joins:[
-                {main:{table:"sales",field:"ID_CUSTOMER"},join:{table:"customers",field:"ID_CUSTOMER"},tipe:"LEFT"}
-              ],
-    
-              fields:[
-                //{panel:"main",name:"id",box:{tipe:0},select:"ID_SALE"},
-                {panel:"main",name:"fecha de emision",box:{tipe:0},select:"DATE_EMMIT"},
-                {panel:"main",name:"documento",box:{tipe:0,options:op_sales_document},select:"ID_DOCUMENT"},
-                {panel:"main",name:"cliente",box:{tipe:0},select:"NAME"},
-                {panel:"main",name:"cliente documento",box:{tipe:0,options:op_identity_document_tipe},select:"COMPANY"},
-                {panel:"main",col:10,name:"nro documento",box:{tipe:0},select:"NRO_DOCUMENT"},
-                {panel:"main",col:2,name:"copy nro",box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-arrow-left-short"></i><i class="bi bi-clipboard"></i>'},action:"copy"},
-                {panel:"main",name:"total",box:bx_money,select:"TOTAL"},
-    
-              ],
-              events:[
+            crud:{
+              title:"lista de facturas",schema:sch_sales,
+              parent:"prnt-bills",name:"cr-bills",
+              joins:[customerJoin.join],
+              selects:[...customerJoin.selects],
+              states:[
                 {
-                  name:"modalSetActive",
-                  actions:[{
-                    action:({active})=>{
-    
-                      md.SetActive({active});
-                    }
-                  }]
-                },
-                {
-                  name:"boxUpdate",
-                  actions:[{
-                    action:({k,field,y})=>{
-
-                      var data = k.Reload_GetData();
-
-                      if(field.name=="copy nro"){
-    
-                        navigator.clipboard.writeText(data[0]["NRO_DOCUMENT"]);
-                      }
-                    }
-                  }]
+                  name:"reload",
+                  tools:[
+                    {name:"reload",show:true},
+                    {name:"config",show:true},
+                    {name:"tutorial",show:true},
+                    {name:"sizes",show:false,value:999},
+                  ],
                 }
               ],
-            }
-          },
-          {
-            name:"saleBill_products",
-            active:true,
-            script:{
-              parent:mdgr.GetColData({x:0,y:1}).col,
-              title:"lista de productos/servicios",
-              panels:[{col:12,y:0,title:"main",tipe:"table"}],
-              stateStart:"block",
-              stateTools:stTls_tb_show, 
-    
-              tableMain:"sales_products",
-              selects:[
-                {table:'sales_products', field:'ID',primary:true},
-                {table:'sales_products', field:'ID_SALE'},
-                {table:'sales_products', field:'ID_PRODUCT'},
-                {table:'sales_products', field:'CANT'},
-                {table:'sales_products', field:'PRICE_UNIT'},
-                {table:'sales_products', field:'PRICE_TOTAL'},
-                {table:"products",field:"NAME"},
-                {table:"products",field:"ID_PRODUCT_TIPE"},
-              ],
-              joins:[
-                {
-                  main:{table:"sales_products",field:"ID_PRODUCT"},
-                  join:{table:"products",field:"ID_PRODUCT"},
-                  tipe:"LEFT",
-                }
-              ],
-    
-              fields:[
-                {panel:"main",name:"producto-servicio",attributes:att_ln,box:{tipe:0},select:"NAME"},
-                {panel:"main",name:"cp",attributes:att_btn,box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-arrow-left-short"></i><i class="bi bi-clipboard"></i>'},action:"copy"},
-                {panel:"main",name:"tipo",attributes:att_cnt,box:{tipe:0,options:op_products_tipe},select:"ID_PRODUCT_TIPE"},
-                {panel:"main",name:"cantidad",attributes:att_cnt,box:{tipe:0,class:"text-center"},select:"CANT"},
-                {panel:"main",name:"cn",attributes:att_btn,box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-arrow-left-short"></i><i class="bi bi-clipboard"></i>'},action:"copy"},
-                {panel:"main",name:"precio unitario",attributes:att_cnt,box:bx_money,select:"PRICE_UNIT"},
-                {panel:"main",name:"cu",attributes:att_btn,box:{tipe:5,class:"btn btn-primary btn-sm",value:'<i class="bi bi-arrow-left-short"></i><i class="bi bi-clipboard"></i>'},action:"copy"},
-                {panel:"main",name:"precio total",attributes:att_cnt,box:bx_money,select:"PRICE_TOTAL"},
-              ],
-              events:[
-                {
-                  name:"printBefore",
-                  actions:[{
-                    action:({k,result})=>{
-    
-                      result.forEach(rst => {
-                        
-                        var priceUnit = parseFloat(rst["PRICE_UNIT"]);
-                        priceUnit /= (1+igvPorcent/100);
-                        rst["PRICE_UNIT"] = priceUnit;
-    
-                        var priceTotal = parseFloat(rst["PRICE_TOTAL"]);
-                        priceTotal /= (1+igvPorcent/100);
-                        rst["PRICE_TOTAL"] = priceTotal;
-                        
-    
-                      });
-    
-                      return {data:result};
-                    }
-                  }]
-                },
-                {
-                  name:"boxUpdate",
-                  actions:[{
-                    action:({field,k,y})=>{
-    
-                      var data = k.Reload_GetData();
-    
-                      if(field.name=="cp"){
-    
-                        navigator.clipboard.writeText(data[y]["NAME"]);
-                      }
-
-                      if(field.name=="cn"){
-    
-                        navigator.clipboard.writeText(data[y]["CANT"]);
-                      }
-    
-                      if(field.name=="cu"){
-    
-                        navigator.clipboard.writeText(data[y]["PRICE_UNIT"]);
-                      }
-                    }
-                  }]
-                }
-              ],
+              panels:[{
+                tipe:"table",
+                fields:[
+                  customerJoin.fields.find(f=>f.name=="name"),
+                ],
+                fieldsSet:[
+                  {value:"status"},
+                  {value:"pay"},
+                  {value:"total"},
+                  {value:"doc",filter:{value:op_sales_document.filter(op=>op.value!=1).map(op=>op.show)}},
+                  {value:"emmit"},
+                  {value:"emit",state:"edit",filter:{value:[op_sales_emitsunat.find(op=>op.value==0).show]}},
+                  {value:"ruc",state:"edit"},
+                ],
+              }],
             },
+          },
+          {modal:{parent:"prnt-md-bill",name:"md-bill",size:"xl"}},
+          {
+            crud:{
+              parent:"md-bill",title:"detalle de factura",head:false,
+              schema:sch_sales,name:"cr-bill",
+              joins:[
+                customerJoin.join,
+              ],
+              selects:[...customerJoin.selects,],
+              panels:[{
+                tipe:"form",title:"informacion",
+                fields:[
+                  customerJoin.fields.find(f=>f.name=="name"),
+                  {...customerJoin.fields.find(f=>f.name=="nroDoc"),col:10},
+                ],
+                fieldsSet:[
+                  {action:"button",name:"copy-doc",title:"copiar item",value:fld_copy.box.value,col:2},
+                  {value:"total"},
+                  {value:"emmit"},
+                  {value:"emit",state:"edit"},
+                  {value:"ruc",state:"edit"},
+                  {action:"div",name:"prnt-bill-detail"},
+                ],
+              }],
+              states:[
+                {
+                  name:"reload",
+                  tools:[
+                    {name:"update",show:true},
+                    {name:"cancel",show:true},
+                    {name:"tutorial",show:true},
+                  ],
+                }
+              ],
+              events:[{
+                name:"boxUpdate",
+                actions:[{
+                  action:({k,field,y})=>{
+
+                    fieldCopyClipboard({crudBuild:k,field,y});
+                  }
+                }]
+              }]
+            },
+          },
+          {
+            crud:{
+              parent:"prnt-bill-detail",title:"detalle de factura",
+              schema:sch_sales_products,name:"cr-bill-detail",
+              states:[],
+              selects:[
+                {table:sch_items.table,field:"NAME",as:"ITEM-NAME"},
+              ],
+              joins:[
+                {
+                  main:{table:sch_sales_products.table,field:sch_items.fieldPrimary},
+                  join:{table:sch_items.table,field:sch_items.fieldPrimary},
+                  tipe:"LEFT",
+                },
+              ],
+              panels:[{
+                tipe:"table",
+                fields:[
+                  {name:"item",box:{tipe:0},select:"ITEM-NAME",attributes:att_ln},
+                ],
+                fieldsSet:[
+                  //{value:"item"},
+                  {action:"button",name:"copy-item",title:"copiar item",value:fld_copy.box.value},
+                  {value:"cant"},
+                  {action:"button",name:"copy-cant",title:"copiar cant.",value:fld_copy.box.value},
+                  {value:"priceUnit"},
+                  {action:"button",name:"copy-price-unit",title:"copiar prec. unit.",value:fld_copy.box.value},
+                ],
+              }],
+              states:[
+                {
+                  name:"reload",
+                  tools:[
+                    {name:"sizes",show:false,value:999},
+                  ],
+                }
+              ],
+              events:[{
+                name:"boxUpdate",
+                actions:[{
+                  action:({k,field,y})=>{
+
+                    fieldCopyClipboard({crudBuild:k,field,y});
+                  }
+                }]
+              }],
+            }
           }
         ],
-    
         conections:[
           {
-            tipe:"tb-fm",
-            master:"bills",
-            masterField:"ID_SALE",
-            maid:"saleBill",
-            maidField:"ID_SALE",
+            event:"cnx",masterAction:"show",
+            masterName:"cr-bills",
+            masterSelect:"ID_SALE",
+            maidName:"cr-bill",
+            maidSelect:"ID_SALE",
           },
           {
-            tipe:"fm-tb",
-            master:"saleBill",
-            masterField:"ID_SALE",
-            maid:"saleBill_products",
-            maidField:"ID_SALE",
-          },
-        ],
-    
-        /*events:[
-          {
-            name:"modifyScript",
-            actions:[{
-              action:({conection,masterScript,maidScript})=>{
-    
-                if(conection.master == "saleBill"){
-    
-                  masterScript.stateTools = [
-                    {
-                        name:"reload",
-                        tools:[
-                            {name:"config",show:false},
-                            {name:"load",show:false},
-        
-                            {name:"excel",show:false},
-                            {name:"pdf",show:false},
-        
-                            {name:"sizes",show:false},
-                            {name:"reload",show:false},
-                            {name:"update",show:false},
-                            {name:"new",show:false},
-                            {name:"insert",show:false},
-                            {name:"cancel",show:false},
-                            
-                            {name:"pages",show:false},
-                        ],
-                    },
-                  ];
-    
-                  maidScript.stateTools = [
-                    {
-                        name:"reload",
-                        tools:[
-                            {name:"config",show:false},
-                            {name:"load",show:false},
-        
-                            {name:"excel",show:false},
-                            {name:"pdf",show:false},
-        
-                            {name:"sizes",show:false,value:50},
-                            {name:"reload",show:false},
-                            {name:"update",show:false},
-                            {name:"new",show:false},
-                            {name:"insert",show:false},
-                            {name:"cancel",show:false},
-                            
-                            {name:"pages",show:false},
-                        ],
-                    },
-                  ];
-                }
-              }
-            }],
-          },
-          {
-            name:"mofifiedScipts",
-            actions:[{
-              action:({k})=>{
-    
-                var md =k.Crud_GetData({name:"saleBill"});
-                md.stateStart="block";
-                md.stateBase="block";
-                console.log(md);
-              }
-            }],
+            event:"cnx",type:"show",
+            masterName:"cr-bill",
+            masterSelect:"ID_SALE",
+            maidName:"cr-bill-detail",
+            maidSelect:"ID_SALE",
           }
-        ],*/
-    
+        ]
       });
+
+      PlayTutorialInPage({group,pageData});
     }
   });
   

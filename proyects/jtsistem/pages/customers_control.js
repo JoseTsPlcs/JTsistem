@@ -6,8 +6,8 @@ $(document).ready(function() {
     success:({userData,pageData})=>{
 
       //pageBuildCruds({userData,pageData});
-      new CrudsGroup({
-        userData,
+      var group = new CrudsGroup({
+        userData,pageData,
         parent:pageData.body,
         layers:[
           {
@@ -20,7 +20,7 @@ $(document).ready(function() {
           },
           {
             crud:{
-              parent:"main",name:"cr-cus-tb",
+              parent:"main",name:"cr-customers",
               schema:sch_customers,title:"lista de clientes",
               panels:[
                 {
@@ -36,15 +36,23 @@ $(document).ready(function() {
                   ],
                 }
               ],
+              events:[
+                {
+                  name:"stateSetFirst",
+                  actions:[{action:()=>{PlayTutorialInPage({pageData,group});}}]
+                }
+              ],
             }
           },
         ],
         groups:[
           {
-            ...gp_customer({parentName:"prnt-md",masterCrud:"cr-cus-tb"}),
+            ...gp_customer({parentName:"prnt-md",masterCrud:"cr-customers"}),
           }
         ],
-      })
+      });
+
+      PlayTutorialInPage({group,pageData});
     }
   });
 

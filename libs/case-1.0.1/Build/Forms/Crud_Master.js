@@ -3,8 +3,30 @@ class Crud_Master extends ODD {
 
     constructor(i){
 
-        super(i);
+        if(true){
 
+            i.logControl = [
+                {name:"load",active:true},
+
+                {name:"tutorialSet",active:false},
+                {name:"tutorialPlay",active:true},
+
+                {name:"state",active:false},
+                {name:"stateSet",active:true},
+                {name:"stateSetVariables",active:true},
+
+                {name:"fieldBoxUpdate",active:false},
+                {name:"fieldSetValue",active:false},
+                {name:"fieldSetOptions",active:false},
+
+                {name:"insert",active:false},
+            ];
+        }
+
+        super(i);
+        this._className = "crudMaster";
+
+        this.#tutorialsSet(i);
         this.#SetVariables(i);
         this.#Build(i);
 
@@ -28,9 +50,11 @@ class Crud_Master extends ODD {
         insertPrimary:false,
         insert:false,
         delete:false,
+        loaded:true,
+        load:true,
     }
 
-    #SetVariables({stateTools=[],questions=[],stateStart="reload",afterCancel="reload",afterDelete="reload",afterInsert="reload",afterUpdate="reload",newLinesStart=1,newActive=true,tableMain,selects,joins,inserts=[],orders=[],conditions=[],fields=[],filters=[],loads=[],insertNoAddFields=false,updateCurrent,panels=[]}){
+    #SetVariables({stateTools=[],questions=[],stateStart="reload",afterCancel="reload",afterDelete="reload",afterInsert="reload",afterUpdate="reload",newLinesStart=1,newActive=true,tableMain,selects,joins,inserts=[],orders=[],conditions=[],fields=[],filters=[],loads=[],insertToEnd=true,updateCurrent,panels=[]}){
 
         this.#conection = db_lip;
         this.#tableMain = tableMain;
@@ -38,7 +62,7 @@ class Crud_Master extends ODD {
         this.#joins = joins;
         this.#conditions = conditions.filter(cnd=>cnd!=null);
         this.#orders = orders;
-        this.#inserts = inserts;
+        this.#inserts = inserts.filter(ins=>ins!=null);
         this.#inserts.forEach(ins => {
             if(ins.tipe==null) ins.tipe = "const";
         });
@@ -51,7 +75,7 @@ class Crud_Master extends ODD {
 
         
         this.#newActive = newActive;
-        this.#insertNoAddFields = insertNoAddFields;
+        this.#insertToEnd = insertToEnd;
         this.#updateCurrent = updateCurrent !=null ? updateCurrent : panels.find(p=>p.tipe == "table");
         this.#stateData.stateStart=stateStart;
         this.#stateData.afterCancel = afterCancel;
@@ -59,24 +83,6 @@ class Crud_Master extends ODD {
         this.#stateData.afterInsert = afterInsert;
         this.#stateData.afterUpdate = afterUpdate;
         this.#stateData.newLinesStart = newLinesStart;
-        //console.log("statetools to " + title, stateTools);
-        
-        this.#stateData.stateTools.forEach(st=>{
-            
-            var toolLoad = st.tools.find(t=>t.name == "load");
-            if(toolLoad) toolLoad.show = loads.length > 0; 
-            var toolConfig = st.tools.find(t=>t.name == "config");
-            if(toolConfig) toolConfig.show = filters.length > 0; 
-            /*var toolQuest = st.tools.find(t=>t.name == "question");
-            if(toolQuest) toolQuest.show = true;*/
-        }); 
-        stateTools.forEach(st => {
-                
-            this.#State_SetTools({
-                stateName:st.name,
-                toolsSet:st.tools,
-            });
-        });
               
     }
 
@@ -106,14 +112,16 @@ class Crud_Master extends ODD {
 
     #body = null;
     bodyGet(){return this.#body;}
+    #parentBuild = null;
+    #Build({parentBuild,parent,title,head=true,attributes,panels,filters,config,states,recordName}){
 
-    #Build({parent,title,head=true,attributes,panels,filters,config}){
-
+        this.#parentBuild = parentBuild;
         let k = this;
         this.#body = new Crud_Body({
-            parent,title,head,
+            name:this._name,logControl:this._logControl,
+            parent,title,head,recordName,
             filters,config,
-            panels,
+            panels,states,tutorials:this.#tutorials.data,
             events:[
                 {
                     name:"configReload",
@@ -131,6 +139,10 @@ class Crud_Master extends ODD {
                     name:"toolUpdate",
                     actions:[{
                         action:({tool,value})=>{
+                            
+                            this.CallEvent({name:"toolUpdate",params:{tool}});
+
+                            if(tool.active == false) return;
 
                             switch (tool.name) {
                                 case "load":
@@ -171,11 +183,15 @@ class Crud_Master extends ODD {
 
                                 case "addLine":
                                     this.#New_AddLine({});
-                                break;                            
+                                break;  
+                                
+                                case "tutorial":
+                                    this.tutorialPlay({value});
+                                break;
                                 
                             }
                         }
-                    }]
+                    }],
                 }
             ],
         });
@@ -239,8 +255,12 @@ class Crud_Master extends ODD {
 
     #Loaded({success}){
 
+        console.log("laoded",this.#loadData);
+        
+
         this.#Loaded_SetOptionsTo({});
         this.#body.LoadingScreenActive({active:false});
+        this.CallEvent({name:"loaded"});
 
         if(success!=null) success();
     }
@@ -250,7 +270,7 @@ class Crud_Master extends ODD {
         let k = this;
 
         //fields
-        this.#body.panelsGet().forEach(panel => {
+        /*this.#body.panelsGet().forEach(panel => {
             
             panel.build.fieldsGet().forEach(field => {
                 
@@ -274,6 +294,24 @@ class Crud_Master extends ODD {
                     //if(field.load.name == "ld-product-recipe") console.log("LD PRODUCT RECIPE", field, loadOptions);
                 }
             });
+        });*/
+
+        //fields
+        this.#body.fieldsGet().filter(f=>f.load!=null).forEach(f=>{
+
+            var options = this.Loaded_GetLoadOptions({
+                loadName:f.load.name,
+                loadShow:f.load.show,
+            });
+
+            this.LogAction({
+                type:"load",
+                action:"load -> set options to fields",
+                msg:{field:f,options},
+            });
+
+            
+            this.#body.fieldSetOptions({fieldName:f.name,options});
         });
 
         //filters
@@ -333,6 +371,218 @@ class Crud_Master extends ODD {
         }});
     }
 
+    //tutorials
+    
+    #tutorials = {
+        data:[],
+        block:false,
+        build:null,
+        generalDescripcion:"",
+    };
+    tutorialsGet(){return this.#tutorials.data;}
+    #tutorialsSet({tutorials=[],descripcion=""}){
+
+        //this.LogAction({type:"tutorialSet",action:"tutorialsSet",msg:{tutorialsExtras:tutorials}});
+        
+        let k = this;
+        this.#tutorials.generalDescripcion = descripcion;
+        this.#tutorials.data = [
+            {value:"how",show:"¿que es esto?",active:true},
+            {value:"use",show:"¿como lo uso?",active:true},
+            {value:"search",show:"¿como realizo una busqueda?",active:true},
+            {
+                value:"insert",show:"¿como ingreso un [registro]?",
+                elementsInfo:({k})=>{
+
+                    var toolName = "insert";
+                    if(k.bodyGet().toolsGet().find(t=>t.name=="new").show) toolName = "new";
+
+                    return [{
+                        ...k.bodyGet().toolGetTutorialElement({toolName}),
+                        eventNext:({element})=>{
+
+                            if(k.#body.toolGet({toolName:"insert"}).show){
+
+                                k.InsertEvent({
+                                    success:()=>{
+    
+                                        k.CallEvent({name:"tutorialInsertEnd",params:{k}});
+                                    }
+                                });
+                            }
+                            else{
+
+                                element.click();
+                                k.CallEvent({name:"tutorialInsertEnd",params:{k}});   
+                            }                     
+                        }
+                    }];
+                },
+                eventActive:()=>{
+
+                    return k.#body.toolGet({toolName:"insert"}).show || k.#body.toolGet({toolName:"new"}).show;
+                }
+            },
+            ...tutorials,
+        ];
+
+        if(tutorials.length>0)this.LogAction({type:"tutorialSet",action:"tutorialsSet - add new tutorials",msg:{tutorials:this.#tutorials.data}});
+    }
+    tutorialSetBlock({block=false}){this.#tutorials.block = block;}
+
+    tutorialPlay({value="use",success=null}){
+        let k = this;
+
+        if(this.#tutorials.block == true)return;
+
+        var elementsInfo = this.tutorialElementsInfoGet({value});
+
+        if(elementsInfo.length > 0){
+
+            this.LogAction({
+                type:"tutorialPlay",
+                action:"tutorialPlay",
+                msg:{value,elementsInfo},
+            });
+
+            this.#tutorials.build = new Tutorial({
+                elementsInfo,
+                eventElementPlay:(params)=>{
+    
+                    k.CallEvent({name:"tutorialPlayElement",params});
+                },
+                eventStart:({})=>{
+                    
+                    k.CallEvent({name:"tutorialStart"});
+                },
+                eventEnd:(params)=>{
+                    
+                    var eventEndParams = {...params,value};
+                    k.LogAction({
+                        type:"tutorialPlay",
+                        action:"tutorialEnd",
+                        msg:eventEndParams,
+                    });
+                    k.CallEvent({name:"tutorialEnd",params:eventEndParams});
+                    if(success!=null) success();
+                }
+            });
+            this.#tutorials.build.startTutorial();
+        }
+        else
+        {
+            this.LogAction({
+                type:"tutorialPlay",
+                action:"tutorialPlay",
+                msg:("error tutorial " + value + " no have elements")
+            });
+        }
+
+    }
+
+    tutorialElementsInfoGet({value="use"}){
+
+        let k = this;
+        var elementsInfo = [];
+
+        switch (value) {
+
+            case "how":
+
+                elementsInfo.push({
+                    id:this.#body.bodyWindowGet().HeadGetDom().id,
+                    descripcion:this.#tutorials.generalDescripcion,
+                });
+            break;
+
+            case "use":
+                
+                this.#body.panelsGet().filter(p=>((p.tipe=="form" && p.build.buildGet().Conteiner_isShow({}))||p.tipe!="form")).forEach(p=>{
+
+                    if(p.descripcion!=null){
+                    
+                        elementsInfo.push({
+                            id:p.build.buildGet().parentGet().id,
+                            descripcion:p.descripcion,
+                        });
+                    }
+                    
+                });
+
+                this.#body.fieldsGet().filter(f=>((f.panel.tipe=="form" && f.panel.build.buildGet().Conteiner_isShow({}))||f.panel.tipe!="form")&&(f.action!="div")).forEach(f => {                   
+
+                    elementsInfo.push({
+                        ...this.#body.fieldGetElementTutorial({fieldName:f.name}),
+                        name:f.name,
+                    });
+                });
+
+                this.#body.toolsGet().filter(t=>t.show==true&&t.name!="tutorial"&&t.name!="title").forEach(tool => {
+                
+                    elementsInfo.push({
+                        ...this.#body.toolGetTutorialElement({toolName:tool.name}),
+                    });
+                });
+
+
+            break;
+
+            case "search":
+
+                if(this.#body.configGetShow()==false){
+
+                    elementsInfo.push({
+                        ...this.#body.toolGetTutorialElement({toolName:"config"}),
+                        //descripcion:"selecciona configuracion para desplegar filtros de busqueda",
+                        eventNext:({element})=>{
+    
+                            k.#body.ConfigSetState({show:true,slow:true});
+                            setTimeout(()=>{
+    
+                                k.#body.configGetWindowFilters().tutorialPlay();
+                            },1000);
+                        }
+                    });
+                }
+                else this.#body.configGetWindowFilters().tutorialPlay();
+
+                
+
+            break;
+        }
+
+        var tutorialInfo = this.#tutorials.data.find(t=>t.value==value);
+        if(tutorialInfo && tutorialInfo.elementsInfo != null) elementsInfo = tutorialInfo.elementsInfo({k:this,value});
+
+        
+        var resp = k.CallEvent({name:"tutorialGetElementsInfo",params:{elementsInfo,value}});
+        if(resp!=null && resp.elementsInfo !=null) elementsInfo = resp.elementsInfo;
+
+        return elementsInfo;
+    }
+
+    #tutorialUpdateTool(){
+
+        this.#tutorials.data.find(t=>t.value=="how").active = this.#tutorials.generalDescripcion != "";
+        this.#tutorials.data.find(t=>t.value=="use").active = this.#body.toolsGet().filter(t=>t.show==true).length > 0;
+        this.#tutorials.data.find(t=>t.value=="search").active = this.#body.toolsGet().find(t=>t.name=="config").show || this.#body.configGetShow();
+        //this.#tutorials.data.find(t=>t.value=="insert").active = this.#body.toolsGet().find(t=>t.name=="new").show || this.#body.toolsGet().find(t=>t.name=="insert").show;
+        
+        var blocks = this.#body.toolGetBox({toolName:"tutorial"}).Blocks_Get();
+        
+        for (let index = 0; index < this.#tutorials.data.length; index++) {
+            
+            var domID = blocks[index+1].id;
+
+            var tutorialInfo = this.#tutorials.data[index];
+            var active = tutorialInfo.active;
+            if(tutorialInfo.eventActive!=null) active = tutorialInfo.eventActive();
+
+            if(active) $('#'+domID).show();
+            else $('#'+domID).hide();
+        }
+    }
+
     //reload
 
     #reloadData = [];
@@ -366,7 +616,7 @@ class Crud_Master extends ODD {
         return this.#reloadData.map((ln)=>{return ln[this.#selectPrimary.field]});
     }
 
-    Reload({success,noUseReloadAfter=false}){
+    Reload({success,noUseReloadAfter=false,setLastPage=false}){
 
         let k = this;
 
@@ -377,7 +627,7 @@ class Crud_Master extends ODD {
 
             success:({size})=>{
                 
-                var sizeValue = parseFloat(k.Tools_GetBox({toolName:"sizes"}).GetValue());
+                var sizeValue = parseFloat(k.#body.toolGetBox({toolName:"sizes"}).GetValue());
                 var pagesCount = Math.ceil(size/sizeValue);
                 if(pagesCount<=0) pagesCount = 1; 
 
@@ -390,12 +640,12 @@ class Crud_Master extends ODD {
                     });                    
                 }
 
-                var pagesBox = k.Tools_GetBox({toolName:"pages"});
+                var pagesBox = k.#body.toolGetBox({toolName:"pages"});
                 var lastpage = pagesBox.GetValue();
                 pagesBox.SetOptions(pagesOptions);
 
                 var lastPageFound = pagesOptions.find(op=>op.value == lastpage);
-                if(!lastPageFound) lastpage = pagesOptions[pagesOptions.length-1].value;
+                if(!lastPageFound || setLastPage) lastpage = pagesOptions[pagesOptions.length-1].value;
 
                 pagesBox.SetValue(lastpage);
                 
@@ -403,7 +653,8 @@ class Crud_Master extends ODD {
 
                     k.#body.LoadingScreenActive({active:false});
                     if(!noUseReloadAfter) k.#Event_ReloadAfter({reloadData:result});
-                    k.#Reload_PrintData({result});
+
+                    k.#Reload_PrintData({result,success});
                 }});
             }
         });
@@ -425,7 +676,7 @@ class Crud_Master extends ODD {
             conditions:k.#Reload_Conditions({}),
         });
 
-        //console.log(this.#title + " - reload_getsizedata - sql:", reloadGetSizeData_sql);
+        //console.log(this._name + " - reload_getsizedata - sql:", reloadGetSizeData_sql);
 
         this.#conection.Request({
             php:"row",log:k.#ctr_log["reloadSize"],
@@ -447,8 +698,8 @@ class Crud_Master extends ODD {
         
         let k = this;
 
-        var size = parseFloat(this.Tools_GetBox({toolName:"sizes"}).GetValue());
-        var page = parseFloat(this.Tools_GetBox({toolName:"pages"}).GetValue());
+        var size = parseFloat(this.#body.toolGetBox({toolName:"sizes"}).GetValue());
+        var page = parseFloat(this.#body.toolGetBox({toolName:"pages"}).GetValue());
 
         var reloadDataSql = k.#conection.GetSql_Select({
             tableMain:k.#tableMain,
@@ -459,7 +710,7 @@ class Crud_Master extends ODD {
             orders:k.#orders,
         });
 
-        //console.log("reload data sql:",reloadDataSql);
+        //console.log(this._name +" -> reload data sql:",reloadDataSql);
 
         this.#conection.Request({
             php:"row",log:k.#ctr_log.reload,
@@ -473,7 +724,7 @@ class Crud_Master extends ODD {
         });
     }
 
-    #Reload_PrintData({result}){
+    #Reload_PrintData({result,success}){
 
         let k = this;
         
@@ -502,6 +753,7 @@ class Crud_Master extends ODD {
         });
 
         this.#Event_printAfter({result});
+        if(success!=null) success();
     }
 
     #Reload_Conditions({}){
@@ -540,6 +792,8 @@ class Crud_Master extends ODD {
         var e_rsp = this.CallEvent({name:"reloadConditionsAfter",params:{conditions}});
         if(e_rsp != null && e_rsp.conditions != null) conditions = e_rsp.conditions;
 
+        //console.log("RELOAD CONDITIONS",conditions);
+
         return conditions;
     }
 
@@ -554,8 +808,30 @@ class Crud_Master extends ODD {
 
     //insert
 
-    #insertNoAddFields = false;
-    Insert({inserts=[],success}){
+    InsertEvent({success}){
+
+        if(this.#body.stateGet()=="reload"){
+
+            this.Insert({
+                noAddFields:true,
+                success,
+            });
+
+        }
+        else { 
+
+            //console.log("no add fields",this.#body.panelsGet()[0].tipe=="table");
+            
+            this.Insert({
+                noAddFields:this.#body.panelsGet()[0].tipe=="table",
+                success
+            });
+        }
+    }
+
+    #insertToEnd = true;
+    insertToEndGet(){return this.#insertToEnd;}
+    Insert({inserts=[],noInserts=false,noAddFields=false,noJoins=false,success}){
 
         var e_rst = this.#Event_InsertBefore({inserts});
         if(e_rst!=null){
@@ -563,17 +839,92 @@ class Crud_Master extends ODD {
             if(e_rst.block == true) return this.SetState({stateName:this.#stateData.afterInsert});;
             if( e_rst.inserts) inserts=e_rst.inserts;
         }
-        //console.log(this.#title+"- before inserts -> ",inserts);
 
         let k = this;
-        k.#body.LoadingScreenActive({active:true});
-        this.#Insert_Request({inserts,success:({primaryNew})=>{
 
-            k.#body.LoadingScreenActive({active:false});
-            var rsp_ins = k.#Event_InsertAfter({field:k.#selectPrimary.field,value:primaryNew});
-            if(rsp_ins != null && rsp_ins.stateBlock==true) return;
-            k.SetState({stateName:k.#stateData.afterInsert});
-        }})
+        k.#body.LoadingScreenActive({active:true});
+        this.#InsertByCruds({
+            inserts,
+            success:({inserts=[]})=>{
+
+                this.#Insert_Request({
+                    inserts,
+                    noInserts,
+                    noAddFields,
+                    noJoins,
+                    success:({primaryNew,msg,resp})=>{
+
+                        k.#body.LoadingScreenActive({active:false});
+                        var params = {field:k.#selectPrimary.field,value:primaryNew,msg,resp};
+                        var rsp_ins = k.#Event_InsertAfter(params);
+                        if(rsp_ins != null && rsp_ins.stateBlock==true) return;
+                        k.SetState({stateName:k.#stateData.afterInsert,setLastPage:k.#insertToEnd,success});
+                    }
+                });
+            }
+        });        
+    }
+
+    #InsertByCruds({inserts=[],success}){
+
+        let k = this;
+
+        if(this.#crudInserts.length > 0){
+
+            var crudIns = this.#crudInserts[0];
+            var listOfInsert = crudIns.list;
+
+            var max = listOfInsert.length-1;
+            var count = 0;
+
+            function playInsert({index}) {
+                                                
+                console.log("insert "+index+"/"+max);
+
+                var item = listOfInsert[index];
+                crudIns.build.Insert({
+                    inserts:item.inserts,
+                    noAddFields:true,
+                    success:({value})=>{
+
+                        item.primary = value;
+                        count++;
+                        if(count <= max){
+                            
+                            playInsert({index:count});
+                        }
+                        else{
+
+                            var crudsInserts = k.crudInsertsGet();
+                            var primaryValues = [];
+                            crudIns.list.forEach(item => {
+                                
+                                primaryValues.push(item.primary);
+                                inserts.push({
+                                    field:"ID_PAY",
+                                    value:item.primary,
+                                });
+                            });
+
+                            console.log("UPDATE PAYS",primaryValues);
+
+                            /*k.Insert({
+                                inserts,
+                            });*/
+
+                            success({inserts});
+                        }
+                    }
+                });  
+            }
+
+            playInsert({index:count});
+        }
+        else
+        {
+            success({inserts});
+        }
+        
     }
 
     #Insert_Request_PrimaryNew({success}){
@@ -603,7 +954,7 @@ class Crud_Master extends ODD {
         })
     }
 
-    #Insert_Request({inserts=[],success}){
+    #Insert_Request({inserts=[],success,noInserts=false,noAddFields=false,noJoins=false}){
 
         let k = this;
         this.#Insert_Request_PrimaryNew({
@@ -611,83 +962,14 @@ class Crud_Master extends ODD {
 
                 //-------------------------
 
-                var insertSql_inserts = inserts;
-
+                var insertSql_inserts = k.Insert_GetInserts({inserts,noInserts,noAddFields,noJoins});      
                 
-                console.log("INSERT REQUEST BY INSERT IN FUNCION", [...insertSql_inserts]);
-
-                //insert by inserts saved
-                insertSql_inserts = [...insertSql_inserts,...k.#inserts];
-
-                console.log("INSERT REQUEST BY SAVED", [...insertSql_inserts]);
-                
-
                 //insert by primary new
                 insertSql_inserts.push({
                     field:k.#selectPrimary.field,
                     value:primaryNew,
                     tipe:"secuence",
                 });
-
-                //console.log("INSERT REQUEST ADDED PRIMARY", [...insertSql_inserts]);
-
-                //inserst by crudjoins
-                k.#crudJoins.forEach(jn=>{
-
-                    //if no primary field
-                    if(jn.field != k.#selectPrimary.field){
-
-                        insertSql_inserts.push({
-                            field: jn.field,
-                            value:jn.value,
-                            tipe:"const",
-                        });
-                    }                   
-                });
-
-                //console.log("INSERT REQUEST ADDED JOINS", [...insertSql_inserts]);
-
-                if(!this.#insertNoAddFields){
-
-                    //insert by fields
-                    k.#body.fieldsGet().forEach(field => {
-                        
-                        //no button, no div and select exist
-                        var select = k.#SelectGet({selectName:field.select});
-                        if(field.box.tipe != 0 && select){
-    
-                            //no primary in insert because primary have a value
-                            if(!select.primary){
-
-                                var fieldSelecField = select.field;
-                                if(this.#stateData.state == "new"){
-
-                                    var fieldValues = k.#body.fieldGetValues({fieldName:field.name});                                    
-                                    fieldValues.forEach(v => {
-                                        
-                                        insertSql_inserts.push({
-                                            field: fieldSelecField,
-                                            value: v,
-                                        });
-                                    });  
-                                }
-                                else
-                                {
-                                    insertSql_inserts.push({
-                                        field: fieldSelecField,
-                                        value: field.box.value,
-                                    });  
-                                }
-                                  
-                                
-                                //console.log(field.name, fieldValues);
-                            }                        
-                        }
-                    }); 
-                }   
-
-                //console.log("INSERT REQUEST ADDED FIELDS", [...insertSql_inserts]);
-                
 
                 //-----request------
 
@@ -698,14 +980,119 @@ class Crud_Master extends ODD {
                         tableMain:this.#tableMain,
                         inserts:insertSql_inserts,
                     }),
-                    success:()=>{
-
-                        if(success!=null)success({primaryNew});
+                    success:(result,msg,resp)=>{
+                        
+                        if(success!=null)success({primaryNew,msg,resp});
                     }
                 });
             }
         })
 
+    }
+
+    Insert_GetInserts({inserts=[],noInserts=false,noAddFields=false,noJoins=false}){
+
+        var insertSql_inserts = [];
+        let k = this;
+
+        this.LogAction({
+                type:"insert",
+                action:"insert_getInserts",
+                msg:{
+                    inserts,
+                    noInserts,
+                    noAddFields,
+                    noJoins,
+                },
+        })
+        //console.log("INSERT REQUEST BY INSERT IN FUNCION", [...insertSql_inserts]);
+
+        //insert by inserts saved
+        insertSql_inserts = [...inserts];
+
+        if(!noInserts){
+
+            k.#inserts.forEach(ins => {
+                
+                insertSql_inserts.push(ins);
+            });
+        }
+
+        //console.log("INSERT REQUEST BY SAVED", [...insertSql_inserts]);
+
+        //console.log("INSERT REQUEST ADDED PRIMARY", [...insertSql_inserts]);
+
+        //inserst by crudjoins
+        if(!noJoins){
+
+            k.#crudJoins.forEach(jn=>{
+
+                //if no primary field
+                if(jn.field != k.#selectPrimary.field){
+    
+                    insertSql_inserts.push({
+                        field: jn.field,
+                        value:jn.value,
+                        tipe:"const",
+                    });
+                }                   
+            });
+        }
+
+        //console.log("INSERT REQUEST ADDED JOINS", [...insertSql_inserts]);
+
+        if(!noAddFields){
+
+            //insert by fields
+            k.#body.fieldsGet().forEach(field => {
+                
+                //no button, no div and select exist,
+                var select = k.#selects.find(slc=>slc.as==field.select||slc.field==field.select);
+                if(field.box.tipe != 0 && select){
+
+                    //no primary in insert because primary have a value
+                    if(!select.primary){
+
+                        var fieldSelecField = select.field;
+                        if(this.#stateData.state != "new"){
+
+                            var fieldValues = k.#body.fieldGetValues({fieldName:field.name}); 
+
+                            k.LogAction({
+                                type:"insert",
+                                action:"getInserts - addfields",
+                                msg:{
+                                    field,
+                                    fieldValues,
+                                },
+                            });
+
+                            fieldValues.forEach(v => {
+                                
+                                insertSql_inserts.push({
+                                    field: fieldSelecField,
+                                    value: v,
+                                });
+                            });  
+                        }
+                        else
+                        {
+                            insertSql_inserts.push({
+                                field: fieldSelecField,
+                                value: field.box.value,
+                            });  
+                        }
+                            
+                        
+                        //console.log(field.name, fieldValues);
+                    }                        
+                }
+            }); 
+        }   
+
+        //console.log("INSERT REQUEST ADDED FIELDS", [...insertSql_inserts]);
+
+        return insertSql_inserts;
     }
 
     //new
@@ -719,13 +1106,13 @@ class Crud_Master extends ODD {
 
     #New_StartLines({}){
 
-        this.#body.AddLine({startcount:this.#stateData.newLinesStart});
+        //this.#body.AddLine({startcount:this.#stateData.newLinesStart});
     }
 
     #New_AddLine({}){
 
         let k = this;
-        this.#body.fieldsGet().forEach(field=>{
+        /*this.#body.fieldsGet().forEach(field=>{
 
             var values = k.#body.fieldGetValues({fieldName:field.name});
 
@@ -735,7 +1122,7 @@ class Crud_Master extends ODD {
                 fieldName:field.name,
                 values,
             });
-        });
+        });*/
     }
 
     #New_RemoveLine({y,from}){
@@ -791,8 +1178,9 @@ class Crud_Master extends ODD {
             updateChangeFist.fields.forEach(fch => {
                 
                 var field = this.#body.fieldGet({fieldName:fch.fieldName});
+                
                 if(field){
-                    var select = this.#selects.find(slc=>slc.field==field.select);
+                    var select = this.#selects.find(slc=>slc.field==field.select||slc.as==field.select);
                     if(select){
 
                         updateSets.push({
@@ -817,7 +1205,7 @@ class Crud_Master extends ODD {
 
          console.log("update:",updateSets,updateConditions);
 
-         if(updateConditions.length>0){
+         if(updateConditions.length>0 && updateSets.length>0){
 
             var updateSql = k.#conection.GetSql_Update({
                 tableMain:k.#tableMain,
@@ -953,78 +1341,7 @@ class Crud_Master extends ODD {
     //state
 
     #stateData = {
-        state:"reload",
-        states:["reload","find","nofound","block","new"],
-        stateBase:"reload",
         stateStart:"reload",
-        stateTools:[
-            {
-                name:"new",
-                tools:[
-                    {name:"config",show:false},
-                    {name:"load",show:false},
-
-                    {name:"excel",show:false},
-                    {name:"pdf",show:false},
-                    {name:"question",show:false},
-
-                    {name:"sizes",show:false},
-                    {name:"reload",show:false},
-                    {name:"update",show:false},
-                    {name:"new",show:false},
-                    {name:"insert",show:false},
-                    {name:"cancel",show:false},
-                    {name:"addLine",show:false},
-                    {name:"delete",show:false},
-                    
-                    {name:"pages",show:false},
-                ],
-            },
-            {
-                name:"reload",
-                tools:[
-                    {name:"config",show:false},
-                    {name:"load",show:false},
-                    
-                    {name:"excel",show:false},
-                    {name:"pdf",show:false},
-                    {name:"question",show:false},
-
-                    {name:"sizes",show:false},
-                    {name:"reload",show:false},
-                    {name:"update",show:false},
-                    {name:"new",show:false},
-                    {name:"insert",show:false},
-                    {name:"cancel",show:false},
-                    {name:"addLine",show:false},
-                    {name:"delete",show:false},
-                    
-                    {name:"pages",show:false},
-                ],
-            },
-            {
-                name:"block",
-                tools:[
-                    {name:"config",show:false},
-                    {name:"load",show:false},
-
-                    {name:"excel",show:false},
-                    {name:"pdf",show:false},
-                    {name:"question",show:false},
-
-                    {name:"sizes",show:false},
-                    {name:"reload",show:false},
-                    {name:"update",show:false},
-                    {name:"new",show:false},
-                    {name:"insert",show:false},
-                    {name:"cancel",show:false},
-                    {name:"addLine",show:false},
-                    {name:"delete",show:false},
-                    
-                    {name:"pages",show:false},
-                ],
-            },
-        ],
         afterInsert:"reload",
         afterUpdate:"reload",
         afterCancel:"reload",
@@ -1034,43 +1351,17 @@ class Crud_Master extends ODD {
 
     StateGet(){
 
-        return this.#stateData.state;
+        return this.#body.stateGet();
     }
 
-    SetState({stateName,noUseReloadAfter=false}){
+    SetState({stateName,noUseReloadAfter=false,setLastPage=false,success}){
 
-        this.#stateData.state = stateName;
-        //set tools
-        var StateToolsData = this.#stateData.stateTools.find(stT=>stT.name == stateName);
+        this.LogAction({type:"stateSet",action:"setState",msg:{stateName}});
+        
+        this.#body.stateSet({stateName});
+        this.#Block({active:(stateName=="block")});
 
-        this.#body.toolsGet().forEach(tool => {
-            
-            var stateToolData = StateToolsData.tools.find(stTool => stTool.name == tool.name);
-
-            if(stateToolData!=null){
-                
-
-                this.Tools_OneToolSetShow({
-                    toolName:tool.name,
-                    show:stateToolData.show,
-                    value:stateToolData.value,
-                });
-            }
-            else
-            {
-
-                this.Tools_OneToolSetShow({
-                    toolName:tool.name,
-                    show:false,
-                });
-            }
-
-        });
-
-        if(this.#stateData.state!="")this.#Block({active:false});
-
-
-        switch (this.#stateData.state) {
+        switch (stateName) {
             case "new":
                 
                 this.New({});
@@ -1078,51 +1369,24 @@ class Crud_Master extends ODD {
 
             case "reload":
                 
-                this.Reload({noUseReloadAfter});
+                this.Reload({noUseReloadAfter,setLastPage,success});
             break;
 
             case "block":
                 
-                this.#Block({active:true});
+                
             break;
         }
 
+        this.#tutorialUpdateTool();
         this.CallEvent({name:"setStateAfter",params:{stateName}});
 
-    }
-
-    #State_SetTools({stateName,toolsSet=[]}){
-
-
-        var stateToolsData = this.#stateData.stateTools.find(st=>st.name==stateName);
-
-        stateToolsData.tools.forEach(toolData => {
-
-            var toolSet = toolsSet.find(fset=>fset.name == toolData.name);
-
-            if(toolSet == null) toolSet = {...toolData};
-            toolData.show = toolSet.show;
-            if(toolSet.value != null) toolData.value = toolSet.value;
-            if(toolSet.descripcion != null) toolData.descripcion = toolSet.descripcion;
-
-        });
-
-    }
-
-    #State_GetTools({stateName}){
-
-        return this.#stateData.stateTools.find(st=>st.name==stateName);
     }
 
     //crudJoin
 
     #crudJoins = [];
-
-    /*{
-        name:"",
-        field:,
-        value:,
-    }*/
+    crudJoinsGet(){return this.#crudJoins}
     
     CrudJoins_Set({name,field,value}){
 
@@ -1139,6 +1403,39 @@ class Crud_Master extends ODD {
 
 
     }    
+
+    #crudUpdates = [];
+    crudMaidAdd({name,build,maidSelect}){
+
+        
+    }
+
+    #crudInserts = [];
+    crudInsertsGet(){return this.#crudInserts;}
+    crudInsertSet({name,build,inserts}){
+
+        var crudInsertFound = this.#crudInserts.find(cr=>cr.name==name);
+        if(crudInsertFound != null){
+
+            crudInsertFound.build = build;
+            crudInsertFound.list.push({
+                primary:null,
+                inserts,
+            });
+        }
+        else{
+
+            this.#crudInserts.push({
+                name,build,
+                list:[{
+                    primary:null,
+                    inserts:inserts,
+                }],
+            });
+        }
+        
+        this.CallEvent({name:"crudInsertSet"});
+    }
 
     //---------events----------
 
@@ -1160,7 +1457,7 @@ class Crud_Master extends ODD {
 
     #Event_UpdateToolInsert({}){
 
-        this.Insert({});
+        this.InsertEvent({});
     }
 
     #Event_UpdateToolCancel({}){
@@ -1179,52 +1476,6 @@ class Crud_Master extends ODD {
         this.Reload({});
     }
 
-    #Event_UpdateToolExcel({}){
-
-        var data = [];
-
-        var header = [];
-        /*this.#fields.forEach(field => {
-            
-            header.push(field.name);
-        });
-        data.push(header);
-
-        let k = this;
-        var total = this.GetValues({fieldName:this.#fields[0].name}).length;
-        for (let index = 0; index < total; index++) {
-            
-            var line = [];
-            this.#fields.forEach(field => {
-                
-                line.push(k.GetValue({
-                    fieldName:field.name,
-                    y:index,
-                }));
-            });
-            data.push(line);            
-        }*/
-
-
-        // Datos de ejemplo
-        /*const data = [
-            ["Nombre", "Edad", "Correo"],
-            ["Juan", 30, "juan@example.com"],
-            ["María", 25, "maria@example.com"],
-            ["Carlos", 35, "carlos@example.com"]
-        ];*/
-
-        // Crear una nueva hoja de trabajo
-        const worksheet = XLSX.utils.aoa_to_sheet(data);
-
-        // Crear un nuevo libro de trabajo
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Hoja1");
-
-        // Generar un archivo Excel
-        XLSX.writeFile(workbook, "Data.xlsx");
-    }
-
     #Event_UpdateToolDelete({}){
 
         this.Delete({
@@ -1238,13 +1489,26 @@ class Crud_Master extends ODD {
         u.k = this;
         u.primaryValues = this.#reloadData.map(ln=>{return ln[k.#selectPrimary.field]});
         
+        this.LogAction({
+            type:"fieldBoxUpdate",
+            action:"fieldBoxUpdate",
+            msg:{...u},
+        });
+        
 
         if(u.field.action == "delete"){
 
             var panel = this.#body.panelGet({panelName:u.field.panel.name});
+
+            this.LogAction({
+                type:"fieldBoxUpdate",
+                action:"field delete update",
+                msg:{...u,panel},
+            });
+
             if(panel.build.tipeGet() == "table"){
 
-                switch (this.#stateData.state) {
+                switch (this.#body.stateGet()) {
                     case "reload":
 
                         var primaryField = this.#selectPrimary["field"];
@@ -1279,10 +1543,14 @@ class Crud_Master extends ODD {
 
             if(u.field.box.tipe !=0 && u.field.box.tipe !=5){
 
-                this.Update_AddChange({
+                this.Update_AddChangeField({
                     fieldName:u.field.name,
-                    value,primary,
-                }); 
+                    value,y
+                });
+                /*this.Update_AddChange({
+                    fieldName:u.field.name,
+                    value,y
+                });*/ 
             }              
         }    
 
@@ -1347,6 +1615,7 @@ class Crud_Master extends ODD {
 
     #Event_StateSetFirst({}){
 
+        
         this.CallEvent({name:"stateSetFirst"});
     }
 
@@ -1358,28 +1627,6 @@ class Crud_Master extends ODD {
     #Event_LoadsReseted(params){
 
         this.CallEvent({name:"loadsReseted",params});
-    }
-
-    //---------public functions-----------
-
-
-    Tools_OneToolSetShow({toolName,show,value}){
-
-        var tool = this.#body.toolsGet().find(t=>t.name==toolName);
-        //if(toolName=="pages") console.log("toolName:",toolName,"tool:",tool,"show:",show,"value:",value);
-
-        if(value!=null) tool.dom.SetValue(value);
-
-        tool.show = show;
-        if(show==false) tool.dom.Hide();
-        else tool.dom.Show();
-        //.Block({active});
-    }
-
-    Tools_GetBox({toolName}){
-
-        var tool = this.#body.toolsGet().find(t=>t.name==toolName);
-        return tool.dom;
     }
 
 

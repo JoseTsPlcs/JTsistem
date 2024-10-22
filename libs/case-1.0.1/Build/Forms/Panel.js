@@ -3,8 +3,10 @@ class Panel extends ODD {
 
 
     constructor(i) {
-        
+
         super(i);
+        this._className = "Panel";
+
         this.#setVariables(i);
         this.#Build(i);
     }
@@ -16,6 +18,10 @@ class Panel extends ODD {
     titleSet({title}){
         
         if(this.#build instanceof PanelBuild) this.#build.titleSet({title});
+    }
+    showGet(){
+
+        return this.#tipe == "table" ? true : this.#build.Conteiner_isShow({});
     }
 
     #name = "";
@@ -38,7 +44,11 @@ class Panel extends ODD {
             var field = fields[fld];
             if(field.title == null) field.title = field.name;
             field.index = fld;
-            field.panel = {name:this.#name,build:null};
+            field.panel = {
+                name:this.#name,
+                tipe:this.#tipe,
+                build:null
+            };
         }
 
         this._fields = fields;
@@ -63,7 +73,8 @@ class Panel extends ODD {
         
         if(this.#build instanceof PanelBuild){
 
-            this.#build.fieldSetValues({fieldName,values});
+            var field = this.fieldGet({fieldName});
+            this.#build.fieldSetValues({fieldName,values,boxNew:field.box});
         }
 
         switch (this.#tipe) {
@@ -75,10 +86,13 @@ class Panel extends ODD {
         
             case "form":
                 
-                if(this.fieldGet({fieldName}).action != "div"){
+                var field = this.fieldGet({fieldName});
+                if(field.action != "div" && field.action!="button"){
 
                     var boxs = this.fieldGetBoxes({fieldName});
-                    boxs[0].SetValue(values[0]);
+                    boxs[0].Block({active:(values.length == 0)});
+                    var value = values.length > 0 ? values[0] : field.box.value;
+                    boxs[0].SetValue(value);
                 }
                
             break;
@@ -112,16 +126,78 @@ class Panel extends ODD {
     }
     fieldSetOptions({fieldName,options}){
         
-        var boxes = this.fieldGetBoxes({fieldName});
+        var field = this.fieldGet({fieldName});
+        field.options = options;
+        field.box.options = options;
+        if(field.box.options) field.box.value = field.box.options[0].value;
 
-        boxes.forEach(box => {           
-            
-            box.SetOptions(options);
+        var lastValues = this.fieldGetValues({fieldName});
+        var boxes = this.fieldGetBoxes({fieldName});
+        
+        this.LogAction({
+            type:"fieldSetOptions",
+            showNoLog:true,
+            msg:{field,options},
         });
+        
+        for (let b = 0; b < boxes.length; b++) {
+
+            const box = boxes[b];
+            box.SetOptions(options);
+            var setvalue = lastValues[b];
+            if(!options.find(op=>op.value==setvalue)) setvalue = options[0].value;
+            box.SetValue(setvalue);
+            
+        }
     }
     fieldGetValues({fieldName}){
 
         return this.fieldGetBoxes({fieldName}).map(bx=>{return bx.GetValue();})
+    }
+    fieldGetDomTutorial({fieldName}){
+
+        switch (this.#tipe) {
+            case "table":
+                  
+            var field = this.fieldGet({fieldName});
+            var boxes = this.fieldGetBoxes({fieldName});
+            if(boxes.length == 0) return this.#build.fieldGet({fieldName}).th;
+
+            if(field.box.tipe == 8) return boxes[boxes.length-1].parentGet();
+
+            return boxes[boxes.length-1].Blocks_Get()[0];
+
+            case "form":
+
+            return this.#build.fieldGetLabel({fieldName}).parentGet();
+        }
+    }
+    fieldGetTutorialElement({fieldName,recordName,last=true}){
+
+        var dom = null;
+        var field = this.fieldGet({fieldName});
+        switch (this.#tipe) {
+            case "table":
+                var boxes = this.fieldGetBoxes({fieldName});
+                if(boxes.length == 0) dom = this.#build.fieldGet({fieldName}).th;
+                if(boxes.length>0 && field.box.tipe == 8) dom = boxes[(last?boxes.length-1:0)].parentGet();
+                if(dom==null) dom = boxes[(last?boxes.length-1:0)].Blocks_Get()[0];
+            break;
+
+            case "form":
+                dom = this.#build.fieldGetLabel({fieldName}).parentGet();
+            break;
+        }
+
+        return {
+            id:dom.id,
+            descripcion:TutorialDescripcion({
+                recordName,
+                fieldName:field.title,
+                descripcion:field.descripcion,
+                boxTipe:field.box.tipe,
+            }),
+        }
     }
 
     #panelWindow = null;
@@ -129,7 +205,7 @@ class Panel extends ODD {
     #build = null;
     buildGet(){return this.#build};
 
-    #Build({parent,head=true,h,maxH}){
+    #Build({parent,head=true,h,maxH,borderR=true,borderL=true,borderTop=true,borderBottom=true}){
 
         this.#panelConteiner = parent;
         let k = this;
@@ -165,7 +241,7 @@ class Panel extends ODD {
             case "form":
                 
                 this.#build = new Window({
-                    head,h,
+                    head,h,borderR,borderL,borderTop,borderBottom,
                     title:this.#title,
                     parent:this.#panelConteiner,
                     fields:this._fields,
@@ -194,6 +270,11 @@ class Panel extends ODD {
 
             break;
         }
+
+        this._fields.forEach(f => {
+            
+            f.panel.build = this;
+        });
     }
 
 }

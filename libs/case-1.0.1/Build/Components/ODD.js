@@ -6,16 +6,9 @@ class ODD {
     #title="";
     _name = '';
     _setName({name=''}){this._name=name};
-    _log  = false;
     _logControl = [
-        {
-            name:'general',
-            log:false,
-        },
-        {
-            name:'events',
-            log:false,
-        },
+        {name:'general',active:false},
+        {name:'events',active:false},
     ];
     _events = [];
     GetListEvents(){
@@ -42,7 +35,7 @@ class ODD {
                     var lgfound = this._logControl.findIndex(li=>li.name == lg.name);
         
                     if(lgfound==-1) this._logControl.push(lg);
-                    else this._logControl[lgfound].log = lg.log;
+                    else this._logControl[lgfound].active = lg.active;
                 });
             }
 
@@ -59,27 +52,27 @@ class ODD {
 
     Log(print,result=null){
 
-        if(this._log) console.log("instance:["+ this._instanceName+"]", print,result);
+        //if(this._log) console.log("instance:["+ this._instanceName+"]", print,result);
     }
 
-    LogAction({type='log',msg='',logName='general'}){
+    LogAction({action="",type="general",msg=""}){
 
-        if(this.GetLogActive({logName:logName}) == false)return;
+        if(/*this._name=="" ||*/ this._className==""){
 
-        const msg0 = this._name + "->";
-        switch(type){
-
-            case 'log':
-                console.log(msg0,msg);
-            break;
-
-            case 'error':
-                console.error(msg0,msg);
-            break;
-
-            default:
-                console.log(msg0,msg);
+            //console.log("log action->classname is null");
+            return;
         }
+
+        var lgc = this._logControl.find(lg=>lg.name==type);
+        if(lgc == null || lgc.active == false){
+
+            //console.log("cant print logAction ",action,"of type",type,"by lgc:",lgc,"logcontrol:",this._logControl);
+            return;
+        }
+        
+        
+
+        console.log(this._name+"("+this._className+") " + lgc.name +  " -> " + action,msg);
     }
 
     GetLogActive({logName='general'}){
@@ -87,6 +80,7 @@ class ODD {
         var logControl = this._logControl.find(lg=>lg.name == logName);
         return logControl ? logControl.log : false;
     }
+    
 
     //---------------events-------------
 
@@ -161,9 +155,11 @@ class ODD {
 
                 action.active = active;
 
-            }else this.LogAction({type:'error',msg:['no found action named "' + actionName + '" in event "' + eventName + '"', event , actionName]});
+            }
+            //else this.LogAction({type:'error',msg:['no found action named "' + actionName + '" in event "' + eventName + '"', event , actionName]});
 
-        }else this.LogAction({type:'error',msg:['no found event "' + eventName + '"']});
+        }
+        //else this.LogAction({type:'error',msg:['no found event "' + eventName + '"']});
 
     }
 
@@ -180,7 +176,7 @@ class ODD {
 
             if(event.actions.length > 0){
 
-                this.LogAction({logName:'events',msg:' event: ' + event.name +' (' + from + ')'});
+                //this.LogAction({logName:'events',msg:' event: ' + event.name +' (' + from + ')'});
 
                 //console.log("eventName:",name,",event:",event);
 
@@ -192,7 +188,7 @@ class ODD {
 
                     if(act.action != null){
     
-                        this.LogAction({type:'log',logName:'events',msg: '[action]: ' + act.name + ' (' + act.active + ')'});
+                        //this.LogAction({type:'log',logName:'events',msg: '[action]: ' + act.name + ' (' + act.active + ')'});
 
                         //console.log("eventName:",name," action:",act);
 
@@ -212,7 +208,8 @@ class ODD {
                     }
                 });
 
-            }else this.LogAction({type:'log',msg:'[event]: ' + name});
+            }
+            //else this.LogAction({type:'log',msg:'[event]: ' + name});
             
         }//else this.LogAction({type:'error',logName:'events',msg:'error could found event ' + name});
 
@@ -224,7 +221,7 @@ class ODD {
 
         eventActives.forEach(e => {
            
-            this.LogAction({msg:{e}});
+            //this.LogAction({msg:{e}});
             this.SetActiveOneAction({...e});
         });
     }

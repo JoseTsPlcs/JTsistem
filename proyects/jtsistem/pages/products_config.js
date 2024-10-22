@@ -14,7 +14,8 @@ $(document).ready(function() {
         ],
       });*/
     
-      new CrudsGroup({
+      var group = new CrudsGroup({
+        pageData,
         userData,parent:pageData.body,
         layers:[
           {
@@ -42,7 +43,7 @@ $(document).ready(function() {
           },
           {
             crud:{
-              parent:"prnt-tags",name:"cr-tags",
+              parent:"prnt-tags",name:"cr-item-tags",
               title:"lista de etiquetas",schema:sch_items_tag,
               panels:[
                 {
@@ -56,6 +57,8 @@ $(document).ready(function() {
           },
         ],
       });
+
+      PlayTutorialInPage({group,pageData});
     }
   });
   

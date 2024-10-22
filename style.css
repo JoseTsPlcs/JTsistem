@@ -119,7 +119,7 @@ a.sidebar-link:hover {
 
 #sidebar:not(.expand) .sidebar-item:hover .has-dropdown+.sidebar-dropdown {
     display: block;
-    max-height: 15em;
+    max-height: 20em;
     width: 100%;
     opacity: 1;
 }
@@ -193,10 +193,57 @@ a.sidebar-link:hover {
   
 
 
+  #iframe, #dialogflow-chatbot {
+    width: 100%;  /* El iframe o widget también ocupará el 100% */
+    height: 500px; /* Ajusta el height según lo que necesites */
+    border: none; /* Opcional: elimina bordes si es necesario */
+}
+  
 
 
+.fixed-button {
+    position: fixed; /* Fija el botón en la pantalla */
+    bottom: 20px;    /* Distancia desde la parte inferior */
+    right: 20px;     /* Distancia desde la derecha */
+    background-color: #007BFF; /* Color de fondo */
+    color: white;    /* Color del texto */
+    border: none;    /* Sin borde */
+    border-radius: 5px; /* Bordes redondeados */
+    padding: 10px 20px; /* Espaciado interno */
+    font-size: 16px;  /* Tamaño de la fuente */
+    cursor: pointer;  /* Cambia el cursor al pasar por encima */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra */
+    transition: background-color 0.3s; /* Transición suave al pasar el cursor */
+}
 
+.fixed-button:hover {
+    background-color: #0056b3; /* Cambia el color al pasar el cursor */
+}
 
+/*select fixed!!*/
 
+/* Establecer un ancho máximo para el select */
+.bootstrap-select {
+    /*max-width: 300px;*/
+    width: 100%;  /* El select ocupa el 100% del contenedor */
+}
 
+/* Hacer que el menú desplegable tenga el mismo ancho que el select */
+.bootstrap-select .dropdown-menu {
+    width: 100%;
+    max-width: 300px;  /* Limitar ancho del menú */
+    overflow-x: auto;  /* Scroll horizontal si es necesario */
+}
 
+/* Asegurar que el contenido de las opciones no se corte */
+.bootstrap-select .dropdown-menu.inner {
+    white-space: nowrap;
+    max-width: none;
+}
+
+/* Evitar que el texto se corte en opciones activas o seleccionadas */
+.bootstrap-select .dropdown-item.active,
+.bootstrap-select .dropdown-item.active.selected {
+    white-space: normal;  /* Mostrar texto completo en múltiples líneas si es necesario */
+    overflow: visible;
+}

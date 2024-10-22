@@ -3,12 +3,36 @@ $(document).ready(function() {
 
   new Pag_Base({
     success:({userData,pageData})=>{
+
+      new BuildPage({
+        type:"new",
+        schema:sch_sales,
+        schemaItems:sch_sales_products,
+        schemaPays:sch_sales_pays,
+        payTag:"venta",
+        userData,pageData,test:test,
+        itemFieldTotal:"priceTotal",
+        mainFieldTotalDscto:"totaldscto",
+        mainFieldDscto:"dscto",
+        mainFieldTotal:"total",
+        mainFieldPay:"pay",
+      });
+
+
+      return;
       
       var acc_price_update = Access_Get(userData.access,"md-items-sale-price");
       var acc_pays = Access_Get(userData.access,"md-box-general");
-      var acc_item_edit = Access_Get(userData.access,"md-items-sale-add");
+      var acc_item_edit = false;//Access_Get(userData.access,"md-items-sale-add");
+      var acc_sale_dsct = Access_Get(userData.access,"md-sale-dscto");
 
-     var group = new CrudsGroup({
+      
+      var startTutorialPlay = false;
+      if(pageData.recive && pageData.recive.tutorial==true) startTutorialPlay = true;
+      //startTutorialPlay = true;
+
+      var group = new CrudsGroup({
+      pageData,
       parent:pageData.body,userData,test:false,
       layers:[
         {
@@ -22,12 +46,32 @@ $(document).ready(function() {
         //----sale------
         {
           crud:{
-            parent:"main",
+            parent:"main",recordName:"venta",
             name:"cr-sale",title:"venta",
             schema:sch_sales,//simple:true,
+            states:[
+              {
+                name:"block",
+                tools:[
+                  {name:"tutorial",show:true},
+                  {name:"insert",show:true}
+                ],
+              },
+              {
+                name:"reload",
+                tools:[
+                  {name:"load",show:true},
+                  {name:"tutorial",show:true},
+                  {name:"cancel",show:true},
+                  {name:"update",show:true},
+                ]
+              }
+            ],
+            afterCancel:"block",
             panels:[
               {
-                tipe:"form",title:"informacion",col:4,
+                tipe:"form",title:"informacion",col:4,name:"info",
+                descripcion:"informacion general de la venta",
                 fieldsSet:[
                   {value:"emmit",state:"edit"},
                   {value:"status",state:"edit"},
@@ -44,9 +88,10 @@ $(document).ready(function() {
                 ],
               },
               {
-                tipe:"form",title:"total",col:12,
+                tipe:"form",title:"total",col:12,name:"total",
+                descripcion:"informacion del total de la venta",
                 fields:[
-                  (acc_pays?{name:"totalPay",title:"total pagado",box:{...bx_money}}:null),
+                  (acc_pays?{name:"totalPay",title:"cantidad pagada",box:{...bx_money}}:null),
                 ],
                 fieldsSet:[
                   {position:"last",value:"total",showBox:{...bx_moneyh1}},
@@ -67,9 +112,9 @@ $(document).ready(function() {
                     var listItems = group.crudGetBuild({crudName:"cr-items"}).bodyGet();
                     var priceTotals = listItems.fieldGetValues({fieldName:"priceTotal"});
                     var totalItems = priceTotals.reduce((acc,v)=>{return acc + parseFloat(v);},0);
-                    sale.fieldSetValues({fieldName:"totaldscto",values:[totalItems]});
 
-                    var dsct = parseFloat(sale.fieldGetValues({fieldName:"dscto"})[0]);
+                    if(acc_sale_dsct) sale.fieldSetValues({fieldName:"totaldscto",values:[totalItems]});
+                    var dsct = acc_sale_dsct ? parseFloat(sale.fieldGetValues({fieldName:"dscto"})[0]) : 0;
                     var totaltoPay = totalItems * (1 - dsct/100); 
                     sale.fieldSetValues({fieldName:"total",values:[totaltoPay]});
                     
@@ -86,7 +131,6 @@ $(document).ready(function() {
 
                     var primary = saleCrud.Reload_GetData_Primarys()[0];
                     var payField = sale.fieldGet({fieldName:"pay"});
-                    var dsctoField = sale.fieldGet({fieldName:"dscto"});
 
                     if(payField.box.tipe == 0){
 
@@ -97,14 +141,18 @@ $(document).ready(function() {
                       });
                     }
 
-                    if(dsctoField.box.tipe == 0){
+                    if(acc_sale_dsct){
 
-                      saleCrud.Update_AddChange({
-                        fieldName:"dscto",
-                        value:dsct,
-                        primary,
-                      });
-                    }
+                      var dsctoField = sale.fieldGet({fieldName:"dscto"});
+                      if(dsctoField.box.tipe == 0){
+
+                        saleCrud.Update_AddChange({
+                          fieldName:"dscto",
+                          value:dsct,
+                          primary,
+                        });
+                      }
+                    }                   
                     
                   }
                 }]
@@ -127,7 +175,61 @@ $(document).ready(function() {
                   action:({field,k})=>{
 
                     k.CallEvent({name:"saleFilter"});
+                    //if(startTutorialPlay) PlayTutorial_Update();
                   }
+                }]
+              },
+              {
+                name:"loaded",
+                actions:[{
+                  action:({k})=>{
+
+                    setTimeout(()=>{
+
+                      
+                    },1000);
+                  }
+                }]
+              },
+              {
+                name:"blockAfter",
+                actions:[{
+                  action:()=>{
+
+                    if(startTutorialPlay) setTimeout(PlayTutorial,1000);
+                  }
+                }]
+              },
+              {
+                name:"tutorialEnd",
+                actions:[{
+                  action:({value})=>{
+
+                    console.log("tutorial end of sale: ",value);
+                    
+                    if(value=="use"){
+
+                      PlayTutorialStep({
+                        stepName:"items",
+                        descripcion:"presiona para ver la lista de productos/servicios de la venta",
+                        crudName:"cr-items",
+                        success:()=>{
+
+                          PlayTutorialStep({
+                            stepName:"pagos",
+                            descripcion:"presiona para ver la lista de pagos realizados a la venta",
+                            crudName:"cr-list-pays",
+                          });
+                        }
+                      });
+                    }
+                  }
+                }]
+              },
+              {
+                name:"stateSetFirst",
+                actions:[{
+                  action:()=>{PlayTutorialInPage({group,pageData});}
                 }]
               },
             ],
@@ -136,9 +238,10 @@ $(document).ready(function() {
         {
           steps:{
             parent:"div-stps",
+            name:"sale-steps",
             items:[
-              {name:"stp-items",title:"items"},
-              (acc_pays?{name:"stp-pays",title:"pagos"}:null),
+              {name:"stp-items",title:"items",head:false,descripcion:"selecciona para mostrar lista de productos/servicios de la venta"},
+              (acc_pays?{name:"stp-pays",title:"pagos",head:false,descripcion:"selecciona para mostrar lista de pagos que se realizan"}:null),
               //{name:"stp-supplies",title:"costos"},
             ],
           }
@@ -156,7 +259,7 @@ $(document).ready(function() {
                     value:'<i class="bi bi-plus-circle"></i> Añadir Nuevo Item',
                   },                
                   update:(params)=>{
-  
+
                     var cr_item = group.crudGetBuild({crudName:"cr-item"});
                     cr_item.SetState({stateName:"new"});
                     
@@ -171,9 +274,20 @@ $(document).ready(function() {
         //------items------
         {
           crud:{
-            parent:"stp-items-div",
+            parent:"stp-items-div",recordName:"producto/servicio",
             name:"cr-items",title:"lista de productos",
             schema:sch_sales_products,
+            states:[
+              {
+                name:"reload",
+                tools:[
+                  {name:"sizes",value:999,show:false},
+                  {name:"insert",show:true},
+                  {name:"load",show:true},
+                  {name:"tutorial",show:true},
+                ]
+              },
+            ],
             panels:[{
               tipe:"table",head:false,h:400,
               fieldsSet:[
@@ -193,7 +307,7 @@ $(document).ready(function() {
                     crudSale.CallEvent({name:"saleFilter"});
                   }
                 }]
-              }
+              },
             ],
           }
         },
@@ -212,7 +326,7 @@ $(document).ready(function() {
           event:"search",
           masterName:"cr-sale",
           masterSelect:"ID_SALE",
-          searchValue:"id_sale",
+          searchValue:"saleID",
         },
       ],
       groups:[
@@ -233,28 +347,39 @@ $(document).ready(function() {
               masterFieldJoin:"ID_SALE",
               sch_join:sch_sales_pays,
               masterCrud:"cr-sale",
-              tagValue:"VENTA",
-              listEvents:[{
-                name:"printAfter",
-                actions:[{
-                  action:()=>{
+              tagValue:"venta",
+              listEvents:[
+                {
+                  name:"printAfter",
+                  actions:[{
+                    action:()=>{
+
+                      group.crudGetBuild({crudName:"cr-sale"}).CallEvent({name:"saleFilter"});
+                    }
+                  }]
+                },
+                {
+                  name:"tutorialStart",
+                  actions:[{
+                    action:({k})=>{
   
-                    group.crudGetBuild({crudName:"cr-sale"}).CallEvent({name:"saleFilter"});
-                  }
-                }]
-              }],
+                      //CrudItemSetPanels({start:false});
+                    }
+                  }]
+                }
+              ],
               formEvents:[{
                 name:"newAfter",
                 actions:[{
                   action:({k})=>{
-  
+
                     var sale = group.crudGetBuild({crudName:"cr-sale"}).bodyGet();
                     var totalToPay = parseFloat(sale.fieldGetValues({fieldName:"total"})[0]);
                     var totalPayed = parseFloat(sale.fieldGetValues({fieldName:"totalPay"})[0]);
                     var currentToPay = (totalToPay - totalPayed); 
                     if(currentToPay < 0) currentToPay = 0;
                     currentToPay = currentToPay.toFixed(2);
-  
+
                     k.bodyGet().fieldSetValues({fieldName:"total",values:[currentToPay]});
                   }
                 }]
@@ -262,7 +387,7 @@ $(document).ready(function() {
             }),
           }:null
         ),
-        (
+        /*(
           acc_item_edit ?
           {
             layers:[
@@ -362,9 +487,41 @@ $(document).ready(function() {
               },
             ],
           }:null
-        ),
+        ),*/
       ],
-     });         
+      });
+
+      //------tutorial general-----
+
+      function PlayTutorialStep({stepName,descripcion,crudName,success}) {
+
+        var steps = group.parentGetBuild({parentName:"sale-steps"});
+        var stepItem = steps.GetStep({stepName});
+        if(stepItem == null){
+
+          console.log("error no found step:",stepName); 
+          return;
+        }//else console.log(stepItem.stepButton.Blocks_Get()[0].id);
+        
+        
+        var tutorial = new Tutorial({
+          elementsInfo:[
+            {
+              id:stepItem.stepButton.Blocks_Get()[0].id,
+              descripcion,
+              eventNext:({element})=>{
+
+                element.click();
+                setTimeout(() => {
+                  
+                  group.crudGetBuild({crudName}).tutorialPlay({value:"use",success});
+                }, 100);
+              }
+            }
+          ],
+        });
+        tutorial.startTutorial();
+      }
 
     }
   });

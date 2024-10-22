@@ -15,15 +15,19 @@ class Box {
 
 
   #parent = undefined;
+  parentGet(){return this.#parent;}
   #blocks = [];
   Blocks_Get(){return this.#blocks};
   #name = "";
+  #title = "";
   #id = "";
 
   #tipe = 0;
+  tipeGet(){return this.#tipe;}
   #value = 0;
   #dflt = 0;
   #options = []; //{value:"", show:""}
+  optionsGet(){return this.#options;}
 
   #clss = "";
   #style = "";
@@ -49,6 +53,7 @@ class Box {
     if(i.tipe) this.#tipe = i.tipe;
     this.#parent = i.parent;
     if(i.name) this.#name = i.name;
+    this.#title = i.title ? i.title : this.#name;
     if(i.id) this.#id = i.id;
     if(i.options) this.#options = i.options;
     if(i.class) this.#clss = i.class;
@@ -268,7 +273,7 @@ class Box {
       this.#blocks[2] = document.createElement("label");
       this.#blocks[2].setAttribute("class","form-check-label");
       this.#blocks[2].setAttribute("for", chk_id);
-      this.#blocks[2].innerHTML = this.#name;
+      this.#blocks[2].innerHTML = this.#title;
       this.#blocks[0].appendChild(this.#blocks[2]);
 
       break;
@@ -516,7 +521,7 @@ class Box {
 
           this.#blocks[0].setAttribute("class",optionInfo.class);
         }
-        else this.#blocks[0].setAttribute("class","");
+        else this.#blocks[0].setAttribute("class",this.#clss);
 
       break;
 

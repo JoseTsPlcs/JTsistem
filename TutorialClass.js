@@ -1,10 +1,16 @@
 class Tutorial {
     
-    constructor({ elementsInfo }) {
+    constructor({elementsInfo, eventElementPlay,eventStart,eventEnd,eventNext}) {
         this.elementsInfo = elementsInfo;
         this.currentIndex = 0;
         this.elements = [];
         this.started = false;
+
+        this.eventElementPlay = eventElementPlay;
+        this.eventStart = eventStart;
+        this.eventEnd = eventEnd;
+        this.eventNext = eventNext;
+
         this.init();
     }
 
@@ -12,13 +18,16 @@ class Tutorial {
         this.elements = this.elementsInfo.map(info => info.id ? document.getElementById(info.id) : null);
         var btnNext = document.getElementById('nextBtn');
         var btnPrev = document.getElementById('prevBtn');
+        var btnCancel = document.getElementById('cancelBtn');
         if (btnNext) btnNext.addEventListener('click', () => this.focusNextElement());
         if (btnPrev) btnPrev.addEventListener('click', () => this.focusPrevElement());
+        if (btnCancel) btnCancel.addEventListener('click', () => this.cancelTutorial());
     }
 
     startTutorial() {
         this.currentIndex = 0;
         this.started = true;
+        if(this.eventStart!=null) this.eventStart({});
         this.showCurrentStep();
     }
 
@@ -31,11 +40,27 @@ class Tutorial {
         }
     }
 
+    actionParamsGet(){
+
+        var elementInfoCurrent = this.elementsInfo[this.currentIndex];
+        var element = this.elements[this.currentIndex];
+
+        return {
+            element,
+            index:this.currentIndex,
+            elementInfo:elementInfoCurrent,
+        };
+    }
+
     highlightElement(element) {
+
+        var elementInfoCurrent = this.elementsInfo[this.currentIndex];
+        if(this.eventElementPlay!=null)this.eventElementPlay(this.actionParamsGet());
+        if(elementInfoCurrent.action!=null) elementInfoCurrent.action(this.actionParamsGet());
 
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-        var pageInfo = null;
+       /* var pageInfo = null;
         var seccInfo = null;
         if(element.href){
 
@@ -65,13 +90,15 @@ class Tutorial {
             const sidebarLink = document.getElementById(seccionId);
             
             // Verificamos si el elemento existe y si tiene las clases necesarias
-            if (sidebarLink && sidebarLink.classList.contains('collapsed') && sidebarLink.classList.contains('has-dropdown')) {
-                // Si el enlace está colapsado, lo abrimos simulando un clic
+            if (sidebarLink) {
+                
+                sidebarLink.classList.toggle('show');
+                //if(sidebarLink.classList.contains('collapsed') && sidebarLink.classList.contains('has-dropdown')) sidebarLink.click();
                 sidebarLink.click();
             } else {
                 console.log(`No se encontró el enlace con el ID "${seccionId}" o no tiene las clases adecuadas.`);
             }
-        }        
+        }*/        
 
         this.applyHighlight(element);
     }
@@ -157,6 +184,9 @@ class Tutorial {
     focusNextElement() {
         if (!this.started) return;
 
+        var currentElementInfo = this.elementsInfo[this.currentIndex];
+        if(currentElementInfo.eventNext!=null) currentElementInfo.eventNext(this.actionParamsGet());
+
         if (this.currentIndex < this.elementsInfo.length - 1) {
             this.currentIndex++;
             this.showCurrentStep();
@@ -181,9 +211,16 @@ class Tutorial {
         }
     }
 
-    endTutorial() {
+    cancelTutorial(){
+
         this.started = false;
         document.querySelectorAll('.highlight').forEach(el => el.remove());
         this.hidePopup();
+    }
+
+    endTutorial() {
+
+        this.cancelTutorial();
+        if(this.eventEnd!=null) this.eventEnd({});
     }
 }

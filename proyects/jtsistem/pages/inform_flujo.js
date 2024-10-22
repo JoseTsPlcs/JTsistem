@@ -12,17 +12,20 @@ $(document).ready(function() {
         "UTILIDAD BRUTA",
       ];
 
-      var groups = new CrudsGroup({
+      var group = new CrudsGroup({
+        userData,pageData,
         layers:[
           {
             crud:{
               name:"cr-main",
               parent:pageData.body,
               title:pageData.title,
-              stateTools:[
+              states:[
                   {
                     name:"reload",
                     tools:[
+                        {name:"tutorial",show:true},
+                        {name:"config",show:true},
                         {name:"sizes",show:false,value:999},
                         {name:"pages",show:false},
                         {name:"reload",show:true},
@@ -266,7 +269,7 @@ $(document).ready(function() {
                       
                       
                       //print table
-                      var table = groups.parentGet({parentName:"detail-tb"}).build;
+                      var table = group.parentGet({parentName:"detail-tb"}).build;
                       var tableFields = table.fieldsGet();
                       for (let f = 0; f < tableFields.length; f++) {
 
@@ -286,7 +289,7 @@ $(document).ready(function() {
                       }
 
                       //print chart
-                      var chart = groups.parentGet({parentName:"detail-chart"}).build;
+                      var chart = group.parentGet({parentName:"detail-chart"}).build;
 
                       var labesValues = [];
                       for (let tb = 1; tb < tableData.length; tb++) labesValues.push(tableData[tb].title);
@@ -364,6 +367,8 @@ $(document).ready(function() {
           }
         ],
       });
+
+      PlayTutorialInPage({pageData,group});
 
     }
   });

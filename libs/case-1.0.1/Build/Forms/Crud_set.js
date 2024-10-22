@@ -306,7 +306,8 @@ class Crud_set extends ODD {
         switch (panel.tipe) {
             case "table":
                 
-                var tbField = panel.build.fieldGet({fieldName:fld.name});    
+                var tbField = panel.build.fieldGet({fieldName:fld.name});  
+                  
             return tbField.th;
 
             case "form":

@@ -20,78 +20,6 @@ class Form extends ODD {
         let k = this;
         this.ToolsSet({tools,toolsPositions});
         this._Fields_Set({fields});
-        this.#questionSet({questions});
-    }
-
-    //questions
-
-    #questions = {
-        data: [
-            {value:"q1",description:"¿como usar filtro?",elementsInfo:[]},
-            {value:"q2",description:"¿que significan los campos?",elementsInfo:[]},
-        ],
-        options:[],
-        tool:{name:"quest",action:"quest",box:{value:'<i class="bi bi-question-circle"></i>',tipe:5,class:"btn btn-secondary btn-sm"}},
-    }
-
-    #questionSet({questions=[]}){
-
-        if(questions.length>0) console.log("----------set questions in form---------------",questions);
-        
-        this.#questions.data.forEach(q => {
-            
-            var qfound = questions.find(qset=>qset.value==q.value);
-            if(qfound) q.elementsInfo = qfound.elementsInfo;
-        });
-
-        if(questions.length>0) console.log("----------questions end---------------",this.#questions);
-
-        this.#questions.options = this.#questions.data.map(q=>{return {value:q.value,show:q.description}});
-    }
-
-    #questionGet({value}){
-
-        return this.#questions.data.find(q=>q.value==value);
-    }
-
-    #questionsSetTutorials(){
-        
-        var q1Elements = this.#tools.filter(t=>t.show==true && t.descripcion!=null).map(t=>{
-
-            var box = this.ToolGetBox({toolName:t.name});
-            var id = box.Blocks_Get()[0].id;
-            return {id,descripcion:t.descripcion};
-        });
-        this.#questionSetTutorial({value:"q1",elementsInfo:q1Elements});
-        
-        var q2Elements = this.Fields_Get().filter(fld=>fld.descripcion!=null).map(fld => {
-            
-            var label = this.FiledGetLabel({fieldName:fld.name});
-            return {id:label.parentGet().id,descripcion:fld.descripcion};
-        });
-        //console.log("set tutorial q2",q2Elements);
-        
-        this.#questionSetTutorial({value:"q2",elementsInfo:q2Elements});
-    }
-
-    #questionSetTutorial({value,elementsInfo=[]}){
-
-        var question = this.#questionGet({value});
-        var questionElementsInfo = [...question.elementsInfo,...elementsInfo];
-        if(question.elementsInfo.length>0) console.log("-------------------------------set tutorial question value: " + value, questionElementsInfo);
-        
-        if(question && elementsInfo.length>0) question.tutorial = new Tutorial({elementsInfo:questionElementsInfo});
-    }
-
-    #questionEvent(value){
-
-        var question = this.#questionGet({value});
-        console.log("play question " + value,question);
-        if(question && question.tutorial != null){
-
-
-            question.tutorial.startTutorial();
-        }
         
     }
 
@@ -110,31 +38,18 @@ class Form extends ODD {
                 else tdata.dom.Hide();
                 
                 if(tset && tset.value !=null) tdata.dom.SetValue(tset.value);
-            })
-
-            tools.forEach(tset => {
-                
-                
             });
         }
         else
         {
-            for (let t = 0; t < tools.length; t++) {
-
-                const tool = tools[t];
-                if(tool.name==this.#questions.tool.name){
-    
-                    this.#questions.tool.box.options = this.#questions.data.map((q)=>{return {value:q.value,show:q.description}});
-                    tools[t] = {...tool,...this.#questions.tool};                
-                }
-            }
+            
     
             this.#tools=tools;
             let k = this;
             for (let t = 0; t < this.#tools.length; t++) {
     
-                let tool = this.#tools[t];
-                //console.log(tool,t);            
+                let tool = this.#tools[t];                
+                if(tool.active == null) tool.active = true;  
                 tool.box.id = "btn" + (t+1);
                 var update = tool.box.update;
                 var pst = this.#Tool_GetPosition({positionName:tool.position});
@@ -148,7 +63,7 @@ class Form extends ODD {
                     if(update!=null) update({tool,value});
                     k.#Event_ToolUpdate({tool,value});
     
-                    if(tool.name == k.#questions.tool.name) k.#questionEvent(value);
+                    
                 }
             }
         }
@@ -158,7 +73,10 @@ class Form extends ODD {
 
     Tool_Get({toolName}){
 
-        return this.#tools.find(t=>t.name==toolName);
+        var toolInfo = this.#tools.find(t=>t.name==toolName);
+        if(toolInfo == null) console.log("tool no found toolName:",toolName,"tools:",this.#tools);
+        
+        return toolInfo;
     }
 
     #Tool_GetPosition({positionName}){
@@ -167,7 +85,7 @@ class Form extends ODD {
         if(pst != null) return pst;
         else return {name:"default",x:0,y:0,count:0};
     }
-    #Tool_SetShow({toolName,show=true}){
+    toolSet({toolName,show=true,active=true,value}){
 
         var tool = this.Tool_Get({toolName});
         var box = tool.dom;
@@ -175,14 +93,32 @@ class Form extends ODD {
         if(show) box.Show();
         else box.Hide();
         tool.show = show;
-
-        console.log("TOOL SET",toolName,tool,show,"BOX: ", box);
+        if(active!=null) tool.active = active;
+        if(value !=null) box.SetValue(value);
     }
     ToolGetBox({toolName}){
 
         var tool = this.Tool_Get({toolName});
         return this.#wn_parent.Conteiner_GetColData({x:tool.x,y:tool.y}).boxs[tool.index];
     }
+    toolGetValue({toolName}){
+
+        var box = this.ToolGetBox({toolName});
+        return box.GetValue();
+    }
+    toolGetTutorialElement({toolName,recordName}){
+
+        var tool = this.Tool_Get({toolName});
+        return {
+            id:this.ToolGetBox({toolName}).Blocks_Get()[0].id,
+            descripcion:TutorialDescripcion({
+                boxTipe:tool.box.tipe,
+                fieldName:("para " + tool.descripcion),
+                recordName,
+            }),
+        };
+    }
+    
 
     //
 
@@ -212,6 +148,25 @@ class Form extends ODD {
 
         return this.#gr_content.GetLabel({name:fieldName});
     }
+    fieldGetTutorialDom({fieldName}){
+
+        return this.FiledGetLabel({fieldName}).parentGet();
+    }
+    fieldGetTutorialElement({fieldName,recordName}){
+        
+        var dom = this.fieldGetTutorialDom({fieldName});
+        var field = this.Field_Get({fieldName});
+
+        return {
+            id:dom.id,
+            descripcion:TutorialDescripcion({
+                recordName,
+                fieldName,
+                descripcion:field.descripcion,
+                boxTipe:field.box.tipe,
+            }),
+        }
+    }
 
     //
 
@@ -236,7 +191,7 @@ class Form extends ODD {
             title,head,blocked,show,
             grid:{
                 cols:[
-                    [4,4,4],//top
+                    [2,8,2],//top
                     [12],//conteiner
                     [1,10,1],//botton
                 ],
@@ -245,7 +200,10 @@ class Form extends ODD {
                     {y:0,x:0,attributes:[{name:"class",value:"d-flex justify-content-start"}]},
                     {y:0,x:1,attributes:[{name:"class",value:"d-flex justify-content-center"}]},
                     {y:0,x:2,attributes:[{name:"class",value:"d-flex justify-content-end"}]},
+                    {y:0,attributes:[{name:"class",value:"border-secondary border-border-bottom"}]},
 
+                    
+                    {y:2,attributes:[{name:"class",value:"border-secondary border-top"}]},
                     {y:2,x:0,attributes:[{name:"class",value:"d-flex justify-content-start"}]},
                     {y:2,x:1,attributes:[{name:"class",value:"d-flex justify-content-center"}]},
                     {y:2,x:2,attributes:[{name:"class",value:"d-flex justify-content-end"}]},
@@ -268,6 +226,8 @@ class Form extends ODD {
 
         });
 
+        
+
         var config = GetGridConfig({panels:this.#fields});
         //console.log("gridConfigConteiner", config);
         
@@ -284,10 +244,10 @@ class Form extends ODD {
 
         toolsPositions.forEach(t => {
             
-            if(t.show != null) this.#Tool_SetShow({toolName:t.name,show:t.show});
+            if(t.show != null) this.toolSet({toolName:t.name,show:t.show});
         });
+        this.#tools.forEach(tool => {if(tool.show!=true)tool.dom.Hide()});
 
-        this.#questionsSetTutorials();
         this.#builded = true;
     }
 
