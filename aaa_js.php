@@ -29,7 +29,6 @@
 
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/md-sales.js"></script>';
   
-  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ConfigProyect.js"></script>';
 
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ListOfPaginas.js"></script>';
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ListOfConections.js"></script>';
@@ -39,6 +38,9 @@
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/cruds/Groups.js"></script>';
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ListOfForms.js"></script>';
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/LoadPage.js"></script>';
+
+  
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ConfigProyect.js"></script>';
 
   echo '<script src="'.$srcPathReturn.'TutorialClass.js"></script>';
   echo '<script src="'.$srcPathReturn.'TutorialsData.js"></script>';

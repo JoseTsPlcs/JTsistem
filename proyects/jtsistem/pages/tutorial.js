@@ -3,148 +3,224 @@ $(document).ready(function() {
 
   new Pag_Base({
 
-    success:({userData,pageData})=>{
+    success:({userData,pageData,k})=>{
 
-      var tutorialModulos = [
-        {
-          value:"md-sale",
-          questions:[
-            //{name:"saleNew",descripcion:"Cómo crear una nueva venta",page:"saleNew2"},
-            {descripcion:"Cómo editar o anular un registro de ventas",page:"salesCotizacion"},
-            {descripcion:"Seguimiento de ventas existentes",page:"salesCotizacion"},
-            {descripcion:"Seguimiento de pagos pendientes",page:"salesPay"},
-            {descripcion:"Realizar una busqueda de ventas",page:"salesControl"},
-            {descripcion:"Reporte de ventas terminadas",page:"informSales"},
-            {descripcion:"Como abro caja para registrar pagos",page:"box"},
-            //{descripcion:"Generación de reportes de ventas"},
-          ],
-        },
-        {
-          value:"md-customer",
-          questions:[
-            {descripcion:"Cómo agregar y editar información de clientes",page:"customers"},
-            {descripcion:"Filtrado y búsqueda de clientes",page:"customers"},
-            //{descripcion:"Segmentación de clientes según compras, historial, etc.",page:"customers"},
-            //{descripcion:"Exportación de la base de datos de clientes"},
-          ],
-        },
-        {
-          value:"md-buy",
-          questions:[
-            {descripcion:"Cómo agregar una nueva compra",page:"buyNew"},
-            {descripcion:"Seguimiento de compras",page:"buyControl"},
-            {descripcion:"Cómo agregar y editar información de proveedores",page:"provieeders"},
-            //{descripcion:"Actualización de inventarios tras una compra"},
-            //{descripcion:"Visualización y descarga de reportes de compras"},
-          ],
-        },
-        {
-          value:"md-items",
-          questions:[
-            {descripcion:"Cómo crear, editar o eliminar productos/servicios",page:"items"},
-            {descripcion:"Control de inventarios (productos)",page:"stock"},
-            {descripcion:"Definir precios",page:"prices"},
-            {descripcion:"Agrupación de ítems por categorías",page:"itemsConfig"},
-          ],
-        },
-        {
-          value:"md-bills",
-          questions:[
-            {descripcion:"Cómo generar una factura a partir de una venta",page:"bills"},
-            //{descripcion:"Generación de reportes financieros",page:"informAccounts"},
-          ],
-        },
-        /*
-        */
-      ];
+      pageData.body.innerHTML += `
+          <div id="bodyTutorial" class="mb-3 bg-white"></div>
+      `;
 
-      //set value to questions
-      tutorialModulos.forEach(modulo => {
+      var assistance = {};
+
+      assistance.modal = new Modal({parent:pageData.body});
+      assistance.form = new Form({
+        title:"asistente",head:false,
+        parent:assistance.modal.GetContent(),
+        tools:[
+          {position:"head-center",name:"title",show:true,box:{tipe:0,class:"h2",value:"asistente"}},
+          {position:"head-rigth",name:"cancel",show:true,box:{tipe:5,class:"btn btn-danger",value:'<i class="bi bi-x"></i>'}},
+        ],
+        fields:[
+          {name:"content",tipe:0,box:{tipe:0,class:"w-100 p-0 m-0"}},
+        ],
+        events:[{
+          name:"toolUpdate",
+          actions:[{
+            action:({tool})=>{if(tool.name=="cancel") assistance.modal.SetActive({active:false});}
+          }]
+        }]
+      });
+
+      assistance.Button = document.createElement("button");
+      pageData.body.appendChild(assistance.Button);
+      assistance.Button.setAttribute("class","fixed-button");
+      assistance.Button.innerHTML = `<i class="bi bi-question-circle"></i> Asistente`;
+      assistance.Button.addEventListener('click',()=>{
+
+        assistance.modal.SetActive({active:true});
+      });
+
+      assistance.form.Field_GetBox({fieldName:"content"}).Blocks_Get()[0].innerHTML += `
+          <iframe allow="microphone;" id="dialogflow-chatbot"
+          src="https://console.dialogflow.com/api-client/demo/embedded/00d92eb6-75ca-4579-b8ab-db55f9bb9b29">
+          </iframe>
+      `;
+
+      function UpdateNotifications() {
         
-        modulo.modulo = modulos.find(md=>md.value==modulo.value);
-        modulo.access = false;
+        //console.log("trigger notifaction request");
 
-        for (let q = 0; q < modulo.questions.length; q++) {
+        db_lip.Request({
+          php:"row",
+          sql:db_lip.GetSql_Select({
+            tableMain:"notifications",
+            selects:[
+              {table:"notifications",field:"ID_NOTIFICATION"},
+              {table:"notifications",field:"TYPE"},
+              {table:"notifications",field:"MESSAGE"},
+              {table:"notifications",field:"DATE_EMMIT"},
+            ],
+            conditions:[
+              {
+                table:"notifications",
+                field:"ID_USER",
+                inter:"=",
+                value:1,//userData.id,
+              }
+            ],
+          }),
+          success:(result)=>{
 
-          var question = modulo.questions[q];
-          question.value = modulo.name + "-" + question.name;      
-          var questionPage = PageDataFind({pageName:question.page});
-          question.access = questionPage.state=="active";
-          if(question.access) modulo.access = true;
-        }
+            console.log("notifications:",result);
+            if(result){
 
-        modulo.questions = modulo.questions.filter(q=>q.access);
+              result.forEach(rst => {
 
-      });
+                var notificationId = rst["ID_NOTIFICATION"];
+                if(rst["TYPE"] == "dialogflow"){
 
-      //filter just the access
-      var tutorialAccess = tutorialModulos.filter(md=>md.access);
+                  const data = JSON.parse(rst["MESSAGE"]);
+                  rst.data = data;
 
-      //build parent
-      var gr_parent = new Grid({
-        parent:pageData.body,
-        cols:tutorialAccess.map(t=>{return [12]}),
-      });
+                  db_lip.Request({
+                    php:"success",
+                    sql:db_lip.GetSql_Delete({
+                      tableMain:"notifications",
+                      conditions:[{
+                        table:"notifications",
+                        field:"ID_NOTIFICATION",
+                        inter:"=",
+                        value:notificationId,
+                      }],
+                    }),
+                    success:()=>{
 
-      //build modulos
-      for (let y = 0; y < tutorialAccess.length; y++) {
+                      console.log("notification to play tutorial",data);
 
-        var t = tutorialAccess[y];
+                      if(data.queryResult!=null){
+    
+                        var actions = data.queryResult.parameters.action;
+                        var action = null;
+                        var cruds = data.queryResult.parameters.crud;
+                        var crud = null;
 
-        var parent = gr_parent.GetColData({x:0,y}).col;
-        var fields = [];
-        for (let q = 0; q < t.questions.length; q++) {
+                        if(Array.isArray(actions)) action = actions[actions.length-1];
+                        if(Array.isArray(cruds)) crud = cruds[cruds.length-1];
+    
+                        if(action && crud){
+    
+                          console.log("get of chat",action,crud);
+                          
+                          assistance.modal.SetActive({active:false});
+                          PlayTutorial({nav:k,tutorialValue:crud+"-"+action});
+                          
+                        }
+                      }
+                    }
+                  });                
+                }                
+                
+              });
+            }
+            
 
-          const question = t.questions[q];
-          let questionValue = question.value;
-
-          fields.push({
-            col:2,
-            name:"questionIteaction"+q,
-            tipe:0,
-            box:{
-              tipe:5,
-              class:"btn btn-secondary btn-sm",
-              value:'<i class="bi bi-question-circle"></i>',
-            },
-          });
-          fields.push({
-            col:10,
-            name:"questionName"+q,
-            tipe:0,
-            box:{
-              tipe:0,
-              class:"text-left w-100 px-1",
-              value:question.descripcion
-            },
-          });          
-
-        };
-
-        t.build = new Form({
-          parent,blocked:false,show:true,
-          title:t.modulo.show,
-          fields,
-          events:[{name:"fieldUpdate",actions:[{action:(value)=>{PlayTutorial({modIndex:y,questIndex:value.y})}}]}],
+          }
         });
       }
 
-      tutorialAccess.forEach(modulo => {
-        
-        //console.log(modulo.build.Field_GetBox({fieldName:"questionIteaction0"}));
-        
+      UpdateNotifications();      
+      setInterval(UpdateNotifications,1000);
+
+
+      tutorialsData.forEach(t=>{ 
+        if(t.access==null)t.access = true;
+        else if(typeof t.access === "string") t.access = Access_Get(userData.access,t.access);
+      });
+      tutorialsData = tutorialsData.filter(t=>t.access==true);
+      var seccions = [];
+      tutorialsData.forEach(t => {
+        if(!seccions.find(scc=>scc==t.seccion)) seccions.push(t.seccion);
       });
 
-      function PlayTutorial({modIndex=-1,questIndex=-1}) {
+      var modCols = [];
+      seccions.forEach(scc => {
         
-        var question = tutorialAccess[modIndex].questions[questIndex];
-        console.log("activar tutorial ",modIndex,questIndex,question);
-        InfoBetweenPagesSet({question});
-        //return;
+        modCols.push([12]);
+      });
+      console.log("MODCOLS",modCols);
+      
+      var mod = new Window({
+        parent:document.getElementById("bodyTutorial"),
+        title:"tutoriales",h:0,
+        grid:{cols:[[12]]},
+      });
+      var table = new Panel({
+        parent:mod.Conteiner_GetColData({x:0,y:0}).col,tipe:"table",maxH:600,
+        fields:[{name:"secc",title:"seccion",tipe:0,box:{tipe:0,class:"w-100 m-0 p-0"}}],
+      });
+      table.fieldSetValues({fieldName:"secc",values:seccions.map(scc=>{return ""})});
 
-        if(question.page) TutorialGoToPage({pageName:question.page});
+      for (let scc = 0; scc < seccions.length; scc++) {
 
+        const secc = seccions[scc];
+        var seccWindow = new Window({
+          parent:table.fieldGetBoxes({fieldName:"secc"})[scc].Blocks_Get()[0],
+          title:secc,
+          cols:[[12]],
+        });
+
+        let seccTutorial = tutorialsData.filter(t=>t.seccion==secc);
+        var seccTable = new Panel({
+          tipe:"table",parent:seccWindow.Conteiner_GetColData({x:0,y:0}).col,
+          fields:[
+            {col:2,name:"start",title:"",tipe:0,box:{tipe:5,class:"btn btn-primary",value:"inciar"}},
+            {col:10,name:"tutorial",title:"",tipe:0,box:{tipe:0}},
+          ],
+          events:[{
+            name:"boxUpdate",
+            actions:[{
+              action:(params)=>{
+
+                PlayTutorial({nav:k,tutorialValue:seccTutorial[params.y].value});
+              }
+            }]
+          }]
+        });
+
+        seccTable.fieldSetValues({fieldName:"tutorial",values:seccTutorial.map(t=>{return t.name})});
+        seccTable.fieldSetValues({fieldName:"start",values:seccTutorial.map(t=>{return `Iniciar <i class="bi bi-play-circle-fill"></i>`})});
       }
+      
+
+      /*var cards = new Panel({
+        parent:mod.Conteiner_GetColData({x:0,y:0}).col,
+        tipe:"table",title:"tutoriales",maxH:600,
+        fields:[
+          {col:2,name:"start",title:"",tipe:0,box:{tipe:5,class:"btn btn-primary",value:"inciar"}},
+          {col:10,name:"tutorial",title:"",tipe:0,box:{tipe:0}},
+        ],
+        events:[
+          {
+            name:"boxUpdate",
+            actions:[{
+              action:(params)=>{
+
+                console.log(params);
+                
+                PlayTutorial({nav:k,tutorialValue:tutorialsData[params.y].value});
+              }
+            }]
+          }
+        ],
+      });      
+
+      cards.fieldSetValues({fieldName:"tutorial",values:tutorialsData.map(t=>{return t.name})});
+      cards.fieldSetValues({fieldName:"start",values:tutorialsData.map(t=>{return `Iniciar <i class="bi bi-play-circle-fill"></i>`})});
+      */
+
+      
+
+      //----
+
       
     }
   });

@@ -5,8 +5,9 @@ $(document).ready(function() {
 
     success:({userData,pageData})=>{
 
-      var groupBuild = new CrudsGroup({
+      var group = new CrudsGroup({
         userData,parent:pageData.body,
+        pageData,
         layers:[
           {
             grid:{
@@ -29,7 +30,7 @@ $(document).ready(function() {
           //-----produccion --- table
           {
             crud:{
-              parent:"prnt-prod",name:"cr-prod-tb",
+              parent:"prnt-prod",name:"cr-produccions",
               title:"ordenes de produccion",schema:sch_produccion,
               panels:[
                 {
@@ -58,7 +59,7 @@ $(document).ready(function() {
                       value:"productResult",state:"edit",
                       update:({groups,crudBuild,field})=>{
                         
-                        groupBuild.CrudJoin({
+                        group.CrudJoin({
                           masterCrud:"cr-prod-fm",
                           masterFieldValue:"productResult",
                           maidCrud:"cr-recipe",
@@ -75,11 +76,11 @@ $(document).ready(function() {
               ],
               events:[
                 {
-                  name:"printAfter",
+                  name:"filterRecipe",
                   actions:[{
                     action:({k})=>{
 
-                      groupBuild.CrudJoin({
+                      group.CrudJoin({
                         masterCrud:"cr-prod-fm",
                         masterFieldValue:"productResult",
                         maidCrud:"cr-recipe",
@@ -87,7 +88,25 @@ $(document).ready(function() {
                       });
                     }
                   }]
-                }
+                },
+                {
+                  name:"printAfter",
+                  actions:[{
+                    action:({k})=>{
+
+                      k.CallEvent({name:"filterRecipe"});
+                    }
+                  }]
+                },
+                {
+                  name:"boxUpdate",
+                  actions:[{
+                    action:({k,field})=>{
+
+                      if(field.name=="productResult") k.CallEvent({name:"filterRecipe"});
+                    }
+                  }]
+                },
               ],
             }
           },
@@ -143,7 +162,7 @@ $(document).ready(function() {
         ],
         conections:[
           {
-            masterName:"cr-prod-tb",
+            masterName:"cr-produccions",
             masterSelect:"ID_PRODUCCION",
             event:"tableForm",
             maidName:"cr-prod-fm",
@@ -157,7 +176,7 @@ $(document).ready(function() {
             maidSelect:"ID_PRODUCCION",
           },
           /*{
-            masterName:"cr-prod-tb",
+            masterName:"cr-produccions",
             masterSelect:"ID_PRODUCT",
             event:"tableForm",type:"show",
             maidName:"cr-recipe",
@@ -172,6 +191,8 @@ $(document).ready(function() {
           }
         ],
       });
+
+      PlayTutorialInPage({group,pageData});
     }
   });
 

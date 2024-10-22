@@ -29,12 +29,19 @@ echo '<script src="'.$src.'Build/Modulos/Config.js"></script>';
 echo '<script src="'.$src.'Build/Modulos/List.js"></script>';
 
 echo '<script src="'.$src.'Build/Forms/Panel.js"></script>';
+echo '<script src="'.$src.'Build/Forms/Panelv2.js"></script>';
 echo '<script src="'.$src.'Build/Forms/PanelBuild.js"></script>';
 echo '<script src="'.$src.'Build/Forms/PanelKpi.js"></script>';
 echo '<script src="'.$src.'Build/Forms/PanelChart.js"></script>';
+echo '<script src="'.$src.'Build/Forms/PanelCards.js"></script>';
 
-echo '<script src="'.$src.'Build/Forms/Crud.js"></script>';
 echo '<script src="'.$src.'Build/Forms/Crud_Body.js"></script>';
+echo '<script src="'.$src.'Build/Forms/Crud_Body_v2.js"></script>';
+
+echo '<script src="'.$src.'Build/Forms/Layers.js"></script>';
+echo '<script src="'.$src.'Build/Forms/Crud.js"></script>';
+echo '<script src="'.$src.'Build/Forms/CrudBuild.js"></script>';
+
 echo '<script src="'.$src.'Build/Forms/Crud_Form.js"></script>';
 echo '<script src="'.$src.'Build/Forms/Crud_Table.js"></script>';
 echo '<script src="'.$src.'Build/Forms/Crud_Master.js"></script>';
@@ -52,6 +59,8 @@ echo '<script src="'.$src.'Constructor/ConsInform.js"></script>';
 echo '<script src="'.$src.'Land/Pag_Base.js"></script>';
 echo '<script src="'.$src.'Land/TutorialCompleto.js"></script>';
 
+echo '<script src="'.$src.'Source/Usefull-Box.js"></script>';
+echo '<script src="'.$src.'Source/Usefull-Grid.js"></script>';
 echo '<script src="'.$src.'Source/Usefull.js"></script>';
 
  ?>

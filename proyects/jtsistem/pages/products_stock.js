@@ -5,8 +5,8 @@ $(document).ready(function() {
 
     success:({userData,pageData})=>{
 
-      new CrudsGroup({
-        userData,
+      var group = new CrudsGroup({
+        userData,pageData,
         parent:pageData.body,
         layers:[
           {
@@ -18,9 +18,9 @@ $(document).ready(function() {
           },
           {
             crud:{
-              parent:"main",name:"cr-prices",
+              parent:"main",name:"cr-items",
               schema:sch_items,title:"lista de stock",
-              stateType:"show",
+              stateType:"show",recordName:"item",
               panels:[
                 {
                   tipe:"table",
@@ -37,10 +37,28 @@ $(document).ready(function() {
                   ],
                 }
               ],
+              tutorials:[
+                {
+                  value:"limit",show:"¿como veo los productos que se estan acabando?",active:true,
+                  elementsInfo:({k})=>{
+
+                    return TutorialGetElementInfoByActions({
+                      k,
+                      actions:[
+                        {toolName:"config",click:true},
+                        {filterName:"limite",value:1},
+                        {toolName:"reload",click:true},
+                      ],
+                    });
+                  }
+                },
+              ],
             }
           }
         ],
       });
+
+      PlayTutorialInPage({pageData,group});
 
     }
   });

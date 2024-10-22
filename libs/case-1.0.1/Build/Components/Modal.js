@@ -29,7 +29,7 @@ class Modal extends ODD {
     #content = null;
 
     //sizes xl, lg && sm
-    #Build({parent,size,index=-1}){
+    #Build({parent,size,index=-10}){
 
         if(parent==null) parent = document.body;
 
@@ -59,6 +59,8 @@ class Modal extends ODD {
         this.#modal.setAttribute("class","modal");
         this.#modal.setAttribute("tabindex",index);
         this.#modal.setAttribute("role","dialog");
+        //this.#modal.Modal({focus:false});
+
         var id = parent.id + "_modal_" + this._name;
         this._id = id;
         this.#modal.setAttribute("id", id);
@@ -75,6 +77,8 @@ class Modal extends ODD {
         modal_dialog.appendChild(this.#content);
 
         this.CallEvent({name:'builded'});
+
+        
 
         let k = this;
         $('#'+this._id).on('hidden.bs.modal', function (e) {
@@ -95,7 +99,12 @@ class Modal extends ODD {
 
         if(active==true){
 
-            $('#'+this.#modal.id).modal('show');
+            var md = new bootstrap.Modal(this.#modal, {
+                focus: false // Desactiva el auto-focus del modal
+            });
+            md.show();
+    
+            //$('#'+this.#modal.id).modal('show');
             this.CallEvent({name:'show'});
         }
         else{
@@ -103,6 +112,8 @@ class Modal extends ODD {
             $('#'+this.#modal.id).modal('hide');
             this.CallEvent({name:'hide'});
         }
+
+        
         
     }
 

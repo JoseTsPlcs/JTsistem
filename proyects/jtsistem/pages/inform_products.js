@@ -6,20 +6,23 @@ $(document).ready(function() {
 
     success:({userData,pageData})=>{
 
-      var groups = new CrudsGroup({
+      var group = new CrudsGroup({
+        userData,pageData,
         layers:[
           {
             crud:{
-              name:"cr-main",
+              name:"cr-items",
               parent:pageData.body,
               title:pageData.title,
-              stateTools:[
+              states:[
                   {
                     name:"reload",
                     tools:[
                         {name:"sizes",show:false,value:999},
                         {name:"pages",show:false},
                         {name:"reload",show:true},
+                        {name:"tutorial",show:true},
+                        {name:"config",show:true},
                     ],
                   },
                   {
@@ -96,13 +99,13 @@ $(document).ready(function() {
 
               configShow:true,    
               filters:[
-                  {name:"rango de fecha",box:{tipe:3,options:op_date_ranges,value:op_date_ranges[2].value}},
+                  {...flt_period},
                   {col:6,name:"fecha min",box:{tipe:2,value:Date_StartQuarter()},select:{table:"sales",field:"DATE_EMMIT",tipe:"min"},descripcion:"buscar por fecha mayor o igual a las seleccionada"},
                   {col:6,name:"fecha max",box:{tipe:2,value:Date_EndQuarter()},select:{table:"sales",field:"DATE_EMMIT",tipe:"max"},descripcion:"buscar por fecha menor o igual a las seleccionada"},
                   {name:"producto",box:bx_input,select:{table:"products",field:"NAME"},descripcion:"buscar por nombre de producto/servicio/insumo"},
                   {name:"tipo",box:{tipe:4,options:op_products_tipe},select:{table:"products",field:"ID_PRODUCT_TIPE"},descripcion:"buscar por producto/servicio/insumo"},
                   {name:"etiqueta",box:{tipe:4,options:[]},select:{table:"products",field:"ID_PRODUCT_TAG"},load:{name:"ld-products_tags",show:"show"},descripcion:"buscar por etiqueta"},
-                  {name:"pagado",box:{tipe:4,options:op_sales_paid,value:[op_sales_paid[0].show]},select:{table:"sales",field:"PAID"}},
+                  {name:"pagado",box:{tipe:4,options:op_sales_paid,value:[op_sales_paid.find(op=>op.value==1).show]},select:{table:"sales",field:"PAID"}},
                   {name:"estado de ventas",box:{tipe:4,options:op_sales_status,value:op_sales_status.filter(st=>st.value!=5).map(st=>{return st.show})},select:{table:"sales",field:"ID_STATUS"}},
               ],
               panels:[
@@ -126,7 +129,7 @@ $(document).ready(function() {
                   actions:[{
                     action:({result,k})=>{
 
-                      var period = k.bodyGet().configGetWindowFilters().Filter_GetBox({filterName:"rango de fecha"}).GetValue();
+                      var period = k.bodyGet().configGetWindowFilters().Filter_GetBox({filterName:"periodo"}).GetValue();
                       console.log("PRINT BEFORE",period, result);
 
                       var products = [];
@@ -203,7 +206,7 @@ $(document).ready(function() {
 
                       //-----print top list-----
 
-                      var tb_top = groups.parentGet({parentName:"tb-top"}).build;
+                      var tb_top = group.parentGet({parentName:"tb-top"}).build;
                       tb_top.fieldSetValues({
                         fieldName:"product",
                         values:products.map(p=>{return p.name}),
@@ -325,38 +328,40 @@ $(document).ready(function() {
 
       function EvolProduct({productName}) {
         
-        var crud = groups.parentGet({parentName:"cr-main"}).build;
+        var crud = group.parentGet({parentName:"cr-items"}).build;
         var dataset = crud.ReloadDataSetGet({dataSetName:"products"});
         var productData = dataset.result.find(rst=>rst.name == productName);
         console.log("EVOL PRODUCT",productData);
 
         //-----cant----
         
-        var kpi_cant_total = groups.parentGet({parentName:"kpi-cant-tot"}).build;
+        var kpi_cant_total = group.parentGet({parentName:"kpi-cant-tot"}).build;
         kpi_cant_total.fieldSetValues({fieldName:"tot",values:[productData.cant]});
 
-        var kpi_cant_prom = groups.parentGet({parentName:"kpi-cant-prom"}).build;
+        var kpi_cant_prom = group.parentGet({parentName:"kpi-cant-prom"}).build;
         kpi_cant_prom.fieldSetValues({fieldName:"prom",values:[productData.cantProm]});
 
-        var chr_cant = groups.parentGet({parentName:"chrt-cant-evol"}).build;
+        var chr_cant = group.parentGet({parentName:"chrt-cant-evol"}).build;
         chr_cant.titleSet({title:"evolutivo de cantidades del producto: " + productName});
         chr_cant.fieldSetValues({fieldName:"labels",values:productData.dates.map(d=>{return d.label;})});
         chr_cant.fieldSetValues({fieldName:"cant",values:productData.dates.map(d=>{return d.cant;})});
 
         //-----sale----
 
-        var kpi_sale_total = groups.parentGet({parentName:"kpi-sale-tot"}).build;
+        var kpi_sale_total = group.parentGet({parentName:"kpi-sale-tot"}).build;
         kpi_sale_total.fieldSetValues({fieldName:"tot",values:[productData.money]});
 
-        var kpi_sale_prom = groups.parentGet({parentName:"kpi-sale-prom"}).build;
+        var kpi_sale_prom = group.parentGet({parentName:"kpi-sale-prom"}).build;
         kpi_sale_prom.fieldSetValues({fieldName:"prom",values:[productData.moneyProm]});
 
-        var chr_sale = groups.parentGet({parentName:"chrt-sale-evol"}).build;
+        var chr_sale = group.parentGet({parentName:"chrt-sale-evol"}).build;
         chr_sale.titleSet({title:"evolutivo de ventas del producto: " + productName});
         chr_sale.fieldSetValues({fieldName:"labels",values:productData.dates.map(d=>{return d.label;})});
         chr_sale.fieldSetValues({fieldName:"sale",values:productData.dates.map(d=>{return d.money;})});
 
       }
+
+      PlayTutorialInPage({group,pageData});
 
     }
   });

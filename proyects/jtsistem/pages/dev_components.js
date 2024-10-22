@@ -1,6 +1,16 @@
 
+var userData = {
+    access:[
+        {value:"md-bills-general",active:"true"},
+    ],
+    company:{id:1},
+}
+var pageData = {
+    title:"dev components",
+}
 
-switch ("crudMaster") {
+
+switch ("crud") {
 
     case "window":
         
@@ -206,6 +216,604 @@ switch ("crudMaster") {
         });
 
         
+
+    break;
+
+    case  "panelCards":
+
+        var pn = new PanelCards({
+            parent:document.body,
+            title:"panel card",
+            tipe:"chart",
+            fields:[
+                {name:"nombre",box:{tipe:1,class:"w-100"},col:10},
+                {name:"tipo",box:{tipe:3,options:[{value:1,show:"tipo1"},{value:2,show:"tipo2"}]},col:2},
+                {name:"total",box:{tipe:1}},
+                {name:"cantidad",box:{tipe:1}},
+            ],
+        });
+        
+
+        setTimeout(()=>{
+
+            pn.fieldSetValues({fieldName:"nombre",values:["nombre1","nombre2"]});
+            pn.fieldSetValues({fieldName:"tipo",values:[1,2]});
+
+        },1000);
+
+    break;
+
+    case "cnxNew":
+
+        var group = new CrudsGroup({
+            userData,pageData,
+            layers:[
+                {
+                    grid:{
+                        items:[
+                            {name:"prnt-sale",col:4},
+                            {name:"prnt-items",col:8},
+                            {name:"prnt-pays",col:8},
+                            {name:"prnt-pay",col:4},
+                        ]
+                    }
+                },
+                {
+                    crud:{
+                        parent:"prnt-sale",name:"cr-sale",
+                        title:"venta",schema:sch_sales,
+                        panels:[
+                            {
+                                tipe:"form",title:"informacion",
+                                fieldsSet:[
+                                    {value:"emmit",state:"edit"},
+                                    {value:"status",state:"edit"},
+                                    {value:"pay",state:"edit"},
+                                    {value:"customer",state:"edit"},
+                                ]
+                            }
+                        ],
+                        stateStart:"new",
+                        states:[
+                            {
+                                name:"new",
+                                tools:[
+                                    {name:"insert",show:true,active:false},
+                                    {name:"cancel",show:false},
+                                ]
+                            },
+                            {
+                                name:"reload",
+                                tools:[
+                                    {name:"new",show:true},
+                                ],
+                            }
+                        ],
+                    }
+                },
+                {
+                    crud:{
+                        parent:"prnt-items",name:"cr-items",
+                        title:"lista de items",schema:sch_sales_products,
+                        panels:[
+                            {
+                                tipe:"table",title:"informacion",
+                                fields:[{...fld_delete}],
+                                fieldsSet:[
+                                    {value:"item",state:"edit"},
+                                    {value:"cant",state:"edit"},
+                                    {value:"priceUnit",state:"edit"},
+                                    {value:"priceTotal",state:"edit"},
+                                ]
+                            }
+                        ],
+                        stateStart:"new",
+                        states:[
+                            {
+                                name:"new",
+                                tools:[
+                                    {name:"insert",show:false},
+                                    {name:"addLine",show:true},
+                                ]
+                            }
+                        ],
+                    }
+                },
+                /*{
+                    crud:{
+                        title:"lista de pagos de ventas",schema:sch_sales_pays,
+                        name:"cr-pays",parent:"prnt-pays",
+                        panels:[{
+                            tipe:"table",
+                            fields:[
+                                {...fld_delete},
+                                {name:"total",box:{...bx_money}},
+                                {name:"ingreso",box:{...bx_shw}},
+                                {name:"etiqueta",box:{...bx_shw}},
+                                {name:"cuenta",box:{...bx_shw}},
+                            ],
+                            fieldsSet:[
+                                {value:"idSale"},
+                                {value:"idPay"},
+                            ],
+                        }],
+                        stateStart:"new",
+                        afterInsert:"new",
+                        states:[
+                            {
+                                name:"new",
+                                tools:[
+                                    {name:"addLine",show:true,active:true},
+                                    {name:"insert",show:false,active:true},
+                                ]
+                            }
+                        ],
+                    }
+                },
+                {
+                    crud:{
+                        parent:"prnt-pay",schema:sch_pays,
+                        title:"pago",name:"cr-pay",
+                        panels:[{
+                            tipe:"form",head:false,
+                            fieldsSet:[
+                                {value:"date"},
+                                {value:"total",state:"edit"},
+                                {value:"income",state:"edit"},
+                                {value:"account",state:"edit"},
+                                {value:"tag",state:"edit"},
+                            ]
+                        }],
+                        actionsBlock:true,
+                        stateStart:"new",
+                        afterCancel:"new",
+                        states:[
+                            {
+                                name:"new",
+                                tools:[
+                                    {name:"insert",active:false,show:true},
+                                    {name:"cancel",active:true,show:true},
+                                ]
+                            }
+                        ],
+                    }
+                },*/
+            ],
+            conections:[
+
+            ]
+        });
+
+    break;
+
+    case "crud":
+
+        var group = new CrudBuild({
+            userData,
+            layers:[
+                {
+                    crud:{
+                        title:"ventas",schema:sch_sales,
+                        name:"cr-sale",
+                        panels:[
+                            {
+                                tipe:"form",title:"informacion",col:4,
+                                fields:[
+                                    {name:"id_sale",box:{tipe:0},select:"primary"},
+                                ],
+                                fieldsSet:[
+                                    {value:"emmit",state:"edit"},
+                                    {value:"status",state:"edit"},
+                                    {value:"pay",state:"edit"},
+                                    {value:"customer",state:"edit"},
+                                    {value:"doc",state:"edit"},
+                                    {value:"comment",state:"edit"},
+                                    {value:"total",state:"edit",showBox:{...bx_moneyh1}},
+                                ],
+                            },
+                            {
+                                tipe:"form",title:"lista",col:8,name:"prnt-steps",
+                            }
+                        ],
+                        stateStart:"new",
+                        states:[
+                            {
+                                name:"new",
+                                tools:[
+                                    {name:"sizes",show:true,value:1},
+                                    {name:"pages",show:true},
+                                    {name:"update",show:true},
+                                    
+                                    {name:"addLine",show:true},
+                                    {name:"cancel",show:true},
+                                ],
+                            },
+                            {
+                                name:"reload",
+                                tools:[
+                                    {name:"sizes",show:true,value:1},
+                                    {name:"pages",show:true},
+                                    {name:"update",show:true},
+                                    
+                                    {name:"reload",show:true},
+                                    {name:"new",show:true},
+                                ],
+                            }
+                        ],
+                        inserts:[
+                            {
+                                field:"ID_COMPANY",
+                                tipe:"const",
+                                value:userData.company.id,
+                            }
+                        ],
+                        events:[
+                            {
+                                name:"printByIndexs",
+                                actions:[{
+                                    action:({k,indexsRecords})=>{
+
+                                        //console.log("print cr sale index:",indexsRecords);
+                                        
+                                        var cr_items = group.layersGet().parentGetBuild({parentName:"cr-items"});
+                                        if(cr_items){
+
+                                            indexsRecords.forEach(index => {
+                                            
+                                                var data = k.recordGetData()[index];
+                                                var value = data.primary;
+    
+                                                cr_items.joinSet({
+                                                    name:"sale-cnx-items",
+                                                    select:"ID_SALE",
+                                                    index,
+                                                    value
+                                                });
+    
+                                                cr_items.PrintData();
+                                            });
+    
+                                            var stateName = k.bodyGet().stateGet();
+                                            console.log("sale -> print by index -> state:", stateName);
+                                            cr_items.bodyGet().stateSet({stateName});    
+                                        }
+
+                                        /*if(k.bodyGet().stateGet() == "reload"){
+
+                                            cr_items.bodyGet().stateSet({stateName:"reload"});
+                                        }
+                                        else
+                                        {
+                                            cr_items.bodyGet().stateSet({stateName:"new"});
+                                        }*/
+                                        
+                                        //cr_items.PrintData();
+                                    }
+                                }]
+                            },
+                        ],
+                        conditions:[
+                            {
+                                table:sch_sales.table,
+                                field:"ID_COMPANY",
+                                inter:"=",
+                                value:userData.company.id,
+                            },
+                        ],
+                    }
+                },
+                {
+                    steps:{
+                        parent:"prnt-steps",
+                        items:[
+                            {name:"prnt-pays"},
+                            {name:"prnt-items"},
+                        ],
+                    }
+                },
+                //lista de items
+                /*{
+                    grid:{
+                        parent:"prnt-items",
+                        items:[
+                            {name:"btn-item-add",box:{...fld_edit.box,value:"añadir nuevo producto"},tipe:0,col:4},
+                            {name:"div-item",box:{tipe:0,class:"conteiner"},tipe:0},
+                            {name:"prnt-items-list",col:12},
+                        ],
+                    },
+                },
+                {
+                    crud:{
+                        title:"lista de items",schema:sch_sales_products,
+                        name:"cr-items",parent:"prnt-items-list",
+                        selects:[
+                            {table:sch_sales_products.table,field:"ID_SALE"},
+                        ],
+                        panels:[{
+                            tipe:"table",h:400,
+                            fields:[
+                                {name:"id",box:{tipe:0},select:"primary"},
+                                {name:"id_sale",box:{tipe:0},select:"ID_SALE"},
+                                {...fld_delete},
+                            ],
+                            fieldsSet:[
+                                {value:"item",state:"edit"},
+                                {value:"cant",state:"edit"},
+                                {value:"priceUnit",state:"edit"},
+                                {value:"priceTotal",state:"edit"},
+                            ]
+                        }],
+                        stateStart:"new",
+                        states:[
+                            {
+                                name:"new",
+                                tools:[
+                                    {name:"update",show:true},
+                                    {name:"addLine",show:true},
+                                    {name:"sizes",show:true,value:10},
+                                    {name:"pages",show:true},
+                                    {name:"data",show:true},
+                                    {name:"cancel",show:true},
+                                ],
+                            },
+                            {
+                                name:"reload",
+                                tools:[
+                                    {name:"update",show:true},
+                                    {name:"addLine",show:true},
+                                    {name:"sizes",show:true,value:10},
+                                    {name:"pages",show:true},
+                                    //{name:"data",show:true},
+                                    //{name:"new",show:true},
+                                ],
+                            }
+                        ],
+                    }
+                },*/
+                //lista de pagos
+                //{grid:{parent:"prnt-pays",items:[{name:"prnt-pays",col:12}]}},
+                {
+                    grid:{
+                        parent:"prnt-pays",
+                        items:[
+                            {name:"prnt-pays-main",col:12},
+                            {name:"prnt-pays-md",col:12},
+                        ],
+                    }
+                },
+                {
+                    crud:{
+                        parent:"prnt-pays",title:"lista de pagos",
+                        name:"cr-pays",tableMain:sch_sales_pays.table,
+                        selectPrimary:sch_sales_pays.fieldPrimary,
+                        conditions:[{
+                            table:sch_sales_pays.table,
+                            field:"ID_SALE",
+                            inter:"=",
+                            value:390
+                        }],
+                        selects:[
+                            {table:sch_sales_pays.table,field:"ID_SALE"},
+                            {table:sch_sales_pays.table,field:"ID_PAY"},
+                        ],
+                        panels:[{
+                            tipe:"table",
+                            fields:[
+                                {...fld_delete},
+                                {...fld_edit},
+                                {name:"id_sale",box:{...bx_shw},select:"ID_SALE"},
+                                {name:"id_pay",box:{...bx_shw},select:"ID_PAY"},
+                                {name:"cuenta",box:{...bx_shw},select:"ACCOUNT"},
+                                {name:"total",box:{...bx_money},select:"TOTAL"},
+                            ],
+                        }],
+                        stateStart:"new",
+                        states:[
+                            {
+                                name:"new",
+                                tools:[
+                                    {name:"new",show:true,active:false},
+                                    {name:"sizes",show:true,value:10},
+                                    {name:"pages",show:true},
+                                ],
+                            },
+                            {
+                                name:"reload",
+                                tools:[
+                                    {name:"sizes",show:true,value:10},
+                                    {name:"reload",show:true},
+                                    {name:"pages",show:true},
+                                    {name:"new",show:true,active:false},
+                                ],
+                            }
+                        ],
+                        events:[
+                            {
+                                name:"toolUpdate",
+                                actions:[{
+                                    action:({tool})=>{
+
+                                        if(tool.name=="new"){
+                                            
+                                            group.layersGet().parentGetBuild({parentName:"md-pay"}).SetActive({active:true});
+                                            //group.layersGet().parentGetBuild({parentName:"cr-pay"}).bodyGet().stateSet({stateName:"new"});
+                                        }
+                                    }
+                                }]
+                            },
+                            {
+                                name:"boxUpdate",
+                                actions:[{
+                                    action:({y,field,index})=>{
+
+                                        
+                                        var cr_pay = group.layersGet().parentGetBuild({parentName:"cr-pay"});
+
+                                        if(field.action=="delete"){
+
+                                            //cr_pay.insertRecordRemove({y});
+                                        }
+
+                                        if(field.action=="edit"){
+
+                                            group.layersGet().parentGetBuild({parentName:"md-pay"}).SetActive({active:true});
+                                            cr_pay.PrintByIndexsRecords({indexsRecords:[index]});
+                                        }
+                                    }
+                                }]
+                            },
+                        ],
+                        inserts:[
+                            {
+                                field:"ID_SALE",
+                                value:397,
+                            }
+                        ],
+                    }
+                },
+                //pago!!
+                {modal:{parent:"prnt-pays-md",name:"md-pay"}},
+                {
+                    crud:{
+                        parent:"md-pay",title:"pago",
+                        schema:sch_pays,name:"cr-pay",
+                        panels:[{
+                            tipe:"form",head:false,
+                            fieldsSet:[
+                                {value:"date",state:"edit"},
+                                {value:"total",state:"edit"},
+                                {value:"income",state:"edit"},
+                                {value:"account",state:"edit"},
+                                {value:"tag",state:"edit"},
+                            ],
+                        }],
+                        stateStart:"new",
+                        states:[
+                            {
+                                name:"new",
+                                tools:[
+                                    {name:"insert",show:true},
+                                    {name:"addLine",show:true},
+
+                                    {name:"update",show:true},
+                                    {name:"sizes",show:true},
+                                    {name:"pages",show:true},
+                                ]
+                            }
+                        ],
+                        events:[
+                            {
+                                name:"toolUpdate",
+                                actions:[{
+                                    action:({tool,k,y})=>{
+                                        
+                                        if(tool.name=="insert"){
+
+                                            /*var inserts = [];
+                                            k.fieldsGet().forEach(field => {
+                                                
+                                                if(field.select!=null){
+
+                                                    inserts.push({
+                                                        field:field.select,
+                                                        value:k.fieldGetValues({fieldName:field.name})[0],
+                                                    });
+                                                }
+                                            });
+
+                                            group.InsertsAdd({
+                                                table:sch_pays.table,
+                                                selectPrimary:sch_pays.fieldPrimary,
+                                                inserts,
+                                            });*/
+                                        }
+                                    }
+                                }],
+                            },
+                            {
+                                name:"recordUpdate",
+                                actions:[{
+                                    action:({k,type})=>{
+                                        
+
+                                        var cr_pay = k;
+                                        var cr_pays = group.layersGet().parentGetBuild({parentName:"cr-pays"});
+                                        
+                                        var data = cr_pay.recordGetData();
+                                        //console.log("cr pay data:",data);
+                                        
+                                        cr_pays.recordSetData({data});
+                                        cr_pays.PrintData();
+                                        
+                                    }
+                                }],
+                            }
+                        ]
+                    }
+                }
+                //customers
+                /*{
+                    crud:{
+                        schema:sch_customers,name:"cr-cust",
+                        title:"lista de clientes",
+                        panels:[{
+                            tipe:"form",head:false,
+                            fields:[{...fld_delete}],
+                            fieldsSet:[
+                                {value:"name",state:"edit"},
+                                {value:"document",state:"edit"},
+                                {value:"nroDoc",state:"edit"},
+                            ],
+                        }],
+                        stateStart:"reload",
+                        states:[
+                            {
+                                name:"reload",
+                                tools:[
+                                    {name:"new",show:true},
+                                    {name:"reload",show:true},
+                                    {name:"pages",show:true},
+                                    {name:"sizes",show:true,value:10},
+                                    {name:"update",show:true},
+                                    {name:"addLine",show:true},
+                                ],
+                            },
+                            {
+                                name:"new",
+                                tools:[
+                                    {name:"addLine",show:true},
+                                    {name:"cancel",show:true},
+                                    {name:"pages",show:true},
+                                    {name:"sizes",show:true,value:10},
+                                    {name:"insert",show:true},
+                                ],
+                            }
+                        ],
+                        inserts:[
+                            {
+                                table:sch_customers.table,
+                                field:"ID_COMPANY",
+                                value:"1",
+                            }
+                        ],
+                    }
+                }*/
+            ],
+            /*conections:[
+                {
+                    masterCrud:"cr-sale",
+                    masterSelect:"ID_SALE",
+                    maidCrud:"cr-items",
+                    maidSelect:"ID_SALE",
+                },
+                {
+                    masterCrud:"cr-pays",
+                    masterSelect:"ID_PAY",
+                    maidCrud:"cr-pay",
+                    maidSelect:"ID_PAY",
+                }
+            ],*/
+        });
 
     break;
 }

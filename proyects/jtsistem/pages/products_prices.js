@@ -5,8 +5,8 @@ $(document).ready(function() {
 
     success:({userData,pageData})=>{
 
-      new CrudsGroup({
-        userData,
+      var group = new CrudsGroup({
+        userData,pageData,
         parent:pageData.body,
         layers:[
           {
@@ -18,7 +18,7 @@ $(document).ready(function() {
           },
           {
             crud:{
-              parent:"main",name:"cr-prices",
+              parent:"main",name:"cr-items",
               schema:sch_items,title:"lista de precios",
               stateType:"show",
               panels:[
@@ -39,6 +39,8 @@ $(document).ready(function() {
           }
         ],
       });
+
+      PlayTutorialInPage({pageData,group});
     }
 
   });

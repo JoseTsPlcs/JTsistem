@@ -76,13 +76,13 @@ class Conection extends ODD {
         alert(resp.msg);
       }
 
-      if(success!=null)success(resp.send);
+      if(success!=null)success(resp.send,resp.msg,resp.resp);
 
 
     }).fail(function() {
 
       
-      k.#RequestFail({fail,msg:resp});
+      k.#RequestFail({fail,msg:"fail"});
 
     }).always().done();
 
@@ -381,10 +381,17 @@ class Conection extends ODD {
       var conditionValue = condition["value"];
       var conditionAfter = condition["after"];
 
+      if(conditionValue=="null") conditionInter = " IS "; 
+
       if(conditionBefore != null) sql += conditionBefore;
       sql += conditionTable + "." + conditionField; 
       sql += conditionInter;
-      if(conditionValue!=null) sql +=  (conditionInter==" LIKE "?"'%":"'") + conditionValue + (conditionInter==" LIKE "?"%'":"'");
+      if(conditionValue!=null){
+
+        if(conditionValue=="null") sql +=" NULL ";
+        else sql +=  (conditionInter==" LIKE "?"'%":"'") + conditionValue + (conditionInter==" LIKE "?"%'":"'");
+
+      }
       if(conditionAfter != null) sql += conditionAfter;
       
     }

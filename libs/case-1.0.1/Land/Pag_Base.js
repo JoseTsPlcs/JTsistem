@@ -66,17 +66,17 @@ var PagesData = [
           {state:"active",name:"prices",title:"precios de items",href:"products_prices.php"},
           {state:"hide",name:"stock",title:"stock de items",href:"products_stock.php"},
           {state:"hide",name:"itemsConfig",title:"configuracion",href:"products_config.php"},
+          {state:"hide",name:"produccion",title:"orden de produccion",href:"produccions.php"},
       ],
   },
-  {
+  /*{
     icon:'<i class="bi bi-hammer"></i>',
     title:"produccion",
     seccion:'production',
     paginas:[
-        {state:"hide",name:"recipe",title:"recetas",href:"products_recipe.php"},
-        {state:"hide",name:"produccion",title:"orden de produccion",href:"produccions.php"},
+        {state:"hide",name:"recipe",title:"recetas & paquetes",href:"products_recipe.php"},
     ],
-},
+  },*/
   {
       icon:'<i class="bi bi-clipboard-data"></i>',
       title:'informes',
@@ -122,13 +122,33 @@ function PageDataFind({pageName}) {
     
     secc.paginas.forEach(pag => {
       
-      console.log(pag,pageName);
+      //console.log(pag,pageName);
       
       if(pag.name==pageName) pageInfo = pag;
     });
   });
 
   return pageInfo;
+}
+
+function SeccDataFind({pageName}) {
+  
+  //console.log("secc data find by pageName:",pageName, "seccions:",PagesData);
+  var seccFound = null;
+  PagesData.forEach(secc => {
+    
+    //console.log("secc paignas",secc.paginas,"pageName",pageName);    
+    var pageFound = secc.paginas.find(pg=>pg.name==pageName);
+    //console.log("pageFound:",pageFound);
+    if(pageFound != null) seccFound = secc;
+  });
+
+  return seccFound;
+}
+
+function SeccDataFindByName({seccion}) {
+  
+  return PagesData.find(secc=>secc.seccion==seccion);
 }
 
 
@@ -166,10 +186,18 @@ class Pag_Base extends ODD {
           if(pag.href == href) pageData = pag;
         });
       });
+
       pageData.body = this.#body;
+      pageData.recive =  InfoBetweenPageGet();
       i.pageData = pageData;
+
       document.title = i.pageData.title;
+      
       i.k = k;
+      i.buildCruds=({crudsScript})=>{
+
+        this.#BuildCrudsGroup({crudsScript,pageData});
+      };
 
       if(success!=null)success(i);
     }});
@@ -179,7 +207,7 @@ class Pag_Base extends ODD {
 
     //console.log("setPages, access:", access);
 
-    var pgOrders = PagesData[0].paginas[0];
+    /*var pgOrders = PagesData[0].paginas[0];
     var pgVehicles = PagesData[0].paginas[3];
     var pgInmuebles = PagesData[0].paginas[4];
     pgOrders.state = "hide";
@@ -196,7 +224,7 @@ class Pag_Base extends ODD {
         pgInmuebles.state="active";
         break;
     
-    }
+    }*/
     
 
     PagesData.forEach(secc => {
@@ -213,33 +241,159 @@ class Pag_Base extends ODD {
           if(company.tipe == 1) pagina.state = "active";
         }
 
+        var state = "active";
+
+        if(pagina.access != null) state = Access_Get(accessList,pagina.access) ? "active": "hide";
+
+        pagina.state = state;
+
       });
 
     });
         
   }
 
-  
-  #body;
+  #BuildCrudsGroup({crudsScript,pageData}){
 
+    var cruds = crudsScript.layers.filter(ly=>ly.crud!=null);
+    if(cruds){
+
+      var crudMain = cruds[0];
+      if(crudMain.events!=null) crudMain.events=[];
+      crudMain.events=[{
+        name:"stateSetFirst",
+        actions:[{
+          action:()=>{
+
+            PlayTutorialInPage({group,pageData});
+          }
+        }]
+      }]
+      
+    }
+
+
+    var group = new CrudsGroup({...groupScript});
+    
+  }
+  
+  #bodyContent = `
+    <div class="main p-0 p-md-3 mt-0 custom-bg-gray" id="bodyMain">
+
+            <!-- Ventana emergente para descripciones -->
+            <div id="popup" class="popup p-3" style="max-width: 600px;">
+                <div class="popup-content position-relative">
+                    <div class="d-flex justify-content-end">
+                      <button id="cancelBtn" class="btn btn-danger"><i class="bi bi-x"></i></button>
+                    </div>
+                    
+                    <div class="py-3" id="popup-description"></div>
+                    <div class="d-flex justify-content-between">
+                        <button id="prevBtn" class="btn btn-secondary">Anterior</button>
+                        <button id="nextBtn" class="btn btn-primary">Siguiente</button>
+                    </div>
+                </div>
+            </div>
+
+
+    </div>
+  `;
+
+  #body;
+  #navSeccChange({seccion}){
+
+    var seccData = SeccDataFindByName({seccion});
+    seccData.open = !seccData.open;
+  }
+
+  #seccionSetState({seccion,show=true}){
+
+    if(this.#navHorizontal){
+
+      var seccionDom = document.getElementById("seccion-"+seccion);
+      var seccionDomMenu = seccionDomMenu.querySelector("div.dropdown-menu");
+      seccionDom.classList.toggle('show');
+      seccionDomMenu.classList.toggle('show');
+    }
+  }
+
+  #opened
+  #icon ={dom:null};
+  NavSet({open=true}){
+
+    var navOpened = !this.#icon.dom.classList.contains('collapsed');
+    if(!this.#navHorizontal) navOpened = document.getElementById("sidebar").classList.contains("expand");
+    
+    if(navOpened!=open) this.#icon.dom.click();
+  }
+
+  NavSetSeccion({seccData,open=true}){
+
+    var seccOpen = false;
+    if(!this.#navHorizontal) seccOpen = seccData.dom.className == "sidebar-link has-dropdown";
+    else seccOpen = seccData.dom.getAttribute('aria-expanded')=='true';
+
+    console.log("navsetseccion",seccData.dom.className,seccOpen);
+    
+
+    if(seccOpen!=open) seccData.dom.click();
+  }
+
+  #navHorizontal = false;
   #BuildNav({}){
 
-    if (window.innerWidth < 500) {
-      
+    this.#navHorizontal = window.innerWidth < 500;
+    if (this.#navHorizontal){
+
       this.#BuildNavHorizontal({});
+      document.querySelectorAll('.nav-item.dropdown > a.dropdown-toggle').forEach(dropdownToggle => {
+        dropdownToggle.addEventListener('click', function (event) {
+            event.preventDefault(); // Prevenir el comportamiento predeterminado del enlace
+    
+            // Obtener el menú dropdown correspondiente
+            const dropdownMenu = this.nextElementSibling;
+    
+            // Alternar la clase 'show' en el menú dropdown
+            const isExpanded = dropdownMenu.classList.toggle('show');
+    
+            // Actualizar el atributo 'aria-expanded'
+            this.setAttribute('aria-expanded', isExpanded);
+    
+            // Cerrar otros dropdowns si se desea (opcional)
+            document.querySelectorAll('.nav-item.dropdown .dropdown-menu.show').forEach(menu => {
+                if (menu !== dropdownMenu) {
+                    menu.classList.remove('show');
+                    menu.previousElementSibling.setAttribute('aria-expanded', 'false'); // Actualizar aria-expanded
+                }
+            });
+        });
+      });
+    
     }
-    else
-    {
+    else {
 
       this.#BuildNavVertical({});
     }
 
     this.#body = document.getElementById("bodyMain");
+    
+    let k = this;
+    this.#icon.dom = document.getElementById("menuIcon");
+
+    PagesData.forEach(secc => {
+      
+      secc.open = false;
+      secc.dom = document.getElementById("seccion-"+secc.seccion);
+      secc.paginas.forEach(pag => {
+          
+        pag.dom = document.getElementById("page-"+pag.name);
+      });
+    });
   }
 
   #BuildNavVertical({pagesData=[]}){
 
-    console.log("buildNav:",PagesData);
+    //console.log("buildNav:",PagesData);
 
     var nav = "";
 
@@ -258,7 +412,7 @@ class Pag_Base extends ODD {
     <div class="wrapper">
         <aside id="sidebar">
             <div class="d-flex">
-                <button class="toggle-btn" type="button">
+                <button class="toggle-btn" type="button" id="menuIcon">
                     <i class="lni lni-grid-alt"></i>
                 </button>
                 <div class="sidebar-logo">
@@ -291,7 +445,7 @@ class Pag_Base extends ODD {
             if(pag.state != "hide"){
                 nav+= `
                 <li class="sidebar-item">
-                    <a id="`+secc.seccion+"-"+pag.name+`" href="`+(pag.state=="active"?pag.href:"")+`" `+(pag.state=="disactive"?"disabled":"")+` class="sidebar-link`+(pag.state=="disactive"?" bg-danger":"")+`">`+pag.title+`</a>
+                    <a id="page-`+pag.name+`" href="`+(pag.state=="active"?pag.href:"")+`" `+(pag.state=="disactive"?"disabled":"")+` class="sidebar-link`+(pag.state=="disactive"?" bg-danger":"")+`">`+pag.title+`</a>
                 </li>
                 `;
             }
@@ -311,7 +465,7 @@ class Pag_Base extends ODD {
     
     nav += `
     <li class="sidebar-item">
-        <a href="tutorial.php" class="sidebar-link">
+        <a href="tutorial.php" class="sidebar-link" id="secc-tutorial">
             <i class="bi bi-question-circle"></i>
             <span>Tutorial</span>
         </a>
@@ -321,26 +475,15 @@ class Pag_Base extends ODD {
     nav += `
             </ul>
             <div class="sidebar-footer">
-                <a href="../../../" class="sidebar-link">
+                <a href="../../../" class="sidebar-link" id="secc-logOut">
                     <i class="lni lni-exit"></i>
                     <span>Salir</span>
                 </a>
             </div>
         </aside>
-        <div class="main p-0 p-md-3 mt-0 custom-bg-gray" id="bodyMain">
 
-          <!-- Ventana emergente para descripciones -->
-          <div id="popup" class="popup">
-              <div class="popup-content">
-                  <p id="popup-description"></p>
-                  <div class="d-flex justify-content-between">
-                      <button id="prevBtn" class="btn btn-secondary">Anterior</button>
-                      <button id="nextBtn" class="btn btn-primary">Siguiente</button>
-                  </div>
-              </div>
-          </div>
+      `+this.#bodyContent+`
 
-        </div>
     </div>
     `;
 
@@ -358,7 +501,7 @@ class Pag_Base extends ODD {
     var nav = `
       <nav class="navbar navbar-dark bg-dark px-2">
         <a class="navbar-brand" href="admin_account.php">JtSistem</a>
-        <button class="navbar-toggler mr-2 text-white" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button id="menuIcon" class="navbar-toggler mr-2 text-white collapsed" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <i class="lni lni-grid-alt"></i>
         </button>
 
@@ -376,17 +519,17 @@ class Pag_Base extends ODD {
           nav += `
       
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a id="seccion-`+secc.seccion+`" class="nav-link dropdown-toggle text-white" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             `+secc.icon+" "+secc.title+`
           </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <div class="dropdown-menu" aria-labelledby="seccion-`+secc.seccion+`">
         `;
 
         secc.paginas.forEach(pg => {
         
           if(pg.state=="active"){
   
-            nav += `<a class="dropdown-item" href="`+pg.href+`">`+pg.title+`</a>`;
+            nav += `<a class="dropdown-item" id="page-`+pg.name+`" href="`+pg.href+`">`+pg.title+`</a>`;
           }
   
         });
@@ -403,12 +546,12 @@ class Pag_Base extends ODD {
     nav += `
 
       <li class="nav-item active">
-        <a class="nav-link" href="tutorial.php">
+        <a class="nav-link" href="tutorial.php" id="secc-tutorial">
           <i class="bi bi-question-circle"></i><span> Tutorial</span>
         </a>
       </li>
 
-      <li class="nav-item active">
+      <li class="nav-item active" id="secc-logOut">
         <a class="nav-link" href="../../../">
           <i class="lni lni-exit"></i><span> Salir</span>
         </a>
@@ -423,12 +566,7 @@ class Pag_Base extends ODD {
       </nav>
     `;
 
-    nav += `
-
-      <div class="main p-2 p-md-3 mt-0 custom-bg-gray" id="bodyMain">
-      </div>
-
-    `;
+    nav += this.#bodyContent;
 
     document.body.innerHTML = nav;
   }
@@ -468,32 +606,46 @@ class Pag_Base extends ODD {
     window.location.href = "../../../Index.php";
   }
 
-  #page = {
-    title:"",
-    tutorials: [],
-  }
+  #tutorial = null;
+  tutorialPlay({pageName,send}){
 
-  AddTutorialtoPage({tutorialClass,name}){
+    var seccData = SeccDataFind({pageName});
+    var pageData = PageDataFind({pageName});
+    
+    var elementsInfo = [];
 
-    return;
-    //<li><a class="dropdown-item" href="#">¿prueba?</a></li>
-    var item = document.createElement("li");
-    var a = document.createElement("a");
-    a.setAttribute("class","dropdown-item");
-    a.href = "#";
-    item.appendChild(a);
-    a.innerHTML = name;
-    a.addEventListener('click', () => tutorialClass.startTutorial());
+    elementsInfo.push({
+      id:"menuIcon",
+      descripcion:"selecciona el icono para mostrar el menu de navegación",
+      eventNext:({element})=>{
 
-
-    document.getElementById("itemsTutorials").appendChild(item);
-    this.#page.tutorials.push({
-      name,
-      item,
-      tutorial:tutorialClass,
+        this.NavSet({open:true});
+      }
     });
 
+    elementsInfo.push({
+      id:"seccion-"+seccData.seccion,
+      descripcion:"seleciona la seccion [title]".replace("[title]",seccData.title),
+      eventNext:({element})=>{
+
+        this.NavSetSeccion({seccData,open:true});
+      }
+    });
+
+    elementsInfo.push({
+      id:"page-"+pageData.name,
+      descripcion:"selecciona la pagina " + pageData.title,
+      eventNext:()=>{
+
+        PageGoto({pageName,send});
+      }
+    });
+    
+
+    this.#tutorial = new Tutorial({elementsInfo});
+    this.#tutorial.startTutorial();
   }
+
 }
 
 function InfoBetweenPagesSet(send) {
@@ -508,13 +660,26 @@ function InfoBetweenPageGet() {
   return data;
 }
 
+function PageGoto({pageName,send=null}) {
+  
+  var pageInfo = PageDataFind({pageName});
+  PageSend({
+    url:pageInfo.href,
+    send,
+  });
+}
+
 //pass to other page with data
 function PageSend({url=null, send={}}){
 
-  window.location.href = url;
+  
   var from = window.location.href;
   send.from = from;
+  console.log("go to url:",url,"send:",send);
+  
   InfoBetweenPagesSet(send);
+
+  window.location.href = url;
 }
 
 //recive data from other page
@@ -597,7 +762,7 @@ function Login({uss,pss,fail}){
               //console.log(result);
 
               var userData = {
-                id:result[0]["IS_USER"],
+                id:result[0]["ID_USER"],
                 name:result[0]["USER_NAME"],
 
                 company:{

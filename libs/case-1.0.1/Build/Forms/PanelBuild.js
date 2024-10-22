@@ -6,6 +6,8 @@ class PanelBuild extends ODD {
     constructor(i) {
         
         super(i);
+
+        i.parent = this._BuildGetParent({parent:i.parent});
         
         this.titleSet(i);
         this.fieldsSet(i);
@@ -87,24 +89,41 @@ class PanelBuild extends ODD {
         var field = this.fieldGet({fieldName});
         if(field) field.title = title;
     }
+    fieldRemove({fieldName,index}){
+
+        this._fields.forEach(field => {
+           
+            var values = this.fieldGetValues({fieldName:field.name});
+            values.splice(index,1);
+            this.fieldSetValues({fieldName:field.name,values});
+        });
+    }
+    fieldsSetValues({fields}){
+
+        
+    }
 
 
     _buildBlocks=[];
     _builded = false;
     _Build({parent}){
 
+        if(parent == null) parent = document.body;
         this._Building({parent});
         this._Builded();
     }
     _Building({parent}){
 
-
+        this.CallEvent({name:"building",params:{parent}});
     }
     _Builded(){
 
         this._builded = true;
     }
-
     _BuildUpdate(){}
+    _BuildGetParent({parent}){
+
+        return parent == null ? document.body: parent;
+    }
     
 }

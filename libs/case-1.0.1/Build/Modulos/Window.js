@@ -56,10 +56,45 @@ class Window extends ODD {
   //-----------------body----------------
 
   #body=null;
+  #parent=null;
+  parentGet(){return this.#parent;}
 
-  #Body_Build({parent=null,title="window",id="w",grid={},titleSize=3,h=100,attributes=[]}){
+  #Body_Build({parent=null,title="window",id="w",grid={},titleSize=3,h=100,attributes=[],borderR=true,borderL=true,borderTop=true,borderBottom=true}){
     
     let k = this;
+    this.#parent = parent;
+
+    var headBorder = "border-secondary ";
+    var conteinerBorder = "border-secondary border-top";
+
+    for (let side = 0; side < 4; side++) {
+      
+      var sideClass = "";
+      var sideOn = false;
+      switch (side) {
+        case 0:
+          sideClass = "left";  
+          sideOn = borderL;
+        break;
+        case 1:
+          sideClass = "top"; 
+          sideOn = borderTop; 
+        break;
+        case 2:
+          sideClass = "right";
+          sideOn = borderR;  
+        break;
+        case 3:
+          sideClass = "bottom"; 
+          sideOn = borderBottom; 
+        break;
+      }
+
+      if(sideOn&&side!=3) headBorder += " border-"+sideClass;
+      if(sideOn&&side!=1) conteinerBorder += " border-"+sideClass;
+      
+      
+    }
 
     //build head - body
     this.#body = new Grid({
@@ -68,8 +103,8 @@ class Window extends ODD {
       parent,
       cols:[[12],[12]],
       attributes:[
-        {y:0,x:0,attributes:[{name:'class',value:'border border-secondary h' + titleSize +' text-center bg-white'},{name:'style',value:'min-height:50px'}]},
-        {y:1,x:0,attributes:[{name:'class',value:'border-right border-left border-bottom border-secondary bg-white '},{name:'style',value:'min-height:'+h+'px'}]},
+        {y:0,x:0,attributes:[{name:'class',value:(headBorder + ' h' + titleSize +' text-center bg-white')},{name:'style',value:'min-height:50px'}]},
+        {y:1,x:0,attributes:[{name:'class',value:(conteinerBorder +' bg-white ')},{name:'style',value:'min-height:'+h+'px'}]},
       ],
       events:[
         {
@@ -130,6 +165,7 @@ class Window extends ODD {
     if(this.#head.show) $('#'+this.#head.dom.id).show(slw);
     else $('#'+this.#head.dom.id).hide(slw);
   }
+  HeadGetDom(){return this.#head.dom;}
 
   //---------------fields-------------
 

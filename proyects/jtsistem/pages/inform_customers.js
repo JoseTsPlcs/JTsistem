@@ -7,15 +7,19 @@ $(document).ready(function() {
     success:({userData,pageData})=>{
 
       var group = new CrudsGroup({
+        userData,pageData,
         layers:[
           {
             crud:{
-              parent:pageData.body,name:"cr-main",
+              parent:pageData.body,name:"cr-customers",
               title:pageData.title,
-              stateTools:[
+              states:[
                   {
                     name:"reload",
                     tools:[
+                        {name:"tutorial",show:true},
+                        {name:"config",show:true},
+                        //{name:"load",show:true},
                         {name:"sizes",show:false,value:999},
                         {name:"reload",show:true},
                     ],
@@ -227,7 +231,7 @@ $(document).ready(function() {
                       
                       if(field.action == fld_search.action){
 
-                        var cr_main = group.parentGet({parentName:"cr-main"}).build;
+                        var cr_main = group.parentGet({parentName:"cr-customers"}).build;
                         
                         var customers = cr_main.ReloadDataSetGet({dataSetName:"customers"}).result;
                         cr_main.CallEvent({name:"customerEvol",params:{customerName:customers[y].name}});
@@ -252,6 +256,7 @@ $(document).ready(function() {
         ],
       });
 
+      PlayTutorialInPage({pageData,group});
     }
   });
 

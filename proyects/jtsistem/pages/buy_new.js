@@ -5,10 +5,26 @@ $(document).ready(function() {
 
     success:({userData,pageData})=>{
 
-      var acc_md_pays = Access_Get(userData.access,"md-box-general");
+      new BuildPage({
+        type:"new",
+        schema:sch_buys,
+        schemaItems:sch_buys_products,
+        schemaPays:sch_buys_payments,
+        payTag:"compra",
+        userData,pageData,test:test,
+        itemFieldTotal:"costTotal",
+        mainFieldTotal:"total",
+      });
+
+      return;
+      
+      var acc_pays = Access_Get(userData.access,"md-box-general");
 
       var group = new CrudsGroup({
-        userData,parent:pageData.body,test:false,
+        pageData,
+        userData,
+        parent:pageData.body,
+        test:false,
         layers:[
           {
             grid:{
@@ -48,6 +64,24 @@ $(document).ready(function() {
                   ],
                 },
               ],
+              states:[
+                {
+                  name:"reload",
+                  tools:[
+                    {name:"update",show:true},
+                    {name:"cancel",show:true},
+                    {name:"tutorial",show:true},
+                    {name:"load",show:true},
+                  ]
+                },
+                {
+                  name:"block",
+                  tools:[
+                    {name:"insert",show:true},
+                    {name:"tutorial",show:true},
+                  ]
+                }
+              ],
             }
           },
           {
@@ -55,7 +89,7 @@ $(document).ready(function() {
               parent:"prnt-buy-stps",
               items:[
                 {name:"stp-products",title:"items"},
-                {name:"stp-pays",title:"pagos"},
+                (acc_pays?{name:"stp-pays",title:"pagos"}:null),
               ],
             }
           },
@@ -72,8 +106,26 @@ $(document).ready(function() {
                     {value:"ruc",state:"edit"},
                   ]
                 }
-              ]
-            }
+              ],
+              states:[
+                {
+                  name:"reload",
+                  tools:[
+                    {name:"tutorial",show:true},
+                    {name:"update",show:true},
+                    {name:"cancel",show:true},
+                  ]
+                },
+                {
+                  name:"new",
+                  tools:[
+                    {name:"tutorial",show:true},
+                    {name:"insert",show:true},
+                    {name:"cancel",show:true},
+                  ]
+                }
+              ],
+            },
           },
           //----products------
           {
@@ -91,6 +143,17 @@ $(document).ready(function() {
                   ],
                 }
               ],
+              states:[
+                {
+                  name:"reload",
+                  tools:[
+                    {name:"sizes",value:999,show:false},
+                    {name:"insert",show:true},
+                    {name:"tutorial",show:true},
+                    {name:"load",show:true},
+                  ],
+                },
+              ],
             }
           },
         ],
@@ -107,7 +170,8 @@ $(document).ready(function() {
           {
             masterName:"cr-buy",
             masterSelect:"ID_BUY",
-            event:"search",searchValue:"id_buy",
+            event:"search",
+            searchValue:"ID_BUY",
           },
           {
             masterName:"cr-buy",
@@ -125,6 +189,7 @@ $(document).ready(function() {
           }
         ],
         groups:[
+          acc_pays?
           {
             ...gp_pays({
               parent:"stp-pays",
@@ -133,7 +198,7 @@ $(document).ready(function() {
               masterFieldJoin:"ID_BUY",
               sch_join:sch_buys_payments,
               masterCrud:"cr-buy",
-              tagValue:"COMPRA",
+              tagValue:"compra",
               formEvents:[{
                 name:"newAfter",
                 actions:[{
@@ -146,10 +211,12 @@ $(document).ready(function() {
                   }
                 }]
               }]
-            }),
-          }
+            })
+          }:null,
         ],
       });
+
+      PlayTutorialInPage({group,pageData});
 
     }
   });

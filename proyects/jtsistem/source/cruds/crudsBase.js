@@ -22,69 +22,7 @@ const schemaExample = {
     ],
 }
 
-var fieldTypes = [
-    {
-        tipe:"show",
-        edit:{box:{...bx_shw}},
-        show:{box:{...bx_shw}},
-    },
-    {
-        tipe:"active",
-        edit:{box:{tipe:6}},
-        show:{box:{...bx_shw}},
-        filter:{box:{tipe:4}},
-    },
-    {
-        tipe:"options",
-        edit:{box:{tipe:3}},
-        show:{box:{...bx_shw}},
-        filter:{box:{tipe:4}},
-    },
-    {
-        tipe:"optionsSearch",
-        edit:{box:{tipe:8,class:"w-100"}},
-        show:{box:{...bx_shw}},
-        filter:{box:{...bx_input}},
-    },
-    {
-        tipe:"date",
-        edit:{box:{...bx_date}},
-        show:{box:{...bx_shw}},
-        //filter:{box:{...bx_date}},
-    },
-    {
-        tipe:"show",
-        edit:{box:{...bx_shw}},
-        show:{box:{...bx_shw}},
-        filter:{box:{...bx_input}},
-    },
-    {
-        tipe:"money",
-        edit:{box:{...bx_input,value:0}},
-        show:{box:{...bx_money}},
-    },
-    {
-        tipe:"input",
-        edit:{box:{...bx_input}},
-        show:{box:{...bx_shw}},
-        filter:{box:{...bx_input}},
-    },
-    {
-        tipe:"cant",
-        edit:{box:{...bx_cant}},
-        show:{box:{...bx_shw}},
-    },
-    {
-        tipe:"porcent",
-        edit:{box:{...bx_cant,value:0}},
-        show:{box:{...bx_shw,format:{end:"%"}}},
-    },
-    {
-        tipe:"comment",
-        edit:{box:{tipe:9,value:""}},
-        show:{box:{...bx_shw}},
-    }
-];
+
 
 function scr_base({schema=null,userData,fieldsSet=[],stateGeneral="hide",parent,title=null,panelTipe="table",h=0,events=[]}) {
 

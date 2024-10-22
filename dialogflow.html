@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificaciones de Dialogflow</title>
+    <script>
+        let notificationCount = 0; // Variable para contar las notificaciones
+
+        // Función para mostrar la notificación en la página
+        function showNotification(message) {
+            const notificationsDiv = document.getElementById('notifications');
+            const newNotification = document.createElement('div');
+            newNotification.textContent = message;
+            notificationsDiv.appendChild(newNotification);
+        }
+
+        // Función para recibir la intención y entidades del webhook
+        function receiveNotification() {
+            fetch('weebhook.php') // Asegúrate de que esto apunte al archivo correcto
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json(); // Parsear la respuesta como JSON
+                })
+                .then(data => {
+                    if (data) {
+                        
+                        notificationCount++; // Incrementar el contador de notificaciones
+                        const intent = data.intent; // Obtener la intención
+                        const entities = data.entities; // Obtener las entidades
+
+                        // Mostrar la intención y las entidades en la página
+                        let message = `Notificación ${notificationCount}: Intención - ${intent}. Entidades - `;
+                        for (const [key, value] of Object.entries(entities)) {
+                            message += `${key}: ${value}, `;
+                        }
+
+                        showNotification(message.slice(0, -2)); // Eliminar la última coma y espacio
+                        console.log(`Notificación ${notificationCount}: Intención - ${intent}, Entidades -`, entities,data);
+                    }
+                })
+                .catch(error => console.error('Error al recibir la notificación:', error));
+        }
+
+        // Llamar a la función cada 5 segundos para obtener nuevas notificaciones
+        setInterval(receiveNotification, 5000);
+    </script>
+</head>
+<body>
+    <h1>Notificaciones de Dialogflow</h1>
+    <div id="notifications"></div>
+</body>
+</html>

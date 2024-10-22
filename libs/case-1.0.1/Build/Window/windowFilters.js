@@ -67,12 +67,39 @@ class windowFilters extends ODD {
         return this.#filters;
     }
 
-    
+    #tutorial = null;
+    tutorialPlay(){
+
+        var elementsInfo = [];
+
+        this.#form.Fields_Get().forEach(f => {
+            
+            var fe = this.#form.fieldGetTutorialElement({fieldName:f.name});
+            fe.descripcion = TutorialDescripcionAction({boxTipe:f.box.tipe}) + " para buscar por " + f.title;
+            elementsInfo.push({
+                ...fe,
+            });
+        });
+
+        this.#form.Tools_Get().filter(t=>t.show==true).forEach(t => {
+            
+            elementsInfo.push({
+                ...this.#form.toolGetTutorialElement({toolName:t.name}),
+            });
+        });
+
+        
+
+        this.#tutorial = new Tutorial({elementsInfo});
+        this.#tutorial.startTutorial();
+    }
 
     //--------build
 
     #window = null;
     #form = null;
+    formGet(){return this.#form;}
+
     #Build({parent,title,head,show,blocked,toolsPositions,questions}){
         
         
@@ -82,9 +109,9 @@ class windowFilters extends ODD {
             title,head,show,blocked,
             fields:this.#filters,questions,
             tools:[
-                {show:true,position:"botton-center",name:"reload",action:"reload",box:{value:"recargar",tipe:5,class:"btn btn-primary btn-sm"},descripcion:"presiona para recargar la data"},
-                {show:true,position:"botton-center",name:"clear",action:"clear",box:{value:"limpiar",tipe:5,class:"btn btn-primary btn-sm"},descripcion:"presiona para colocar los filtros por defecto"},
-                {show:false,position:"head-right",name:"quest"},
+                {show:true,position:"botton-center",name:"reload",action:"reload",box:{value:"buscar",tipe:5,class:"btn btn-primary btn-sm"},descripcion:"realizar busqueda"},
+                {show:false,position:"botton-center",name:"clear",action:"clear",box:{value:"limpiar",tipe:5,class:"btn btn-primary btn-sm"},descripcion:"presiona para colocar los filtros por defecto"},
+                {show:false,position:"head-rigth",name:"tutorial",action:"tutorial",box:{id:"btn2",tipe:5,value:'<i class="bi bi-question-circle"></i>',class:"btn btn-secondary btn"}},
             ],
             events:[
                 {
@@ -101,6 +128,10 @@ class windowFilters extends ODD {
                             
                                 case "clear":
                                     k.#Clear();
+                                break;
+
+                                case "tutorial":
+                                    k.tutorialPlay();
                                 break;
                             }
                         }

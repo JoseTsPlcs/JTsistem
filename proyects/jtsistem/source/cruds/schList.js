@@ -1,22 +1,44 @@
 
 
-const sch_customers = {
+function loadGet({schema,}) {
+
+    var ld = {
+        name:"ld-"+schema.table,
+        tableMain:schema.table,
+        selects:[
+            {table:schema.table,field:schema.fieldPrimary,as:"value"},
+            {table:schema.table,field:"NAME",as:"show"},
+            //{sql:("CONCAT("+sch_items.table+".NAME,' (',unids.SIMBOL,')') AS 'show'")},
+        ],
+        /*joins:[
+            {
+                main:{table:sch_items.table,field:"UNID_ID"},
+                join:{table:sch_unids.table,field:sch_unids.fieldPrimary},
+                tipe:"LEFT",
+            },
+        ],*/
+    }
     
+    return ld;
+}
+
+
+const sch_customers = {
     table:"customers",
     fieldPrimary:"ID_CUSTOMER",
-    company:true,
+    company:true,record:{name:"customer",title:"cliente"},
     fields:[
         {
-            value:"name",
+            value:"name",tags:["main","main-flt"],
             name:"nombre",
             select:'NAME',
             access:true,
             tipe:"input",
             minWidth:350,
-            descripcion:"nombre del cliente"
+            descripcion:"nombre del cliente",
         },
         {
-            value:"document",
+            value:"document",tags:["main"],
             name:"documento",
             select:'COMPANY',
             minWidth:100,
@@ -25,7 +47,7 @@ const sch_customers = {
             descripcion:"si el cliente es empresa o persona natural",
         },
         {
-            value:"nroDoc",
+            value:"nroDoc",tags:["main","main-flt"],
             name:"nro documento",
             select:'NRO_DOCUMENT',
             minWidth:150,
@@ -34,7 +56,7 @@ const sch_customers = {
             descripcion:"nro del documento del dni/ruc",
         },
         {
-            value:"cel",
+            value:"cel",tags:["main"],
             name:"celular",
             select:'PHONE',
             minWidth:150,
@@ -43,7 +65,7 @@ const sch_customers = {
             descripcion:"numero de celular del cliente",
         },
         {
-            value:"dir",
+            value:"dir",tags:["main"],
             name:"direccion",
             select:'DIRECCION',
             minWidth:300,
@@ -73,15 +95,52 @@ const sch_customers = {
             value:"dateInsert",
             name:"fecha de ingreso",
             select:'DATE_INSERT',
-            minWidth:300,
+            minWidth:300,calculate:true,
             access:true,
             tipe:"date",
             descripcion:"fecha de ingreso del cliente",
         },
     ],
-    panels:[
-        {tipe:"table",title:"lista de clientes"},
-        {tipe:"form",title:"cliente"},
+    visuals:[
+        {
+            name:"load",
+            fields:[
+                {value:"name",state:"show"},
+            ],
+        },
+        {
+            name:"modulo",
+            fields:[
+                {value:"name",state:"show"},
+                {value:"document",state:"show"},
+                {value:"nroDoc",state:"show"},
+                {value:"cel",state:"show"},
+                {value:"dir",state:"show"},
+                {value:"email",state:"show"},
+                {value:"comment",state:"show"},
+            ],
+        },
+        {
+            name:"detail-edit",
+            fields:[
+                {value:"name",state:"edit"},
+                {value:"document",state:"edit"},
+                {value:"nroDoc",state:"edit"},
+                {value:"cel",state:"edit"},
+                {value:"dir",state:"edit"},
+                {value:"email",state:"edit"},
+                {value:"comment",state:"edit"},
+            ],
+        },
+        {
+            name:"control",
+            fields:[
+                {value:"name",state:"show"},
+                {value:"document",state:"show"},
+                {value:"nroDoc",state:"show"},
+                {value:"cel",state:"show"},
+            ],
+        }
     ],
 }
 
@@ -124,40 +183,196 @@ function scr_customer_tb({parent, userData}) {
     };
 }
 
+const sch_companies = {
+    table:"companies",record:{name:"company",title:"empresa"},
+    fieldPrimary:"ID_COMPANY",
+    company:true,
+    fields:[
+        {
+            value:"name",name:"nombre corto de la empresa",tipe:"input",
+            select:"NAME",access:true,
+        },
+        {
+            value:"ruc",select:"RUC",name:"ruc",tipe:"input",
+            access:true,
+        },
+        {
+            value:"active",select:"ACTIVE",name:"activo",tipe:"input",
+            access:true,
+        },
+        {
+            value:"nameReal",select:"NAME_REAL",name:"razon social",tipe:"input",
+            access:true,
+        },
+        {
+            value:"dir",select:"DIRECCION",name:"direccion",tipe:"input",
+            access:true,
+        },
+        {
+            value:"cel",select:"TELF",name:"telefono",tipe:"input",
+            access:true,
+        },
+        {
+            value:"email",select:"EMAIL",name:"correo electronico",tipe:"input",
+            access:true,
+        },
+        {
+            value:"type",select:"ID_COMPANY_TYPE",name:"tipo de empresa",tipe:"options",
+            access:true,options:op_company_type,
+        },
+        {
+            value:"logo",select:"LOGO",name:"logotipo",tipe:"input",
+            access:true,
+        },
+    ],
+}
+
+const sch_rucs = {
+    table:"rucs",
+    company:true,record:{title:"ruc"},
+    fieldPrimary:"ID_RUC",
+    fields:[
+        {
+            value:"ruc",name:"ruc",minWidth:200,
+            tipe:"input",select:"RUC",access:true,tags:["main"],
+        },
+        {
+            value:"name",name:"razón social",
+            tipe:"input",select:"RAZON_SOCIAL",access:true,tags:["main"],
+        },
+    ],
+}
+
+var ld_rucs = {
+    tableMain:sch_rucs.table,
+    selects:[
+        {table:sch_rucs.table,field:sch_rucs.fieldPrimary,as:"value"},
+        {table:sch_rucs.table,field:"RUC",as:"show"},
+    ],
+    startOptions:[
+        {value:"null",show:"ruc principal"},
+    ],
+};
+
+const sch_work_areas = {
+    table:"work_areas",record:{name:"area",title:"are de trabajo"},
+    fieldPrimary:"ID_WORK_AREA",
+    company:true,
+    fields:[
+        {
+            value:"name",name:"nombre del area de trabajo",
+            tipe:"input",select:"NAME",access:true,tags:["main"],
+        },
+    ],
+};
+
+var ld_work_areas = {
+    tableMain:sch_work_areas.table,
+    selects:[
+        {table:sch_work_areas.table,field:sch_work_areas.fieldPrimary,as:"value"},
+        {table:sch_work_areas.table,field:"NAME",as:"show"},
+    ],
+};
+
+function CreateLoadBySchema({name="ld",schema,selectShow}) {
+    
+    return {
+        name,
+        tableMain:schema.table,
+        selects:[
+            {table:schema.table,field:schema.fieldPrimary,as:"value"},
+            {table:schema.table,field:selectShow,as:"show"},
+        ],
+    }
+}
+
+const sch_workers = {
+    table:"workers",
+    fieldPrimary:"ID_WORKER",
+    company:true,record:{name:"work",title:"trabajador"},
+    fields:[
+        {
+            value:"area",name:"area de trabajo",access:true,
+            select:"ID_WORK_AREA",tipe:"options",load:{
+                schema:sch_work_areas,
+                ...ld_work_areas,
+            },
+            //conect:{schema:sch_work_areas,type:"edit"},
+
+        },
+        /*{
+            value:"worker",name:"trabajador",access:true,
+            select:"ID_CUSTOMER",tipe:"",
+        },*/
+        {
+            value:"name",name:"nombre",access:true,tags:["main"],
+            select:"NAME",tipe:"input",minWidth:300,
+        },
+        {
+            value:"cel",name:"celular",access:true,
+            select:"CEL_NUMBER",tipe:"input",minWidth:200,
+        },
+    ],
+};
+
+var ld_workers = {
+    name:"ld-workers",schema:sch_workers,
+    tableMain:sch_workers.table,
+    selects:[
+        {table:sch_workers.table,field:sch_workers.fieldPrimary,as:"value"},
+        {table:sch_workers.table,field:"NAME",as:"show"},
+    ],
+};
+
+
+const sch_users = {
+    table:"users",
+    fieldPrimary:"ID_USER",
+    company:true,
+    fields:[
+        {
+            value:"name",select:"NAME",
+            tipe:"input",access:true,tags:["main"],
+        },
+        {
+            value:"password",select:"PASSWORD",
+            tipe:"input",access:true,
+        },
+        {
+            value:"active",select:"ACTIVE",
+            tipe:"active",access:true,
+        },
+    ],
+}
+
+//------items-----
 
 const sch_items = {
 
-    table:"products",
+    table:"products",record:{name:"item",title:"item"},
     fieldPrimary:"ID_PRODUCT",
     company:true,
     fields:[
         {
-            value:"idItem",
-            name:"id del item",state:"show",
-            select:"ID_PRODUCT",access:true,
-            tipe:"show",
-            descripcion:"id del producto/servicio/insumo",
-        },
-        {
-            value:"name",
-            name:"nombre del item",state:"show",minWidth:300,
+            value:"name",tags:["main"],
+            name:"nombre",state:"show",minWidth:300,
             select:"NAME",access:true,
-            tipe:"input",
-            descripcion:"nombre del producto/servicio/insumo",
+            tipe:"input",tags:["load"],
+            descripcion:"nombre del item",
         },
         {
-            value:"tipe",
+            value:"tipe",tags:["main"],
             name:"tipo",state:"show",
             select:"ID_PRODUCT_TIPE",access:true,
             tipe:"options",options:op_products_tipe,
-            descripcion:"puede ser producto/servicio/insumo",
+            descripcion:"puede ser item",
         },
         {
             value:"tag",
             name:"etiqueta",state:"show",
-            select:"ID_PRODUCT_TAG",access:"md-items-config",
-            tipe:"options",
-            descripcion:"etiqueta del producto/servicio/insumo",
+            select:"ID_PRODUCT_TAG",access:true,
+            tipe:"optionsSearch",tags:["load"],
+            descripcion:"etiqueta del item",
             load:{
                 name:"ld-products_tags",
                 tableMain:"products_tags",
@@ -170,9 +385,9 @@ const sch_items = {
         {
             value:"unid",
             name:"unidad",state:"show",
-            select:"UNID_ID",access:"md-items-config",
+            select:"UNID_ID",access:true,
             tipe:"options",
-            descripcion:"unidad del producto/servicio/insumo",
+            descripcion:"unidad del item",
             load:{
                 name:"ld-unids",
                 tableMain:"unids",
@@ -208,7 +423,7 @@ const sch_items = {
             name:"stock minimo",state:"show",minWidth:70,
             select:"STOCK_LIMIT",access:"md-items-stock",
             tipe:"cant",
-            descripcion:"stock minimo del producto/insumo/servicio, en caso el stock sea menor o igual, se lanza una alerta",
+            descripcion:"stock minimo del item, en caso el stock sea menor o igual, se lanza una alerta",
         },
         {
             value:"limitOn",
@@ -220,10 +435,10 @@ const sch_items = {
         },
         {
             value:"active",
-            name:"activo",state:"show",
+            name:"estado",state:"show",
             select:"ACTIVE",access:true,
             tipe:"active",options:op_active,
-            descripcion:"si el producto/servicio/insumo esta activo, se puede vender o usar",
+            descripcion:"si el item esta activo, se puede vender o usar",
         },
         {
             value:"cantRecipe",
@@ -233,7 +448,7 @@ const sch_items = {
             descripcion:"cantidad que se obtiene al momento de realizar la receta",
         },
         {
-            value:"produccionAutomate",name:"produccion automatica",
+            value:"produccionAutomate",name:"produccion",minWidth:150,
             tipe:"options",access:true,
             options:[
                 {value:0,show:"produccion manual",class:"rounded text-center bg-primary text-white"},
@@ -246,7 +461,7 @@ const sch_items = {
 }
 
 const sch_unids = {
-    table:"unids",
+    table:"unids",record:{name:"unid",title:"unidad"},
     fieldPrimary:"ID_UNID",
     company:true,
     fields:[
@@ -263,10 +478,33 @@ const sch_unids = {
             descripcion:"",
         },
     ],
+    visuals:[
+        {
+            name:"control",
+            fields:[
+                {value:"name",state:"show"},
+                {value:"simbol",state:"show"},
+            ]
+        },
+        {
+            name:"detail-edit",
+            fields:[
+                {value:"name",state:"edit"},
+                {value:"simbol",state:"edit"},
+            ]
+        },
+        {
+            name:"modulo",
+            fields:[
+                {value:"name",state:"edit"},
+                {value:"simbol",state:"edit"},
+            ]
+        },
+    ],
 }
 
 const sch_items_tag = {
-    table:"products_tags",
+    table:"products_tags",record:{name:"item-tag",title:"etiqueta de item"},
     fieldPrimary:"ID_PRODUCT_TAG",
     company:true,
     fields:[
@@ -277,73 +515,111 @@ const sch_items_tag = {
             descripcion:"",
         },
     ],
+    visuals:[
+        {
+            name:"modulo",
+            fields:[
+                {value:"name",state:"edit"},
+            ]
+        }
+    ],
 }
 
 const sch_vehicles = {
 
     table:"items_vehicles",
     fieldPrimary:"ID_VEHICLE",
+    recordName:"vehiculo",record:{title:"vehiculo"},
+    selectShow:"PLACA",
     fields:[
         {
-            name:"placa",state:"show",minWidth:100,
-            select:"PLACA",access:true,
-            edit:{box:{...bx_input}},
-            show:{box:{...bx_shw}},
-            filter:{box:{...bx_input}},
-            descripcion:"placa del vehiculo",
+            value:"placa",name:"placa",minWidth:100,
+            select:"PLACA",access:true,tipe:"input",
+            descripcion:"placa del vehiculo",tags:["main"],
         },
         {
-            name:"marca",state:"show",minWidth:100,
-            select:"MARCA",access:true,
-            edit:{box:{...bx_input}},
-            show:{box:{...bx_shw}},
-            filter:{box:{...bx_input}},
-            descripcion:"marca del vehiculo",
+            value:"marca",name:"marca",minWidth:100,
+            select:"MARCA",access:true,tipe:"input",
+            descripcion:"marca del vehiculo",tags:["main"],
         },
         {
-            name:"modelo",state:"show",minWidth:100,
-            select:"MODELO",access:true,
-            edit:{box:{...bx_input}},
-            show:{box:{...bx_shw}},
-            filter:{box:{...bx_input}},
+            value:"modelo",name:"modelo",minWidth:100,
+            select:"MODELO",access:true,tipe:"input",
             descripcion:"modelo del vehiculo",
         },
         {
-            name:"nro de motor",state:"show",minWidth:100,
-            select:"NRO_MOTO",access:true,
-            edit:{box:{...bx_input}},
-            show:{box:{...bx_shw}},
-            filter:{box:{...bx_input}},
-            descripcion:"numero de motor",
-        },
-        {
-            name:"nro de vin",state:"show",minWidth:100,
-            select:"NRO_VIN",access:true,
-            edit:{box:{...bx_input}},
-            show:{box:{...bx_shw}},
-            filter:{box:{...bx_input}},
-            descripcion:"numero de vin",
-        },
-        {
-            name:"año",state:"show",minWidth:100,
-            select:"ANIO",access:true,
-            edit:{box:{...bx_input}},
-            show:{box:{...bx_shw}},
-            filter:{box:{...bx_input}},
+            value:"anio",name:"año",minWidth:100,
+            select:"ANIO",access:true,tipe:"input",
             descripcion:"año de fabricacion del vehiculo",
         },
         {
-            name:"color",state:"show",minWidth:100,
-            select:"COLOR",access:true,
-            edit:{box:{...bx_input}},
-            show:{box:{...bx_shw}},
-            filter:{box:{...bx_input}},
-            descripcion:"color del vehiculo",
+            value:"nro",name:"nro de motor",minWidth:100,
+            select:"NRO_MOTO",access:true,tipe:"input",detail:2,
+            descripcion:"numero de motor",
+        },
+        {
+            value:"vin",name:"numero de vin",minWidth:100,
+            select:"NRO_VIN",access:true,tipe:"input",detail:2,
+            descripcion:"numero de vin",
+        },
+        {
+            value:"color",name:"color",minWidth:100,
+            select:"COLOR",access:true,tipe:"input",
+            descripcion:"color del vehiculo",detail:2,
         },
     ],
-    panels:[
-        {tipe:"form",title:"vehiculo"},
-        {tipe:"table",title:"lista de vehiculos"},
+    panels:[],
+}
+
+const sch_checkin_vehicles = {
+    table:"checkin_vehicles",
+    fieldPrimary:"ID_CHECKIN_VEHICLE",
+    company:false,recordName:"orden de trabajo",
+    fields:[
+        
+        {access:true,value:"customer",name:"cliente",tipe:"optionsSearch",select:"ID_CUSTOMER",conect:{schema:sch_customers,type:"edit"},panel:"customer"},
+        {access:true,value:"receptor-customer",name:"solicitante",tipe:"optionsSearch",select:"ID_CUSTOMER_RECEPTOR",conect:{schema:sch_customers,type:"edit"},detail:2,panel:"customer"},
+        {access:true,value:"receptor-user",name:"recepcionista",tipe:"optionsSearch",select:"ID_USER_RECEPTOR",conect:{schema:sch_workers,type:"show"},panel:"customer"},
+        
+        {access:true,value:"vehicle",name:"vehiculo",tipe:"optionsSearch",select:"ID_VEHICLE",conect:{schema:sch_vehicles,type:"edit"},panel:"vehicle"},
+        {access:true,value:"date_enter",name:"fecha de entrada",tipe:"date",select:"DATE_ENTER",detail:2,panel:"vehicle",col:6},
+        {access:true,value:"date-out",name:"fecha de entrega",tipe:"date",select:"DATE_OUT",detail:2,panel:"vehicle",col:6},
+        {access:true,value:"fuel",name:"combustible",tipe:"bar",select:"FUEL",detail:2,panel:"vehicle"},
+        {access:true,value:"milage",name:"kilometraje",tipe:"input",select:"MILEAGE",detail:2,panel:"vehicle",col:6},
+        {access:true,value:"milage-prox",name:"kilometraje del proximo servicio",tipe:"input",select:"MILEAGE_PROX",detail:2,panel:"vehicle",col:6},
+        {access:true,value:"comment",name:"requerimiento",tipe:"comment",select:"COMENT",detail:2,panel:"vehicle"},
+
+        
+        //{access:true,value:"front",name:"imagen frontal",tipe:"input",select:"IMG_FRONT",detail:2},
+        {access:true,value:"observations",name:"observaciones",tipe:"comment",select:"OBSERVATIONS",detail:2,panel:"chasis"},
+
+        //{access:true,value:"",name:"",tipe:"input",select:"ID_SALE",detail:2},
+        {access:true,value:"check_1",name:"radio",panel:"inv",detail:1,tipe:"active",select:"CHECK_1"},
+        {access:true,value:"check_2",name:"tapa de aceite",panel:"inv",detail:1,tipe:"active",select:"CHECK_2"},
+        {access:true,value:"check_3",name:"antena de radio",panel:"inv",detail:1,tipe:"active",select:"CHECK_3"},
+        {access:true,value:"check_4",name:"brazo de plumilla",panel:"inv",detail:1,tipe:"active",select:"CHECK_4"},
+        {access:true,value:"check_5",name:"cabezales de asiento",panel:"inv",detail:1,tipe:"active",select:"CHECK_5"},
+        {access:true,value:"check_6",name:"cenicero",panel:"inv",detail:1,tipe:"active",select:"CHECK_6"},
+        {access:true,value:"check_7",name:"cinturon de seguridad",panel:"inv",detail:1,tipe:"active",select:"CHECK_7"},
+        {access:true,value:"check_8",name:"claxon",panel:"inv",detail:1,tipe:"active",select:"CHECK_8"},
+        {access:true,value:"check_9",name:"alarma y control",panel:"inv",detail:1,tipe:"active",select:"CHECK_9"},
+        {access:true,value:"check_10",name:"emblemas",panel:"inv",detail:1,tipe:"active",select:"CHECK_10"},
+        {access:true,value:"check_11",name:"encendedor",panel:"inv",detail:1,tipe:"active",select:"CHECK_11"},
+        {access:true,value:"check_12",name:"escarpines",panel:"inv",detail:1,tipe:"active",select:"CHECK_12"},
+        {access:true,value:"check_13",name:"espejos externos",panel:"inv",detail:1,tipe:"active",select:"CHECK_13"},
+        {access:true,value:"check_14",name:"espejos interior",panel:"inv",detail:1,tipe:"active",select:"CHECK_14"},
+        {access:true,value:"check_15",name:"gata y palanca",panel:"inv",detail:1,tipe:"active",select:"CHECK_15"},
+        {access:true,value:"check_16",name:"juego de herramientas",panel:"inv",detail:1,tipe:"active",select:"CHECK_16"},
+        {access:true,value:"check_17",name:"llanvas de repuesto",panel:"inv",detail:1,tipe:"active",select:"CHECK_17"},
+        {access:true,value:"check_18",name:"llave de ruedas",panel:"inv",detail:1,tipe:"active",select:"CHECK_18"},
+        {access:true,value:"check_19",name:"llave de seguro vasos",panel:"inv",detail:1,tipe:"active",select:"CHECK_19"},
+        {access:true,value:"check_20",name:"llave de seguro rueda",panel:"inv",detail:1,tipe:"active",select:"CHECK_20"},
+        {access:true,value:"check_21",name:"llavero",panel:"inv",detail:1,tipe:"active",select:"CHECK_21"},
+        {access:true,value:"check_22",name:"luz de salor",panel:"inv",detail:1,tipe:"active",select:"CHECK_22"},
+        {access:true,value:"check_23",name:"manija de puertas",panel:"inv",detail:1,tipe:"active",select:"CHECK_23"},
+        {access:true,value:"check_24",name:"parlantes",panel:"inv",detail:1,tipe:"active",select:"CHECK_24"},
+        {access:true,value:"check_25",name:"pisos de jebe",panel:"inv",detail:1,tipe:"active",select:"CHECK_25"},
+        {access:true,value:"check_26",name:"plimillas/otros",panel:"inv",detail:1,tipe:"active",select:"CHECK_26"},
     ],
 }
 
@@ -360,154 +636,228 @@ function scr_vehicle_fm({parent,userData}) {
     }
 }
 
-const sch_sales = {
+//----transaccions----
 
-    table:"sales",
-    fieldPrimary:"ID_SALE",
+const sch_accounts = {
+    table:"accounts",record:{name:"account",title:"cuenta"},
+    fieldPrimary:"ID_ACCOUNT",
     company:true,
     fields:[
         {
-            value:"emmit",
+            value:"name",access:true,minWidth:200,
+            name:"nombre de cuenta",select:"NAME",
+            tipe:"input",tags:["main"],
+            descripcion:"",
+        },
+        {
+            value:"total",access:true,minWidth:150,
+            name:"total",select:"TOTAL",
+            tipe:"money",
+            descripcion:"",
+        },
+        {
+            value:"active",access:true,
+            name:"activo",select:"ACTIVE",
+            tipe:"options",options:op_active,
+            descripcion:"",
+        },
+        {
+            value:"open",access:true,
+            name:"estado",select:"OPEN",
+            tipe:"options",options:[
+                {value:0,show:"cerrado",class:"rounded text-center bg-danger text-white"},
+                {value:1,show:"abierto",class:"rounded text-center bg-success text-white"},
+            ],
+            descripcion:"",
+        },
+        {
+            value:"control",access:true,
+            name:"cuenta controlada",select:"CONTROL_BY_OPEN",
+            tipe:"options",options:[
+                {value:0,show:"libre",class:"rounded text-center bg-primary text-white"},
+                {value:1,show:"controlado",class:"rounded text-center bg-warning text-white"},
+            ],
+            descripcion:"",
+        },
+    ],
+    visuals:[
+        {
+            name:"modulo",
+            fields:[
+                {value:"name",state:"edit"},
+                {value:"total",state:"edit"},
+                {value:"open",state:"edit"},
+                {value:"control",state:"edit"},
+                //{value:"active",state:"edit"},
+            ],
+        },
+    ]
+}
+
+const shc_pay_tag = {
+
+    table:"pay_tag",record:{name:"pay-tag",title:"etiqueta"},
+    fieldPrimary:"ID_PAY_TAG",
+    company:true,
+    fields:[
+        {
+            value:"name",access:true,
+            select:"NAME",name:"nombre de etiqueta",
+            tipe:"input",tags:["main"],
+            descripcion:"",
+        },
+        {
+            value:"income",access:true,
+            select:"INCOME",name:"ingreso",
+            tipe:"options",
+            options:[
+                {value:0,show:"egreso",class:"rounded text-center bg-danger text-white"},
+                {value:1,show:"ingreso",class:"rounded text-center bg-success text-white"},
+            ],
+            descripcion:"",
+        },
+        /*{
+            value:"active",access:true,
+            select:"ACTIVE",name:"activo",
+            tipe:"active",
+            descripcion:"",
+        },*/
+    ],
+    visuals:[
+        {
+            name:"modulo",
+            fields:[
+                {value:"name",state:"edit"},
+                {value:"income",state:"edit"},
+                //{value:"active",state:"edit"},
+            ],
+        },
+    ]
+};
+
+const pay_tags_default = [
+    {name:"venta",income:true},
+    {name:"compra",income:false},
+    {name:"ingreso de caja",income:true},
+    {name:"retiro de caja",income:false},
+    {name:"ingreso de transferencia entre cuentas",income:true},
+    {name:"egreso de transferencia entre cuentas",income:false},
+];
+
+const sch_pays = {
+    
+    table:"payments",record:{name:"pay",title:"pago"},
+    fieldPrimary:"ID_PAY",
+    company:true,
+    fields:[
+        {
+            value:"date",
             name:"fecha de emision",
             select:"DATE_EMMIT",access:true,
-            tipe:"date",
-            descripcion:"fecha de emision de la venta",
-        },
-        {
-            value:"status",
-            name:"estado de venta",
-            select:"ID_STATUS",access:true,
-            tipe:"options",options:op_sales_status,
-            descripcion:"estado de venta",
-        },
-        {
-            value:"pay",
-            name:"pagado",
-            select:"PAID",access:true,
-            tipe:"options",options:op_sales_paid,
-            descripcion:"si la venta ya ha sido pagada",
-        },
-        {
-            value:"customer",
-            name:"cliente",minWidth:300,
-            table:"customers",select:"ID_CUSTOMER",access:true,sql:"CONCAT(customers.NAME,'-',customers.NRO_DOCUMENT) AS 'NAME'",
-            tipe:"optionsSearch",
-            descripcion:"cliente de la venta",
-            load:{
-                name:"ld-customer",
-                tableMain:sch_customers.table,
-                selects:[
-                    {table:sch_customers.table,field:sch_customers.fieldPrimary,as:"value"},
-                    {table:sch_customers.table,field:"NAME",as:"show"},
-                ],
-            }
-        },
-        {
-            value:"doc",
-            name:"documento",
-            select:"ID_DOCUMENT",access:true,
-            tipe:"options",options:op_sales_document,
-            descripcion:"documento de emision a sunat (nota de pago/boleta/factura)",
+            tipe:"show",
+            descripcion:"",
         },
         {
             value:"total",
-            name:"total",
+            name:"total",tags:["main"],
             select:"TOTAL",access:true,
             tipe:"money",
-            descripcion:"total de de la venta",
+            descripcion:"",
         },
         {
-            value:"emit",
-            name:"venta emitida a sunat",minWidth:250,
-            select:"DOCUMENT_EMMIT",access:true,
-            tipe:"active",options:[
-                {value:0,show:"venta no emitida",class:"rounded text-center bg-danger text-white"},
-                {value:1,show:"venta emitida a sunat",class:"rounded text-center bg-success text-white"}
+            value:"income",tags:["main"],
+            name:"ingreso/egreso",
+            select:"INCOME",access:true,
+            tipe:"options",options:[
+                {value:0,show:"egreso",class:"rounded text-center bg-danger text-white"},
+                {value:1,show:"ingreso",class:"rounded text-center bg-success text-white"},
             ],
-            descripcion:"si ya se emitio (nota de pago/boleta/factura) a sunat",
+            descripcion:"",
         },
         {
-            value:"comment",
-            name:"comentario",
-            select:"COMMENT",access:true,
-            tipe:"comment",
-            descripcion:"comentario que solo pueden ver el equipo",
-        },
-        {
-            value:"itemId",
-            name:"objeto",
-            select:"ID_ITEM",access:true,
-            tipe:"show",
-            descripcion:"objeto asignado a la venta",
-        },
-        {
-            value:"itemType",
-            name:"tipo de objeto",
-            select:"ID_ITEM_TYPE",access:true,
-            tipe:"show",
-            descripcion:"tipo de objeto asignado a la venta",
-        },
-        {
-            value:"checkin",
-            name:"check in asignado a la venta",
-            select:"ID_CHECKIN",access:true,
-            tipe:"show",
-            descripcion:"checkin asignado a la venta",
-        },
-        {
-            value:"worker",
-            name:"trabajador asignado a la venta",
-            select:"ID_WORK_PROCESS",access:true,
-            tipe:"options",
-            descripcion:"trabajador asignado a la venta",
+            value:"account",
+            name:"cuenta",tags:["main"],
+            select:"ID_ACCOUNT",access:true,
+            tipe:"options",conect:{schema:sch_accounts},
+            descripcion:"",
             load:{
-                ld:"ld-worker",
+                name:"ld-account",
+                tableMain:sch_accounts.table,
+                selects:[
+                    {table:sch_accounts.table,field:sch_accounts.fieldPrimary,as:"value"},
+                    {table:sch_accounts.table,field:"NAME",as:"show"},
+                ],
             },
         },
         {
-            value:"dscto",
-            name:"descuento a la venta",
-            select:"DSCTO",access:"md-sale-dscto",
-            tipe:"porcent",
-            descripcion:"descuento a la venta",
+            value:"tag",
+            name:"etiqueta",tags:["main"],
+            select:"ID_PAY_TAG",access:true,
+            tipe:"options",conect:{schema:shc_pay_tag},
+            descripcion:"",
+            load:{
+                name:"ld-tag",
+                tableMain:shc_pay_tag.table,
+                selects:[
+                    {table:shc_pay_tag.table,field:shc_pay_tag.fieldPrimary,as:"value"},
+                    {table:shc_pay_tag.table,field:"NAME",as:"show"},
+                ],
+            },
         },
         {
-            value:"totaldscto",
-            name:"total sin descuento",
-            select:"TOTAL_WITHOUT_DSCTO",access:true,
-            tipe:"money",
-            descripcion:"total sin contar descuento",
-        },
-        {
-            value:"ruc",
-            name:"ruc",
-            select:"ID_RUC",access:true,
-            tipe:"options",
-            descripcion:"razon social con la cual se emitio la venta",
-        },
+            value:"comment",select:"NOTE",
+            name:"comentario",tipe:"comment",
+            descripcion:"",access:true,
+        }
+    ]
+};
 
+//----sales----
+
+const sch_sales_pays = {
+    table:"sales_payments",recordName:"trasaccion",
+    fieldPrimary:"ID_SALE_PAY",
+    fields:[
+        {
+            value:"idSale",access:true,
+            name:"id sale",tipe:"show",
+            select:"ID_SALE",
+            descripcion:"",
+        },
+        {
+            value:"idPay",access:true,
+            name:"id pay",tipe:"show",
+            select:"ID_PAY",
+            descripcion:"",conect:{schema:sch_pays,type:"show"},
+        },
     ],
 }
 
+const op_sales_emitsunat = [
+    {value:1,show:"emitido a sunat",class:"rounded text-center bg-success text-white"},
+    {value:0,show:"sin emitir a sunat",class:"rounded text-center bg-danger text-white"},
+];
+
 const sch_sales_products = {
+    record:{name:"item",title:"producto/servicio"},
     table:"sales_products",
     fieldPrimary:"ID",
     fields:[
         {
-            value:"saleId",
+            value:"saleId",detail:"hide",
             name:"id de venta",
             select:"ID_SALE",access:true,
-            tipe:"show",
+            tipe:"key",line0:true,
             descripcion:"",
         },
         {
             value:"item",
-            name:"producto/servicio",maxWidth:300,
+            name:"producto/servicio",maxWidth:100,
             select:"ID_PRODUCT",access:true,
-            tipe:"optionsSearch",
-            descripcion:"",
+            tipe:"optionsSearch",conect:{schema:sch_items,type:"show"},
+            descripcion:"producto/servicio de la venta",
             load:{
-                name:"ld-item",
+                name:"ld-item",schema:sch_items,
                 tableMain:sch_items.table,
                 selects:[
                     {table:sch_items.table,field:sch_items.fieldPrimary,as:"value"},
@@ -523,64 +873,182 @@ const sch_sales_products = {
                 startOptions:[
                     {value:"null",show:"Nuevo Producto/Servicio"},
                 ],
-            },
+            },line0:true,
         },
         {
             value:"cant",
             name:"cantidad",
             select:"CANT",access:true,
-            tipe:"cant",
-            descripcion:"",
+            tipe:"cant",line0:true,
+            descripcion:"cantidad de producto/servicios vendidos",
         },
         {
-            value:"priceUnit",
+            value:"priceUnit",minWidth:140,
             name:"precio unitario",
             select:"PRICE_UNIT",access:true,
-            tipe:"money",
-            descripcion:"",
+            tipe:"money",line0:true,
+            descripcion:"precio unitario del producto/servicio",
         },
         {
-            value:"priceTotal",
+            value:"priceTotal",minWidth:140,
             name:"precio total",
             select:"PRICE_TOTAL",access:true,
-            tipe:"money",
-            descripcion:"",
+            tipe:"money",line0:true,
+            descripcion:"precio total del producto/servicio",
         },
         {
             value:"checklist",
-            name:"terminado",
-            select:"CHECKLIST",access:true,
-            tipe:"active",
+            name:"terminado",line0:true,
+            select:"CHECKLIST",access:"md-workers-item",
+            tipe:"options",options:[
+                {value:0,show:"pendiente",class:"rounded text-center bg-danger text-white"},
+                {value:1,show:"terminado",class:"rounded text-center bg-success text-white"},
+            ],
             descripcion:"",
         },
         {
-            value:"worker",
-            name:"trabajador asignado",
-            select:"ID_WORKER",access:true,
-            tipe:"options",
+            value:"worker",conect:{schema:sch_workers},
+            name:"trabajador asignado",line0:true,
+            select:"ID_WORKER",access:"md-workers-item",
+            tipe:"optionsSearch",load:{...ld_workers},
             descripcion:"",
         },
     ],
 }
 
-const sch_sales_pays = {
-    table:"sales_payments",
-    fieldPrimary:"ID_SALE_PAY",
+const sch_sales = {
+    record:{name:"sale",title:"venta"},
+    table:"sales",
+    fieldPrimary:"ID_SALE",
+    company:true,
     fields:[
         {
-            value:"idSale",access:true,
-            name:"id sale",tipe:"show",
-            select:"ID_SALE",
+            value:"emmit",minWidth:150,
+            name:"fecha de ingreso",tags:["main","control"],
+            select:"DATE_EMMIT",access:true,
+            tipe:"date",panel:"info",
+            descripcion:"fecha en la que la venta fue ingresada",
+        },
+        {
+            value:"status",panel:"info",
+            name:"estado de venta",tags:["main","control"],
+            select:"ID_STATUS",access:true,
+            tipe:"options",options:op_sales_status,
+            descripcion:"puede ser "+op_sales_status.map(op=>{return op.show;}).join(", "),
+        },
+        {
+            value:"pay",panel:"info",tags:["main","control"],
+            name:"estado de pagos",minWidth:150,
+            select:"PAID",access:true,states:{edit:{access:"md-box-general"}},
+            tipe:"options",options:op_sales_paid,
+            descripcion:"muestra si la venta ya ha sido pagada",
+        },
+        {
+            value:"customer",panel:"info",
+            name:"cliente",minWidth:300,tags:["main","control"],
+            table:"customers",select:"ID_CUSTOMER",access:true,sql:"CONCAT(customers.NAME,'-',customers.NRO_DOCUMENT) AS 'NAME'",
+            tipe:"optionsSearch",
+            descripcion:"",conect:{schema:sch_customers,type:"edit"},
+            load:{
+                name:"ld-customer",schema:sch_customers,
+                tableMain:sch_customers.table,
+                selects:[
+                    {table:sch_customers.table,field:sch_customers.fieldPrimary,as:"value"},
+                    {table:sch_customers.table,field:"NAME",as:"show"},
+                ],
+            }
+        },
+        {
+            value:"doc",panel:"info",
+            name:"documento",tags:["detail","bill","control"],
+            select:"ID_DOCUMENT",access:true,
+            tipe:"options",options:op_sales_document,
+            descripcion:"es el documento que se emite a sunat ("+op_sales_document.map(op=>{return op.show}).join("/")+")",
+        },
+        {
+            value:"total",panel:"total",
+            name:"total",tags:["main","total","control"],
+            select:"TOTAL",access:true,calculate:true,
+            tipe:"money",
             descripcion:"",
         },
         {
-            value:"idPay",access:true,
-            name:"id pay",tipe:"show",
-            select:"ID_PAY",
+            value:"emit",panel:"bill",detail:"hide",
+            name:"venta emitida a sunat",minWidth:250,
+            select:"DOCUMENT_EMMIT",access:true,tags:["bill"],
+            tipe:"options",options:op_sales_emitsunat,
+            descripcion:"se emitio "+op_sales_document.map(op=>{return op.show}).join("/")+ " a sunat",
+        },
+        {
+            value:"comment",panel:"info",
+            name:"comentario",tags:["main","control"],
+            select:"COMMENT",access:true,
+            tipe:"comment",
+            descripcion:"este comentario solo pueden ser visto por los usuarios",
+        },
+        {
+            value:"itemId",tags:["item"],
+            name:"vehiculo",//detail:"hide",
+            select:"ID_ITEM",access:true,
+            tipe:"optionsSearch",
+            descripcion:"objeto asignado a la venta",
+            /*load:{
+                schema:sch_vehicles,
+                tableMain:sch_vehicles.table,
+                selects:[
+                    {table:sch_vehicles.table,field:sch_vehicles.fieldPrimary,as:"value"},
+                    {table:sch_vehicles.table,field:"PLACA",as:"show"},
+                ],
+            },*/
+        },
+        {
+            value:"itemType",
+            name:"tipo de objeto",
+            select:"ID_ITEM_TYPE",access:false,
+            tipe:"show",
+            descripcion:"tipo de objeto asignado a la venta",
+        },
+        {
+            value:"checkin",
+            name:"check in asignado a la venta",
+            select:"ID_CHECKIN",access:false,
+            tipe:"show",
+            descripcion:"checkin asignado a la venta",
+        },
+        {
+            value:"worker",panel:"worker",
+            name:"trabajador",
+            select:"ID_WORK_PROCESS",access:"md-workers-sale",
+            tipe:"optionsSearch",conect:{schema:sch_workers,type:"show"},
+            load:ld_workers,
+            descripcion:"trabajador asignado a la venta",
+        },
+        {
+            value:"dscto",panel:"total",tags:["detail","total"],
+            name:"descuento a la venta",
+            select:"DSCTO",access:"md-sale-dscto",
+            tipe:"porcent",
             descripcion:"",
         },
+        {
+            value:"totaldscto",panel:"total",calculate:true,
+            name:"total sin descuento",tags:["detail","total"],
+            select:"TOTAL_WITHOUT_DSCTO",access:true,
+            tipe:"money",
+            descripcion:"",
+        },
+        {
+            value:"ruc",minWidth:120,
+            name:"ruc",tags:["bill"],
+            select:"ID_RUC",access:"md-bills-rucs",
+            tipe:"options",load:{...ld_rucs},
+            descripcion:"razon social con la cual se emitio la venta",
+        },
+
     ],
 }
+
+//
 
 const sch_recipe_inputs = {
 
@@ -659,7 +1127,7 @@ const sch_recipe_inputs = {
 }
 
 const sch_produccion = {
-    table:"produccions",
+    table:"produccions",record:{name:"produccion",title:"orden de producción"},
     fieldPrimary:"ID_PRODUCCION",
     company:true,delete:true,
     fields:[
@@ -691,12 +1159,35 @@ const sch_produccion = {
                     }
                 ],
                 conditions:[
-                    {
+                    /*{
+                        before:" ( ",
                         table:sch_items.table,
                         field:"ID_PRODUCT_TIPE",
                         inter:"=",
                         value:3,
-                    }
+                    },
+                    {
+                        before:" OR ",
+                        table:sch_items.table,
+                        field:"ID_PRODUCT_TIPE",
+                        inter:"=",
+                        value:4,
+                    },
+                    {
+                        before:" OR ",
+                        table:sch_items.table,
+                        field:"ID_PRODUCT_TIPE",
+                        inter:"=",
+                        value:5,
+                    },
+                    {
+                        before:" OR ",
+                        table:sch_items.table,
+                        field:"ID_PRODUCT_TIPE",
+                        inter:"=",
+                        value:1,
+                        after:" ) "
+                    },*/
                 ],
             }, 
             
@@ -771,149 +1262,12 @@ const sch_database = [
     ],
 ];
 
-const sch_accounts = {
-    table:"accounts",
-    fieldPrimary:"ID_ACCOUNT",
-    company:true,
-    fields:[
-        {
-            value:"name",access:true,
-            name:"nombre de cuenta",select:"NAME",
-            tipe:"input",
-            descripcion:"",
-        },
-        {
-            value:"total",access:true,
-            name:"total",select:"TOTAL",
-            tipe:"money",
-            descripcion:"",
-        },
-        {
-            value:"active",access:true,
-            name:"activo",select:"ACTIVE",
-            tipe:"active",
-            descripcion:"",
-        },
-        {
-            value:"open",access:true,
-            name:"estado",select:"OPEN",
-            tipe:"options",options:[
-                {value:0,show:"cerrado",class:"rounded text-center bg-danger text-white"},
-                {value:1,show:"abierto",class:"rounded text-center bg-success text-white"},
-            ],
-            descripcion:"",
-        },
-        {
-            value:"control",access:true,
-            name:"cuenta controlada",select:"CONTROL_BY_OPEN",
-            tipe:"active",
-            descripcion:"",
-        },
-    ],
-}
 
-const shc_pay_tag = {
 
-    table:"pay_tag",
-    fieldPrimary:"ID_PAY_TAG",
-    company:true,
-    fields:[
-        {
-            value:"name",access:true,
-            select:"NAME",name:"nombre de etiqueta",
-            tipe:"input",
-            descripcion:"",
-        },
-        {
-            value:"income",access:true,
-            select:"INCOME",name:"ingreso",
-            tipe:"options",
-            options:[
-                {value:0,show:"egreso",class:"rounded text-center bg-danger text-white"},
-                {value:1,show:"ingreso",class:"rounded text-center bg-success text-white"},
-            ],
-            descripcion:"",
-        },
-        {
-            value:"active",access:true,
-            select:"ACTIVE",name:"activo",
-            tipe:"active",
-            descripcion:"",
-        },
-    ],
-};
-
-const sch_pays = {
-    
-    table:"payments",
-    fieldPrimary:"ID_PAY",
-    company:true,
-    fields:[
-        {
-            value:"idPay",
-            name:"id del pago",
-            select:"ID_PAY",access:true,
-            tipe:"show",
-            descripcion:"",
-        },
-        {
-            value:"date",
-            name:"fecha de emision",
-            select:"DATE_EMMIT",access:true,
-            tipe:"show",
-            descripcion:"",
-        },
-        {
-            value:"total",
-            name:"total",
-            select:"TOTAL",access:true,
-            tipe:"money",
-            descripcion:"",
-        },
-        {
-            value:"income",
-            name:"ingreso/egreso",
-            select:"INCOME",access:true,
-            tipe:"options",options:[
-                {value:0,show:"egreso",class:"rounded text-center bg-danger text-white"},
-                {value:1,show:"ingreso",class:"rounded text-center bg-success text-white"},
-            ],
-            descripcion:"",
-        },
-        {
-            value:"account",
-            name:"cuenta",
-            select:"ID_ACCOUNT",access:true,
-            tipe:"options",
-            descripcion:"",
-            load:{
-                name:"ld-account",
-                tableMain:sch_accounts.table,
-                selects:[
-                    {table:sch_accounts.table,field:sch_accounts.fieldPrimary,as:"value"},
-                    {table:sch_accounts.table,field:"NAME",as:"show"},
-                ],
-            },
-        },
-        {
-            value:"tag",
-            name:"etiqueta",
-            select:"ID_PAY_TAG",access:true,
-            tipe:"options",
-            descripcion:"",
-            load:{
-                name:"ld-tag",
-                tableMain:shc_pay_tag.table,
-                selects:[
-                    {table:shc_pay_tag.table,field:shc_pay_tag.fieldPrimary,as:"value"},
-                    {table:shc_pay_tag.table,field:"NAME",as:"show"},
-                ],
-            },
-        },
-    ]
-};
+//-----provieeders & buys---------
 
 const sch_provideers = {
+    record:{name:"provieeder",title:"proveedor"},
     table:"provideers",
     fieldPrimary:"ID_PROVIDEER",
     company:true,
@@ -921,76 +1275,38 @@ const sch_provideers = {
         {
             value:"name",access:true,
             name:"nombre",tipe:"input",
-            select:"NAME",
-            descripcion:"",
+            select:"NAME",tags:["main"],
+            descripcion:"nombre del proveedor",
         },
         {
-            value:"ruc",access:true,
+            value:"ruc",access:true,tags:["main"],
             name:"ruc",tipe:"input",
             select:"RUC",
-            descripcion:"",
-        },
-    ],
-}
-
-const sch_buys = {
-    table:"buys",
-    fieldPrimary:"ID_BUY",
-    company:true,
-    fields:[
-        {
-            value:"date",access:true,
-            name:"fecha de emision",tipe:"date",
-            select:"DATE_EMMIT",
-            descripcion:"",
-        },
-        {
-            value:"state",access:true,
-            name:"estado de compra",tipe:"options",
-            select:"ID_BUY_STATUS",options:op_buys_status,
-            descripcion:"",
-        },
-        {
-            value:"provideer",access:true,
-            name:"proveedor",tipe:"optionsSearch",
-            select:"ID_PROVIDEER",
-            descripcion:"",
-            load:{
-                name:"ld-provideers",
-                tableMain:sch_provideers.table,
-                selects:[
-                    {table:sch_provideers.table,field:sch_provideers.fieldPrimary,as:"value"},
-                    {table:sch_provideers.table,field:"NAME",as:"show"},
-                ],
-            }
-        },
-        {
-            value:"total",access:true,
-            name:"total",tipe:"money",
-            select:"TOTAL",
-            descripcion:"",
+            descripcion:"ruc del proveedor",
         },
     ],
 }
 
 const sch_buys_products = {
+    record:{name:"item",title:"insumo"},
     table:"buys_products",
     fieldPrimary:"ID_BUY_PRODUCT",
     delete:true,
     fields:[
         {
             value:"idBuy",access:true,
-            name:"id buy",tipe:"show",
-            select:"ID_BUY",
+            name:"id buy",tipe:"key",
+            select:"ID_BUY",detail:"hide",
             descripcion:"",
         },
         {
             value:"item",access:true,
             name:"producto/insumo",tipe:"optionsSearch",
-            select:"ID_PRODUCT",
+            select:"ID_PRODUCT",minWidth:300,
             descripcion:"",
+            conect:{schema:sch_items,type:"edit"},
             load:{
-                name:"ld-item",
+                name:"ld-item",schema:sch_items,
                 tableMain:sch_items.table,
                 selects:[
                     {table:sch_items.table,field:sch_items.fieldPrimary,as:"value"},
@@ -1001,7 +1317,7 @@ const sch_buys_products = {
                         main:{table:sch_items.table,field:"UNID_ID"},
                         join:{table:sch_unids.table,field:sch_unids.fieldPrimary},
                         tipe:"LEFT",
-                    }
+                    },
                 ],
             },
         },
@@ -1014,14 +1330,34 @@ const sch_buys_products = {
         {
             value:"costUnit",access:true,
             name:"costo unitario",tipe:"money",
-            select:"COST_UNIT",maxWidth:100,
+            select:"COST_UNIT",minWidth:150,maxWidth:200,
             descripcion:"",
         },
         {
             value:"costTotal",access:true,
             name:"costo total",tipe:"money",
-            select:"COST_TOTAL",maxWidth:100,
+            select:"COST_TOTAL",minWidth:150,maxWidth:200,
             descripcion:"",
+        },
+    ],
+    visuals:[
+        {
+            name:"detail-show",
+            fields:[
+                {value:"item",state:"show"},
+                {value:"cant",state:"show"},
+                {value:"costUnit",state:"show"},
+                {value:"costTotal",state:"show"},
+            ],
+        },
+        {
+            name:"table-edit",
+            fields:[
+                {value:"item",state:"edit"},
+                {value:"cant",state:"edit"},
+                {value:"costUnit",state:"edit"},
+                {value:"costTotal",state:"edit"},
+            ],
         },
     ],
 }
@@ -1042,6 +1378,50 @@ const sch_buys_payments = {
             name:"id pay",tipe:"show",
             select:"ID_PAY",
             descripcion:"",
+        },
+    ],
+    conections:[
+        {schema:sch_pays}
+    ],
+}
+
+const sch_buys = {
+    record:{name:"buy",title:"compra"},
+    table:"buys",
+    fieldPrimary:"ID_BUY",
+    company:true,
+    fields:[
+        {
+            value:"date",access:true,
+            name:"fecha de emision",tipe:"date",
+            select:"DATE_EMMIT",panel:"info",
+            descripcion:"",
+        },
+        {
+            value:"state",access:true,
+            name:"estado de compra",tipe:"options",
+            select:"ID_BUY_STATUS",options:op_buys_status,
+            descripcion:"",panel:"info",
+        },
+        {
+            value:"provideer",access:true,
+            name:"proveedor",tipe:"optionsSearch",
+            select:"ID_PROVIDEER",panel:"info",
+            descripcion:"",conect:{schema:sch_provideers,type:"edit"},
+            load:{
+                name:"ld-provideers",schema:sch_provideers,
+                tableMain:sch_provideers.table,
+                selects:[
+                    {table:sch_provideers.table,field:sch_provideers.fieldPrimary,as:"value"},
+                    {table:sch_provideers.table,field:"NAME",as:"show"},
+                ],
+            },
+        },
+        {
+            value:"total",access:true,
+            name:"total",tipe:"money",
+            select:"TOTAL",panel:"total",
+            descripcion:"",detail:"calculate",
         },
     ],
     
@@ -1074,7 +1454,7 @@ const sch_control_accounts = {
             }
         },
         {
-            value:"open_emmit",name:"fecha de apertura",tipe:"show",
+            value:"open_emmit",name:"fecha de apertura",tipe:"date",
             select:"DATE_EMMIT_OPEN",access:true,minWidth:200,
             descripcion:"",
         },
@@ -1093,7 +1473,7 @@ const sch_control_accounts = {
             descripcion:"",
         },
         {
-            value:"close_emmit",name:"fecha de cierre",tipe:"show",
+            value:"close_emmit",name:"fecha de cierre",tipe:"date",
             select:"DATE_EMMIT_CLOSE",access:true,minWidth:200,
             descripcion:"",
         },
@@ -1109,6 +1489,8 @@ const sch_control_accounts = {
         }
     ],
 }
+
+
 
 /*const schema = {
     tables:[

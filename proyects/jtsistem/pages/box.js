@@ -5,109 +5,39 @@ $(document).ready(function() {
 
     success:({userData,pageData})=>{
 
+
+      concepBuildPage({userData,pageData});
+
+      return;
+
       var group = new CrudsGroup({
-        userData,parent:pageData.body,test:false,
+        pageData,
+        userData,
+        parent:pageData.body,
+        test:false,
         layers:[
           {
             grid:{
               items:[
-                {name:"prnt-account",col:4},
-                {name:"prnt-control",col:8},
+                {name:"prnt-control",col:12},
                 {name:"prnt-control-md",col:12},
                 {name:"prnt-pay-md",col:12},
               ],
             },
           },
-          {
-            crud:{
-              parent:"prnt-account",title:"caja",
-              name:"cr-account",schema:sch_accounts,
-              config:{
-                show:true,head:false,
-                toolsPositions:[
-                  {name:"reload",show:false},
-                  {name:"clear",show:false},
-                  {name:"quest",show:false},
-                ],
-              },
-              panels:[{
-                tipe:"form",head:false,
-                fields:[
-                  //{name:"box-modif",action:"modif",box:{tipe:5,class:"w-100 btn btn-primary m-1 btn",value:"MODIFICAR CAJA"}},
-                ],
-                fieldsSet:[
-                  {position:"first",value:"open"},
-                  {position:"first",value:"total",showBox:{...bx_moneyh1}},
-                  {position:"first",value:"name"},
-                ],
-              }],
-              loads:[
-                {
-                  name:"ld-boxs",
-                  tableMain:sch_accounts.table,
-                  selects:[
-                    {table:sch_accounts.table,field:sch_accounts.fieldPrimary,as:"value"},
-                    {table:sch_accounts.table,field:"NAME",as:"show"},
-                  ],
-                  conditions:[
-                    {
-                      table:sch_accounts.table,
-                      field:"CONTROL_BY_OPEN",
-                      inter:"=",
-                      value:1
-                    },
-                    {
-                      before:" AND ",
-                      table:sch_accounts.table,
-                      field:"ID_COMPANY",
-                      inter:"=",
-                      value:userData.company.id,
-                    }
-                  ],
-                },
-              ],
-              filters:[
-                {name:"boxs",title:"cuenta",box:{tipe:3,class:"w-100"},load:{name:"ld-boxs",show:"show"},select:{table:sch_accounts.table,field:"ID_ACCOUNT"}}
-              ],
-              stateTools:[
-                {
-                  name:"reload",
-                  tools:[
-                    {name:"reload",show:true},
-                    {name:"new",show:false},
-                    {name:"quest",show:false},
-                    {name:"load",show:false},
-                    {name:"config",show:false},
-                  ],
-                }
-              ],
-              events:[
-                {
-                  name:"boxUpdate",
-                  actions:[{
-                    action:({k,field})=>{
-
-                      if(field.action == "modif"){
-                        
-                        group.crudGetBuild({crudName:"cr-pay"}).SetState({stateName:"new"});
-                      }
-                    }
-                  }]
-                },
-              ],
-            }
-          },
           //-----control------
           {
             crud:{
-              parent:"prnt-control",name:"cr-control-tb",
+              parent:"prnt-control",name:"cr-boxs",recordName:"control de caja",
               title:"lista de control de caja",schema:sch_control_accounts,
+              insertToEnd:false,
+              config:{show:true},
               panels:[
                 {
                   tipe:"table",
                   fieldsSet:[
+                    {value:"account",filter:{type:"unique"},minWidth:120},
                     {value:"status"},
-                    //{value:"account"},
                     {value:"open_emmit"},
                     {value:"open_total"},
                     {value:"close_emmit"},
@@ -117,23 +47,17 @@ $(document).ready(function() {
                 }
               ],
               stateStart:"reload",
-              stateTools:[
+              states:[
                 {
                   name:"reload",
                   tools:[
-                    {name:"reload",show:false},
-                    {name:"config",show:false},
-                    {name:"load",show:false},
                     {name:"insert",show:true},
-                    {name:"sizes",show:false,value:10},
+                    {name:"sizes",show:true,value:10},
+                    {name:"pages",show:true},
+                    {name:"reload",show:true},
+                    {name:"tutorial",show:true},
                   ]
                 },
-                {
-                  name:"block",
-                  tools:[
-                    {name:"load",show:false},
-                  ]
-                }
               ],
               inserts:[
                 {
@@ -147,22 +71,29 @@ $(document).ready(function() {
                   actions:[{
                     action:()=>{
   
-                      var crudAccount = group.crudGetBuild({crudName:"cr-account"});
-                      crudAccount.bodyGet().fieldSetValues({fieldName:"open",values:[1]});
+                      //var crudAccount = group.crudGetBuild({crudName:"cr-account"});
+                      //crudAccount.bodyGet().fieldSetValues({fieldName:"open",values:[1]});
                     }
                   }]
                 },
                 {
                   name:"insertBefore",
                   actions:[{
-                    action:()=>{
+                    action:({inserts})=>{
 
-                      var crudAccount = group.crudGetBuild({crudName:"cr-account"});
-                      var open = crudAccount.bodyGet().fieldGetValues({fieldName:"open"})[0] == "1";
+                      //var crudAccount = group.crudGetBuild({crudName:"cr-account"});
+                      //var open = crudAccount.bodyGet().fieldGetValues({fieldName:"open"})[0] == "1";
 
-                      if(open) alert("no se puede abrir una caja que ya esta abierta");
+                      //if(open) alert("no se puede abrir una caja que ya esta abierta");
 
-                      return {block:open};
+                      //var inserts = [{field:"OPEN",value:1}];
+
+                      inserts = [{
+                        field:"ID_ACCOUNT",
+                        value:AccountGetId(),
+                      }]
+
+                      return {block:open,inserts};
                     }
                   }]
                 }
@@ -179,7 +110,7 @@ $(document).ready(function() {
           //control form
           {
             crud:{
-              parent:"md-control",name:"cr-control-fm",
+              parent:"md-control",name:"cr-control-fm",recordName:"control de caja",
               title:"control de caja",schema:sch_control_accounts,
               panels:[
                 {
@@ -213,8 +144,8 @@ $(document).ready(function() {
                 {
                   tipe:"form",head:false,name:"actions",
                   fieldsSet:[
-                    {action:"button",name:"close",value:"CERRAR CAJA",class:"w-100 btn btn-danger m-1 btn"},
-                    {action:"button",name:"modif",value:"MODIFICAR CAJA",class:"w-100 btn btn-primary m-1 btn"},
+                    {action:"button",name:"close",title:"cerrar caja",value:"CERRAR CAJA",class:"w-100 btn btn-danger m-1 btn",descripcion:"una vez cerrada la caja, no se puede modificar ingresos/egresos"},
+                    {action:"button",name:"modif",title:"modificar saldo",value:"MODIFICAR SALDO",class:"w-100 btn btn-primary m-1 btn",descripcion:"ingresar/retirar saldo de caja"},
                   ],
                 }
               ],
@@ -255,13 +186,15 @@ $(document).ready(function() {
                         k.Update({success:()=>{
 
                           k.SetState({stateName:"block"});
-                          group.crudGetBuild({crudName:"cr-account"}).SetState({stateName:"reload"});
+                          //group.crudGetBuild({crudName:"cr-account"}).SetState({stateName:"reload"});
                         }});
                       }
 
                       if(field.name=="modif"){
 
-                        group.crudGetBuild({crudName:"cr-pay"}).SetState({stateName:"new"});
+                        var crud_pay = group.crudGetBuild({crudName:"cr-pay"}); 
+                        crud_pay.SetState({stateName:"new"});
+                        crud_pay.bodyGet().fieldSetValues({fieldName:"account",values:[AccountGetId()]});
                       }
                     }
                   }]
@@ -283,17 +216,19 @@ $(document).ready(function() {
                   actions:[{
                     action:()=>{
 
-                      group.crudGetBuild({crudName:"cr-account"}).SetState({stateName:"reload"});
+                      group.crudGetBuild({crudName:"cr-boxs"}).SetState({stateName:"reload"});
                     }
                   }]
                 }
               ],
               afterCancel:"block",
               afterUpdate:"block",
-              stateTools:[
+              states:[
                 {
                   name:"reload",
                   tools:[
+                    //{name:"load",show:true},
+                    {name:"tutorial",show:true},
                     {name:"cancel",show:true},
                     {name:"update",show:true},
                   ],
@@ -439,7 +374,7 @@ $(document).ready(function() {
                 ],
               }],
               stateStart:"block",
-              stateTools:[
+              states:[
                 {
                   name:"reload",
                   tools:[
@@ -455,22 +390,23 @@ $(document).ready(function() {
           {modal:{parent:"prnt-pay-md",name:"md-pay"}},
           {
             crud:{
-              name:"cr-pay",title:"transaccion",
+              name:"cr-pay",title:"transaccion",recordName:"transaccion",
               schema:sch_pays,parent:"md-pay",
               panels:[{
                 tipe:"form",head:false,
                 fieldsSet:[
                   {value:"date"},
-                  {value:"account"},
+                  {value:"account",state:"show"},
                   {value:"tag",state:"edit"},
                   {value:"total",state:"edit"},
                   {value:"income"},
                 ],
               }],
-              stateTools:[
+              states:[
                 {
                   name:"new",
                   tools:[
+                    {name:"tutorial",show:true},
                     {name:"load",show:false},
                     {name:"cancel",show:true},
                     {name:"insert",show:true},
@@ -502,6 +438,29 @@ $(document).ready(function() {
                       value:"INGRESO DE CAJA",
                       after:" ) "
                     },
+                    {
+                      before:" AND ",
+                      table:shc_pay_tag.table,
+                      field:"ID_COMPANY",
+                      inter:"=",
+                      value:userData.company.id,
+                    },
+                  ],
+                },
+                {
+                  name:"ld-account",
+                  tableMain:sch_accounts.table,
+                  selects:[
+                      {table:sch_accounts.table,field:sch_accounts.fieldPrimary,as:"value"},
+                      {table:sch_accounts.table,field:"NAME",as:"show"},
+                  ],
+                  conditions:[
+                    {
+                      table:sch_accounts.table,
+                      field:"ID_COMPANY",
+                      inter:"=",
+                      value:userData.company.id,
+                    },
                   ],
                 },
               ],
@@ -517,14 +476,16 @@ $(document).ready(function() {
                       var tagId = k.bodyGet().fieldGetValues({fieldName:"tag"})[0];
                       var loadResult = k.Loaded_GetLoadData({loadName:"ld-tag"}).result;
                       var tagInfo = loadResult.find(rst=>rst.value == tagId);
-                      var tagIncome = tagInfo.income == "1" ? 1 : 0;
+                      if(tagInfo){
 
-                      k.bodyGet().fieldSetValues({fieldName:"income",values:[tagIncome]});
-                      k.Update_AddChangeField({
-                        fieldName:"income",
-                        value:tagIncome,
-                        y:0,
-                      });
+                        var tagIncome = tagInfo.income == "1" ? 1 : 0;
+                        k.bodyGet().fieldSetValues({fieldName:"income",values:[tagIncome]});
+                        k.Update_AddChangeField({
+                          fieldName:"income",
+                          value:tagIncome,
+                          y:0,
+                        });
+                      }                     
 
                     }
                   }],
@@ -563,7 +524,7 @@ $(document).ready(function() {
                             value:income,
                           });
                         }
-                      });                     
+                      });   
 
                       return {inserts}
                     }
@@ -584,24 +545,22 @@ $(document).ready(function() {
         ],
         conections:[
           {
-            masterName:"cr-account",
-            masterSelect:"ID_ACCOUNT",
-            event:"cnx",type:"show",
-            maidName:"cr-control-tb",
-            maidSelect:"ID_ACCOUNT",
-            maidMasterReload:true,
-          },
-          {
-            masterName:"cr-control-tb",
+            masterName:"cr-boxs",
             masterSelect:"ID_CONTROL_ACCOUNT",
             masterAction:"edit",
             event:"cnx",
             maidName:"cr-control-fm",
             maidSelect:"ID_CONTROL_ACCOUNT",
           },
-        ]
+        ],
       });
 
+      function AccountGetId(){
+
+        return group.crudGetBuild({crudName:"cr-boxs"}).bodyGet().configGetWindowFilters().Filter_GetBox({filterName:"cuenta"}).GetValue();
+      }
+
+      PlayTutorialInPage({group,pageData});
     }
   });
   
