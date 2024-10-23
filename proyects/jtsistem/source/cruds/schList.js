@@ -435,7 +435,7 @@ const sch_items = {
         },
         {
             value:"active",
-            name:"estado",state:"show",
+            name:"activo",state:"show",
             select:"ACTIVE",access:true,
             tipe:"active",options:op_active,
             descripcion:"si el item esta activo, se puede vender o usar",
@@ -444,7 +444,7 @@ const sch_items = {
             value:"cantRecipe",
             name:"cantidad de receta",state:"show",
             select:"RECIPE_CANT",access:true,
-            tipe:"input",
+            tipe:"cant",
             descripcion:"cantidad que se obtiene al momento de realizar la receta",
         },
         {
@@ -530,8 +530,14 @@ const sch_vehicles = {
     table:"items_vehicles",
     fieldPrimary:"ID_VEHICLE",
     recordName:"vehiculo",record:{title:"vehiculo"},
-    selectShow:"PLACA",
+    selectShow:"PLACA",company:true,
     fields:[
+        {
+            value:"customer",name:"cliente",
+            select:"ID_CUSTOMER",access:true,tipe:"optionsSearch",
+            descripcion:"dueño del vehiculo",
+            conect:{schema:sch_customers},
+        },
         {
             value:"placa",name:"placa",minWidth:100,
             select:"PLACA",access:true,tipe:"input",
@@ -574,7 +580,7 @@ const sch_vehicles = {
 const sch_checkin_vehicles = {
     table:"checkin_vehicles",
     fieldPrimary:"ID_CHECKIN_VEHICLE",
-    company:false,recordName:"orden de trabajo",
+    company:true,recordName:"orden de trabajo",
     fields:[
         
         {access:true,value:"customer",name:"cliente",tipe:"optionsSearch",select:"ID_CUSTOMER",conect:{schema:sch_customers,type:"edit"},panel:"customer"},

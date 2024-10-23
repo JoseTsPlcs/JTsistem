@@ -52,7 +52,7 @@ var fieldTypes = [
     },
     {
         tipe:"cant",
-        edit:{box:{...bx_cant,class:"w-100 text-center"}},
+        edit:{box:{...bx_cant,class:"w-100 text-center",value:1}},
         show:{box:{...bx_shw,format:{start:"x"}}},
     },
     {
@@ -1601,6 +1601,8 @@ class CrudsGroup extends ODD {
         if(masterSelect){
             
             var data = masterCrudBuild.Reload_GetData();
+            console.log("data of master:",data);
+            
             masterValue = data[y][masterSelect];
             //console.log("conection of " + masterName + " event " + event + " to " + maidName + " set value by select",masterSelect,data);
         }

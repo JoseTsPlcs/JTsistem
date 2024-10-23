@@ -1,8 +1,12 @@
 
 const primaryShow = false;
 const ambient = 'dev';
-const test = false;
-const testNew = false;
+const test = true;
+const testNew = true;
+
+const testNewSetAddItem = false;
+const testNewSetAddItemValue = false;
+
 const testPay = false;
 const testPaySet = false;
 const testAccess = false;

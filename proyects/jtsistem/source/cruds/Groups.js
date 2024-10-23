@@ -23,7 +23,7 @@ function gp_item({parentName,itemEvents=[]}) {
             {
                 crud:{
                   parent:"md-item",name:"cr-item",recordName:"item",
-                  title:"item",schema:sch_items,
+                  title:"item",schema:sch_items,head:false,
                   panels:[
                     {
                         tipe:"form",title:"informacion general",
@@ -58,13 +58,25 @@ function gp_item({parentName,itemEvents=[]}) {
                   ],
                   stateStart:"block",
                   afterUpdate:"block",
+                  afterInsert:"block",
                   states:[
                     {
                       name:"reload",
                       tools:[
+                        {name:"title",show:true,value:"item"},
                         {name:"tutorial",show:true},
                         //{name:"reload",show:true},
                         {name:"update",show:true},
+                        {name:"cancel",show:true},
+                      ],
+                    },
+                    {
+                      name:"new",
+                      tools:[
+                        {name:"title",show:true,value:"item"},
+                        {name:"tutorial",show:true},
+                        //{name:"reload",show:true},
+                        {name:"insert",show:true},
                         {name:"cancel",show:true},
                       ],
                     }
@@ -267,7 +279,19 @@ function gp_item({parentName,itemEvents=[]}) {
                                 {name:"cancel",show:true},
                             ],
                         }
-                    ]
+                    ],
+                    events:[
+                      {
+                        name:"insertAfter",
+                        actions:[{
+                          action:({k})=>{
+
+                            k.SetState({stateName:"block"});
+                            k.group.crudGetBuild({crudName:"cr-item"}).Load_Reset({});
+                          }
+                        }]
+                      }
+                    ],
                 }
             },
             {modal:{parent:"prnt-md-unids",name:"md-unids"}},
@@ -298,7 +322,19 @@ function gp_item({parentName,itemEvents=[]}) {
                                 {name:"cancel",show:true},
                             ],
                         }
-                    ]
+                    ],
+                    events:[
+                      {
+                        name:"insertAfter",
+                        actions:[{
+                          action:({k})=>{
+
+                            k.SetState({stateName:"block"});
+                            k.group.crudGetBuild({crudName:"cr-item"}).Load_Reset({});
+                          }
+                        }]
+                      }
+                    ],
                 }
             },
             
@@ -1261,9 +1297,11 @@ class BuildPage extends ODD {
 
     #setGroupScriptNew({schema,mainModVisual,mainTotalVisual,schemaItems,schemaPays,userData,payTag,mainFieldTotal,itemFieldTotal,mainFieldDscto=null,mainFieldTotalDscto=null,mainFieldPay=null,objectInfo}){
     
+
         let u = this;
 
         var acc_pay = Access_Get(userData.access,"md-box-general");
+        var acc_add_item = (testNewSetAddItem ? testNewSetAddItemValue : Access_Get(userData.access,"md-items-sale-add"));
         if(testPay) acc_pay = testPaySet;
 
         //main crud
@@ -1297,7 +1335,7 @@ class BuildPage extends ODD {
                     tools:[
                         {name:"title",show:true,value:schema.record.title},
                         {name:"tutorial",show:true},
-                        {name:"load",show:true},
+                        {name:"load",show:false},
                         {name:"update",show:true},
                         {name:"cancel",show:true},
                     ]
@@ -1541,15 +1579,72 @@ class BuildPage extends ODD {
         });
     
         //items
+        this.#group.script.layers.push({
+          grid:{
+            parent:"stp-items",
+            items:[
+              (acc_add_item?{name:"prnt-new",col:3,name:"item-new",tipe:0,box:{tipe:5,value:"ingresar item",class:"btn btn-primary",update:()=>{u.#group.build.crudGetBuild({crudName:"cr-item"}).SetState({stateName:"new"})}}}:null),
+              (acc_add_item?{name:"prnt-item-md",col:9,tipe:0,box:{tipe:0}}:null),
+              {name:"prnt-items",col:12},
+            ],
+          }
+        });
+        
+
         var itemsCrud = getCrudType({
-            schema:schemaItems,userData,visualInfo:{fields:schemaItems.fields.filter(f=>f.tipe!="key").map(f=>{return{value:f.value,state:"edit",line0:true}})},
+            schema:schemaItems,userData,
+            visualInfo:{
+              fields:schemaItems.fields.filter(f=>f.tipe!="key").map(f=>{return{value:f.value,state:"edit",line0:true}})
+            },
             dependence:true,tipe:"table",state:"edit"
         });
+
+        //sale-add
+        if(acc_add_item){
+
+          this.#group.script.groups.push({
+            ...gp_item({
+              parentName:"prnt-item-md",
+              itemEvents:[
+                {
+                  name:"insertAfter",
+                  actions:[{
+                    action:({k})=>{
+
+                      console.log("insert after block cr-item",k);
+                      
+                      //k.SetState({stateName:"block"});
+                      u.#group.build.crudGetBuild({crudName:itemsCrud.name}).Load_Reset({});
+                      //k.SetState({stateName:"new"});
+                    }
+                  }]
+                },
+                {
+                  name:"updateAfter",
+                  actions:[{
+                    action:({k})=>{
+
+                      u.#group.build.crudGetBuild({crudName:itemsCrud.name}).Load_Reset({});
+                    }
+                  }]
+                }
+              ],
+            })
+          });
+          this.#group.script.conections.push({
+            event:"cnx",masterAction:"edit",
+            masterName:itemsCrud.name,
+            masterSelect:"sales_products-ID_PRODUCT",
+            maidName:"cr-item",
+            maidSelect:"ID_PRODUCT",
+          });
+          
+        }
 
         itemsCrud.line0 = true;
         itemsCrud.panels.forEach(pn=>{pn.fields.forEach(f=>{f.attributes=[{name:"class",value:"m-0 py-0 px-1"}]})});
 
-        itemsCrud.parent = "stp-items"; 
+        itemsCrud.parent = "prnt-items"; 
         itemsCrud.panels[0].h=600;
         itemsCrud.states.forEach(st=>{
             var toolInsert = st.tools.find(t=>t.name=="insert");
@@ -2461,6 +2556,9 @@ function getGroupBySchema({parentName,schema,userData}) {
 
 function getCrudMult({schemaMain,fields,tipe="table",filters=true,userData,eventEnd}) {
   
+  if(userData)console.log("ERROR IN CRUD MULT, no exist userData");
+  
+
   var crud = {
     tableMain:schemaMain.table,
     selects:[{table:schemaMain.table,field:schemaMain.fieldPrimary,primary:true}],
@@ -2547,24 +2645,42 @@ function getCrudMult({schemaMain,fields,tipe="table",filters=true,userData,event
 
           //load
           var fld = null;
-          if(sch_conect!=null){
+          if(f.load != null){
 
-            var loadSelectShow = sch_conect.selectShow? sch_conect.selectShow :"NAME";
-            fld = {
-              name:"ld-"+sch_conect.table,
-              tableMain:sch_conect.table,
-              selects:[
-                {table:sch_conect.table,field:sch_conect.fieldPrimary,as:"value"},
-                {table:sch_conect.table,field:loadSelectShow,as:"show"},
-              ],
-              conditions:[(sch_conect.company?{
+            fld = {...f.load};
+            if(sch_conect.company){
+
+              if(fld.conditions==null)fld.conditions=[];
+              fld.conditions.push({
+                before:(fld.conditions.length>0?" AND ":""),
                 table:sch_conect.table,
                 field:"ID_COMPANY",
                 inter:"=",
                 value:userData.company.id,
-              }:null)]
+              });
             }
-          }    
+          }
+          else
+          {
+            if(sch_conect!=null){
+
+              var loadSelectShow = sch_conect.selectShow? sch_conect.selectShow :"NAME";
+              fld = {
+                name:"ld-"+sch_conect.table,
+                tableMain:sch_conect.table,
+                selects:[
+                  {table:sch_conect.table,field:sch_conect.fieldPrimary,as:"value"},
+                  {table:sch_conect.table,field:loadSelectShow,as:"show"},
+                ],
+                conditions:[(sch_conect.company?{
+                  table:sch_conect.table,
+                  field:"ID_COMPANY",
+                  inter:"=",
+                  value:userData.company.id,
+                }:null)]
+              }
+            }
+          }
           if(fld) crud.loads.push(fld); 
 
           //select
@@ -5102,6 +5218,7 @@ function pageConfig_vehicles({}) {
                 schemaMain:sch_vehicles,
                 userData,tipe:"table",
                 fields:[
+                  {value:"customer",fields:["name"]},
                   {value:"placa"},
                   {value:"marca"},
                   {value:"modelo"},
@@ -5133,6 +5250,7 @@ function pageConfig_vehicles({}) {
                 schemaMain:sch_vehicles,
                 userData,tipe:"form",
                 fields:[
+                  {value:"customer",state:"edit"},
                   {value:"placa",state:"edit"},
                   {value:"marca",state:"edit"},
                   {value:"modelo",state:"edit"},
@@ -5261,7 +5379,22 @@ function pageConfig_ordenWork({}) {
                   {value:"receptor-customer",state:"edit",panel:"recep"},
                   {value:"receptor-user",state:"edit",panel:"recep"},
 
-                  {value:"vehicle",state:"edit",panel:"info"},
+                  {value:"vehicle",state:"edit",panel:"info",load:{
+                    name:"ld-vehicle",
+                    tableMain:sch_vehicles.table,
+                    selects:[
+                      {table:sch_vehicles.table,field:sch_vehicles.fieldPrimary,as:"value"},
+                      {sql:"CONCAT(items_vehicles.PLACA,' ',items_vehicles.MARCA) AS 'show'"},
+                      {table:sch_customers.table,field:sch_customers.fieldPrimary,as:"customer-id"},
+                    ],
+                    joins:[
+                      {
+                        main:{table:sch_vehicles.table,field:"ID_CUSTOMER"},
+                        join:{table:sch_customers.table,field:sch_customers.fieldPrimary},
+                        tipe:"LEFT",
+                      }
+                    ],
+                  }},
                   {value:"date_enter",state:"edit",panel:"info",col:6},
                   {value:"date-out",state:"edit",panel:"info",col:6},
                   {value:"fuel",state:"edit",panel:"info"},
@@ -5447,15 +5580,37 @@ function pageConfig_ordenWork({}) {
                     }
                   }],
                 },
-                /*{
-                  name:"modalSetActive",
+                {
+                  name:"boxUpdate",
                   actions:[{
-                    action:({active})=>{
+                    action:({field,k})=>{
 
-                      md_checkin_fm.SetActive({active});
+                      if(field.name=="vehicle"){
+
+                        var vehiResult = k.Loaded_GetLoadData({loadName:"ld-vehicle"}).result;
+                        var vehiValue = k.bodyGet().fieldGetValues({fieldName:"vehicle"})[0];
+                        
+                        var vehiCustomerID = null;
+                        var vehiInfo = vehiResult.find(rst=>rst.value==vehiValue);
+                        if(vehiInfo !=null) vehiCustomerID = vehiInfo["customer-id"];
+                        k.bodyGet().fieldSetValues({fieldName:"customer",values:[vehiCustomerID]});                       
+
+                      }
+
+                      if(field.name=="customer"){
+
+                        var vehiResult = k.Loaded_GetLoadData({loadName:"ld-vehicle"}).result;
+                        var customerId = k.bodyGet().fieldGetValues({fieldName:"customer"})[0];
+                        var vehixCustomer = vehiResult.filter(rst=>rst["customer-id"]==customerId);
+                        
+                        var options = vehixCustomer.length > 0 ? vehixCustomer.map(rst=>{return {value:rst.value,show:rst.show}}):[{value:"null",show:"no hay vehiculos asignados a este cliente"}];
+                        
+                        k.bodyGet().fieldSetOptions({fieldName:"vehicle",options});
+                      }
+
                     }
                   }]
-                },*/
+                },
                 {
                   name:"toolUpdate",
                   actions:[{
@@ -5596,7 +5751,7 @@ function pageConfig_ordenWork({}) {
             crud:{
               parent:"md-vehi",name:"cr-vehi",head:false,
               ...getCrudMult({
-                tipe:"form",schemaMain:sch_vehicles,filters:false,
+                tipe:"form",schemaMain:sch_vehicles,filters:false,userData,
                 fields:sch_vehicles.fields.map(f=>{return {value:f.value,state:"edit"}}),
               }),
               afterInsert:"block",
@@ -5621,6 +5776,19 @@ function pageConfig_ordenWork({}) {
                   ],
                 },
               ],
+              events:[{
+                name:"setStateAfter",
+                actions:[{
+                  action:({stateName,k})=>{
+
+                    if(stateName=="new"){
+
+                      var customer_id = build.groupGet().crudGetBuild({crudName:"cr-order"}).bodyGet().fieldGetValues({fieldName:"customer"})[0];
+                      if(customer_id) k.bodyGet().fieldSetValues({fieldName:"customer",values:[customer_id]});
+                    }
+                  }
+                }]
+              }],
             }
           }
         ],
