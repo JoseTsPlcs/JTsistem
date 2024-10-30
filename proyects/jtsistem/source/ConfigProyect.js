@@ -1,8 +1,8 @@
 
 const primaryShow = false;
 const ambient = 'dev';
-const test = false;
-const testNew = false;
+const test = true;
+const testNew = true;
 
 const testNewSetAddItem = false;
 const testNewSetAddItemValue = false;
@@ -1169,11 +1169,15 @@ var concepts = [
                             {value:"doc",state:"edit"},
                             {value:"comment",state:"edit"},
                             {value:"worker",state:"edit"},
+                            {value:"deliv",state:"edit"},
+                            {value:"deliv-zone",state:"edit"},
+                            {value:"deliv-dir",state:"edit"},
                         ],
                     },
                     mainTotalVisual:{
                         fields:[
                             {value:"totaldscto",state:"show"},
+                            {value:"deliv-cost",state:"edit"},
                             {value:"dscto",state:"edit"},
                             {value:"total",state:"show"},
                         ],
@@ -1269,6 +1273,26 @@ var concepts = [
                     //schema:sch_items,
                 },
             },
+        ],
+    },
+    {
+        name:"deliv",title:"delivery",icon:'<i class="bi bi-truck"></i>',
+        descripcion:"Modulo de delivery, asignar zonas de delivery, precios y reporte de deliverys.",
+        pages:[
+            {
+                name:"zone",title:"zonas de entrega",
+                descripcion:"Zonas donde se pueden realizar entregas",
+                buildPageConfig:{
+                    ...pageCofig_zones({}),
+                },
+            },
+            {
+                name:"deliverys",title:"deliverys",
+                descripcion:"Reporte de deliverys entregados, en proceso o pendientes",
+                buildPageConfig:{
+                    ...pageCofig_deliverys({}),
+                },
+            }
         ],
     },
     {

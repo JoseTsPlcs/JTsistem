@@ -345,6 +345,29 @@ const sch_users = {
     ],
 }
 
+//------delivery-----
+
+const sch_zones = {
+    table:"zones",record:{name:"zona de entrega",title:"zona de entrega"},
+    fieldPrimary:"ID_ZONE",
+    company:true,
+    loadName:"NAME",
+    fields:[
+        {
+            value:"name",name:"nombre",
+            tipe:"input",minWidth:150,
+            select:"NAME",access:true,
+            descripcion:"",
+        },
+        {
+            value:"price",name:"precio de delivery",
+            tipe:"money",
+            select:"precio_delivery",access:true,
+            descripcion:"",
+        },        
+    ],
+};
+
 //------items-----
 
 const sch_items = {
@@ -456,7 +479,7 @@ const sch_items = {
             ],
             select:"PRODUCCION_AUTOMATE",
             descripcion:"",
-        }
+        },
     ],
 }
 
@@ -1049,6 +1072,34 @@ const sch_sales = {
             select:"ID_RUC",access:"md-bills-rucs",
             tipe:"options",load:{...ld_rucs},
             descripcion:"razon social con la cual se emitio la venta",
+        },
+        {
+            value:"deliv",name:"delivery",tipe:"active",access:true,
+            select:"USEDELIV",
+            descripcion:"",
+        },
+        {
+            value:"deliv-zone",name:"zona de envio",tipe:"optionsSearch",access:true,
+            select:"ID_ZONE",
+            descripcion:"",conect:{schema:sch_zones,type:"edit"},
+            load:{
+                schema:sch_zones,
+                tableMain:sch_zones.table,
+                selects:[
+                    {table:sch_zones.table,field:sch_zones.fieldPrimary,as:"value"},
+                    {table:sch_zones.table,field:sch_zones.loadName,as:"show"},
+                ],
+            }
+        },
+        {
+            value:"deliv-cost",name:"costo de envio",tipe:"money",access:true,
+            select:"DELIVERY",
+            descripcion:"",
+        },
+        {
+            value:"deliv-dir",name:"direccion",tipe:"input",access:true,
+            select:"DIRECCION",
+            descripcion:"",
         },
 
     ],

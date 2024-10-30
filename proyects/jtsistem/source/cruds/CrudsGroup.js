@@ -1004,9 +1004,7 @@ class CrudsGroup extends ODD {
                         eventName:"updateAfter",
                         action:({})=>{
 
-                            console.log("UPDATE MAID SO RELOAD");
-                            
-                            u.crudGetBuild({crudName:cnx.masterName}).SetState({stateName:"reload"});
+                            //u.crudGetBuild({crudName:cnx.masterName}).SetState({stateName:"reload"});
                         }
                     });
                 });

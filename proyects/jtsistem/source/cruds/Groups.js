@@ -1295,7 +1295,7 @@ class BuildPage extends ODD {
         }
     }
 
-    #setGroupScriptNew({schema,mainModVisual,mainTotalVisual,schemaItems,schemaPays,userData,payTag,mainFieldTotal,itemFieldTotal,mainFieldDscto=null,mainFieldTotalDscto=null,mainFieldPay=null,objectInfo}){
+    #setGroupScriptNew({schema,mainModVisual,mainTotalVisual,schemaItems,schemaPays,userData,payTag,mainFieldTotal,itemFieldTotal,mainFieldDscto=null,mainFieldTotalDscto=null,mainFieldPay=null,objectInfo,moduloDeliv=false}){
     
 
         let u = this;
@@ -2045,65 +2045,70 @@ class BuildPage extends ODD {
 
       //tutorial
 
-      var mainCrudScript = this.#group.script.layers.filter(ly=>ly.crud!=null)[0].crud;
-      
-      var tutorialPlayed = false;
-      const playTut = ()=>{
+      var cruds = this.#group.script.layers.filter(ly=>ly.crud!=null);
+      if(cruds.length>0){
 
-        if(!tutorialPlayed){
-
-          PlayTutorialInPage({
-            group:k.#group.build,
-            pageData:i.pageData,
-            crudName:mainCrudScript.name,
-          });
-          tutorialPlayed = true;
-        }
-      }
-
-      if(mainCrudScript.stateStart == null || mainCrudScript.stateStart == "reload" || mainCrudScript.stateStart == "block"){
-
-        console.log("play tutorial delay");
+        var mainCrudScript = cruds[0].crud;
         
-        if(mainCrudScript.events == null) mainCrudScript.events = [];
-        mainCrudScript.events.push({
-          name:mainCrudScript.stateStart=="block"?"blockAfter":"printAfter",
-          actions:[{
-            action:()=>{
+        var tutorialPlayed = false;
+        const playTut = ()=>{
 
-              console.log("------play tutorial!!!");
-              
-              playTut();
-            }
-          }]
-        });
-      }
-      else playTut();
+          if(!tutorialPlayed){
 
-      //tutorial - actions
-      if(i.actionsActive==true){
+            PlayTutorialInPage({
+              group:k.#group.build,
+              pageData:i.pageData,
+              crudName:mainCrudScript.name,
+            });
+            tutorialPlayed = true;
+          }
+        }
 
-        var conectionMasterMaid = this.#group.script.conections.find(cnx=>cnx.masterName==mainCrudScript.name);
-        if(conectionMasterMaid.event=="cnx" && conectionMasterMaid.masterAction=="new"){
+        if(mainCrudScript.stateStart == null || mainCrudScript.stateStart == "reload" || mainCrudScript.stateStart == "block"){
 
-          if(mainCrudScript.events==null) mainCrudScript.events = [];
+          console.log("play tutorial delay");
+          
+          if(mainCrudScript.events == null) mainCrudScript.events = [];
           mainCrudScript.events.push({
-            name:"tutorialInsertEnd",
+            name:mainCrudScript.stateStart=="block"?"blockAfter":"printAfter",
             actions:[{
-              action:({})=>{
+              action:()=>{
 
-                setTimeout(()=>{
-
-                  var maidCrudBuild = u.#group.build.crudGetBuild({crudName:conectionMasterMaid.maidName});
-                  maidCrudBuild.tutorialPlay("insert");
-
-                },1000);
+                console.log("------play tutorial!!!");
+                
+                playTut();
               }
             }]
           });
         }
+        else playTut();
 
+        //tutorial - actions
+        if(i.actionsActive==true){
+
+          var conectionMasterMaid = this.#group.script.conections.find(cnx=>cnx.masterName==mainCrudScript.name);
+          if(conectionMasterMaid && conectionMasterMaid.event=="cnx" && conectionMasterMaid.masterAction=="new"){
+
+            if(mainCrudScript.events==null) mainCrudScript.events = [];
+            mainCrudScript.events.push({
+              name:"tutorialInsertEnd",
+              actions:[{
+                action:({})=>{
+
+                  setTimeout(()=>{
+
+                    var maidCrudBuild = u.#group.build.crudGetBuild({crudName:conectionMasterMaid.maidName});
+                    maidCrudBuild.tutorialPlay("insert");
+
+                  },1000);
+                }
+              }]
+            });
+          }
+
+        }
       }
+      
 
       //------
 
@@ -2556,7 +2561,7 @@ function getGroupBySchema({parentName,schema,userData}) {
 
 function getCrudMult({schemaMain,fields,tipe="table",filters=true,userData,eventEnd}) {
   
-  if(userData)console.log("ERROR IN CRUD MULT, no exist userData");
+  if(!userData)console.log("ERROR IN CRUD MULT, no exist userData");
   
 
   var crud = {
@@ -2961,15 +2966,33 @@ function script_bills({userData,build}){
                     ],
                 }
                 ],
-                events:[{
-                name:"boxUpdate",
-                actions:[{
-                    action:({k,field,y})=>{
-    
-                    fieldCopyClipboard({crudBuild:k,field,y});
-                    }
-                }]
-                }],
+                events:[
+                  {
+                    name:"boxUpdate",
+                    actions:[{
+                        action:({k,field,y})=>{
+        
+                        fieldCopyClipboard({crudBuild:k,field,y});
+                        }
+                    }]
+                  },
+                  {
+                    name:"printBefore",
+                    actions:[{
+                      action:({result})=>{
+
+                        console.log("PRINT BEFORE",result);
+                        
+                        result.forEach(rst => {
+                          
+                          rst["PRICE_UNIT"] = parseFloat(rst["PRICE_UNIT"]) / 1.18;
+                        });
+
+                        return {data:result}
+                      }
+                    }]
+                  },
+                ],
             }
             }
         ],
