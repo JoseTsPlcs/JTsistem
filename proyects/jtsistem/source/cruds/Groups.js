@@ -2966,33 +2966,15 @@ function script_bills({userData,build}){
                     ],
                 }
                 ],
-                events:[
-                  {
-                    name:"boxUpdate",
-                    actions:[{
-                        action:({k,field,y})=>{
-        
-                        fieldCopyClipboard({crudBuild:k,field,y});
-                        }
-                    }]
-                  },
-                  {
-                    name:"printBefore",
-                    actions:[{
-                      action:({result})=>{
-
-                        console.log("PRINT BEFORE",result);
-                        
-                        result.forEach(rst => {
-                          
-                          rst["PRICE_UNIT"] = parseFloat(rst["PRICE_UNIT"]) / 1.18;
-                        });
-
-                        return {data:result}
-                      }
-                    }]
-                  },
-                ],
+                events:[{
+                name:"boxUpdate",
+                actions:[{
+                    action:({k,field,y})=>{
+    
+                    fieldCopyClipboard({crudBuild:k,field,y});
+                    }
+                }]
+                }],
             }
             }
         ],
