@@ -97,6 +97,12 @@ var modulos = [
         recordName:"vehiculo",
         show:"modulo de taller",
         access:[],
+    },
+    {
+        value:"property",
+        recordName:"inmbueble",
+        show:"modulo de inmuebles",
+        access:[],
     }
 ];
 
@@ -1124,7 +1130,7 @@ var script_items = {
       
 }
 
-var concepts = [  
+var concepts = [
     {
         name:"taller",title:"taller",icon:'<i class="bi bi-wrench-adjustable"></i>',
         descripcion:'',

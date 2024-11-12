@@ -2189,8 +2189,9 @@ const invoiceData = {
 };
 */
 async function generateInvoicePDF(invoiceData) {
+    
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('landscape', 'pt', 'a4'); // Mantener tamaño A4 horizontal
+    const pdf = new jsPDF('landscape', 'pt', 'a4');
 
     const margin = 40;
     const startY = 50;
@@ -2202,7 +2203,6 @@ async function generateInvoicePDF(invoiceData) {
     const fontSizeHeader = 20 * 0.85;  // Incremento del 15%
     
     // Logo
-    
     const logoImg = new Image();
     logoImg.src = invoiceData.companyLogo;
     logoImg.onload = function() {
@@ -2230,9 +2230,6 @@ async function generateInvoicePDF(invoiceData) {
 
         //vehicle Details
         if(invoiceData.vehicle!=null){
-
-            pdf.setFontSize(fontSizeNormal);
-            pdf.setTextColor(100, 100, 100);
             pdf.text(`Placa: ${invoiceData.vehicle.placa}`, margin+250, startY + 2 * lineHeight);
             pdf.text(`Marca: ${invoiceData.vehicle.marca}`, margin+250, startY + 3 * lineHeight);
             pdf.text(`Modelo: ${invoiceData.vehicle.modelo}`, margin+250, startY + 4 * lineHeight);
@@ -2241,28 +2238,29 @@ async function generateInvoicePDF(invoiceData) {
             pdf.text(`Año: ${invoiceData.vehicle.anio}`, margin+250, startY + 7 * lineHeight);
             pdf.text(`Color: ${invoiceData.vehicle.color}`, margin+250, startY + 8 * lineHeight);   
         }
-        
-        // Company Box
-        const companyBoxWidth = 200;
-        const companyBoxHeight = 6 * lineHeight;
-        const companyBoxX = pageWidth - margin - companyBoxWidth - logoWidth - 10;
-        const companyBoxY = startY + 2 * lineHeight - 50;
-        pdf.setFillColor(230, 230, 230);
-        pdf.rect(companyBoxX, companyBoxY, companyBoxWidth, companyBoxHeight, 'F');
-        pdf.setTextColor(40, 40, 40);
-        pdf.text(`Razón Social: ${invoiceData.companyName}`, companyBoxX + 10, startY + 2.5 * lineHeight - 50);
-        pdf.text(`RUC: ${invoiceData.companyRUC}`, companyBoxX + 10, startY + 3.5 * lineHeight - 50);
-        pdf.text(`Dirección: ${invoiceData.companyAddress}`, companyBoxX + 10, startY + 4.5 * lineHeight - 50);
-        pdf.text(`Teléfono: ${invoiceData.companyPhone}`, companyBoxX + 10, startY + 5.5 * lineHeight - 50);
 
+         // Company Box
+         const companyBoxWidth = 200;
+         const companyBoxHeight = 6 * lineHeight;
+         const companyBoxX = pageWidth - margin - companyBoxWidth - logoWidth - 10;
+         const companyBoxY = startY + 2 * lineHeight - 50;
+         pdf.setFillColor(230, 230, 230);
+         pdf.rect(companyBoxX, companyBoxY, companyBoxWidth, companyBoxHeight, 'F');
+         pdf.setTextColor(40, 40, 40);
+         pdf.text(`Razón Social: ${invoiceData.companyName}`, companyBoxX + 10, startY + 2.5 * lineHeight - 50);
+         pdf.text(`RUC: ${invoiceData.companyRUC}`, companyBoxX + 10, startY + 3.5 * lineHeight - 50);
+         pdf.text(`Dirección: ${invoiceData.companyAddress}`, companyBoxX + 10, startY + 4.5 * lineHeight - 50);
+         pdf.text(`Teléfono: ${invoiceData.companyPhone}`, companyBoxX + 10, startY + 5.5 * lineHeight - 50);
+        
         // Table Headers
         const precioUnitarioWidth = 480 + 50;
         const precioTotalWidth = 570 + 100;
-
+        
         pdf.setFillColor(230, 230, 230);
         pdf.rect(margin, startY + 10 * lineHeight, usableWidth, lineHeight, 'F');
         pdf.setTextColor(0, 0, 0);
         pdf.setFontSize(fontSizeNormal);
+
         pdf.text('Detalle', margin + 5, startY + 10.7 * lineHeight);
         pdf.text('Tipo', margin + 250, startY + 10.7 * lineHeight);
         pdf.text('Cantidad', margin + 330, startY + 10.7 * lineHeight);
@@ -2272,9 +2270,31 @@ async function generateInvoicePDF(invoiceData) {
 
         // Table Content
         let positionY = startY + 11.5 * lineHeight;
+        let itemsPerPage = 15;
+        let itemCount = 0;
         let totalServices = 0;
         let totalProducts = 0;
+
         invoiceData.items.forEach(item => {
+            // Check if we need a new page
+            if (itemCount > 0 && itemCount % itemsPerPage === 0) {
+                pdf.addPage();
+                var headPositionY = startY + 1 * lineHeight;
+                positionY = startY + 2 * lineHeight; // Reset Y position for the new page
+                
+                // Re-add table headers on the new page
+                pdf.setFillColor(230, 230, 230);
+                pdf.rect(margin, headPositionY-lineHeight*0.6, usableWidth, lineHeight, 'F');
+                pdf.setTextColor(0, 0, 0);
+                pdf.text('Detalle', margin + 5, headPositionY);
+                pdf.text('Tipo', margin + 250, headPositionY);
+                pdf.text('Cantidad', margin + 330, headPositionY);
+                pdf.text('Unidad', margin + 410, headPositionY);
+                pdf.text('Precio Unitario', margin + precioUnitarioWidth, headPositionY);
+                pdf.text('Precio Total', margin + precioTotalWidth, headPositionY);
+            }
+
+            // Add item details
             pdf.setTextColor(100, 100, 100);
             pdf.text(item.detail, margin + 5, positionY);
             pdf.text(item.type, margin + 250, positionY);
@@ -2283,6 +2303,7 @@ async function generateInvoicePDF(invoiceData) {
             pdf.text(`S/. ${item.unitPrice.toFixed(2)}`, margin + precioUnitarioWidth, positionY);
             pdf.text(`S/. ${item.totalPrice.toFixed(2)}`, margin + precioTotalWidth, positionY);
             positionY += lineHeight;
+            itemCount++;
 
             if (item.type === 'servicio') {
                 totalServices += item.totalPrice;
@@ -2294,7 +2315,7 @@ async function generateInvoicePDF(invoiceData) {
         const TotalWidth = 100;
         var dscto = invoiceData.dscto;
 
-        // Total
+        // Totales
         pdf.setTextColor(0, 0, 0);
         pdf.setFontSize(fontSizeNormal);
         pdf.text(`Total Productos: S/. ${totalProducts.toFixed(2)}`, margin + precioUnitarioWidth + TotalWidth, positionY + lineHeight);
@@ -2304,14 +2325,9 @@ async function generateInvoicePDF(invoiceData) {
         pdf.text(`Total: S/. ${((totalProducts + totalServices)*(1-dscto/100)).toFixed(2)}`, margin + precioUnitarioWidth + TotalWidth, positionY + 5 * lineHeight);
         
         // Open PDF in a new window
+        pdf.save(invoiceData.title + "-" + invoiceData.invoiceNumber + ".pdf");
         window.open(pdf.output('bloburl'), '_blank');
-
-        // Open PDF in New Tab
-        //const pdfDataUri = pdf.output('datauristring');
-        //const newTab = window.open();
-        //newTab.document.body.innerHTML = '<embed width="100%" height="100%" src="' + pdfDataUri + '" type="application/pdf">';
     };
-    
 }
 
 /*
