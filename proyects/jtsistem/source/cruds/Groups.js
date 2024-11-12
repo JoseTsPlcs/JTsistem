@@ -1755,7 +1755,7 @@ class BuildPage extends ODD {
         }
     }
 
-    #setGroupScriptControl({pageData,schema,mainControlVisual,mainDetailVisual,itemDetailVisual,schemaItems,userData,page,filters=[],fieldTotalName}){
+    #setGroupScriptControl({pageData,schema,mainControlVisual,mainDetailVisual,itemDetailVisual,schemaItems,userData,page,filters=[],fieldTotalName,eventPdf}){
 
         //main
         var mainCrud = getCrudType({
@@ -1790,8 +1790,17 @@ class BuildPage extends ODD {
         var showCrud = getCrudType({
             schema,type:"show",visualInfo:mainDetailVisual,
             userData,visual:"control-detail",
-            tipe:"form",state:"show",dependence:true,modal:true}
-        );
+            tipe:"form",state:"show",dependence:true,modal:true,
+            eventPdf,
+        });
+        showCrud.events.push({
+          name:"userData",
+          actions:[{action:()=>{return userData;}}]
+        });
+        showCrud.events.push({
+          name:"getGroupBuild",
+          actions:[{action:()=>{return this.#group.build;}}]
+        });
 
         this.#addCrudToGrid({crud:showCrud,modal:true});
         this.#group.script.conections.push({
@@ -1817,6 +1826,7 @@ class BuildPage extends ODD {
             tipe:"table",dependence:true
         });
         itemsCrud.parent = "prnt-cnx0";
+        itemsCrud.panels[0].fields.forEach(f=>f.attributes=[{name:"class",value:"m-0 py-0 px-1"}/*,{name:"style",value:"min-width: 200px"}*/]);
         
         console.log(showCrud,itemsCrud);
         
@@ -2194,7 +2204,7 @@ function getInfoOfSchema({schema,userData,type="select"}) {
     return info;
 }
 
-function getCrudType({schema,userData,visualInfo=null,tipe="table",state="edit",dependence=false,modal=false,fieldTotalName=null,line0=false}) {
+function getCrudType({schema,userData,visualInfo=null,tipe="table",state="edit",dependence=false,modal=false,fieldTotalName=null,line0=false,eventPdf}) {
 
     var total = true;
     if(tipe=="form" || dependence==true) total = false;
@@ -2219,6 +2229,7 @@ function getCrudType({schema,userData,visualInfo=null,tipe="table",state="edit",
         panels:[],
         conditions:[],
         inserts:[],
+        events:[],
     };
 
     var panelInfo = {tipe,title:"informacion",fields:[]};
@@ -2338,6 +2349,7 @@ function getCrudType({schema,userData,visualInfo=null,tipe="table",state="edit",
                 {name:"reload",show:useFilters},
                 {name:"update",show:(dependence&&state=="edit"&&modal)},
                 {name:"cancel",show:modal},
+                {name:"pdf",show:eventPdf!=null},
             ],
         },
         {
@@ -2355,6 +2367,19 @@ function getCrudType({schema,userData,visualInfo=null,tipe="table",state="edit",
         },
     ];
     if(crud.panels.length==1&&crud.panels[0].tipe=="form") crud.panels[0].head=false;
+
+    if(eventPdf!=null){
+
+      crud.events.push({
+        name:"toolUpdate",
+        actions:[{
+          action:({k,tool})=>{
+
+            if(tool.name=="pdf") eventPdf({k});
+          }
+        }]
+      });
+    }
 
     return crud;
 
@@ -3570,6 +3595,47 @@ function script_box({userData,build}) {
 
 function pageConfig_saleControls({filters,dateFilter=true}) {
   
+
+  const eventPdf = ({k})=>{
+
+    var userData = k.CallEvent({name:"userData"});
+    var dataMain = k.Reload_GetData();
+    var crudList = k.CallEvent({name:"getGroupBuild"}).crudGetBuild({crudName:"cr-items"});
+    var dataList = crudList.Reload_GetData();
+
+    console.log("DOWLAND PDF OF SALE!!!",dataMain,dataList);
+
+    var invoiceData = {
+    title:"venta",
+    invoiceNumber: '001-001-000000'+dataMain[0]['ID_SALE'],
+    invoiceDate: dataMain[0]['sales-DATE_EMMIT'],
+    companyName: userData.company.nameReal,
+    companyRUC: userData.company.ruc,
+    companyAddress: userData.company.direccion,
+    companyPhone: userData.company.telf,
+    companyLogo:userData.company.logo,
+    customerName: dataMain[0]['customers-NAME'],
+    customerDocumentType: 'dni',
+    customerDocumentNumber: dataMain[0]['customers-NRO_DOCUMENT'],
+    customerPhone: dataMain[0]['customers-PHONE'],
+    customerAddress: dataMain[0]['customers-DIRECCION'],
+    items: [
+        { detail: 'Servicio de Consultoría', type: 'Servicio', quantity: 1, unitPrice: 150, totalPrice: 150 },
+    ],
+    dscto:0,
+    };
+
+    var itemOptions = crudList.Loaded_GetLoadOptions({loadName:"ld-item",loadShow:"show"});
+    
+
+    invoiceData.items = dataList.map(d=>{
+
+      return {detail:itemOptions.find(op=>op.value==d["sales_products-ID_PRODUCT"])["show"],type:"",quantity:d["sales_products-CANT"],unitPrice:parseFloat(d["sales_products-PRICE_UNIT"]),totalPrice:parseFloat(d["sales_products-PRICE_TOTAL"])};
+    })
+
+    generateInvoicePDF(invoiceData);
+  }
+
   return {
     type:"control",
     schema:sch_sales,
@@ -3607,6 +3673,8 @@ function pageConfig_saleControls({filters,dateFilter=true}) {
 
     page:"sale-new",
     fieldTotalName:"pay",
+
+    eventPdf,
   }
 }
 
