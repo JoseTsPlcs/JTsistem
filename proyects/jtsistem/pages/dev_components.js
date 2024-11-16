@@ -10,7 +10,7 @@ var pageData = {
 }
 
 
-switch ("crud") {
+switch ("layerCrud") {
 
     case "window":
         
@@ -813,6 +813,92 @@ switch ("crud") {
                     maidSelect:"ID_PAY",
                 }
             ],*/
+        });
+
+    break;
+
+    case "layerCrud":
+
+        var group = new CrudsGroup({
+            userData,pageData,
+            layers:[
+                {
+                    grid:{
+                        items:[
+                            {name:"prnt-main",col:4},
+                            {name:"prnt-items",col:8},
+                        ],
+                    }
+                },
+                {
+                    crudBody:{
+                        parent:"prnt-main",
+                        title:"venta",
+                        schema:sch_sales,
+                        panels:[
+                            {
+                                title:"main",tipe:"form",
+                                fieldsSet:[
+                                    {value:"emmit",state:"edit"},
+                                    {value:"status",state:"edit"},
+                                    {value:"pay",state:"edit"},
+                                    {value:"customer",state:"edit"},
+                                    {value:"doc",state:"edit"},
+                                ],
+                            }
+                        ],
+                    }
+                },
+                {
+                    crudBody:{
+                        parent:"prnt-items",title:"lista de productos",
+                        schema:sch_sales_products,
+                        panels:[
+                            {
+                                tipe:"table",
+                                fieldsSet:[
+                                    {value:"item",state:"edit"},
+                                    {value:"cant",state:"edit"},
+                                    {value:"priceUnit",state:"edit"},
+                                    {value:"priceTotal",state:"edit"},
+                                ],
+                            }
+                        ],
+                    }
+                },
+                {
+                    crudBrain:{
+                        joins:[
+                            {
+                                crudName:"cr-sale",
+                                field:"ID_SALE",
+                            },
+                            {
+                                crudName:"cr-items",
+                                field:"ID_SALE",
+                            },
+                        ],
+                        events:[
+                            {
+                                name:"state-new",
+                                action:{
+                                    //
+                                }
+                            },
+                            {
+                                name:"state-reload",
+                                params:[
+                                    {name:"id_sale"},
+                                ],
+                                action:{
+                                    //reload condition sale
+                                    //reload condition items
+                                }
+                            }
+                        ],
+                    }
+                }
+            ],
         });
 
     break;

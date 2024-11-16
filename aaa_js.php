@@ -25,19 +25,17 @@
   include $srcPathReturn.'libs/case-1.0.1/case.php';
 
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/Constans.js"></script>';
-  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/cruds/schList.js"></script>';
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ListOfSchemas.js"></script>';
 
-  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/md-sales.js"></script>';
-  
-
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ListOfPageBuild.js"></script>';
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ListOfPaginas.js"></script>';
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ListOfConections.js"></script>';
 
-  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/cruds/crudsBase.js"></script>';
-  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/cruds/CrudsGroup.js"></script>';
-  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/cruds/Groups.js"></script>';
-  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ListOfForms.js"></script>';
-  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/LoadPage.js"></script>';
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/CrudsGroup.js"></script>';
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/BuildPage.js"></script>';
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ListOfGroups.js"></script>';
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/Admin.js"></script>';
+  echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/Usefull-Pdf.js"></script>';
 
   
   echo '<script src="'.$srcPathReturn.'proyects/jtsistem/source/ConfigProyect.js"></script>';

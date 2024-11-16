@@ -686,366 +686,8 @@ function TutorialDescripcion({boxTipe=0,descripcion,action,fieldName="",recordNa
     return dsc;
 }
 
-//-----
-
-
-function BuildCrudsOfPage({userData,pageData}) {
-    
-    var item = null;
-    var pageInfo = null;
-    items.forEach(itm => {
-        
-        itm.pages.forEach(pg => {
-           
-            if(pg.name==pageData.name){
-
-                item = itm;
-                pageInfo = pg;
-            }
-        });
-    });
-    
-    if(item && pageInfo){
-
-        var layers = [
-            {
-                grid:{
-                    parent:pageData.body,
-                    items:[],
-                }
-            },
-        ];
-        var conections = [];
-
-        //main
-        layers[0].grid.items.push({name:"prnt-main",col:12});
-        var mainCrud = crudScriptListGet({item,userData});
-        mainCrud.parent = "prnt-main";
-        layers.push({crud:mainCrud});
-        
-        //main detail
-        layers[0].grid.items.push({name:"prnt-detail",col:12});
-        layers.push({modal:{parent:"prnt-detail",name:"md-detail",size:"xl"}});
-
-        var detailCrud = crudScriptDetailGet({item,userData});
-        detailCrud.parent = "md-detail";
-        layers.push({crud:detailCrud});
-
-        conections.push({
-            event:"cnx",masterAction:"edit",
-            masterName:mainCrud.name,
-            masterSelect:item.schema.fieldPrimary,
-            maidName:detailCrud.name,
-            maidSelect:item.schema.fieldPrimary,
-        });
-
-        //conections
-        item.schema.fields.filter(f=>f.conect!=null&&f.conect.type=="edit").forEach(f=>{
-
-            if(f.conect.panels==null)console.log(f.conect);
-            
-
-            layers[0].grid.items.push({name:"pnt-detail"+f.value,col:12});
-            layers.push({modal:{parent:"pnt-detail"+f.value,name:"md-detail"+f.value}});
-            
-            var conectCrud = crudScriptDetailGet({item:{value:"item",schema:f.conect.schema},userData});
-            conectCrud.name="cr-detail-"+f.value;
-            conectCrud.parent = "md-detail"+f.value;
-            layers.push({crud:conectCrud});
-
-            conections.push({
-                event:"formForm",
-                masterFieldName:f.value,
-                masterName:detailCrud.name,
-                maidSelect:f.conect.schema.fieldPrimary,
-                maidName:conectCrud.name,
-            });
-
-        });
-        
-        var group = new CrudsGroup({
-            userData,pageData,
-            parent:pageData.body,
-            layers,
-            conections,
-        });
-
-        PlayTutorialInPage({group,pageData});
-    }
-}
-
-function crudScriptGetField({field,box}) {
-    
-    return {
-        name:field.value,
-        title:field.name,
-        box:{...box,options:field.options},
-        select:field.select,col:field.col,
-    }
-}
-
-function crudScriptListGet({schema,userData}) {
-    
-    var crud = {
-        name:"cr-"+schema.recordName+"s",title:"lista de " + schema.recordName+"s",
-        recordName:schema.recordName,schema,
-        tableMain:schema.table,
-        selects:[],
-        joins:[],
-        panels:[{
-            tipe:"table",
-            fields:[],
-        }],
-        filters:[],
-    }
-
-    schema.fields.filter(f=>f.detail==null||f.detail==0).forEach(f=>{
-
-            
-        if(f.conect==null){
-
-            var selectAs = schema.table + "-" + f.select;
-            var ftype = fieldTypeGet({tipe:f.tipe});
-
-            //selects
-            crud.selects.push({
-                table:schema.table,
-                field:f.select,
-                as:selectAs,
-            });
-
-            //fields
-            crud.panels[0].fields.push({
-                ...crudScriptGetField({field:f,box:ftype.show.box}),
-                select:selectAs,
-            });
-
-            //filters
-            crud.filters.push({
-                ...crudScriptGetField({field:f,box:ftype.filter.box}),
-                select:{
-                    table:schema.table,
-                    field:f.select,
-                }
-            });
-        }
-        else
-        {
-            //joins
-            var joinAdd = {
-                main:{table:schema.table,field:f.select},
-                join:{table:f.conect.schema.table,field:f.conect.schema.fieldPrimary},
-                tipe:"LEFT",
-            };
-            if(!crud.joins.find(jn=>jn.join.table==joinAdd.join.table)){
-
-                crud.joins.push(joinAdd);
-            }                
-            
-            f.conect.schema.fields.filter(fc=>fc.detail==0).forEach(fc=>{
-
-                //select
-                var selectAs = f.conect.schema.table + "-" + fc.select;
-                var ftype = fieldTypeGet({tipe:fc.tipe});
-
-                crud.selects.push({
-                    table:f.conect.schema.table,
-                    field:fc.select,
-                    as:selectAs,
-                });
-
-                //fields
-                crud.panels[0].fields.push({
-                    ...crudScriptGetField({field:fc,box:ftype.show.box}),
-                    title:f.name+" "+fc.name,
-                    select:selectAs,
-                });
-
-                //filters
-                crud.filters.push({
-                    ...crudScriptGetField({field:fc,box:ftype.filter.box}),
-                    title:f.name+" "+fc.name,
-                    select:{
-                        table:f.conect.schema.table,
-                        field:fc.select,
-                    }
-                });
-            });
-        }
-    });
-
-    return crud;
-}
-
-function crudScriptDetailGet({schema,userData}) {
- 
-    var crud = {
-        title:schema.recordName,schema:schema,recordName:schema.recordName,
-        name:"cr-"+schema.table,
-        tableMain:schema.table,
-        loads:[],
-        selects:[],
-        conditions:[],
-        inserts:[],
-        states:[
-            {
-                name:"reload",
-                tools:[
-                    {name:"tutorial",show:true},
-                    {name:"update",show:true},
-                    {name:"cancel",show:true},
-                ],
-            },
-            {
-                name:"new",
-                tools:[
-                    {name:"tutorial",show:true},
-                    {name:"insert",show:true},
-                    {name:"cancel",show:true},
-                ],
-            }
-        ],
-    };
-
-    if(schema.company){
-        
-        crud.conditions.push({
-            table:schema.table,
-            field:"ID_COMPANY",
-            inter:"=",
-            value:userData.company.id,
-        });
-        crud.inserts.push({
-            field:"ID_COMPANY",
-            value:userData.company.id,
-        });
-    }
-
-    crud.panels = [...(schema.panels?schema.panels:[]),{head:false,name:null}].map(p=>{
-
-        var panelInfo = {
-            ...p,tipe:"form",
-            fields:[],
-        };
-        
-        schema.fields.filter(f=>f.panel==p.name).forEach(f=>{
-
-            var selectAs = schema.table +"-"+ f.select;
-
-            //selects
-            crud.selects.push({
-                table:schema.table,
-                field:f.select,
-                as:selectAs,
-            });
-
-            //loads
-            var loadName = null;
-            if(f.conect!=null){
-
-                loadName = "ld-"+f.conect.schema.table;
-                crud.loads.push({
-                    name:loadName,
-                    tableMain:f.conect.schema.table,
-                    selects:[
-                        {table:f.conect.schema.table,field:f.conect.schema.fieldPrimary,as:"value"},
-                        {table:f.conect.schema.table,field:f.conect.schema.fields.find(fld=>fld.detail==0).select,as:"show"},
-                    ],
-                    conditions:[(f.conect.schema.company?{
-                        table:f.conect.schema.table,
-                        field:"ID_COMPANY",
-                        inter:"=",
-                        value:userData.company.id,
-                    }:null)],
-                });
-            }
-
-            //fields
-            panelInfo.fields.push({
-                ...crudScriptGetField({field:f,box:fieldTypeGet({tipe:f.tipe}).edit.box}),
-                select:selectAs,
-                load:(loadName?{name:loadName,value:"value",show:"show"}:null),
-            });
-        });
-
-        return panelInfo;
-    });
-    crud.panels = crud.panels.filter(p=>p.fields!=null&&p.fields.length>0);
-
-    //conections
-    if(schema.conections && schema.conections.length>0){
-
-        crud.panels.push({
-            title:"conecciones",head:true,
-            tipe:"form",col:12,
-            fields:[{
-                name:"prnt-conections",
-                tipe:2,box:{tipe:0,class:"w-100 m-0 p-0"},
-            }],
-        });
-    }
-
-    return crud;
-}
-  
-function BuildCruds({schema,type="new",userData,pageData}) {
-    
-    var layers = [
-        {
-            grid:{
-                parent:pageData.body,
-                items:[],
-            }
-        },
-    ];
-    var conections = [];
-
-    //main
-    layers[0].grid.items.push({name:"prnt-main",col:12});
-    var mainCrud = crudScriptBySchema({schema,type:"form",userData,pageData});
-    mainCrud.parent = "prnt-main";
-    layers.push({crud:mainCrud});
-
-    //conections
-    schema.conections.forEach(cnx => {
-        
-        var parentName = "prnt-"+cnx.schema.table;
-        layers[0].grid.items.push({name:parentName,col:12});
-        var joinCrud = crudScriptBySchema({schema:cnx.schema,type:"list",userData,pageData});
-        joinCrud.parent = parentName;
-        layers.push({crud:joinCrud});
-
-        conections.push({
-            event:"cnx",
-            masterName:mainCrud.name,
-            masterSelect:schema.fieldPrimary,
-            maidName:joinCrud.name,
-            maidSelect:schema.fieldPrimary,
-        });
-    });
-    
-
-    var group = new CrudsGroup({
-        userData,pageData,
-        parent:pageData.body,
-        layers,
-        conections,
-    });
-
-    PlayTutorialInPage({group,pageData});
-    
-}
-
 
 //--------concepts-------
-
-const pagesTypesData = [
-    {name:"new",title:"[registro] nuevo"},
-    {name:"control",title:"control de [registro]s"},
-    {name:"list",title:"[registro]s"},
-    {name:"simple",title:"[registro]s"},
-    {name:"free",title:""},
-];
 
 var script_items = {
     layers:[
@@ -1085,49 +727,48 @@ var script_items = {
             }]
           }
         }
-      ],
-      conections:[
-        {
-          event:"cnx",
-          masterName:"cr-items",masterAction:"edit",
-          masterSelect:"ID_PRODUCT",
-          maidName:"cr-item",
-          maidSelect:"ID_PRODUCT",
-        }
-      ],
-      groups:[
-        {
-          ...gp_item({
-            parentName:"item",
-            itemEvents:[
-              {
-                name:"filterItem",
-                actions:[{
-                  action:({k})=>{
-                    
-                    var cr_item = k.group.crudGetBuild({crudName:"cr-item"});
-                    console.log(cr_item);
-                    
-                    var recipeShow = cr_item.CallEvent({name:"recipeShowGet"});
-                    var cr_recipe = k.group.crudGetBuild({crudName:"cr-recipe-inputs"});
-                    cr_recipe.tutorialSetBlock({block:!recipeShow});
-                  }
-                }]
-              },
-              {
-                name:"updateAfter",
-                actions:[{
-                  action:({k})=>{
+    ],
+    conections:[
+    {
+        event:"cnx",
+        masterName:"cr-items",masterAction:"edit",
+        masterSelect:"ID_PRODUCT",
+        maidName:"cr-item",
+        maidSelect:"ID_PRODUCT",
+    }
+    ],
+    groups:[
+    {
+        ...gp_item({
+        parentName:"item",
+        itemEvents:[
+            {
+            name:"filterItem",
+            actions:[{
+                action:({k})=>{
+                
+                var cr_item = k.group.crudGetBuild({crudName:"cr-item"});
+                console.log(cr_item);
+                
+                var recipeShow = cr_item.CallEvent({name:"recipeShowGet"});
+                var cr_recipe = k.group.crudGetBuild({crudName:"cr-recipe-inputs"});
+                cr_recipe.tutorialSetBlock({block:!recipeShow});
+                }
+            }]
+            },
+            {
+            name:"updateAfter",
+            actions:[{
+                action:({k})=>{
 
-                    k.group.crudGetBuild({crudName:"cr-items"}).SetState({stateName:"reload"});
-                  }
-                }]
-              }
-            ],
-          }),
-        }
-      ],
-      
+                k.group.crudGetBuild({crudName:"cr-items"}).SetState({stateName:"reload"});
+                }
+            }]
+            }
+        ],
+        }),
+    }
+    ],    
 }
 
 var concepts = [
@@ -1140,7 +781,7 @@ var concepts = [
                 record:{title:"orden de trabajo",titleMult:"ordenes de trabajos"},
                 descripcion:" ",access:"md-vehicle-general",
                 buildPageConfig:{
-                    ...pageConfig_ordenWork({}),
+                    ...pageBuildConfig_ordenWork({}),
                 }
             },
             {
@@ -1148,7 +789,7 @@ var concepts = [
                 record:{title:"vehiculo",titleMult:"vehiculos"},access:"md-vehicle-general",
                 descripcion:" ",
                 buildPageConfig:{
-                    ...pageConfig_vehicles({}),
+                    ...pageBuildConfig_vehicles({}),
                 }
             },
         ],
@@ -1158,106 +799,47 @@ var concepts = [
         descripcion:`Acceso al módulo para gestionar ventas, donde se pueden registrar nuevas ventas, modificar existentes y consultar el historial.`,
         pages:[
             {
-                name:"sale-new",title:"venta nueva",
-                actions:["insert"],
-                record:{title:"venta nueva",titleMult:"ventas nuevas"},
-                attributeTitle:"nueva",
-                descripcion:"Página donde se puede registrar una nueva venta. Permite seleccionar los productos o servicios, ingresar detalles del cliente, aplicar descuentos, y definir el método de pago.",
-                buildPageConfig:{
-                    type:"new",
-                    schema:sch_sales,
-                    mainModVisual:{
-                        fields:[
-                            {value:"emmit",state:"edit"},
-                            {value:"status",state:"edit"},
-                            {value:"pay",state:"edit"},
-                            {value:"customer",state:"edit"},
-                            {value:"doc",state:"edit"},
-                            {value:"comment",state:"edit"},
-                            {value:"worker",state:"edit"},
-                        ],
-                    },
-                    mainTotalVisual:{
-                        fields:[
-                            {value:"totaldscto",state:"show"},
-                            {value:"dscto",state:"edit"},
-                            {value:"total",state:"show"},
-                        ],
-                    },
-                    objectInfo:{
-                        schema:sch_vehicles,
-                        name:"vehicle",title:"vehiculo",
-                        load:{
-                            tableMain:sch_vehicles.table,
-                            selects:[
-                                {table:sch_vehicles.table,field:sch_vehicles.fieldPrimary,as:"value"},
-                                {table:sch_vehicles.table,field:"PLACA",as:"show"},
-                            ],
-                        }
-                    },
-
-                    schemaItems:sch_sales_products,
-                    schemaPays:sch_sales_pays,
-                    payTag:"venta",
-                    itemFieldTotal:"priceTotal",
-                    mainFieldTotal:"total",
-                    mainFieldDscto:"dscto",
-                    mainFieldTotalDscto:"totaldscto",
-                    mainFieldPay:"pay",
-                },
+                ...pgConfig_SaleNew({}),
             },
             {
-              name:"sale-day",
-              title:"ventas del día",actions:["see","search","update"],
-              record:{title:"venta diaria",titleMult:"ventas diarias"},access:"md-sale-day",
-              descripcion:"Muestra un resumen de todas las ventas realizadas durante el día. Permite consultar los detalles de cada venta y realizar ajustes si es necesario.",
-              buildPageConfig:{
-                  ...pageConfig_saleControls({
+                ...pgConfig_SaleControl({
+                    name:"sale-day",
+                    title:"ventas del día",actions:["see","search","update"],
+                    record:{title:"venta diaria",titleMult:"ventas diarias"},
+                    access:"md-sale-day",
+                    descripcion:"Muestra un resumen de todas las ventas realizadas durante el día. Permite consultar los detalles de cada venta y realizar ajustes si es necesario.",
                     filters:[
-                      {name:"status",value:op_sales_status.filter(op=>op.value!=5).map(op=>{return op.show;})},
-                      {name:"emmit-min",value:Date_Today(0)},
-                      {name:"emmit-max",value:Date_Today(0)},
-                    ]
-                  }),
-              },
+                        {name:"status",value:op_sales_status.filter(op=>op.value!=5).map(op=>{return op.show;})},
+                        {name:"emmit-min",value:Date_Today(0)},
+                        {name:"emmit-max",value:Date_Today(0)},
+                    ],
+                }),
             },
             {
-              name:"sale-control",
-              title:"ventas en proceso",actions:["see"],attribute:"day",
-              record:{title:"venta en proceso",titleMult:"ventas en proceso"},
-              descripcion:"Página para gestionar las ventas que aún no han sido finalizadas o que están pendientes de algún paso, como la confirmación de pago o la entrega de productos.",
-              buildPageConfig:{
-                  ...pageConfig_saleControls({
-                    title:"ventas en proceso",
+                ...pgConfig_SaleControl({
+                    name:"sale-control",
+                    title:"ventas en proceso",actions:["see"],attribute:"day",
+                    record:{title:"venta en proceso",titleMult:"ventas en proceso"},
+                    descripcion:"Página para gestionar las ventas que aún no han sido finalizadas o que están pendientes de algún paso, como la confirmación de pago o la entrega de productos.",
                     filters:[
-                      {name:"status",value:op_sales_status.filter(op=>op.value!=5&&op.value!=4).map(op=>{return op.show;})},
-                    ]
-                  }),
-              },
+                        {name:"status",value:op_sales_status.filter(op=>op.value!=5&&op.value!=4).map(op=>{return op.show;})},
+                    ],
+                }),
             },
             {
-                name:"sale-pay",title:"ventas por cobrar",actions:["see"],attribute:"pay",
-                record:{title:"venta en proceso",titleMult:"ventas en proceso"},
-                descripcion:"Página para gestionar las ventas que aún no han sido finalizadas o que están pendientes de algún paso, como la confirmación de pago o la entrega de productos.",
-                buildPageConfig:{
-                    ...pageConfig_saleControls({
-                      title:"ventas por cobrar",dateFilter:false,
-                      filters:[
+                ...pgConfig_SaleControl({
+                    name:"sale-pay",title:"ventas por cobrar",actions:["see"],attribute:"pay",
+                    record:{title:"venta en proceso",titleMult:"ventas en proceso"},
+                    descripcion:"Página para gestionar las ventas que aún no han sido finalizadas o que están pendientes de algún paso, como la confirmación de pago o la entrega de productos.",
+                    filters:[
                         {name:"status",value:op_sales_status.filter(op=>op.value!=5).map(op=>{return op.show;})},
                         {name:"pay",value:op_sales_paid.find(op=>op.value==0).show},
                         {name:"emmit",filter:false},
-                      ]
-                    }),
-                },
+                    ]
+                }),
               },
             {
-              name:"sale-bills",title:"facturas",actions:["see","search"],attribute:"bill",
-              record:{title:"factura",titleMult:"facturas"},access:"md-bills-general",
-              descripcion:"Sección dedicada a la gestión de las facturas generadas por las ventas. Permite consultar facturas emitidas.",
-              buildPageConfig:{
-                  type:"free",
-                  script:(u)=>{return script_bills(u)},
-              }
+                ...pgConfig_Bills({}),
             },
         ],
     },
@@ -1266,14 +848,7 @@ var concepts = [
         descripcion:"Permite administrar la caja diaria, realizar aperturas y cierres de caja, registrar ingresos y egresos, y revisar movimientos.",
         pages:[
             {
-                name:"box",title:"caja",actions:["insert","search","update","see"],access:"md-box-general",
-                descripcion:"Página para administrar los movimientos de caja, donde se pueden realizar la apertura y cierre diario, registrar ingresos y egresos de dinero, y consultar el historial de transacciones.",
-                record:{title:"registro de caja",titleMult:"registros de cajas"},
-                buildPageConfig:{
-                    type:"free",
-                    script:(u)=>{return script_box(u)},
-                    //schema:sch_items,
-                },
+                ...pgConfig_Box({}),
             },
         ],
     },
@@ -1394,7 +969,7 @@ var concepts = [
               descripcion:"Página donde se pueden gestionar los precios de los productos y servicios. Permite actualizar los precios.",
               buildPageConfig:{
                 type:"free",
-                ...pageConfig_items({
+                ...pageBuildConfig_items({
                   title:"lista de precios",
                   fields:[
                     {value:"price",state:"edit"},
@@ -1409,7 +984,7 @@ var concepts = [
               descripcion:"Módulo para el control del inventario. Permite revisar la cantidad de productos disponibles, registrar ajustes de stock",
               buildPageConfig:{
                 type:"free",
-                ...pageConfig_items({
+                ...pageBuildConfig_items({
                   title:"stock de items",
                   fields:[
                     {value:"stock",state:"edit"},
@@ -1425,7 +1000,7 @@ var concepts = [
                 descripcion:"Módulo para la producción de productos a partir de una receta.",
                 buildPageConfig:{
                   type:"free",
-                  ...pageConfig_produccion({}),
+                  ...pageBuildConfig_produccion({}),
                 }
               },
             {
@@ -1457,7 +1032,7 @@ var concepts = [
             record:{title:"venta pagada",titleMult:"ventas pagadas"},
             descripcion:" Página donde se pueden consultar y generar reportes sobre las ventas que han sido pagadas en su totalidad. Permite filtrar por criterios relevantes para el análisis de ventas.",
             buildPageConfig:{
-              ...pageConfig_inform_sales({}),
+              ...pageBuildConfig_inform_sales({}),
             }
           },
           {
@@ -1465,7 +1040,7 @@ var concepts = [
             record:{title:"producto vendido",titleMult:"productos vendidos"},
             descripcion:"Muestra un informe detallado de los productos vendidos en un período determinado. Ayuda a identificar los productos más populares y las tendencias de ventas.",
             buildPageConfig:{
-              ...pageConfig_inform_products({}),
+              ...pageBuildConfig_inform_products({}),
             }
           },
           {
@@ -1473,7 +1048,7 @@ var concepts = [
             record:{title:"cliente frecuente",titleMult:"clientes frecuentes"},
             descripcion:"Sección que muestra un listado de los clientes que han realizado más compras. Permite analizar la lealtad de los clientes y evaluar oportunidades para ofrecer programas de fidelización.",
             buildPageConfig:{
-              ...pageConfig_inform_customer({}),
+              ...pageBuildConfig_inform_customer({}),
             }
           },
           {
@@ -1481,7 +1056,7 @@ var concepts = [
             record:{title:"informe general",titleMult:"flujos de caja"},
             descripcion:"Reporte sobre los movimientos de efectivo en la caja, que incluye ingresos y egresos. Facilita el análisis del flujo de caja diario, semanal o mensual para una mejor gestión financiera.",
             buildPageConfig:{
-              ...pageConfig_inform_flujo({}),
+              ...pageBuildConfig_inform_flujo({}),
             }
           },
         ],
@@ -1495,7 +1070,7 @@ var concepts = [
                 record:{title:"transferencia",titleMult:"transferencias"},access:"md-box-general",
                 descripcion:" Página donde se pueden consultar transferecias de ventas, compras, etc.",
                 buildPageConfig:{
-                  ...pageConfig_payments({}),
+                  ...pageBuildConfig_payments({}),
                 }
             },
             {
