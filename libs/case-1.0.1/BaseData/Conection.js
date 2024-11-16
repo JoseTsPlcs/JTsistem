@@ -35,14 +35,7 @@ class Conection extends ODD {
 
   Request({php, sql=null,success=null,fail=null,name,log=false}){ 
 
-    var arr = window.location.pathname.split('/');
-    var path = "";
-    for (let i = 0; i < arr.length-(2 + (arr.find(a=>a=="JTsistem")?1:0)); i++) {
-      
-      path += "../";
-    }
-    
-    //console.log("----------request:",path,arr); // Retorna el nombre del archivo actual
+    var path = getPath({});
 
     switch (php) {
       case "row":

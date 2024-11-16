@@ -77,6 +77,9 @@ function fieldTypeGet({tipe}) {
     return fieldTypes.find(f=>f.tipe==tipe);
 }
 
+console.log("field type getAAAAAAAAA",fieldTypeGet({tipe:"show"}));
+
+
 
 function crudSetBySchema({crud,userData}) {
 
@@ -529,7 +532,9 @@ class CrudsGroup extends ODD {
     }
 
     #test = true;
-
+    #pageReciveData = null;
+    #cruds=[];
+    #fromPage = null;
     #conections = [];
 
     #Build({userData,pageData,parent,layers=[],cruds=[],conections=[]}){
@@ -543,8 +548,7 @@ class CrudsGroup extends ODD {
         this.#layersBuild({parent,layers,userData});
     };
 
-    #pageReciveData = null;
-    #cruds=[];#fromPage = null;
+    //------cruds------
 
     #crudSetByConections({crud}){
 
@@ -1705,6 +1709,17 @@ class CrudsGroup extends ODD {
 
         return schema.fields.find(f=>f.value==fieldValue).name;
     }
+
+    #getCrudBodyBySchema({schema}){
+
+        return {
+            title:"crudBody",
+            schema,
+            panels:[],
+        }
+    }
+
+    //-------LAYERS---------
 
     #layers = [];
     #parent = null;

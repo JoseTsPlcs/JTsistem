@@ -652,19 +652,6 @@ const sch_checkin_vehicles = {
     ],
 }
 
-function scr_vehicle_fm({parent,userData}) {
-    return {
-        ...scr_base({
-            schema:sch_vehicles,
-            userData,
-            fieldsSet:[],
-            stateGeneral:"edit",
-            parent,
-            panelTipe:"form",
-          }),
-    }
-}
-
 //----transaccions----
 
 const sch_accounts = {

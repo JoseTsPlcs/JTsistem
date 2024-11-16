@@ -815,7 +815,7 @@ function Login({uss,pss,fail}){
                   });
 
 
-                  $.post(window.location.pathname.split('/').pop()+"libs/case-1.0.1/Land/setLogin.php",{userData},function(resp) {
+                  $.post(getPath({})+"libs/case-1.0.1/Land/setLogin.php",{userData},function(resp) {
                   
                     if(controlTest.login) return;
                     

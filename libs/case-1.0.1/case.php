@@ -3,6 +3,9 @@
 
 //$src = "";
 
+
+echo '<script src="'.$src.'Source/Usefull-Config.js"></script>';
+
 echo '<script src="'.$src.'Build/Components/Events_Machine.js"></script>';
 echo '<script src="'.$src.'Build/Components/ODD.js"></script>';
 echo '<script src="'.$src.'Build/Components/Params.js"></script>';
@@ -38,7 +41,6 @@ echo '<script src="'.$src.'Build/Forms/PanelCards.js"></script>';
 echo '<script src="'.$src.'Build/Forms/Crud_Body.js"></script>';
 echo '<script src="'.$src.'Build/Forms/Crud_Body_v2.js"></script>';
 
-echo '<script src="'.$src.'Build/Forms/Layers.js"></script>';
 echo '<script src="'.$src.'Build/Forms/Crud.js"></script>';
 echo '<script src="'.$src.'Build/Forms/CrudBuild.js"></script>';
 
@@ -53,6 +55,7 @@ echo '<script src="'.$src.'Build/Window/windowConection.js"></script>';
 echo '<script src="'.$src.'Build/Window/windowRequest.js"></script>';
 echo '<script src="'.$src.'Build/Window/windowFilters.js"></script>';
 
+echo '<script src="'.$src.'Constructor/Layers.js"></script>';
 echo '<script src="'.$src.'Constructor/ConsCruds.js"></script>';
 echo '<script src="'.$src.'Constructor/ConsInform.js"></script>';
 
