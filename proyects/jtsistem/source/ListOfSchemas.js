@@ -56,6 +56,11 @@ const sch_customers = {
             descripcion:"nro del documento del dni/ruc",
         },
         {
+            value:"sale-doc",name:"documento de venta",
+            select:"ID_SALE_DOCUMENT",access:true,descripcion:"documento para emitir en una venta",
+            tipe:"options",options:op_sales_document,
+        },
+        {
             value:"cel",tags:["main"],
             name:"celular",
             select:'PHONE',
@@ -948,6 +953,7 @@ const sch_sales = {
                 selects:[
                     {table:sch_customers.table,field:sch_customers.fieldPrimary,as:"value"},
                     {table:sch_customers.table,field:"NAME",as:"show"},
+                    {table:sch_customers.table,field:"ID_SALE_DOCUMENT",as:"sale-doc"},
                 ],
             }
         },
