@@ -77,7 +77,7 @@ class BuildPage extends ODD {
         }
     }
 
-    #setGroupScriptNew({schema,mainModVisual,mainTotalVisual,schemaItems,schemaPays,userData,payTag,mainFieldTotal,itemFieldTotal,mainFieldDscto=null,mainFieldTotalDscto=null,mainFieldPay=null,objectInfo}){
+    #setGroupScriptNew({schema,mainModVisual,mainTotalVisual,saleEvents=[],schemaItems,schemaPays,userData,payTag,mainFieldTotal,itemFieldTotal,mainFieldDscto=null,mainFieldTotalDscto=null,mainFieldPay=null,objectInfo}){
     
 
         let u = this;
@@ -244,7 +244,8 @@ class BuildPage extends ODD {
                 k.tutorialPlay({value:"use"});
               }
             }]
-          }
+          },
+          ...saleEvents,
         ];
 
         //object

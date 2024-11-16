@@ -98,6 +98,40 @@ function pgConfig_SaleNew({}) {
                 ],
             }
         },
+        saleEvents:[
+          {
+            name:"customerFilter",
+            actions:[{
+              action:({k})=>{
+
+                var loadData = k.Loaded_GetLoadData({loadName:"ld-customer"});
+                var customerValue = k.bodyGet().fieldGetValues({fieldName:"customer"})[0];
+                var customerInfo = loadData.result.find(rst=>rst.value==customerValue);
+                if(customerInfo){
+
+                  var customerSaleDoc = customerInfo["sale-doc"];
+                  k.bodyGet().fieldSetValues({fieldName:"doc",values:[customerSaleDoc]});
+                  k.Update_AddChangeField({fieldName:"doc",value:customerSaleDoc});
+                }
+                console.log("CUSTOMER FILTER",loadData,customerValue);
+                
+                //var customerInfo =
+              }
+            }]
+          },
+          {
+            name:"printAfter",
+            actions:[{
+              action:({k})=>{k.CallEvent({name:"customerFilter"});}
+            }]
+          },
+          {
+            name:"boxUpdate",
+            actions:[{
+              action:({k,field})=>{if(field.name=="customer")k.CallEvent({name:"customerFilter"});}
+            }]
+          },
+        ],
 
         schemaItems:sch_sales_products,
         schemaPays:sch_sales_pays,
