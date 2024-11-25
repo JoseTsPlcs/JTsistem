@@ -819,85 +819,51 @@ switch ("layerCrud") {
 
     case "layerCrud":
 
-        var group = new CrudsGroup({
-            userData,pageData,
-            layers:[
+        new CrudControl({
+            dataSets:[
                 {
-                    grid:{
-                        items:[
-                            {name:"prnt-main",col:4},
-                            {name:"prnt-items",col:8},
+                    name:"ld-customer",
+                    request:{
+                        tableMain:sch_customers.table,
+                        selects:[
+                            {table:sch_customers.table,field:"ID_CUSTOMER",as:"value"},
+                            {table:sch_customers.table,field:"NAME",as:"show"},
                         ],
-                    }
-                },
-                {
-                    crudBody:{
-                        parent:"prnt-main",
-                        title:"venta",
-                        schema:sch_sales,
-                        panels:[
+                        conditions:[
                             {
-                                title:"main",tipe:"form",
-                                fieldsSet:[
-                                    {value:"emmit",state:"edit"},
-                                    {value:"status",state:"edit"},
-                                    {value:"pay",state:"edit"},
-                                    {value:"customer",state:"edit"},
-                                    {value:"doc",state:"edit"},
-                                ],
+                                table:sch_customers.table,
+                                field:"ID_COMPANY",
+                                inter:"=",
+                                value:1,
                             }
                         ],
                     }
                 },
                 {
-                    crudBody:{
-                        parent:"prnt-items",title:"lista de productos",
-                        schema:sch_sales_products,
-                        panels:[
-                            {
-                                tipe:"table",
-                                fieldsSet:[
-                                    {value:"item",state:"edit"},
-                                    {value:"cant",state:"edit"},
-                                    {value:"priceUnit",state:"edit"},
-                                    {value:"priceTotal",state:"edit"},
-                                ],
-                            }
+                    name:"ld-item",
+                    request:{
+                        tableMain:sch_items.table,
+                        selects:[
+                            {table:sch_items.table,field:sch_items.fieldPrimary,as:"value"},
+                            {sql:("CONCAT("+sch_items.table+".NAME,' (',unids.SIMBOL,')') AS 'show'")},
                         ],
-                    }
-                },
-                {
-                    crudBrain:{
                         joins:[
                             {
-                                crudName:"cr-sale",
-                                field:"ID_SALE",
-                            },
-                            {
-                                crudName:"cr-items",
-                                field:"ID_SALE",
-                            },
+                                main:{table:sch_items.table,field:"UNID_ID"},
+                                join:{table:sch_unids.table,field:sch_unids.fieldPrimary},
+                                tipe:"LEFT",
+                            }
                         ],
-                        events:[
+                        conditions:[
                             {
-                                name:"state-new",
-                                action:{
-                                    //
-                                }
-                            },
-                            {
-                                name:"state-reload",
-                                params:[
-                                    {name:"id_sale"},
-                                ],
-                                action:{
-                                    //reload condition sale
-                                    //reload condition items
-                                }
+                                table:sch_items.table,
+                                field:"ID_COMPANY",
+                                inter:"=",
+                                value:1,
                             }
                         ],
                     }
-                }
+                },
             ],
         });
 

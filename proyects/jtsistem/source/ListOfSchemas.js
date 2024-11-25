@@ -873,7 +873,7 @@ const sch_sales_products = {
         },
         {
             value:"item",
-            name:"producto/servicio",maxWidth:100,
+            name:"producto/servicio",
             select:"ID_PRODUCT",access:true,
             tipe:"optionsSearch",conect:{schema:sch_items,type:"show"},
             descripcion:"producto/servicio de la venta",
