@@ -24,6 +24,7 @@ echo '<script src="'.$src.'Build/Components/EditableImage.js"></script>';
 
 echo '<script src="'.$src.'BaseData/Conection.js"></script>';
 echo '<script src="'.$src.'BaseData/Loads.js"></script>';
+echo '<script src="'.$src.'BaseData/DataSets.js"></script>';
 
 echo '<script src="'.$src.'Build/Modulos/Modulo.js"></script>';
 echo '<script src="'.$src.'Build/Modulos/Window.js"></script>';
@@ -44,11 +45,13 @@ echo '<script src="'.$src.'Build/Forms/Crud_Body_v2.js"></script>';
 echo '<script src="'.$src.'Build/Forms/Crud.js"></script>';
 echo '<script src="'.$src.'Build/Forms/CrudBuild.js"></script>';
 
+echo '<script src="'.$src.'Build/Forms/CrudBrain.js"></script>';
 echo '<script src="'.$src.'Build/Forms/Crud_Form.js"></script>';
 echo '<script src="'.$src.'Build/Forms/Crud_Table.js"></script>';
 echo '<script src="'.$src.'Build/Forms/Crud_Master.js"></script>';
 echo '<script src="'.$src.'Build/Forms/CrudWindow.js"></script>';
 echo '<script src="'.$src.'Build/Forms/Crud_set.js"></script>';
+echo '<script src="'.$src.'Build/Forms/CrudControl.js"></script>';
 
 
 echo '<script src="'.$src.'Build/Window/windowConection.js"></script>';

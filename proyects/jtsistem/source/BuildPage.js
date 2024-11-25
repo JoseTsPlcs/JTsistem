@@ -615,7 +615,7 @@ class BuildPage extends ODD {
         itemsCrud.parent = "prnt-cnx0";
         itemsCrud.panels[0].fields.forEach(f=>f.attributes=[{name:"class",value:"m-0 py-0 px-1"}/*,{name:"style",value:"min-width: 200px"}*/]);
         
-        console.log(showCrud,itemsCrud);
+        //console.log(showCrud,itemsCrud);
         
         this.#group.script.layers.push({crud:itemsCrud});
         this.#group.script.conections.push({
@@ -994,7 +994,7 @@ function getInfoOfSchema({schema,userData,type="select"}) {
 function getCrudType({schema,userData,visualInfo=null,tipe="table",state="edit",dependence=false,modal=false,fieldTotalName=null,line0=false,eventPdf}) {
 
     var total = true;
-    if(tipe=="form" || dependence==true) total = false;
+    if(tipe=="form" || dependence == true) total = false;
     
     //var visualInfo = schema.visuals.find(v=>v.name==visual);
     if(!visualInfo) console.log("no found visual: "+visualInfo,"schema:",schema);
@@ -1129,7 +1129,7 @@ function getCrudType({schema,userData,visualInfo=null,tipe="table",state="edit",
                 {name:"tutorial",show:state=="edit"},
                 {name:"config",show:useFilters},
 
-                {name:"sizes",show:total,value:(total?999:(tipe=="table"?10:1))},
+                {name:"sizes",show:total,value:(total?999:(tipe=="table"?(dependence?999:10):1))},
                 {name:"pages",show:total},
 
                 {name:"insert",show:(tipe=="table"&&state=="edit"&&dependence)},

@@ -207,6 +207,70 @@ class Crud_Body extends ODD {
       return panel.build.fieldGetTutorialElement({fieldName,recordName:this.#recordName,last});
     }
 
+    //------actions------
+
+    #fieldsActions = [];
+    fieldsActionsGet(){return this.#fieldsActions;}
+    fieldAction({type,name,value}){
+
+      switch (type) {
+        case "insert":
+          
+        var values = this.fieldGetValues({fieldName:name});
+        values.push(value);
+        this.fieldSetValues({fieldName:name,values});
+
+        break;
+      
+        default:
+          break;
+      }
+
+      this.#fieldsActions.push({type,name,value});
+    }
+
+    requestGet({schema,type,primary=0}){
+
+      var request = {
+        php:"row",type,
+        config:{
+          tableMain:schema.table,
+        },
+      };
+
+      switch (type) {
+        case "primary":
+
+          request.php = "row";
+          request.config.selects = [
+              {table:request.config.tableMain,field:schema.fieldPrimary,action:"MAX",as:"MAX"},
+          ];
+          
+        break;
+      
+        case "insert":
+
+            request.php = "success";
+            request.config.inserts = this.fieldsGet().filter(f=>f.select!=null).map(f=>{
+
+                return {
+                    field:f.select,
+                    value:this.fieldGetValues({fieldName:f.name}),
+                }
+            });
+            request.config.inserts.push({
+                field:schema.fieldPrimary,
+                value:primary,
+                tipe:"secuence",
+            });
+
+        break;
+      }
+
+      return request;
+    }
+
+    //-------------
 
     #bodyWindow = null;
     bodyWindowGet(){return this.#bodyWindow;}

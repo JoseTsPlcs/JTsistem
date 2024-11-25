@@ -85,7 +85,7 @@ function pageBuildConfig_saleControls({filters,dateFilter=true}) {
   
       eventPdf,
     }
-  }
+}
   
 function pageBuildConfig_items({title,fields=[]}) {
 

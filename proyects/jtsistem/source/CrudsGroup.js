@@ -77,10 +77,6 @@ function fieldTypeGet({tipe}) {
     return fieldTypes.find(f=>f.tipe==tipe);
 }
 
-console.log("field type getAAAAAAAAA",fieldTypeGet({tipe:"show"}));
-
-
-
 function crudSetBySchema({crud,userData}) {
 
     if(crud == null) crud = {};
@@ -1010,7 +1006,7 @@ class CrudsGroup extends ODD {
 
                             console.log("UPDATE MAID SO RELOAD");
                             
-                            u.crudGetBuild({crudName:cnx.masterName}).SetState({stateName:"reload"});
+                            //u.crudGetBuild({crudName:cnx.masterName}).SetState({stateName:"reload"});
                         }
                     });
                 });
