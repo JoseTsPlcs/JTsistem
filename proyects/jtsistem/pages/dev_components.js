@@ -820,50 +820,32 @@ switch ("layerCrud") {
     case "layerCrud":
 
         new CrudControl({
-            dataSets:[
+            schema:sch_sales,
+            panels:[
                 {
-                    name:"ld-customer",
-                    request:{
-                        tableMain:sch_customers.table,
-                        selects:[
-                            {table:sch_customers.table,field:"ID_CUSTOMER",as:"value"},
-                            {table:sch_customers.table,field:"NAME",as:"show"},
-                        ],
-                        conditions:[
-                            {
-                                table:sch_customers.table,
-                                field:"ID_COMPANY",
-                                inter:"=",
-                                value:1,
-                            }
-                        ],
-                    }
+                    tipe:"form",
+                    fields:[
+                        {name:"date"},
+                        {name:"customer"},
+                    ],
+                }
+            ],
+            stateStart:"new",
+            states:[
+                {
+                    name:"reload",
+                    tools:[
+                        {name:"reload",show:true},
+                        {name:"new",show:true},
+                        {name:"sizes",show:true},
+                    ],
                 },
                 {
-                    name:"ld-item",
-                    request:{
-                        tableMain:sch_items.table,
-                        selects:[
-                            {table:sch_items.table,field:sch_items.fieldPrimary,as:"value"},
-                            {sql:("CONCAT("+sch_items.table+".NAME,' (',unids.SIMBOL,')') AS 'show'")},
-                        ],
-                        joins:[
-                            {
-                                main:{table:sch_items.table,field:"UNID_ID"},
-                                join:{table:sch_unids.table,field:sch_unids.fieldPrimary},
-                                tipe:"LEFT",
-                            }
-                        ],
-                        conditions:[
-                            {
-                                table:sch_items.table,
-                                field:"ID_COMPANY",
-                                inter:"=",
-                                value:1,
-                            }
-                        ],
-                    }
-                },
+                    name:"new",
+                    tools:[
+                        {name:"cancel",show:true},
+                    ],
+                }
             ],
         });
 
