@@ -799,7 +799,6 @@ var concepts = [
         descripcion:`Acceso al módulo para gestionar ventas, donde se pueden registrar nuevas ventas, modificar existentes y consultar el historial.`,
         pages:[
             {
-<<<<<<< HEAD
                 name:"sale-new",title:"venta nueva",
                 actions:["insert"],
                 record:{title:"venta nueva",titleMult:"ventas nuevas"},
@@ -817,15 +816,11 @@ var concepts = [
                             {value:"doc",state:"edit"},
                             {value:"comment",state:"edit"},
                             {value:"worker",state:"edit"},
-                            {value:"deliv",state:"edit"},
-                            {value:"deliv-zone",state:"edit"},
-                            {value:"deliv-dir",state:"edit"},
                         ],
                     },
                     mainTotalVisual:{
                         fields:[
                             {value:"totaldscto",state:"show"},
-                            {value:"deliv-cost",state:"edit"},
                             {value:"dscto",state:"edit"},
                             {value:"total",state:"show"},
                         ],
@@ -851,17 +846,14 @@ var concepts = [
                     mainFieldTotalDscto:"totaldscto",
                     mainFieldPay:"pay",
                 },
-=======
-                ...pgConfig_SaleNew({}),
->>>>>>> 1d1f62f (testing new state)
             },
             {
-                ...pgConfig_SaleControl({
-                    name:"sale-day",
-                    title:"ventas del día",actions:["see","search","update"],
-                    record:{title:"venta diaria",titleMult:"ventas diarias"},
-                    access:"md-sale-day",
-                    descripcion:"Muestra un resumen de todas las ventas realizadas durante el día. Permite consultar los detalles de cada venta y realizar ajustes si es necesario.",
+              name:"sale-day",
+              title:"ventas del día",actions:["see","search","update"],
+              record:{title:"venta diaria",titleMult:"ventas diarias"},access:"md-sale-day",
+              descripcion:"Muestra un resumen de todas las ventas realizadas durante el día. Permite consultar los detalles de cada venta y realizar ajustes si es necesario.",
+              buildPageConfig:{
+                  ...pageConfig_saleControls({
                     filters:[
                         {name:"status",value:op_sales_status.filter(op=>op.value!=5).map(op=>{return op.show;})},
                         {name:"emmit-min",value:Date_Today(0)},
@@ -902,28 +894,15 @@ var concepts = [
         descripcion:"Permite administrar la caja diaria, realizar aperturas y cierres de caja, registrar ingresos y egresos, y revisar movimientos.",
         pages:[
             {
-                ...pgConfig_Box({}),
-            },
-        ],
-    },
-    {
-        name:"deliv",title:"delivery",icon:'<i class="bi bi-truck"></i>',
-        descripcion:"Modulo de delivery, asignar zonas de delivery, precios y reporte de deliverys.",
-        pages:[
-            {
-                name:"zone",title:"zonas de entrega",
-                descripcion:"Zonas donde se pueden realizar entregas",
+                name:"box",title:"caja",actions:["insert","search","update","see"],access:"md-box-general",
+                descripcion:"Página para administrar los movimientos de caja, donde se pueden realizar la apertura y cierre diario, registrar ingresos y egresos de dinero, y consultar el historial de transacciones.",
+                record:{title:"registro de caja",titleMult:"registros de cajas"},
                 buildPageConfig:{
-                    ...pageCofig_zones({}),
+                    type:"free",
+                    script:(u)=>{return script_box(u)},
+                    //schema:sch_items,
                 },
             },
-            {
-                name:"deliverys",title:"deliverys",
-                descripcion:"Reporte de deliverys entregados, en proceso o pendientes",
-                buildPageConfig:{
-                    ...pageCofig_deliverys({}),
-                },
-            }
         ],
     },
     {

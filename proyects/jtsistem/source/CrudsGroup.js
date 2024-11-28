@@ -1008,7 +1008,10 @@ class CrudsGroup extends ODD {
 =======
                             console.log("UPDATE MAID SO RELOAD");
                             
+<<<<<<< HEAD
 >>>>>>> 07e322c (usefull pdf fixed multiple lines)
+=======
+>>>>>>> devep
                             //u.crudGetBuild({crudName:cnx.masterName}).SetState({stateName:"reload"});
                         }
                     });

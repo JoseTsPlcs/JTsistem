@@ -1,6 +1,7 @@
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 function pageCofig_zones({}) {
     
     return {
@@ -58,6 +59,8 @@ function pageCofig_deliverys({}) {
     }
 }
 =======
+=======
+>>>>>>> devep
 function pgConfig_SaleNew({}) {
   
   return {
@@ -950,4 +953,7 @@ function script_box({userData,build}) {
       ],
   }
 }
+<<<<<<< HEAD
 >>>>>>> 1d1f62f (testing new state)
+=======
+>>>>>>> devep
